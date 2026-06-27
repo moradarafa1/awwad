@@ -39,6 +39,9 @@ admin/.astro/
 supabase/.branches/
 supabase/.temp/
 
+# ===== Claude / local session =====
+.claude/
+
 # ===== OS / Editor =====
 .DS_Store
 Thumbs.db
