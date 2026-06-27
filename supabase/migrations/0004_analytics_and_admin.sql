@@ -106,7 +106,7 @@ stable
 security definer
 set search_path = public, pg_temp
 as $$
-  select b.key, b.tier, count(e.id)::int
+  select b.key, b.tier, count(e.id)::int as earned
   from public.badge_definitions b
   left join public.earned_badges e on e.badge_key = b.key
   where public.is_admin()
