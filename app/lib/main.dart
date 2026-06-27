@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,21 +13,32 @@ import 'core/state/app_state.dart';
 import 'features/onboarding/onboarding_flow.dart';
 import 'features/home/home_shell.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  final store = LocalStore(prefs);
-  // Cloud auth/sync is optional — no-op unless SUPABASE_URL/ANON_KEY are defined.
-  await SupabaseService.init();
-  AnalyticsService.instance
-      .track('app_opened', {'is_first_open': store.loadHabit() == null});
+void main() {
+  // runZonedGuarded so that any async error from optional cloud init (or any
+  // plugin) can NEVER tear down the offline-first UI.
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    final prefs = await SharedPreferences.getInstance();
+    final store = LocalStore(prefs);
+    AnalyticsService.instance
+        .track('app_opened', {'is_first_open': store.loadHabit() == null});
 
-  runApp(
-    ProviderScope(
-      overrides: [localStoreProvider.overrideWithValue(store)],
-      child: const AwwadApp(),
-    ),
-  );
+    // Paint the UI FIRST — the app is fully usable offline.
+    runApp(
+      ProviderScope(
+        overrides: [localStoreProvider.overrideWithValue(store)],
+        child: const AwwadApp(),
+      ),
+    );
+
+    // Initialize cloud AFTER the first frame; failures are swallowed by the zone.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(SupabaseService.init());
+    });
+  }, (error, stack) {
+    // Cloud/async errors must not crash the app. (Logged in debug only.)
+    debugPrint('Awwad zone error (ignored): $error');
+  });
 }
 
 class AwwadApp extends ConsumerWidget {

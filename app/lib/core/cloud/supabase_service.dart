@@ -22,9 +22,16 @@ class SupabaseService {
 
   static Future<void> init() async {
     if (!configured || _inited) return;
-    // _anon holds the public anon/publishable key (passed via --dart-define).
-    await Supabase.initialize(url: _url, publishableKey: _anon);
-    _inited = true;
+    // _anon holds the legacy public anon JWT (passed via --dart-define).
+    // Use anonKey (not publishableKey): our project uses the legacy JWT key,
+    // and passing it as publishableKey breaks initialize on web.
+    try {
+      // ignore: deprecated_member_use
+      await Supabase.initialize(url: _url, anonKey: _anon);
+      _inited = true;
+    } catch (_) {
+      // Leave _inited=false → app stays offline; retried lazily on sign-in.
+    }
   }
 
   static SupabaseClient get client => Supabase.instance.client;
@@ -37,7 +44,8 @@ class SupabaseService {
     required String email,
     required String password,
     String locale = 'ar',
-  }) {
+  }) async {
+    await init();
     return client.auth.signUp(
       email: email,
       password: password,
@@ -45,12 +53,15 @@ class SupabaseService {
     );
   }
 
-  static Future<AuthResponse> signInWithPassword(String email, String password) {
+  static Future<AuthResponse> signInWithPassword(
+      String email, String password) async {
+    await init();
     return client.auth.signInWithPassword(email: email, password: password);
   }
 
   /// Sends a 6-digit email OTP to an already-registered user (never creates one).
-  static Future<void> sendLoginOtp(String email) {
+  static Future<void> sendLoginOtp(String email) async {
+    await init();
     return client.auth.signInWithOtp(email: email, shouldCreateUser: false);
   }
 
