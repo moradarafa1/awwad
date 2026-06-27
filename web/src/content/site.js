@@ -1,0 +1,286 @@
+// Trilingual content for the Awwad marketing site.
+// Aligned with docs/content-values-guideline.md. The Flutter app is the product;
+// this static site carries SEO + the store-required legal pages.
+
+export const LOCALES = ['ar', 'en', 'fr'];
+export const DIR = { ar: 'rtl', en: 'ltr', fr: 'ltr' };
+export const LANG_NAME = { ar: 'العربية', en: 'English', fr: 'Français' };
+export const OG_LOCALE = { ar: 'ar_AR', en: 'en_US', fr: 'fr_FR' };
+
+// Page keys -> URL slug (home = '').
+export const PAGES = {
+  home: '',
+  'break-habit': 'break-habit',
+  'build-habit': 'build-habit',
+  privacy: 'privacy',
+  terms: 'terms',
+  'delete-account': 'delete-account',
+};
+
+export const LINKEDIN = 'https://www.linkedin.com/in/moradarafa/';
+
+export const t = {
+  ar: {
+    brand: 'عوّاد',
+    slogan: 'عوّاد.. دايماً بالخير.',
+    nav: { home: 'الرئيسية', break: 'اكسر عادة', build: 'ابنِ عادة', privacy: 'الخصوصية', terms: 'الشروط' },
+    footer_rights: 'جميع الحقوق محفوظة',
+    footer_disclaimer: 'عوّاد أداة دعم سلوكي ومتابعة، وليست بديلاً عن الاستشارة الطبية أو النفسية المتخصّصة.',
+    cta_download: 'حمّل التطبيق',
+    pages: {
+      home: {
+        title: 'عوّاد — اكسر عادة سيّئة أو ابنِ عادة جديدة',
+        description: 'تطبيق عربي يساعدك تتخلّص من عادة سيّئة أو تبني عادة جديدة، بمنهج علمي (HRT) وروح داعمة متوافقة مع قيمك. مجاني، خصوصية كاملة، ويعمل بدون نت.',
+        h1: 'اكسر عادة سيّئة، أو ابنِ عادة جديدة',
+        sub: 'رفيقك اليومي لتغيير العادات — خطوة واحدة كل يوم، بمنهج علمي وروح داعمة.',
+        tracks: [
+          { icon: '🚭', title: 'اكسر عادة', desc: 'تدخين، قضم أظافر، تسويف، موبايل... نتعامل معها بوعي وبمنهج Habit Reversal Training.', href: 'break-habit' },
+          { icon: '🌱', title: 'ابنِ عادة جديدة', desc: 'صلاة في وقتها، ورد قرآن، رياضة، قراءة... ثبّت العادة الكويسة بالسلاسل والتحفيز.', href: 'build-habit' },
+        ],
+        features: [
+          { icon: '🔒', h: 'خصوصية كاملة', p: 'ملفك خاص بك، لا يراه أحد. تسجيل بإيميل واسم وكلمة مرور فقط.' },
+          { icon: '🏅', h: 'دروع وتحفيز', p: 'كل ما تكمّل أيام، تكسب درعاً — فضي ٣٠، ذهبي ٦٠، ماسي ٩٠.' },
+          { icon: '🌙', h: 'متوافق مع قيمك', p: 'محتوى يحثّ على الخير، مع قوالب عادات إسلامية اختيارية.' },
+          { icon: '📶', h: 'يعمل بدون نت', p: 'سجّل يومك في أي وقت، ويتزامن لما يرجع الاتصال.' },
+        ],
+        sectionTitle: 'مساران، طريقك أنت',
+        featuresTitle: 'مصمَّم عشان تنجح',
+      },
+      'break-habit': {
+        title: 'اكسر عادة سيّئة — منهج HRT | عوّاد',
+        description: 'تخلّص من عادة سيّئة (تدخين، قضم أظافر، نتف الشعر، إدمان الموبايل) بمنهج Habit Reversal Training: وعي ثم استجابة بديلة ثم تحكّم في البيئة ثم تثبيت.',
+        h1: 'اكسر العادة السيّئة بمنهج علمي',
+        intro: 'الـ Habit Reversal Training منهج معتمد لتغيير العادات القهرية. عوّاد بيطبّقه معاك على ٤ مراحل واضحة.',
+        blocks: [
+          { h: '١) الوعي', p: 'ترصد وتسجّل متى وأين وليه بتحصل العادة — أول خطوة وأهمها.' },
+          { h: '٢) الاستجابة التنافسية', p: 'تتدرّب على سلوك بديل يمنع العادة لحظة الرغبة.' },
+          { h: '٣) التحكم في البيئة', p: 'تعدّل محيطك عشان تقلّل المحفّزات.' },
+          { h: '٤) التثبيت', p: 'تراجع وتثبّت اللي بينفع وتحافظ على تقدّمك.' },
+        ],
+      },
+      'build-habit': {
+        title: 'ابنِ عادة جديدة وثبّتها | عوّاد',
+        description: 'ابنِ عادة جديدة (صلاة، قرآن، رياضة، قراءة) وثبّتها بنظام السلاسل (Streak) والتذكير اليومي والتحفيز — مع قوالب عادات إسلامية اختيارية.',
+        h1: 'ابنِ عادتك الجديدة وثبّتها',
+        intro: 'العادة الجديدة بتتثبّت بالتكرار والتشجيع. عوّاد بيساعدك تحافظ على سلسلتك يوماً بعد يوم.',
+        blocks: [
+          { h: 'حدّد نيّتك ودافعك', p: 'اكتب "ليه" عايز العادة دي — هتفكّرك في وقت الفتور.' },
+          { h: 'سلسلة يومية (Streak)', p: 'كل يوم تكمّله يبني سلسلتك ويقرّبك من الدرع الجاي.' },
+          { h: 'تذكير لطيف', p: 'تذكير يومي بوقت تختاره، يراعي أوقات الصلاة.' },
+          { h: 'قوالب جاهزة', p: 'صلاة في وقتها، ورد قرآن، أذكار، رياضة، قراءة... أو عادتك الخاصة.' },
+        ],
+      },
+      privacy: {
+        title: 'سياسة الخصوصية | عوّاد',
+        description: 'سياسة خصوصية عوّاد: ما نجمعه، كيف نستخدمه، وحقوقك في بياناتك.',
+        h1: 'سياسة الخصوصية',
+        blocks: [
+          { h: 'البيانات التي نجمعها', p: 'بيانات الحساب (الاسم، الإيميل، كلمة مرور مشفّرة)، وبيانات متابعتك للعادة التي تُدخلها أنت، وبيانات استخدام مجهّلة لتحسين التجربة. الاستبيان في بداية الاستخدام اختياري بالكامل.' },
+          { h: 'كيف نستخدمها', p: 'لتشغيل حسابك ومزامنة بياناتك عبر أجهزتك، ولفهم وتحسين التجربة. لا نبيع بياناتك ولا نشاركها لأغراض إعلانية.' },
+          { h: 'بيانات البحث الاختيارية', p: 'إذا وافقت على الاستبيان، قد يراجع فريقنا إجاباتك (بشكل مجمّع أو فردي) لأغراض البحث وتحسين المنتج. يمكنك تجاوز الاستبيان دون أي تأثير على استخدامك.' },
+          { h: 'مزوّدو الخدمة', p: 'نستخدم Supabase لتخزين البيانات والمصادقة، وFirebase Cloud Messaging للإشعارات. تخضع هذه الخدمات لسياساتها الخاصة، ونقتصر على الحد اللازم.' },
+          { h: 'حقوقك', p: 'يمكنك تصدير بياناتك أو حذف حسابك وكل بياناتك في أي وقت من داخل التطبيق أو عبر صفحة حذف الحساب.' },
+          { h: 'تواصل', p: 'لأي استفسار حول الخصوصية: olenshop.sa@gmail.com' },
+        ],
+      },
+      terms: {
+        title: 'الشروط والأحكام | عوّاد',
+        description: 'شروط استخدام تطبيق عوّاد.',
+        h1: 'الشروط والأحكام',
+        blocks: [
+          { h: 'طبيعة الخدمة', p: 'عوّاد أداة دعم سلوكي ومتابعة ذاتية، وليست خدمة طبية أو نفسية. لا تُعدّ بديلاً عن استشارة مختصّ.' },
+          { h: 'الاستخدام', p: 'أنت مسؤول عن سرّية حسابك ودقّة بياناتك. يُمنع إساءة استخدام الخدمة.' },
+          { h: 'مجاني الآن', p: 'الخدمة مجانية حالياً وغير هادفة للربح. قد نُضيف باقات اشتراك اختيارية مستقبلاً، وسنُعلمك قبل أي تغيير.' },
+          { h: 'المحتوى الديني', p: 'المحتوى التحفيزي للتذكير فقط. أي إشارة لمسألة شرعية مصدرها موقع إسلام ويب، والرجوع لأهل العلم للفتوى.' },
+          { h: 'إخلاء المسؤولية', p: 'نقدّم الخدمة "كما هي" دون ضمانات. لا نتحمّل مسؤولية أي قرار تتخذه بناءً على التطبيق.' },
+        ],
+      },
+      'delete-account': {
+        title: 'حذف الحساب | عوّاد',
+        description: 'كيفية حذف حسابك وبياناتك في عوّاد نهائياً.',
+        h1: 'حذف الحساب والبيانات',
+        blocks: [
+          { h: 'من داخل التطبيق', p: 'افتح: الإعدادات ← الحساب ← حذف الحساب. سيتم حذف حسابك وكل بياناتك (العادات، التسجيلات، الدروع) نهائياً ولا يمكن التراجع.' },
+          { h: 'بدون تسجيل دخول', p: 'لو لم تعد تستطيع الدخول، أرسل طلباً من البريد المسجّل إلى olenshop.sa@gmail.com بعنوان "حذف حساب"، وسنؤكّد هويتك عبر بريدك ثم نحذف كل بياناتك خلال مدة قصيرة.' },
+          { h: 'ما الذي يُحذف', p: 'كل بياناتك الشخصية وبيانات المتابعة والأجهزة الموثوقة وسجلّات الاستخدام المرتبطة بك.' },
+        ],
+      },
+    },
+  },
+
+  en: {
+    brand: 'Awwad',
+    slogan: 'Awwad — always for the better.',
+    nav: { home: 'Home', break: 'Break a habit', build: 'Build a habit', privacy: 'Privacy', terms: 'Terms' },
+    footer_rights: 'All rights reserved',
+    footer_disclaimer: 'Awwad is a behavioral support and tracking tool, not a substitute for professional medical or psychological advice.',
+    cta_download: 'Get the app',
+    pages: {
+      home: {
+        title: 'Awwad — Break a bad habit or build a new one',
+        description: 'An app that helps you break a bad habit or build a new one with an evidence-based method (HRT) and a supportive, values-aligned tone. Free, private, works offline.',
+        h1: 'Break a bad habit, or build a new one',
+        sub: 'Your daily companion for changing habits — one step a day, with a proven method and a supportive spirit.',
+        tracks: [
+          { icon: '🚭', title: 'Break a habit', desc: 'Smoking, nail-biting, procrastination, phone... handled with awareness and Habit Reversal Training.', href: 'break-habit' },
+          { icon: '🌱', title: 'Build a new habit', desc: 'Prayer on time, daily reading, exercise... make the good habit stick with streaks and motivation.', href: 'build-habit' },
+        ],
+        features: [
+          { icon: '🔒', h: 'Fully private', p: 'Your profile is yours alone. Sign up with just name, email and password.' },
+          { icon: '🏅', h: 'Badges & motivation', p: 'Earn shields as you progress — silver at 30, gold at 60, diamond at 90 days.' },
+          { icon: '🌙', h: 'Values-aligned', p: 'Encouraging content, with optional faith-based habit templates.' },
+          { icon: '📶', h: 'Works offline', p: 'Log your day anytime; it syncs when you reconnect.' },
+        ],
+        sectionTitle: 'Two tracks, your path',
+        featuresTitle: 'Built so you succeed',
+      },
+      'break-habit': {
+        title: 'Break a bad habit — the HRT method | Awwad',
+        description: 'Break a bad habit (smoking, nail-biting, hair-pulling, phone addiction) with Habit Reversal Training: awareness, competing response, environment control, then maintenance.',
+        h1: 'Break the habit with a proven method',
+        intro: 'Habit Reversal Training is an evidence-based method for changing compulsive habits. Awwad walks you through 4 clear phases.',
+        blocks: [
+          { h: '1) Awareness', p: 'Notice and log when, where and why the habit happens — the first and most important step.' },
+          { h: '2) Competing response', p: 'Practice an alternative behavior that blocks the habit at the moment of urge.' },
+          { h: '3) Environment control', p: 'Adjust your surroundings to reduce triggers.' },
+          { h: '4) Maintenance', p: 'Review, keep what works, and protect your progress.' },
+        ],
+      },
+      'build-habit': {
+        title: 'Build a new habit that sticks | Awwad',
+        description: 'Build a new habit (prayer, reading, exercise) and make it stick with streaks, daily reminders and motivation — plus optional faith-based templates.',
+        h1: 'Build your new habit and make it stick',
+        intro: 'New habits stick through repetition and encouragement. Awwad helps you protect your streak day after day.',
+        blocks: [
+          { h: 'Set your why', p: 'Write down why you want this habit — it reminds you when motivation dips.' },
+          { h: 'Daily streak', p: 'Each completed day builds your streak and brings the next badge closer.' },
+          { h: 'Gentle reminder', p: 'A daily reminder at a time you choose, mindful of prayer times.' },
+          { h: 'Ready templates', p: 'Prayer, reading, exercise, dhikr... or your own custom habit.' },
+        ],
+      },
+      privacy: {
+        title: 'Privacy Policy | Awwad',
+        description: 'Awwad privacy policy: what we collect, how we use it, and your rights.',
+        h1: 'Privacy Policy',
+        blocks: [
+          { h: 'Data we collect', p: 'Account data (name, email, hashed password), the habit-tracking data you enter, and anonymized usage data to improve the experience. The optional onboarding survey is entirely voluntary.' },
+          { h: 'How we use it', p: 'To run your account and sync data across devices, and to understand and improve the experience. We never sell your data or share it for advertising.' },
+          { h: 'Optional research data', p: 'If you consent to the survey, our team may review your answers (aggregated or individually) for research and product improvement. You can skip the survey with no impact on your use.' },
+          { h: 'Service providers', p: 'We use Supabase for storage and authentication, and Firebase Cloud Messaging for notifications, limited to what is necessary.' },
+          { h: 'Your rights', p: 'You can export your data or delete your account and all data at any time, from the app or via the account-deletion page.' },
+          { h: 'Contact', p: 'For privacy questions: olenshop.sa@gmail.com' },
+        ],
+      },
+      terms: {
+        title: 'Terms of Service | Awwad',
+        description: 'Terms of use for the Awwad app.',
+        h1: 'Terms of Service',
+        blocks: [
+          { h: 'Nature of the service', p: 'Awwad is a behavioral self-help and tracking tool, not a medical or psychological service, and not a substitute for a professional.' },
+          { h: 'Use', p: 'You are responsible for the confidentiality of your account and the accuracy of your data. Misuse is prohibited.' },
+          { h: 'Free for now', p: 'The service is currently free and not-for-profit. Optional subscriptions may be added later; we will notify you before any change.' },
+          { h: 'Religious content', p: 'Motivational content is for reminder only. Any reference to a religious ruling is sourced from IslamWeb; consult qualified scholars for fatwa.' },
+          { h: 'Disclaimer', p: 'The service is provided "as is" without warranty. We are not liable for decisions you make based on the app.' },
+        ],
+      },
+      'delete-account': {
+        title: 'Delete your account | Awwad',
+        description: 'How to permanently delete your Awwad account and data.',
+        h1: 'Delete account and data',
+        blocks: [
+          { h: 'From inside the app', p: 'Open: Settings → Account → Delete account. Your account and all data (habits, logs, badges) are permanently deleted and cannot be recovered.' },
+          { h: 'Without signing in', p: 'If you can no longer sign in, email a request from your registered address to olenshop.sa@gmail.com with subject "Delete account". We verify you via your email, then delete all your data shortly after.' },
+          { h: 'What is deleted', p: 'All your personal data, tracking data, trusted devices, and usage records linked to you.' },
+        ],
+      },
+    },
+  },
+
+  fr: {
+    brand: 'Awwad',
+    slogan: 'Awwad — toujours pour le meilleur.',
+    nav: { home: 'Accueil', break: 'Arrêter une habitude', build: 'Bâtir une habitude', privacy: 'Confidentialité', terms: 'Conditions' },
+    footer_rights: 'Tous droits réservés',
+    footer_disclaimer: "Awwad est un outil de soutien comportemental et de suivi, et non un substitut à un avis médical ou psychologique professionnel.",
+    cta_download: "Obtenir l'app",
+    pages: {
+      home: {
+        title: 'Awwad — Arrêtez une mauvaise habitude ou bâtissez-en une nouvelle',
+        description: "Une app qui vous aide à arrêter une mauvaise habitude ou à en bâtir une nouvelle avec une méthode éprouvée (HRT) et un ton bienveillant aligné sur vos valeurs. Gratuit, privé, hors ligne.",
+        h1: 'Arrêtez une mauvaise habitude, ou bâtissez-en une nouvelle',
+        sub: "Votre compagnon quotidien pour changer vos habitudes — un pas par jour, avec une méthode éprouvée.",
+        tracks: [
+          { icon: '🚭', title: 'Arrêter une habitude', desc: 'Tabac, ongles rongés, procrastination, téléphone... avec la méthode Habit Reversal Training.', href: 'break-habit' },
+          { icon: '🌱', title: 'Bâtir une habitude', desc: 'Prière à l\'heure, lecture, sport... ancrez la bonne habitude avec des séries et de la motivation.', href: 'build-habit' },
+        ],
+        features: [
+          { icon: '🔒', h: 'Totalement privé', p: 'Votre profil n\'appartient qu\'à vous. Inscription avec nom, e-mail et mot de passe.' },
+          { icon: '🏅', h: 'Badges & motivation', p: 'Gagnez des boucliers : argent à 30, or à 60, diamant à 90 jours.' },
+          { icon: '🌙', h: 'Aligné sur vos valeurs', p: 'Un contenu encourageant, avec des modèles d\'habitudes religieuses optionnels.' },
+          { icon: '📶', h: 'Fonctionne hors ligne', p: 'Enregistrez votre journée à tout moment ; synchronisation au retour du réseau.' },
+        ],
+        sectionTitle: 'Deux parcours, votre chemin',
+        featuresTitle: 'Conçu pour votre réussite',
+      },
+      'break-habit': {
+        title: 'Arrêter une mauvaise habitude — méthode HRT | Awwad',
+        description: "Arrêtez une mauvaise habitude (tabac, ongles, cheveux, téléphone) avec la méthode Habit Reversal Training : prise de conscience, réponse alternative, contrôle de l'environnement, puis maintien.",
+        h1: 'Arrêtez l\'habitude avec une méthode éprouvée',
+        intro: "Le Habit Reversal Training est une méthode reconnue pour changer les habitudes compulsives. Awwad vous guide en 4 phases claires.",
+        blocks: [
+          { h: '1) Prise de conscience', p: 'Repérez et notez quand, où et pourquoi l\'habitude survient — l\'étape la plus importante.' },
+          { h: '2) Réponse alternative', p: 'Entraînez un comportement de remplacement au moment de l\'envie.' },
+          { h: '3) Contrôle de l\'environnement', p: 'Ajustez votre entourage pour réduire les déclencheurs.' },
+          { h: '4) Maintien', p: 'Révisez, gardez ce qui marche et protégez vos progrès.' },
+        ],
+      },
+      'build-habit': {
+        title: 'Bâtir une nouvelle habitude durable | Awwad',
+        description: "Bâtissez une nouvelle habitude (prière, lecture, sport) et ancrez-la avec des séries, des rappels quotidiens et de la motivation — modèles religieux optionnels.",
+        h1: 'Bâtissez votre nouvelle habitude',
+        intro: "Les nouvelles habitudes s'ancrent par la répétition et l'encouragement. Awwad vous aide à protéger votre série jour après jour.",
+        blocks: [
+          { h: 'Définissez votre pourquoi', p: 'Écrivez pourquoi vous voulez cette habitude — un rappel dans les moments de baisse.' },
+          { h: 'Série quotidienne', p: 'Chaque jour complété construit votre série et rapproche le prochain badge.' },
+          { h: 'Rappel bienveillant', p: 'Un rappel quotidien à l\'heure de votre choix, respectueux des heures de prière.' },
+          { h: 'Modèles prêts', p: 'Prière, lecture, sport, dhikr... ou votre habitude personnalisée.' },
+        ],
+      },
+      privacy: {
+        title: 'Politique de confidentialité | Awwad',
+        description: 'Politique de confidentialité d\'Awwad : ce que nous collectons, comment nous l\'utilisons et vos droits.',
+        h1: 'Politique de confidentialité',
+        blocks: [
+          { h: 'Données collectées', p: 'Données de compte (nom, e-mail, mot de passe haché), vos données de suivi que vous saisissez, et des données d\'usage anonymisées. Le questionnaire initial est entièrement facultatif.' },
+          { h: 'Utilisation', p: 'Pour faire fonctionner votre compte et synchroniser vos données, et pour améliorer l\'expérience. Nous ne vendons jamais vos données et ne les partageons pas à des fins publicitaires.' },
+          { h: 'Données de recherche optionnelles', p: 'Si vous consentez au questionnaire, notre équipe peut consulter vos réponses (agrégées ou individuelles) à des fins de recherche et d\'amélioration. Vous pouvez le passer sans conséquence.' },
+          { h: 'Prestataires', p: 'Nous utilisons Supabase (stockage et authentification) et Firebase Cloud Messaging (notifications), au strict nécessaire.' },
+          { h: 'Vos droits', p: 'Vous pouvez exporter vos données ou supprimer votre compte et toutes vos données à tout moment, depuis l\'app ou la page de suppression de compte.' },
+          { h: 'Contact', p: 'Pour toute question : olenshop.sa@gmail.com' },
+        ],
+      },
+      terms: {
+        title: 'Conditions d\'utilisation | Awwad',
+        description: 'Conditions d\'utilisation de l\'application Awwad.',
+        h1: 'Conditions d\'utilisation',
+        blocks: [
+          { h: 'Nature du service', p: 'Awwad est un outil d\'auto-assistance comportementale et de suivi, ni un service médical ni psychologique, et non un substitut à un professionnel.' },
+          { h: 'Utilisation', p: 'Vous êtes responsable de la confidentialité de votre compte et de l\'exactitude de vos données. Tout usage abusif est interdit.' },
+          { h: 'Gratuit pour l\'instant', p: 'Le service est actuellement gratuit et sans but lucratif. Des abonnements optionnels pourront être ajoutés ; vous serez prévenu avant tout changement.' },
+          { h: 'Contenu religieux', p: 'Le contenu motivant est un simple rappel. Toute référence à une règle religieuse provient d\'IslamWeb ; consultez des savants qualifiés pour une fatwa.' },
+          { h: 'Avis de non-responsabilité', p: 'Le service est fourni « tel quel » sans garantie. Nous ne sommes pas responsables des décisions prises sur la base de l\'app.' },
+        ],
+      },
+      'delete-account': {
+        title: 'Supprimer votre compte | Awwad',
+        description: 'Comment supprimer définitivement votre compte et vos données Awwad.',
+        h1: 'Supprimer le compte et les données',
+        blocks: [
+          { h: 'Depuis l\'application', p: 'Ouvrez : Réglages → Compte → Supprimer le compte. Votre compte et toutes vos données (habitudes, journaux, badges) sont supprimés définitivement et irréversiblement.' },
+          { h: 'Sans connexion', p: 'Si vous ne pouvez plus vous connecter, envoyez une demande depuis votre adresse enregistrée à olenshop.sa@gmail.com avec l\'objet « Supprimer le compte ». Nous vous vérifions par e-mail, puis supprimons vos données.' },
+          { h: 'Ce qui est supprimé', p: 'Toutes vos données personnelles, de suivi, vos appareils de confiance et les journaux d\'usage liés à vous.' },
+        ],
+      },
+    },
+  },
+};

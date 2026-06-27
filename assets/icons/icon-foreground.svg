@@ -1,0 +1,15 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+  <!-- content kept within the central safe zone for Android adaptive icons -->
+  <g transform="translate(0,40)">
+    <path d="M512 700 C512 596 512 524 512 478" stroke="#22C55E" stroke-width="34" stroke-linecap="round" fill="none"/>
+    <path d="M512 524 C424 524 356 476 326 388 C424 368 502 416 514 502 Z" fill="url(#leaf)"/>
+    <path d="M512 486 C600 476 684 418 706 322 C600 310 520 366 512 464 Z" fill="url(#leaf)"/>
+    <path d="M372 712 C430 740 596 740 652 712" stroke="#4F8EF7" stroke-width="26" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

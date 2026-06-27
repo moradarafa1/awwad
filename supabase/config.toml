@@ -1,0 +1,59 @@
+# Supabase local config for Awwad. `supabase start` reads this.
+project_id = "awwad"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]            # local email testing (catches OTP mails in dev)
+enabled = true
+port = 54324
+
+[auth]
+enabled = true
+site_url = "http://localhost:8099"
+additional_redirect_urls = ["http://localhost:8099", "https://app.awwad.app"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true       # verify email on signup
+secure_password_change = true
+otp_expiry = 900                  # 15 minutes
+max_frequency = "60s"             # OTP resend cooldown
+
+# In production, configure custom SMTP (Brevo) here / in the dashboard.
+# Built-in SMTP is capped at ~2/hour and only mails your team — unusable for OTP.
+# [auth.email.smtp]
+#   host = "smtp-relay.brevo.com"
+#   port = 587
+#   user = "env(BREVO_SMTP_USER)"
+#   pass = "env(BREVO_SMTP_PASS)"
+#   admin_email = "no-reply@awwad.app"
+#   sender_name = "عوّاد Awwad"
+
+[functions.login-guard]
+verify_jwt = false   # we verify the JWT manually inside (need raw token + device secret)
+[functions.register-trusted-device]
+verify_jwt = true
+[functions.award-badges]
+verify_jwt = true
+[functions.account-export-delete]
+verify_jwt = false   # supports a logged-out email-verified delete path
+[functions.send-engagement]
+verify_jwt = false   # invoked by cron/service, not end users

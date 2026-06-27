@@ -1,0 +1,32 @@
+# Supabase keep-alive — prevents the free project from PAUSING after 7 days
+# of no DB activity. Copy this file to `.github/workflows/keep-alive.yml` in a
+# PUBLIC GitHub repo (public-repo Actions minutes are free).
+#
+# IMPORTANT (defense in depth): GitHub disables scheduled workflows after 60 days
+# of repo inactivity, and cron is best-effort. So ALSO set up a second independent
+# pinger (cron-job.org, free) hitting the same URL, AND a free UptimeRobot monitor
+# on the health endpoint so you're emailed if the project ever goes down.
+#
+# Required repo secrets:
+#   SUPABASE_URL       e.g. https://xxxx.supabase.co
+#   SUPABASE_ANON_KEY  the project anon/public key
+
+name: supabase-keep-alive
+on:
+  schedule:
+    - cron: '17 6 */3 * *' # every 3 days at 06:17 UTC (well under the 7-day limit)
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase (real authenticated SELECT keeps the DB warm)
+        run: |
+          set -e
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/habit_catalog?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          echo "HTTP $code"
+          test "$code" = "200"

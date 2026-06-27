@@ -1,0 +1,4 @@
+# The Flutter web app (app.<domain>) is the product, NOT SEO content.
+# Keep it out of search so it never competes with the marketing site.
+User-agent: *
+Disallow: /

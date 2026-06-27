@@ -1,0 +1,48 @@
+# ===== Secrets / env =====
+.env
+.env.*
+!.env.example
+**/secrets.*
+service-role-key*
+admin/config.js
+ops/deploy.env
+*.keystore
+*.jks
+key.properties
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+app/lib/firebase_options.dart
+
+# ===== Flutter / Dart =====
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/build/
+app/.pub-cache/
+app/.pub/
+app/**/*.g.dart.lock
+app/ios/Pods/
+app/ios/.symlinks/
+app/android/.gradle/
+app/android/local.properties
+app/**/generated_plugin_registrant.*
+
+# ===== Node / Astro =====
+node_modules/
+web/dist/
+web/.astro/
+admin/dist/
+admin/.astro/
+.cache/
+
+# ===== Supabase =====
+supabase/.branches/
+supabase/.temp/
+
+# ===== OS / Editor =====
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log

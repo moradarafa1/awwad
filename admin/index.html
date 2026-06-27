@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>عوّاد — لوحة الأدمن</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#0d1117;--surface:#161b22;--border:#2a3441;--accent:#4f8ef7;--accent2:#2dd4bf;--accent3:#f59e0b;--text:#e2e8f0;--muted:#7a8899;--heading:#f0f6ff;--success:#22c55e;--danger:#ef4444;}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',sans-serif;}
+    body{background:var(--bg);color:var(--text);min-height:100vh;}
+    .wrap{max-width:1000px;margin:0 auto;padding:28px 18px 60px;}
+    h1{color:var(--heading);font-size:24px;}
+    .muted{color:var(--muted);font-size:13px;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+    .stat{text-align:center;}
+    .stat .num{font-size:30px;font-weight:900;color:var(--accent);}
+    .stat .lbl{color:var(--muted);font-size:12px;margin-top:4px;}
+    input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:11px;margin-top:8px;font-size:14px;}
+    button{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px 22px;font-weight:700;cursor:pointer;margin-top:14px;font-family:inherit;}
+    button.ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+    .bar-row{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:13px;}
+    .bar{height:18px;background:var(--accent);border-radius:4px;min-width:2px;}
+    .bar.teal{background:var(--accent2);}
+    .err{color:var(--danger);font-size:13px;margin-top:10px;}
+    .hidden{display:none;}
+    h2{color:var(--heading);font-size:16px;margin:18px 0 10px;}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    td{padding:6px 4px;border-bottom:1px solid var(--border);}
+    .right{text-align:left;color:var(--muted);}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>عوّاد — لوحة الأدمن</h1>
+    <p class="muted">تحليلات مجمّعة بدون كشف هوية المستخدمين (خلف صلاحية أدمن).</p>
+
+    <!-- login -->
+    <div id="login" class="card" style="max-width:420px;margin-top:20px;">
+      <h2>تسجيل دخول الأدمن</h2>
+      <input id="email" type="email" placeholder="البريد الإلكتروني" />
+      <input id="password" type="password" placeholder="كلمة المرور" />
+      <div id="otpBox" class="hidden">
+        <input id="otp" type="text" placeholder="رمز التحقق (OTP)" />
+      </div>
+      <button id="loginBtn">دخول</button>
+      <div id="loginErr" class="err"></div>
+      <p class="muted" style="margin-top:12px">يتطلب أن يكون حسابك ضمن جدول admin_users.</p>
+    </div>
+
+    <!-- dashboard -->
+    <div id="dash" class="hidden">
+      <button class="ghost" id="logoutBtn" style="float:left;margin-top:0">خروج</button>
+      <div class="card">
+        <div class="grid" id="overview"></div>
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0">توزيع المسارين</h2>
+        <div id="tracks"></div>
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0">أكثر العادات اختياراً</h2>
+        <table id="topHabits"></table>
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0">توزيع الدروع</h2>
+        <div id="badges"></div>
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0">الاستبيان (مجمّع)</h2>
+        <div id="survey" class="muted"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const cfg = window.AWWAD_CONFIG;
+    const $ = (id) => document.getElementById(id);
+    if (!cfg || cfg.SUPABASE_URL.includes('YOUR-PROJECT')) {
+      $('loginErr').textContent = 'انسخ config.example.js إلى config.js واملأ مفاتيح Supabase.';
+    }
+    const sb = cfg && !cfg.SUPABASE_URL.includes('YOUR-PROJECT')
+      ? createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY) : null;
+
+    async function loadDashboard() {
+      $('login').classList.add('hidden');
+      $('dash').classList.remove('hidden');
+      const num = (v) => (v ?? 0).toLocaleString('ar-EG');
+
+      const { data: ov } = await sb.rpc('admin_overview');
+      const labels = { total_users:'مستخدم', active_today:'نشط اليوم', active_7d:'نشط ٧ أيام', total_habits:'عادة', entries_total:'تسجيلة', avg_streak:'متوسط الستريك', badges_awarded:'درع' };
+      $('overview').innerHTML = Object.entries(labels).map(([k,l]) =>
+        `<div class="stat"><div class="num">${num(ov?.[k])}</div><div class="lbl">${l}</div></div>`).join('');
+
+      const { data: tracks } = await sb.rpc('admin_track_split');
+      const maxT = Math.max(1, ...(tracks||[]).map(t=>t.habits));
+      $('tracks').innerHTML = (tracks||[]).map(t =>
+        `<div class="bar-row"><span style="width:90px">${t.track==='break'?'اكسر عادة':'ابنِ عادة'}</span><div class="bar ${t.track==='build'?'teal':''}" style="width:${t.habits/maxT*240}px"></div><span>${t.habits}</span></div>`).join('') || '<span class="muted">لا بيانات</span>';
+
+      const { data: top } = await sb.rpc('admin_top_habits', { p_limit: 10 });
+      $('topHabits').innerHTML = (top||[]).map(h =>
+        `<tr><td>${h.title?.ar ?? h.catalog_key}</td><td class="right">${h.picks}</td></tr>`).join('') || '<tr><td class="muted">لا بيانات</td></tr>';
+
+      const { data: badges } = await sb.rpc('admin_badge_distribution');
+      $('badges').innerHTML = (badges||[]).map(b =>
+        `<div class="bar-row"><span style="width:120px">${b.badge_key}</span><div class="bar teal" style="width:${Math.min(b.earned*8,240)}px"></div><span>${b.earned}</span></div>`).join('') || '<span class="muted">لا بيانات</span>';
+
+      const { data: sv } = await sb.rpc('admin_survey_aggregate');
+      $('survey').textContent = sv ? `عدد المشاركين: ${sv.responses ?? 0}` : 'لا بيانات';
+    }
+
+    $('loginBtn').addEventListener('click', async () => {
+      if (!sb) return;
+      $('loginErr').textContent = '';
+      const email = $('email').value.trim();
+      const password = $('password').value;
+      const otp = $('otp')?.value?.trim();
+      try {
+        if (otp) {
+          const { error } = await sb.auth.verifyOtp({ email, token: otp, type: 'email' });
+          if (error) throw error;
+        } else {
+          const { error } = await sb.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+        }
+        // verify admin by attempting an admin RPC
+        const { error: rpcErr } = await sb.rpc('admin_overview');
+        if (rpcErr) throw new Error('هذا الحساب ليس أدمن.');
+        await loadDashboard();
+      } catch (e) {
+        $('loginErr').textContent = e.message || String(e);
+      }
+    });
+
+    $('logoutBtn').addEventListener('click', async () => {
+      await sb?.auth.signOut();
+      location.reload();
+    });
+
+    // auto-resume session
+    (async () => {
+      if (!sb) return;
+      const { data } = await sb.auth.getSession();
+      if (data?.session) {
+        const { error } = await sb.rpc('admin_overview');
+        if (!error) loadDashboard();
+      }
+    })();
+  </script>
+</body>
+</html>

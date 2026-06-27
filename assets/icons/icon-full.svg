@@ -1,0 +1,26 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0F1420"/>
+      <stop offset="1" stop-color="#0B0F18"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.55">
+      <stop offset="0" stop-color="#4F8EF7" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#4F8EF7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="224" fill="url(#glow)"/>
+  <!-- stem -->
+  <path d="M512 720 C512 600 512 520 512 470" stroke="#22C55E" stroke-width="34" stroke-linecap="round" fill="none"/>
+  <!-- left leaf -->
+  <path d="M512 520 C420 520 350 470 320 380 C420 360 500 410 512 500 Z" fill="url(#leaf)"/>
+  <!-- right leaf -->
+  <path d="M512 480 C604 470 690 410 712 312 C604 300 520 360 512 460 Z" fill="url(#leaf)"/>
+  <!-- soil/base arc -->
+  <path d="M360 730 C420 760 604 760 664 730" stroke="#4F8EF7" stroke-width="26" stroke-linecap="round" fill="none" opacity="0.9"/>
+</svg>

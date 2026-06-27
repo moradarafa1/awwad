@@ -1,0 +1,194 @@
+---
+import { t, DIR, LANG_NAME, LOCALES, OG_LOCALE, PAGES, LINKEDIN } from '../content/site.js';
+
+const { lang, pageKey, title, description, pageSlug } = Astro.props;
+const dir = DIR[lang];
+const tt = t[lang];
+
+function localizedPath(l, key) {
+  const slug = PAGES[key] ?? '';
+  const base = l === 'ar' ? '' : `/${l}`;
+  return `${base}/${slug}` || '/';
+}
+// locale-independent slug (used for blog/post pages not in PAGES)
+function localizedSlug(l, slug) {
+  const base = l === 'ar' ? '' : `/${l}`;
+  return `${base}/${slug}` || '/';
+}
+
+const curSlug = pageSlug ?? PAGES[pageKey] ?? '';
+const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
+const canonical = site + localizedSlug(lang, curSlug);
+const alternates = LOCALES.map((l) => ({ l, href: site + localizedSlug(l, curSlug) }));
+
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Awwad',
+  url: site + '/',
+  sameAs: [LINKEDIN],
+};
+const appLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MobileApplication',
+  name: 'Awwad',
+  operatingSystem: 'Android, iOS, Web',
+  applicationCategory: 'HealthApplication',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+<!doctype html>
+<html lang={lang} dir={dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alternates.map((a) => (
+      <link rel="alternate" hreflang={a.l} href={a.href} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={site + localizedSlug('ar', curSlug)} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={OG_LOCALE[lang]} />
+    {LOCALES.filter((l) => l !== lang).map((l) => (
+      <meta property="og:locale:alternate" content={OG_LOCALE[l]} />
+    ))}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+    {pageKey === 'home' && (
+      <script type="application/ld+json" set:html={JSON.stringify(appLd)} />
+    )}
+
+    <!-- privacy-light data layer (GTM-style, no third-party) -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'page_view', path: location.pathname, locale: document.documentElement.lang });
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href={localizedPath(lang, 'home')}>
+        <span class="brand-mark">🌱</span>
+        <span>{tt.brand}</span>
+      </a>
+      <nav class="nav">
+        <a href={localizedPath(lang, 'break-habit')}>{tt.nav.break}</a>
+        <a href={localizedPath(lang, 'build-habit')}>{tt.nav.build}</a>
+        <a href={localizedSlug(lang, 'blog')}>{({ ar: 'المدوّنة', en: 'Blog', fr: 'Blog' })[lang]}</a>
+      </nav>
+      <div class="lang-switch">
+        {LOCALES.map((l) => (
+          <a
+            href={localizedPath(l, pageKey)}
+            class={l === lang ? 'active' : ''}
+            hreflang={l}
+            aria-label={LANG_NAME[l]}>{l.toUpperCase()}</a>
+        ))}
+      </div>
+    </header>
+
+    <main class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <p class="disclaimer">{tt.footer_disclaimer}</p>
+      <nav class="footer-nav">
+        <a href={localizedPath(lang, 'privacy')}>{tt.nav.privacy}</a>
+        <a href={localizedPath(lang, 'terms')}>{tt.nav.terms}</a>
+        <a href={localizedPath(lang, 'delete-account')}>{lang === 'ar' ? 'حذف الحساب' : lang === 'fr' ? 'Supprimer le compte' : 'Delete account'}</a>
+      </nav>
+      <p class="copyright">
+        © {tt.footer_rights} —
+        <a href={LINKEDIN} target="_blank" rel="noopener">Morad Arafa</a>
+      </p>
+    </footer>
+
+    <style is:global>
+      :root {
+        --bg: #0d1117; --surface: #161b22; --border: #2a3441;
+        --accent: #4f8ef7; --accent2: #2dd4bf; --accent3: #f59e0b;
+        --text: #e2e8f0; --muted: #7a8899; --heading: #f0f6ff;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'Cairo', system-ui, sans-serif;
+        background: var(--bg); color: var(--text);
+        line-height: 1.7; min-height: 100vh;
+        display: flex; flex-direction: column;
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .container { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; flex: 1; width: 100%; }
+      .site-header {
+        display: flex; align-items: center; gap: 18px;
+        padding: 14px 20px; border-bottom: 1px solid var(--border);
+        max-width: 1100px; margin: 0 auto; width: 100%; flex-wrap: wrap;
+      }
+      .brand { display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 20px; color: var(--heading); }
+      .brand:hover { text-decoration: none; }
+      .nav { display: flex; gap: 16px; margin-inline-start: auto; }
+      .nav a { color: var(--muted); font-size: 14px; }
+      .lang-switch { display: flex; gap: 6px; }
+      .lang-switch a {
+        font-size: 12px; color: var(--muted); padding: 3px 8px;
+        border: 1px solid var(--border); border-radius: 6px;
+      }
+      .lang-switch a.active { color: var(--accent); border-color: var(--accent); }
+      h1 { font-size: clamp(26px, 5vw, 40px); color: var(--heading); line-height: 1.25; }
+      h2 { color: var(--heading); margin-top: 8px; font-size: 22px; }
+      h3 { color: var(--heading); font-size: 17px; }
+      p { color: var(--text); }
+      .hero { text-align: center; padding: 36px 0 12px; }
+      .hero .sub { color: var(--muted); font-size: 18px; margin-top: 12px; }
+      .slogan { color: var(--accent2); font-size: 14px; margin-top: 8px; }
+      .btn {
+        display: inline-block; background: var(--accent); color: #fff;
+        padding: 12px 26px; border-radius: 12px; font-weight: 700; margin-top: 22px;
+      }
+      .btn:hover { text-decoration: none; opacity: .92; }
+      .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+      .card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 16px; padding: 22px;
+      }
+      .card .icon { font-size: 30px; }
+      .card h3 { margin: 10px 0 6px; }
+      .card p { color: var(--muted); font-size: 14px; }
+      .features { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+      .feature { display: flex; gap: 12px; align-items: flex-start; }
+      .feature .icon { font-size: 22px; }
+      .feature h3 { font-size: 15px; }
+      .feature p { color: var(--muted); font-size: 13px; }
+      .section-title { text-align: center; margin: 40px 0 4px; }
+      .prose h2 { margin-top: 26px; }
+      .prose p { color: var(--text); margin-top: 6px; }
+      .site-footer {
+        border-top: 1px solid var(--border); padding: 28px 20px;
+        text-align: center; max-width: 1100px; margin: 0 auto; width: 100%;
+      }
+      .site-footer .disclaimer { color: var(--muted); font-size: 12px; max-width: 620px; margin: 0 auto 14px; }
+      .footer-nav { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+      .footer-nav a { color: var(--muted); font-size: 13px; }
+      .copyright { color: var(--muted); font-size: 13px; }
+      @media (max-width: 640px) {
+        .cards, .features { grid-template-columns: 1fr; }
+        .nav { margin-inline-start: 0; width: 100%; }
+      }
+    </style>
+  </body>
+</html>
