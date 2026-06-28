@@ -7,9 +7,9 @@
 # pinger (cron-job.org, free) hitting the same URL, AND a free UptimeRobot monitor
 # on the health endpoint so you're emailed if the project ever goes down.
 #
-# Required repo secrets:
-#   SUPABASE_URL       e.g. https://xxxx.supabase.co
-#   SUPABASE_ANON_KEY  the project anon/public key
+# No repo secrets required: the project URL and PUBLIC anon key (the same key
+# shipped in the app) are embedded as defaults below. You may override them with
+# repo secrets SUPABASE_URL / SUPABASE_ANON_KEY. Never put the service_role key here.
 
 name: supabase-keep-alive
 on:
@@ -24,9 +24,13 @@ jobs:
       - name: Ping Supabase (real authenticated SELECT keeps the DB warm)
         run: |
           set -e
+          URL="${{ secrets.SUPABASE_URL }}"
+          ANON="${{ secrets.SUPABASE_ANON_KEY }}"
+          if [ -z "$URL" ]; then URL="https://kdczbzzjezyhfxgpegqc.supabase.co"; fi
+          if [ -z "$ANON" ]; then ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkY3pienpqZXp5aGZ4Z3BlZ3FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1MzUxNzcsImV4cCI6MjA5ODExMTE3N30.U1EEeJ_kCauZnXWVTlb-Whm5DyEIgGqkwEUpG8pI2vQ"; fi
           code=$(curl -s -o /dev/null -w "%{http_code}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/habit_catalog?select=id&limit=1" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+            "$URL/rest/v1/habit_catalog?select=id&limit=1" \
+            -H "apikey: $ANON" \
+            -H "Authorization: Bearer $ANON")
           echo "HTTP $code"
           test "$code" = "200"

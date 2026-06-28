@@ -1,6 +1,9 @@
 # Supabase keep-alive — prevents the free project pausing after 7 days idle.
-# Add repo secrets: SUPABASE_URL, SUPABASE_ANON_KEY.
-# Also set up a 2nd independent pinger (cron-job.org) + UptimeRobot for safety.
+# Works with NO repo secrets: the project URL and the PUBLIC anon key (the same
+# key shipped inside the app) are embedded as defaults. Optionally override them
+# with repo secrets SUPABASE_URL / SUPABASE_ANON_KEY. The secret service_role
+# key is NEVER used here.
+# For extra safety also set up a 2nd independent pinger (cron-job.org / UptimeRobot).
 name: supabase-keep-alive
 on:
   schedule:
@@ -14,9 +17,14 @@ jobs:
       - name: Ping Supabase (real SELECT keeps the DB warm)
         run: |
           set -e
+          URL="${{ secrets.SUPABASE_URL }}"
+          ANON="${{ secrets.SUPABASE_ANON_KEY }}"
+          # Public defaults (safe to commit) if no secrets are configured.
+          if [ -z "$URL" ]; then URL="https://kdczbzzjezyhfxgpegqc.supabase.co"; fi
+          if [ -z "$ANON" ]; then ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkY3pienpqZXp5aGZ4Z3BlZ3FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1MzUxNzcsImV4cCI6MjA5ODExMTE3N30.U1EEeJ_kCauZnXWVTlb-Whm5DyEIgGqkwEUpG8pI2vQ"; fi
           code=$(curl -s -o /dev/null -w "%{http_code}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/habit_catalog?select=id&limit=1" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+            "$URL/rest/v1/habit_catalog?select=id&limit=1" \
+            -H "apikey: $ANON" \
+            -H "Authorization: Bearer $ANON")
           echo "HTTP $code"
           test "$code" = "200"
