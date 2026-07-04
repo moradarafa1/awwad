@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,12 +10,39 @@ import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
 import '../../core/cloud/supabase_service.dart';
 import '../../core/cloud/sync_service.dart';
+import '../../core/content/dhikr.dart';
+import '../../core/notifications/notifications.dart';
+import '../../core/notifications/notif_scheduler.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import '../auth/auth_screen.dart';
 import 'fields_manager_screen.dart';
+import 'habits_screen.dart';
+import 'profile_screen.dart';
 
-const _linkedInUrl = 'https://www.linkedin.com/in/moradarafa/';
+const _linkedInUrl = 'https://www.facebook.com/MoradArafaOfficial/';
+
+const Map<String, Map<String, String>> _kSet = {
+  'notif': {'ar': 'الإشعارات', 'en': 'Notifications', 'fr': 'Notifications'},
+  'notifSub': {
+    'ar': 'تذكير يومي وتهنئة بالأوسمة',
+    'en': 'Daily reminder and badge congratulations',
+    'fr': 'Rappel quotidien et félicitations'
+  },
+  'dhikr': {'ar': 'ذكر الصباح اليومي', 'en': 'Daily morning dhikr', 'fr': 'Dhikr du matin'},
+  'dhikrSub': {
+    'ar': 'الصلاة الإبراهيمية كما في صحيح مسلم',
+    'en': 'The Ibrahimic prayer as in Sahih Muslim',
+    'fr': "La prière ibrahimique (Sahih Muslim)"
+  },
+  'profile': {'ar': 'ملفّي وأوسمتي', 'en': 'My profile & badges', 'fr': 'Mon profil et badges'},
+  'habits': {'ar': 'العادات', 'en': 'Habits', 'fr': 'Habitudes'},
+  'permDenied': {
+    'ar': 'الإشعارات غير مسموح بها. فعّلها لعوّاد من إعدادات النظام.',
+    'en': 'Notifications are blocked. Enable them for Awwad in system settings.',
+    'fr': "Les notifications sont bloquées. Activez-les pour Awwad dans les réglages système."
+  },
+};
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -22,6 +50,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final loc = Localizations.localeOf(context).languageCode;
     final s = ref.watch(appControllerProvider);
     final ctrl = ref.read(appControllerProvider.notifier);
 
@@ -58,38 +87,94 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
 
-          // religious content + reminder
+          // notifications + reminders + dhikr + religious content
           SectionCard(
             child: Column(
               children: [
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: s.settings.notificationsEnabled,
+                  activeThumbColor: AppColors.accent,
+                  title: Text(_set('notif', loc),
+                      style: const TextStyle(fontSize: 13)),
+                  subtitle: Text(_set('notifSub', loc),
+                      style: const TextStyle(
+                          fontSize: 11, color: AppColors.muted)),
+                  onChanged: (v) async {
+                    // Turning ON: request OS permission first (skip on web,
+                    // where notifications are a no-op). If denied, stay off.
+                    if (v && !kIsWeb) {
+                      final granted = await ensureNotificationPermission();
+                      if (!granted) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(_set('permDenied', loc))));
+                        }
+                        return;
+                      }
+                    }
+                    await ctrl.setNotificationsEnabled(v);
+                    await _applySchedule(ref, loc);
+                  },
+                ),
+                const Divider(),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: s.settings.dhikrEnabled,
+                  activeThumbColor: AppColors.accent,
+                  title: Text(_set('dhikr', loc),
+                      style: const TextStyle(fontSize: 13)),
+                  subtitle: Text(_set('dhikrSub', loc),
+                      style: const TextStyle(
+                          fontSize: 11, color: AppColors.muted)),
+                  onChanged: (v) async {
+                    await ctrl.setDhikrEnabled(v);
+                    await _applySchedule(ref, loc);
+                  },
+                ),
+                const Divider(),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: s.settings.showReligiousContent,
                   activeThumbColor: AppColors.accent,
                   title: Text(l10n.showReligiousContent,
                       style: const TextStyle(fontSize: 13)),
-                  onChanged: ctrl.setShowReligiousContent,
+                  onChanged: (v) async {
+                    await ctrl.setShowReligiousContent(v);
+                    await _applySchedule(ref, loc);
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // profile + habits management
+          SectionCard(
+            child: Column(
+              children: [
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.person_outline,
+                      color: AppColors.accent),
+                  title: Text(_set('profile', loc),
+                      style: const TextStyle(fontSize: 13)),
+                  trailing: const Icon(Icons.chevron_right,
+                      color: AppColors.muted),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const ProfileScreen())),
                 ),
                 const Divider(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(l10n.reminderTime,
-                          style: const TextStyle(fontSize: 13)),
-                    ),
-                    DropdownButton<int>(
-                      value: s.settings.reminderHour,
-                      dropdownColor: AppColors.surface,
-                      underline: const SizedBox.shrink(),
-                      items: List.generate(
-                          24,
-                          (h) => DropdownMenuItem(
-                              value: h,
-                              child: Text(
-                                  '${h.toString().padLeft(2, '0')}:00'))),
-                      onChanged: (v) => ctrl.setReminderHour(v ?? 20),
-                    ),
-                  ],
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading:
+                      const Icon(Icons.flag_outlined, color: AppColors.accent),
+                  title: Text(_set('habits', loc),
+                      style: const TextStyle(fontSize: 13)),
+                  trailing: const Icon(Icons.chevron_right,
+                      color: AppColors.muted),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const HabitsScreen())),
                 ),
               ],
             ),
@@ -213,7 +298,7 @@ class SettingsScreen extends ConsumerWidget {
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    const Text('© جميع الحقوق محفوظة — ',
+                    const Text('© جميع الحقوق محفوظة، ',
                         style: TextStyle(
                             color: AppColors.muted, fontSize: 12)),
                     InkWell(
@@ -232,6 +317,22 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  String _set(String key, String loc) =>
+      _kSet[key]?[loc] ?? _kSet[key]?['ar'] ?? key;
+
+  Future<void> _applySchedule(WidgetRef ref, String loc) async {
+    final state = ref.read(appControllerProvider);
+    final st = state.settings;
+    await applyNotificationSchedule(
+      enabled: st.notificationsEnabled,
+      habitReminders: habitRemindersFor(state.habits, loc),
+      dhikrEnabled: st.dhikrEnabled,
+      showReligious: st.showReligiousContent,
+      dhikrHour: st.dhikrHour,
+      dhikrTitle: kDhikrTitle[loc] ?? kDhikrTitle['ar']!,
     );
   }
 
@@ -258,7 +359,7 @@ class SettingsScreen extends ConsumerWidget {
     final s = ref.read(appControllerProvider);
     try {
       await SyncService.pushAll(
-          habit: s.habit, entries: s.entries, survey: s.survey);
+          habits: s.habits, entries: s.entries, survey: s.survey);
       if (context.mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('تمت المزامنة ✅')));
@@ -274,7 +375,7 @@ class SettingsScreen extends ConsumerWidget {
   Future<void> _export(BuildContext context, WidgetRef ref) async {
     final s = ref.read(appControllerProvider);
     final data = {
-      'habit': s.habit?.toJson(),
+      'habits': s.habits.map((h) => h.toJson()).toList(),
       'entries': s.entries.map((e) => e.toJson()).toList(),
       'badges': s.badges.map((b) => b.toJson()).toList(),
     };

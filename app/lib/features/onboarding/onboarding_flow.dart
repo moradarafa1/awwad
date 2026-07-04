@@ -5,10 +5,12 @@ import 'package:uuid/uuid.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/countries.dart';
 import '../../core/models.dart';
 import '../../core/state/app_state.dart';
 import '../../core/analytics/analytics.dart';
 import '../../core/widgets/common.dart';
+import '../../core/widgets/reminder_times_picker.dart';
 
 class OnboardingFlow extends ConsumerStatefulWidget {
   const OnboardingFlow({super.key});
@@ -20,14 +22,14 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   int _step = 0;
 
   // collected data
-  bool _consent = false;
-  String? _ageRange, _gender, _country, _referral;
+  String? _ageRange, _gender, _country;
+  Country? _selectedCountry;
   String? _track; // 'break' | 'build'
   CatalogHabit? _picked;
   bool _custom = false;
   final _nameCtrl = TextEditingController();
   final _whyCtrl = TextEditingController();
-  int _reminderHour = 20;
+  List<int> _reminderHours = [20];
 
   @override
   void initState() {
@@ -43,6 +45,14 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   }
 
   String get _locale => Localizations.localeOf(context).languageCode;
+
+  String _reminderHint() =>
+      const {
+        'ar': 'يمكنك إضافة أكثر من وقت، أو تركها بدون تذكير.',
+        'en': 'You can add more than one time, or leave it with no reminder.',
+        'fr': "Vous pouvez ajouter plusieurs heures ou n'en mettre aucune.",
+      }[_locale] ??
+      '';
 
   void _next() => setState(() => _step++);
   void _prev() => setState(() => _step--);
@@ -61,21 +71,16 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       title: title,
       reason: _whyCtrl.text.trim().isEmpty ? null : _whyCtrl.text.trim(),
       templateKey: _custom ? 'generic' : (_picked?.templateKey ?? 'generic'),
-      reminderHour: _reminderHour,
+      reminderHour: _reminderHours.isNotEmpty ? _reminderHours.first : 20,
+      reminderHours: _reminderHours,
       createdAt: DateTime.now(),
     );
-    final survey = _consent ||
-            _ageRange != null ||
-            _gender != null ||
-            (_country?.isNotEmpty ?? false)
-        ? SurveyData(
-            consent: _consent,
-            ageRange: _ageRange,
-            gender: _gender,
-            country: _country,
-            referralSource: _referral,
-          )
-        : null;
+    final survey = SurveyData(
+      consent: true,
+      ageRange: _ageRange,
+      gender: _gender,
+      country: _country,
+    );
     await ref
         .read(appControllerProvider.notifier)
         .completeOnboarding(habit, survey: survey);
@@ -111,7 +116,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
-        children: List.generate(5, (i) {
+        children: List.generate(4, (i) {
           final active = i <= _step;
           return Expanded(
             child: Container(
@@ -131,163 +136,89 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   Widget _buildStep(AppLocalizations l10n) {
     switch (_step) {
       case 0:
-        return _welcomeStep(l10n);
-      case 1:
         return _surveyStep(l10n);
-      case 2:
+      case 1:
         return _trackStep(l10n);
-      case 3:
+      case 2:
         return _habitStep(l10n);
       default:
         return _setupStep(l10n);
     }
   }
 
-  // ---------- step 0: welcome + language ----------
-  Widget _welcomeStep(AppLocalizations l10n) {
-    final current = ref.watch(appControllerProvider).settings.locale;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 20),
-        Center(
-          child: Text('🌱', style: const TextStyle(fontSize: 56)),
-        ),
-        const SizedBox(height: 16),
-        Text(l10n.appName,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w900,
-                color: AppColors.heading)),
-        const SizedBox(height: 6),
-        Text(l10n.slogan,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.accent2, fontSize: 14)),
-        const SizedBox(height: 24),
-        Text(l10n.onboardWelcomeTitle,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-                fontSize: 18, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 8),
-        Text(l10n.onboardWelcomeBody,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.muted, height: 1.6)),
-        const SizedBox(height: 24),
-        Text(l10n.chooseLanguage,
-            style: const TextStyle(
-                fontWeight: FontWeight.w700, color: AppColors.muted)),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            _langBtn('العربية', 'ar', current),
-            const SizedBox(width: 8),
-            _langBtn('English', 'en', current),
-            const SizedBox(width: 8),
-            _langBtn('Français', 'fr', current),
-          ],
-        ),
-        const SizedBox(height: 24),
-        SectionCard(
-          child: Row(
-            children: [
-              const Icon(Icons.info_outline,
-                  color: AppColors.accent3, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(l10n.medicalDisclaimer,
-                    style: const TextStyle(
-                        fontSize: 12, color: AppColors.muted, height: 1.6)),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _langBtn(String label, String code, String? current) {
-    final selected = current == code;
-    return Expanded(
-      child: InkWell(
-        onTap: () =>
-            ref.read(appControllerProvider.notifier).setLocale(code),
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: selected
-                ? AppColors.accent.withValues(alpha: 0.15)
-                : AppColors.surface,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-                color: selected ? AppColors.accent : AppColors.border),
-          ),
-          child: Text(label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: selected ? AppColors.accent : AppColors.text,
-                  fontWeight: FontWeight.w700)),
-        ),
-      ),
-    );
-  }
-
-  // ---------- step 1: optional survey ----------
+  // ---------- step 0: profile (gender mandatory, the rest optional) ----------
   Widget _surveyStep(AppLocalizations l10n) {
+    final selectHint = const {
+      'ar': 'اختر دولتك',
+      'en': 'Select your country',
+      'fr': 'Sélectionnez votre pays',
+    }[_locale] ?? 'Select your country';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 8),
         Text(l10n.surveyTitle,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 6),
-        Text(l10n.surveyBody,
-            style: const TextStyle(color: AppColors.muted, height: 1.6)),
         const SizedBox(height: 18),
-        _surveyField(l10n.ageRange, ['<18', '18-24', '25-34', '35-44', '45-54', '55+'],
+        // Gender — mandatory.
+        _surveyField('${l10n.gender} *', [l10n.genderMale, l10n.genderFemale],
+            _gender, (v) => setState(() => _gender = v)),
+        const SizedBox(height: 16),
+        // Age — optional.
+        _surveyField(l10n.ageRange, ['18-24', '25-34', '35-44', '45+'],
             _ageRange, (v) => setState(() => _ageRange = v)),
-        const SizedBox(height: 14),
-        _surveyField(
-            l10n.gender,
-            [l10n.genderMale, l10n.genderFemale, l10n.genderPreferNot],
-            _gender,
-            (v) => setState(() => _gender = v)),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
+        // Country — optional, searchable list of all countries (localized).
         Text(l10n.country,
             style: const TextStyle(
                 fontWeight: FontWeight.w700, color: AppColors.muted)),
         const SizedBox(height: 8),
-        TextField(
-          decoration: const InputDecoration(isDense: true),
-          onChanged: (v) => _country = v,
-        ),
-        const SizedBox(height: 14),
-        Text(l10n.referralSource,
-            style: const TextStyle(
-                fontWeight: FontWeight.w700, color: AppColors.muted)),
-        const SizedBox(height: 8),
-        TextField(
-          decoration: const InputDecoration(isDense: true),
-          onChanged: (v) => _referral = v,
-        ),
-        const SizedBox(height: 16),
         InkWell(
-          onTap: () => setState(() => _consent = !_consent),
-          child: Row(
-            children: [
-              Icon(_consent ? Icons.check_box : Icons.check_box_outline_blank,
-                  color: _consent ? AppColors.accent : AppColors.muted),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(l10n.surveyConsent,
-                    style: const TextStyle(fontSize: 12, height: 1.5)),
-              ),
-            ],
+          onTap: _pickCountry,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _selectedCountry?.name(_locale) ?? selectHint,
+                    style: TextStyle(
+                        color: _selectedCountry == null
+                            ? AppColors.muted
+                            : AppColors.text),
+                  ),
+                ),
+                const Icon(Icons.expand_more, color: AppColors.muted, size: 20),
+              ],
+            ),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _pickCountry() async {
+    final picked = await showModalBottomSheet<Country>(
+      context: context,
+      backgroundColor: AppColors.bg,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (_) => _CountrySheet(locale: _locale),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedCountry = picked;
+        _country = picked.en; // store a stable canonical value
+      });
+    }
   }
 
   Widget _surveyField(String label, List<String> options, String? selected,
@@ -394,6 +325,9 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
         _picked = h;
         _custom = false;
         _nameCtrl.text = h.t(_locale);
+        // Suggest the habit's natural reminder times (e.g. water = several/day).
+        _reminderHours =
+            h.defaultReminderHours.isNotEmpty ? [...h.defaultReminderHours] : [20];
         AnalyticsService.instance.track('habit_selected', {
           'catalog_key': h.key,
           'category': h.category,
@@ -437,16 +371,13 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
         Text(l10n.reminderTime,
             style: const TextStyle(
                 fontWeight: FontWeight.w700, color: AppColors.muted)),
+        const SizedBox(height: 4),
+        Text(_reminderHint(),
+            style: const TextStyle(color: AppColors.muted, fontSize: 11)),
         const SizedBox(height: 8),
-        DropdownButtonFormField<int>(
-          initialValue: _reminderHour,
-          dropdownColor: AppColors.surface,
-          items: List.generate(
-              24,
-              (h) => DropdownMenuItem(
-                  value: h,
-                  child: Text('${h.toString().padLeft(2, '0')}:00'))),
-          onChanged: (v) => setState(() => _reminderHour = v ?? 20),
+        ReminderTimesPicker(
+          hours: _reminderHours,
+          onChanged: (v) => setState(() => _reminderHours = v),
         ),
       ],
     );
@@ -454,63 +385,100 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
 
   // ---------- bottom bar ----------
   Widget _bottomBar(AppLocalizations l10n) {
-    final canNext = _canProceed();
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 18),
       decoration: const BoxDecoration(
+        color: AppColors.bg,
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
       child: Row(
         children: [
-          if (_step > 0)
-            TextButton(onPressed: _prev, child: Text(l10n.back)),
-          if (_step == 1)
-            TextButton(
-                onPressed: () {
-                  AnalyticsService.instance.track('survey_skipped');
-                  _next();
-                },
-                child: Text(l10n.skipSurvey)),
-          const Spacer(),
-          FilledButton(
-            onPressed: canNext
-                ? () {
-                    if (_step == 1) {
-                      AnalyticsService.instance.track('survey_completed', {
-                        'consent': _consent,
-                        'fields_count': [
-                          _ageRange,
-                          _gender,
-                          _country,
-                          _referral
-                        ].where((e) => e != null && e.toString().isNotEmpty).length,
-                      });
-                    }
-                    if (_step >= 4) {
-                      _finish();
-                    } else {
-                      _next();
-                    }
-                  }
-                : null,
-            child: Text(_step >= 4 ? l10n.startJourney : l10n.next),
+          if (_step > 0) ...[
+            OutlinedButton(
+              onPressed: _prev,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.text,
+                minimumSize: const Size(64, 52),
+                side: const BorderSide(color: AppColors.border),
+              ),
+              child: Text(l10n.back),
+            ),
+            const SizedBox(width: 12),
+          ],
+          // "Next" is ALWAYS visible and enabled, and spans the width so it can
+          // never be missed. Validation runs on tap, so a blocked step shows a
+          // clear reason instead of an invisible disabled button.
+          Expanded(
+            child: FilledButton(
+              onPressed: () => _onNext(l10n),
+              child: Text(_step >= 3 ? l10n.startJourney : l10n.next),
+            ),
           ),
         ],
       ),
     );
   }
 
-  bool _canProceed() {
-    switch (_step) {
-      case 2:
-        return _track != null;
-      case 3:
-        return _custom ? _nameCtrl.text.trim().isNotEmpty : _picked != null;
-      case 4:
-        return _nameCtrl.text.trim().isNotEmpty;
-      default:
-        return true;
+  void _onNext(AppLocalizations l10n) {
+    final err = _stepError();
+    if (err != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(err),
+        backgroundColor: AppColors.surface,
+      ));
+      return;
     }
+    if (_step == 0) {
+      AnalyticsService.instance.track('survey_completed', {
+        'has_gender': _gender != null,
+        'has_age': _ageRange != null,
+        'has_country': _country != null,
+      });
+    }
+    if (_step >= 3) {
+      _finish();
+    } else {
+      _next();
+    }
+  }
+
+  // Localized reason the current step can't advance, or null when it can.
+  String? _stepError() {
+    switch (_step) {
+      case 0:
+        return _gender == null ? _msg('gender') : null;
+      case 1:
+        return _track == null ? _msg('track') : null;
+      case 2:
+        return (_custom ? _nameCtrl.text.trim().isEmpty : _picked == null)
+            ? _msg('habit')
+            : null;
+      case 3:
+        return _nameCtrl.text.trim().isEmpty ? _msg('habit') : null;
+      default:
+        return null;
+    }
+  }
+
+  String _msg(String key) {
+    const m = {
+      'gender': {
+        'ar': 'من فضلك اختر النوع للمتابعة',
+        'en': 'Please choose your gender to continue',
+        'fr': 'Veuillez choisir votre sexe pour continuer',
+      },
+      'track': {
+        'ar': 'اختر مسارًا للمتابعة',
+        'en': 'Choose a track to continue',
+        'fr': 'Choisissez un parcours pour continuer',
+      },
+      'habit': {
+        'ar': 'اختر عادة أو اكتب اسم عادتك',
+        'en': 'Pick a habit or type its name',
+        'fr': 'Choisissez une habitude ou saisissez son nom',
+      },
+    };
+    return m[key]?[_locale] ?? m[key]?['en'] ?? '';
   }
 }
 
@@ -674,6 +642,87 @@ class _HabitPickerState extends State<_HabitPicker> {
           ),
         ],
       ],
+    );
+  }
+}
+
+// Searchable country picker (bottom sheet). Searches by the localized name
+// (and English/Arabic fallback) so it works whatever the app language is.
+class _CountrySheet extends StatefulWidget {
+  final String locale;
+  const _CountrySheet({required this.locale});
+  @override
+  State<_CountrySheet> createState() => _CountrySheetState();
+}
+
+class _CountrySheetState extends State<_CountrySheet> {
+  String _q = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final hint = const {
+      'ar': 'ابحث عن دولة...',
+      'en': 'Search for a country...',
+      'fr': 'Rechercher un pays...',
+    }[widget.locale] ?? 'Search...';
+    final raw = _q.trim();
+    final q = raw.toLowerCase();
+    final list = raw.isEmpty
+        ? kCountries
+        : kCountries
+            .where((c) =>
+                c.name(widget.locale).toLowerCase().contains(q) ||
+                c.en.toLowerCase().contains(q) ||
+                c.ar.contains(raw))
+            .toList();
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.82,
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2)),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+              child: TextField(
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: hint,
+                  prefixIcon:
+                      const Icon(Icons.search, color: AppColors.muted),
+                  isDense: true,
+                ),
+                onChanged: (v) => setState(() => _q = v),
+              ),
+            ),
+            Expanded(
+              child: list.isEmpty
+                  ? Center(
+                      child: Text('·',
+                          style: const TextStyle(color: AppColors.muted)))
+                  : ListView.builder(
+                      itemCount: list.length,
+                      itemBuilder: (_, i) {
+                        final c = list[i];
+                        return ListTile(
+                          title: Text(c.name(widget.locale),
+                              style: const TextStyle(color: AppColors.text)),
+                          onTap: () => Navigator.of(context).pop(c),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

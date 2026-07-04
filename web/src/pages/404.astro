@@ -1,0 +1,48 @@
+---
+// Branded 404. Netlify serves dist/404.html automatically for unknown routes.
+// Standalone (no Base layout) so it can never break: Arabic-first with links
+// to every locale's home page.
+---
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#0a0e14" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <title>الصفحة غير موجودة | عوّاد</title>
+    <style>
+      :root { --bg:#0a0e14; --accent:#2dd4bf; --text:#d6e0ec; --muted:#8294a6; --heading:#f3f8ff; }
+      * { box-sizing:border-box; margin:0; padding:0; }
+      body {
+        font-family:'Cairo', system-ui, -apple-system, sans-serif;
+        background:var(--bg); color:var(--text);
+        min-height:100dvh; display:grid; place-items:center; text-align:center; padding:24px;
+        background-image: radial-gradient(60% 50% at 82% -5%, rgba(45,212,191,.11), transparent 60%);
+      }
+      .mark { font-size:52px; }
+      h1 { color:var(--heading); font-size:28px; margin:14px 0 8px; }
+      p { color:var(--muted); max-width:44ch; margin:0 auto; line-height:1.8; }
+      .links { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:26px; }
+      a {
+        color:var(--accent); text-decoration:none; font-weight:700;
+        border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:9px 22px;
+        background:rgba(45,212,191,.08);
+      }
+      a:hover { background:rgba(45,212,191,.16); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="mark">🌱</div>
+      <h1>الصفحة التي تبحث عنها غير موجودة</h1>
+      <p>ربما تغيّر الرابط أو حُذفت الصفحة. يمكنك العودة إلى الصفحة الرئيسية ومتابعة رحلتك.</p>
+      <div class="links">
+        <a href="/">الرئيسية</a>
+        <a href="/en/" lang="en" dir="ltr">English</a>
+        <a href="/fr/" lang="fr" dir="ltr">Français</a>
+      </div>
+    </main>
+  </body>
+</html>

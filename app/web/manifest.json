@@ -1,11 +1,13 @@
 {
-    "name": "عوّاد — Awwad",
+    "name": "عوّاد - Awwad",
     "short_name": "عوّاد",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0D1117",
     "theme_color": "#4F8EF7",
-    "description": "عوّاد — تطبيق تغيير وبناء العادات. عوّاد.. دايماً بالخير.",
+    "description": "عوّاد - تطبيق مجاني يساعدك على ترك العادات السيئة وبناء عادات نافعة بأسلوب علمي وقيم إسلامية.",
+    "lang": "ar",
+    "dir": "rtl",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

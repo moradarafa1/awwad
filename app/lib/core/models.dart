@@ -7,6 +7,12 @@ class AppSettings {
   final bool onboardingDone;
   final bool notificationsEnabled;
   final int reminderHour;
+  final String? activeHabitId; // which habit the Today/Stats/History tabs show
+  final bool authChoiceMade; // first-open: sign-in vs continue-as-guest answered
+  final bool firstLogPromptShown; // the "create an account" popup shown once
+  final bool notifPromptShown; // notification-permission rationale shown once
+  final bool dhikrEnabled; // daily Ibrahimic-prayer dhikr notification
+  final int dhikrHour; // when the daily dhikr fires
 
   const AppSettings({
     this.locale,
@@ -14,6 +20,12 @@ class AppSettings {
     this.onboardingDone = false,
     this.notificationsEnabled = true,
     this.reminderHour = 20,
+    this.activeHabitId,
+    this.authChoiceMade = false,
+    this.firstLogPromptShown = false,
+    this.notifPromptShown = false,
+    this.dhikrEnabled = true,
+    this.dhikrHour = 8,
   });
 
   AppSettings copyWith({
@@ -22,6 +34,13 @@ class AppSettings {
     bool? onboardingDone,
     bool? notificationsEnabled,
     int? reminderHour,
+    String? activeHabitId,
+    bool clearActiveHabit = false,
+    bool? authChoiceMade,
+    bool? firstLogPromptShown,
+    bool? notifPromptShown,
+    bool? dhikrEnabled,
+    int? dhikrHour,
   }) =>
       AppSettings(
         locale: locale ?? this.locale,
@@ -29,6 +48,13 @@ class AppSettings {
         onboardingDone: onboardingDone ?? this.onboardingDone,
         notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
         reminderHour: reminderHour ?? this.reminderHour,
+        activeHabitId:
+            clearActiveHabit ? null : (activeHabitId ?? this.activeHabitId),
+        authChoiceMade: authChoiceMade ?? this.authChoiceMade,
+        firstLogPromptShown: firstLogPromptShown ?? this.firstLogPromptShown,
+        notifPromptShown: notifPromptShown ?? this.notifPromptShown,
+        dhikrEnabled: dhikrEnabled ?? this.dhikrEnabled,
+        dhikrHour: dhikrHour ?? this.dhikrHour,
       );
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +63,12 @@ class AppSettings {
         'onboardingDone': onboardingDone,
         'notificationsEnabled': notificationsEnabled,
         'reminderHour': reminderHour,
+        'activeHabitId': activeHabitId,
+        'authChoiceMade': authChoiceMade,
+        'firstLogPromptShown': firstLogPromptShown,
+        'notifPromptShown': notifPromptShown,
+        'dhikrEnabled': dhikrEnabled,
+        'dhikrHour': dhikrHour,
       };
 
   factory AppSettings.fromJson(Map<String, dynamic> j) => AppSettings(
@@ -45,6 +77,12 @@ class AppSettings {
         onboardingDone: j['onboardingDone'] as bool? ?? false,
         notificationsEnabled: j['notificationsEnabled'] as bool? ?? true,
         reminderHour: j['reminderHour'] as int? ?? 20,
+        activeHabitId: j['activeHabitId'] as String?,
+        authChoiceMade: j['authChoiceMade'] as bool? ?? false,
+        firstLogPromptShown: j['firstLogPromptShown'] as bool? ?? false,
+        notifPromptShown: j['notifPromptShown'] as bool? ?? false,
+        dhikrEnabled: j['dhikrEnabled'] as bool? ?? true,
+        dhikrHour: j['dhikrHour'] as int? ?? 8,
       );
 }
 
@@ -65,7 +103,8 @@ class Habit {
   final String? reason;
   final String templateKey;
   final int totalWeeks;
-  final int reminderHour;
+  final int reminderHour; // legacy single time (kept for migration)
+  final List<int> reminderHours; // one or more daily reminder hours
   final DateTime createdAt;
 
   const Habit({
@@ -78,10 +117,20 @@ class Habit {
     this.templateKey = 'generic',
     this.totalWeeks = 8,
     this.reminderHour = 20,
+    this.reminderHours = const [],
     required this.createdAt,
   });
 
-  Habit copyWith({String? title, String? reason, int? reminderHour}) => Habit(
+  /// The effective reminder times (falls back to the legacy single hour).
+  List<int> get times =>
+      reminderHours.isNotEmpty ? reminderHours : [reminderHour];
+
+  Habit copyWith(
+          {String? title,
+          String? reason,
+          int? reminderHour,
+          List<int>? reminderHours}) =>
+      Habit(
         id: id,
         track: track,
         catalogKey: catalogKey,
@@ -91,6 +140,7 @@ class Habit {
         templateKey: templateKey,
         totalWeeks: totalWeeks,
         reminderHour: reminderHour ?? this.reminderHour,
+        reminderHours: reminderHours ?? this.reminderHours,
         createdAt: createdAt,
       );
 
@@ -104,6 +154,7 @@ class Habit {
         'templateKey': templateKey,
         'totalWeeks': totalWeeks,
         'reminderHour': reminderHour,
+        'reminderHours': reminderHours,
         'createdAt': createdAt.toIso8601String(),
       };
 
@@ -117,6 +168,8 @@ class Habit {
         templateKey: j['templateKey'] as String? ?? 'generic',
         totalWeeks: j['totalWeeks'] as int? ?? 8,
         reminderHour: j['reminderHour'] as int? ?? 20,
+        reminderHours:
+            (j['reminderHours'] as List<dynamic>?)?.cast<int>() ?? const [],
         createdAt:
             DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now(),
       );
@@ -220,23 +273,27 @@ class EarnedBadge {
   final String badgeKey;
   final DateTime earnedAt;
   final bool celebrated;
+  final String? habitId; // badges are earned per-habit; null = legacy/global
 
   const EarnedBadge({
     required this.badgeKey,
     required this.earnedAt,
     this.celebrated = false,
+    this.habitId,
   });
 
   EarnedBadge copyWith({bool? celebrated}) => EarnedBadge(
         badgeKey: badgeKey,
         earnedAt: earnedAt,
         celebrated: celebrated ?? this.celebrated,
+        habitId: habitId,
       );
 
   Map<String, dynamic> toJson() => {
         'badgeKey': badgeKey,
         'earnedAt': earnedAt.toIso8601String(),
         'celebrated': celebrated,
+        'habitId': habitId,
       };
 
   factory EarnedBadge.fromJson(Map<String, dynamic> j) => EarnedBadge(
@@ -244,5 +301,6 @@ class EarnedBadge {
         earnedAt:
             DateTime.tryParse(j['earnedAt'] as String? ?? '') ?? DateTime.now(),
         celebrated: j['celebrated'] as bool? ?? false,
+        habitId: j['habitId'] as String?,
       );
 }

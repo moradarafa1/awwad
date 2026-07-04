@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
+import '../../core/catalog/habit_catalog.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
+import 'habit_switcher.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -13,8 +15,17 @@ class StatsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).languageCode;
     final s = ref.watch(appControllerProvider);
-    final recent = s.entries.take(7).toList().reversed.toList();
+    final recent = s.activeEntries.take(7).toList().reversed.toList();
+    final habit = s.activeHabit;
+    final metrics =
+        metricsForHabit(habit?.catalogKey, habit?.track ?? 'break');
+    final last7 = const {
+      'ar': 'آخر ٧ أيام',
+      'en': 'last 7 days',
+      'fr': '7 derniers jours'
+    }[locale] ?? 'last 7 days';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -24,6 +35,8 @@ class StatsScreen extends ConsumerWidget {
           Text(l10n.navStats,
               style: const TextStyle(
                   fontSize: 22, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 12),
+          const HabitSwitcher(),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -51,7 +64,7 @@ class StatsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.weeklyUrgeTrend,
+                Text('${metrics.primary.l(locale)} - $last7',
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 13)),
                 const SizedBox(height: 16),
@@ -59,7 +72,7 @@ class StatsScreen extends ConsumerWidget {
                   height: 160,
                   child: recent.isEmpty
                       ? const Center(
-                          child: Text('—',
+                          child: Text('·',
                               style: TextStyle(color: AppColors.muted)))
                       : BarChart(
                           BarChartData(
@@ -107,13 +120,13 @@ class StatsScreen extends ConsumerWidget {
               Expanded(
                   child: StatTile(
                       value: s.avgUrge.toStringAsFixed(1),
-                      label: l10n.avgUrge,
+                      label: metrics.primary.l(locale),
                       color: AppColors.accent3)),
               const SizedBox(width: 10),
               Expanded(
                   child: StatTile(
                       value: s.avgResistance.toStringAsFixed(1),
-                      label: l10n.avgResistance,
+                      label: metrics.secondary.l(locale),
                       color: AppColors.accent2)),
               const SizedBox(width: 10),
               Expanded(

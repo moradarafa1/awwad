@@ -1,7 +1,26 @@
-// No-op notifications for web (and any non-io platform).
+// No-op notifications for web (and any non-io platform). Every function here
+// MUST mirror a signature in notifications_mobile.dart or the web build breaks.
 
 Future<void> initNotifications() async {}
 
+Future<bool> ensureNotificationPermission() async => false;
+
 Future<void> scheduleDailyReminder(int hour, String title, String body) async {}
 
+Future<void> scheduleHabitReminder(
+    int slot, int hour, String title, String body) async {}
+
+Future<void> cancelHabitReminders() async {}
+
+Future<void> scheduleDhikrReminder(int hour, String title, String body) async {}
+
+Future<void> scheduleReengageNudge(
+    Duration delay, String title, String body) async {}
+
+Future<void> showBadgeNotification(int slot, String title, String body) async {}
+
 Future<void> cancelReminders() async {}
+
+Future<void> cancelDhikr() async {}
+
+Future<void> cancelReengageNudge() async {}

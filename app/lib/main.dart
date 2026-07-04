@@ -11,7 +11,9 @@ import 'core/cloud/supabase_service.dart';
 import 'core/data/local_store.dart';
 import 'core/state/app_state.dart';
 import 'features/onboarding/onboarding_flow.dart';
+import 'features/onboarding/language_screen.dart';
 import 'features/home/home_shell.dart';
+import 'features/auth/auth_choice_screen.dart';
 
 void main() {
   // runZonedGuarded so that any async error from optional cloud init (or any
@@ -20,8 +22,10 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     final prefs = await SharedPreferences.getInstance();
     final store = LocalStore(prefs);
-    AnalyticsService.instance
-        .track('app_opened', {'is_first_open': store.loadHabit() == null});
+    AnalyticsService.instance.track('app_opened', {
+      'is_first_open':
+          store.loadHabits().isEmpty && store.loadLegacyHabit() == null
+    });
 
     // Paint the UI FIRST — the app is fully usable offline.
     runApp(
@@ -48,7 +52,7 @@ class AwwadApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appControllerProvider).settings;
     return MaterialApp(
-      title: 'Awwad',
+      onGenerateTitle: (context) => AppLocalizations.of(context).appName,
       debugShowCheckedModeBanner: false,
       theme: buildAwwadTheme(),
       locale: settings.locale != null ? Locale(settings.locale!) : null,
@@ -65,7 +69,10 @@ class _RootGate extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(appControllerProvider);
-    final ready = state.settings.onboardingDone && state.habit != null;
+    // 1) Pick a language. 2) Sign-in vs continue-as-guest. 3) Onboarding / home.
+    if (state.settings.locale == null) return const LanguageScreen();
+    if (!state.settings.authChoiceMade) return const AuthChoiceScreen();
+    final ready = state.settings.onboardingDone && state.habits.isNotEmpty;
     return ready ? const HomeShell() : const OnboardingFlow();
   }
 }

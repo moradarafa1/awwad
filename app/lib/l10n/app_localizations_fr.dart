@@ -12,14 +12,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get appName => 'Awwad';
 
   @override
-  String get slogan => 'Awwad — toujours pour le meilleur.';
+  String get slogan => 'Awwad, toujours pour le meilleur.';
 
   @override
   String get onboardWelcomeTitle => 'Bienvenue sur Awwad';
 
   @override
   String get onboardWelcomeBody =>
-      'Commencez votre parcours pour arrêter une habitude ou en bâtir une nouvelle — un pas chaque jour.';
+      'Commencez votre parcours pour arrêter une habitude ou en bâtir une nouvelle, un pas chaque jour.';
 
   @override
   String get chooseLanguage => 'Choisissez votre langue';
@@ -66,10 +66,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get privacyNote =>
-      'Vos données sont privées — aucun autre utilisateur ne peut les voir.';
+      'Vos données sont privées, aucun autre utilisateur ne peut les voir.';
 
   @override
-  String get surveyTitle => 'Aidez-nous à mieux vous comprendre (facultatif)';
+  String get surveyTitle => 'Aidez-nous à mieux vous comprendre';
 
   @override
   String get surveyBody =>
@@ -147,7 +147,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get habitWhyHint =>
-      'Écrivez votre raison — elle vous rappellera dans les moments difficiles';
+      'Écrivez votre raison, elle vous rappellera dans les moments difficiles';
 
   @override
   String get reminderTime => 'Heure du rappel quotidien';
@@ -218,7 +218,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get alreadyLoggedToday =>
-      'Déjà enregistré aujourd\'hui — vous pouvez le modifier.';
+      'Déjà enregistré aujourd\'hui, vous pouvez le modifier.';
 
   @override
   String get statsDaysLogged => 'jours enregistrés';
@@ -236,7 +236,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get statsWeek => 'Semaine';
 
   @override
-  String get weeklyUrgeTrend => 'Tendance de l\'envie — jours récents';
+  String get weeklyUrgeTrend => 'Tendance de l\'envie, jours récents';
 
   @override
   String get avgUrge => 'Envie moy.';
@@ -370,9 +370,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get motivationIntention =>
-      'Renouvelez votre intention — la sincérité est la moitié du chemin. 🤍';
+      'Renouvelez votre intention, la sincérité est la moitié du chemin. 🤍';
 
   @override
   String get motivationPatience =>
-      'La patience est la clé du soulagement — un nouveau jour propre est enregistré.';
+      'La patience est la clé du soulagement, un nouveau jour propre est enregistré.';
 }

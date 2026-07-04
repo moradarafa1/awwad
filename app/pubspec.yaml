@@ -1,5 +1,5 @@
 name: awwad
-description: "عوّاد — تطبيق تغيير وبناء العادات. عوّاد.. دايماً بالخير."
+description: "عوّاد - تطبيق مجاني يساعدك على ترك العادات السيئة وبناء عادات نافعة بأسلوب علمي وقيم إسلامية."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -39,6 +39,9 @@ dependencies:
 
   # Misc
   url_launcher: ^6.3.1
+  # Online/offline detection (used to hide the suggested-solutions/video card
+  # when the device has no connection). Web-safe (navigator.onLine).
+  connectivity_plus: ^6.1.0
 
   # Local notifications (mobile only; web uses a no-op via conditional import)
   flutter_local_notifications: ^18.0.1

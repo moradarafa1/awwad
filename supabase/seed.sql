@@ -42,9 +42,9 @@ insert into public.badge_definitions (key, tier, category, title, description, i
   '{"ar":"تعثّرت ورجعت — ده عين النجاح 🤍","en":"You stumbled and came back.","fr":"Vous êtes revenu plus fort."}',
   '🤍','comeback_after_relapse',1,9),
 ('logged_30','silver','consistency',
-  '{"ar":"مواظب — ٣٠ تسجيلة","en":"Consistent — 30 Logs","fr":"Assidu — 30 journaux"}',
-  '{"ar":"٣٠ يوم من المتابعة المنتظمة","en":"30 days of tracking.","fr":"30 jours de suivi."}',
-  '📈','days_logged',30,10);
+  '{"ar":"مواظب — ١٠٠ تسجيلة","en":"Consistent — 100 Logs","fr":"Assidu — 100 journaux"}',
+  '{"ar":"١٠٠ يوم من المتابعة المنتظمة","en":"100 days of tracking.","fr":"100 jours de suivi."}',
+  '📈','days_logged',100,10);
 
 -- ---------- HABIT CATALOG ----------
 -- BREAK track
@@ -62,13 +62,17 @@ insert into public.habit_catalog (key, track, category, title, description, icon
   '{"ar":"عادة عصبية شائعة — نتعامل معها بوعي","en":"A common nervous habit.","fr":"Une habitude nerveuse courante."}',
   '💅','hrt_8week',false,null, 80, 3),
 ('hair_pulling','break','mind',
-  '{"ar":"نتف الشعر (هوس النتف)","en":"Hair pulling (Trichotillomania)","fr":"Arrachage de cheveux"}',
+  '{"ar":"متلازمة نتف الشعر","en":"Hair pulling (Trichotillomania)","fr":"Trichotillomanie (arrachage des cheveux)"}',
   '{"ar":"متابعة بمنهج HRT العلمي","en":"Tracked with the evidence-based HRT method.","fr":"Suivi avec la méthode HRT."}',
   '💇','hrt_8week',false,null, 60, 4),
 ('skin_picking','break','mind',
   '{"ar":"نتش الجلد","en":"Skin picking","fr":"Grattage de la peau"}',
   '{"ar":"عادة جلدية متكررة — نخفّفها بالتدريب","en":"A repetitive skin habit.","fr":"Une habitude cutanée répétitive."}',
   '🤚','hrt_8week',false,null, 40, 5),
+('secret_habit','break','mind',
+  '{"ar":"العادة السرية","en":"Compulsive masturbation","fr":"Masturbation compulsive"}',
+  '{"ar":"تحرّر بثبات وستر، بمنهج علمي وروح داعمة","en":"Break free with discretion and support.","fr":"Libérez-vous avec discrétion et soutien."}',
+  '🔒','hrt_8week',true,null, 90, 6),
 ('phone_addiction','break','productivity',
   '{"ar":"إدمان الموبايل","en":"Phone addiction","fr":"Addiction au téléphone"}',
   '{"ar":"قلّل التصفّح اللاواعي واسترجع وقتك","en":"Reclaim your time from doomscrolling.","fr":"Reprenez votre temps."}',
@@ -121,7 +125,7 @@ insert into public.habit_catalog (key, track, category, title, description, icon
   '{"ar":"حصّن يومك بالذكر","en":"Fortify your day with remembrance.","fr":"Protégez votre journée."}',
   '📿','generic',true,null, 90, 22),
 ('voluntary_fasting','build','worship',
-  '{"ar":"صيام النفل","en":"Voluntary fasting","fr":"Jeûne surérogatoire"}',
+  '{"ar":"صيام النوافل","en":"Voluntary fasting","fr":"Jeûne surérogatoire"}',
   '{"ar":"الإثنين والخميس والأيام البيض","en":"Mondays, Thursdays, white days.","fr":"Lundi, jeudi, jours blancs."}',
   '🌙','generic',true,'https://www.islamweb.net/ar/fatwa/50964/', 70, 23),
 ('qiyam','build','worship',
@@ -157,8 +161,8 @@ insert into public.habit_catalog (key, track, category, title, description, icon
   '{"ar":"نوم مبكر = استيقاظ للفجر بنشاط","en":"Early to bed, up for Fajr.","fr":"Au lit tôt."}',
   '🌃','generic',false,null, 72, 31),
 ('gratitude','build','mind',
-  '{"ar":"الامتنان اليومي","en":"Gratitude journal","fr":"Journal de gratitude"}',
-  '{"ar":"اكتب نِعَمك كل يوم","en":"Note your blessings daily.","fr":"Notez vos bienfaits."}',
+  '{"ar":"الحمد والدعاء","en":"Praise & du''a","fr":"Louange et invocation"}',
+  '{"ar":"احمد الله على نِعَمه وادعُه كل يوم","en":"Praise Allah for His blessings and call upon Him daily.","fr":"Louez Dieu pour Ses bienfaits et invoquez-Le chaque jour."}',
   '🤍','generic',true,null, 68, 32),
 ('learn_skill','build','productivity',
   '{"ar":"تعلّم مهارة جديدة","en":"Learn a new skill","fr":"Apprendre une compétence"}',
@@ -168,3 +172,31 @@ insert into public.habit_catalog (key, track, category, title, description, icon
   '{"ar":"الاستيقاظ للفجر","en":"Wake up for Fajr","fr":"Se lever pour Fajr"}',
   '{"ar":"بركة يومك تبدأ من الفجر","en":"Begin your day with Fajr.","fr":"Commencez par Fajr."}',
   '🌅','generic',true,null, 88, 34);
+
+-- New habits (2026-06-28): 3 build + 3 break, popular among Arabs/Muslims.
+insert into public.habit_catalog (key, track, category, title, description, icon, default_template_key, is_islamic, islamweb_ref, popularity, sort_order) values
+('salawat','build','worship',
+  '{"ar":"الصلاة على النبي","en":"Salawat on the Prophet","fr":"Salawat sur le Prophète"}',
+  '{"ar":"أكثِر من الصلاة على النبي صلى الله عليه وسلم، فهي نورٌ لقلبك وسببٌ لرفعة درجاتك، وأكثِر منها يوم الجمعة.","en":"Send abundant blessings upon the Prophet, peace be upon him. It brings light to your heart and raises your rank, especially on Fridays.","fr":"Multipliez les prières sur le Prophète, paix sur lui. Elles illuminent le cœur et élèvent les rangs, surtout le vendredi."}',
+  '🌹','generic',true,null, 50, 50),
+('honor_parents','build','social',
+  '{"ar":"بر الوالدين","en":"Honoring your parents","fr":"Honorer ses parents"}',
+  '{"ar":"أحسِن إلى والديك كل يوم بكلمة طيبة أو خدمة أو دعاء، فرضاهما من رضا الله، وبرّهما باب من أبواب الجنة.","en":"Be good to your parents every day with a kind word, a service, or a prayer. Their pleasure is from God''s pleasure, and honoring them is a gate to Paradise.","fr":"Soyez bon envers vos parents chaque jour par une parole douce, un service ou une prière. Leur satisfaction relève de celle de Dieu, et les honorer est une porte du Paradis."}',
+  '👵','generic',true,null, 50, 51),
+('dua','build','worship',
+  '{"ar":"الدعاء اليومي","en":"Daily supplication","fr":"Invocation quotidienne"}',
+  '{"ar":"اجعل لك نصيباً ثابتاً من الدعاء كل يوم، وارفع حاجاتك إلى الله بقلب موقن بالإجابة، فالدعاء مفتاح كل خير.","en":"Set aside a steady portion of supplication each day, raising your needs to God with a heart certain of an answer. Supplication is the key to every good.","fr":"Réservez chaque jour un moment d''invocation, en présentant vos besoins à Dieu avec un cœur convaincu de la réponse. L''invocation est la clé de tout bien."}',
+  '🤍','generic',true,null, 50, 52),
+('late_nights','break','health',
+  '{"ar":"السهر المتأخر","en":"Staying up late","fr":"Veiller tard"}',
+  '{"ar":"تخلّص من عادة السهر المتأخر الذي يسرق نومك وصلاة فجرك ونشاط نهارك، ونظّم وقت نومك.","en":"Break the habit of staying up late, which steals your sleep, your Fajr prayer, and your daytime energy. Regulate your bedtime.","fr":"Rompez avec l''habitude de veiller tard, qui vous prive de sommeil, de la prière de Fajr et de votre énergie. Régulez l''heure du coucher."}',
+  '🌙','hrt_8week',false,null, 50, 53),
+('binge_watching','break','productivity',
+  '{"ar":"الإفراط في المشاهدة","en":"Binge-watching","fr":"Visionnage excessif"}',
+  '{"ar":"قلّل ساعات مشاهدة المسلسلات والمقاطع القصيرة المتواصلة التي تسرق وقتك وتركيزك، واسترجع ساعاتك لما ينفعك.","en":"Cut back on hours of nonstop series and short clips that steal your time and focus, and reclaim your hours for what benefits you.","fr":"Réduisez les heures de séries et de clips courts ininterrompus qui volent votre temps et votre concentration, et récupérez vos heures pour ce qui est utile."}',
+  '📺','hrt_8week',false,null, 50, 54),
+('anger','break','mind',
+  '{"ar":"الغضب وسرعة الانفعال","en":"Anger & quick temper","fr":"Colère et emportement"}',
+  '{"ar":"تعلّم ضبط غضبك وكظم غيظك في المواقف الصعبة، فالقوي من يملك نفسه عند الغضب، واحفظ علاقاتك وصحتك.","en":"Learn to control your anger and restrain it in difficult moments. The strong one is who masters himself when angry, protecting your relationships and health.","fr":"Apprenez à maîtriser votre colère et à la contenir dans les moments difficiles. Le fort est celui qui se domine quand il est en colère, préservant ses relations et sa santé."}',
+  '😤','hrt_8week',true,null, 50, 55)
+on conflict (key) do nothing;

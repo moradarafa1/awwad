@@ -1,12 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
-import { t, LOCALES, PAGES } from '../content/site.js';
+import { t, LOCALES, PAGES, WEB_APP_URL } from '../content/site.js';
 import { POSTS, postsForLocale } from '../content/posts.js';
 
 const BLOG = {
-  ar: { title: 'المدوّنة — مقالات عن العادات', desc: 'مقالات عن كسر العادات السيّئة وبناء عادات جديدة بمنهج علمي.', read: 'اقرأ المزيد', faq: 'أسئلة شائعة', published: 'نُشر في' },
-  en: { title: 'Blog — articles on habits', desc: 'Articles on breaking bad habits and building new ones with a science-based method.', read: 'Read more', faq: 'FAQ', published: 'Published' },
-  fr: { title: 'Blog — articles sur les habitudes', desc: 'Articles pour arrêter de mauvaises habitudes et en bâtir de nouvelles.', read: 'Lire la suite', faq: 'FAQ', published: 'Publié le' },
+  ar: { title: 'المدوّنة: مقالات عن العادات', desc: 'مقالات عن كسر العادات السيّئة وبناء عادات جديدة بمنهجٍ علميّ.', read: 'اقرأ المزيد', faq: 'أسئلة شائعة', published: 'نُشر في' },
+  en: { title: 'Blog: articles on habits', desc: 'Articles on breaking bad habits and building new ones with a science-based method.', read: 'Read more', faq: 'FAQ', published: 'Published' },
+  fr: { title: 'Blog : articles sur les habitudes', desc: 'Articles pour arrêter de mauvaises habitudes et en bâtir de nouvelles.', read: 'Lire la suite', faq: 'FAQ', published: 'Publié le' },
 };
 
 export function getStaticPaths() {
@@ -78,7 +78,11 @@ const faqLd = isPost && post.faq[lang]?.length ? {
         <h1>{page.h1}</h1>
         <p class="slogan">{tt.slogan}</p>
         <p class="sub">{page.sub}</p>
-        <a class="btn" href={appHref()}>{tt.cta_download}</a>
+        <div class="cta-row">
+        <button class="btn btn-lg" type="button" onclick="awDownload()">{tt.cta_download}</button>
+        <span class="cta-or">{tt.cta_or}</span>
+        <a class="btn btn-ghost btn-sm" href={WEB_APP_URL}>{tt.cta_webversion}</a>
+      </div>
       </section>
       <h2 class="section-title">{page.sectionTitle}</h2>
       <div class="cards">
@@ -107,7 +111,18 @@ const faqLd = isPost && post.faq[lang]?.length ? {
       <h1>{page.h1}</h1>
       <p class="sub" style="color:var(--muted);font-size:17px;margin-top:10px">{page.intro}</p>
       {page.blocks.map((b) => (<><h2>{b.h}</h2><p>{b.p}</p></>))}
-      <a class="btn" href={appHref()}>{tt.cta_download}</a>
+      {page.resource && (
+        <aside style="margin-top:28px;padding:20px;border:1px solid color-mix(in srgb, var(--accent2) 45%, transparent);border-radius:14px;background:color-mix(in srgb, var(--accent2) 8%, transparent)">
+          <h2 style="margin-top:0">{page.resource.h}</h2>
+          <p>{page.resource.p}</p>
+          <a class="btn" href={page.resource.url} target="_blank" rel="noopener noreferrer">{page.resource.cta} →</a>
+        </aside>
+      )}
+      <div class="cta-row">
+        <button class="btn btn-lg" type="button" onclick="awDownload()">{tt.cta_download}</button>
+        <span class="cta-or">{tt.cta_or}</span>
+        <a class="btn btn-ghost btn-sm" href={WEB_APP_URL}>{tt.cta_webversion}</a>
+      </div>
     </article>
   )}
 
@@ -146,7 +161,11 @@ const faqLd = isPost && post.faq[lang]?.length ? {
           {post.faq[lang].map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
         </>
       )}
-      <a class="btn" href={appHref()}>{tt.cta_download}</a>
+      <div class="cta-row">
+        <button class="btn btn-lg" type="button" onclick="awDownload()">{tt.cta_download}</button>
+        <span class="cta-or">{tt.cta_or}</span>
+        <a class="btn btn-ghost btn-sm" href={WEB_APP_URL}>{tt.cta_webversion}</a>
+      </div>
       <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />
       {faqLd && <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />}
     </article>

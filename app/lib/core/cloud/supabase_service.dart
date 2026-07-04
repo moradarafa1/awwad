@@ -43,13 +43,26 @@ class SupabaseService {
     required String name,
     required String email,
     required String password,
+    required String gender, // 'male' | 'female' (mandatory at registration)
     String locale = 'ar',
+    String? country,
+    String? birthDate, // ISO yyyy-MM-dd
+    String? whatsapp,
   }) async {
     await init();
     return client.auth.signUp(
       email: email,
       password: password,
-      data: {'full_name': name, 'locale': locale},
+      data: {
+        'full_name': name,
+        'locale': locale,
+        'gender': gender,
+        if (country != null && country.trim().isNotEmpty) 'country': country.trim(),
+        if (birthDate != null && birthDate.trim().isNotEmpty)
+          'birth_date': birthDate.trim(),
+        if (whatsapp != null && whatsapp.trim().isNotEmpty)
+          'whatsapp': whatsapp.trim(),
+      },
     );
   }
 
@@ -70,6 +83,12 @@ class SupabaseService {
   }
 
   static Future<void> signOut() => client.auth.signOut();
+
+  /// Change the signed-in user's password.
+  static Future<void> changePassword(String newPassword) async {
+    await init();
+    await client.auth.updateUser(UserAttributes(password: newPassword));
+  }
 
   /// Calls the login-guard edge function to decide if OTP is needed for an
   /// untrusted device. Returns true when the device is already trusted.

@@ -1,5 +1,5 @@
 ---
-import { t, DIR, LANG_NAME, LOCALES, OG_LOCALE, PAGES, LINKEDIN } from '../content/site.js';
+import { t, DIR, LANG_NAME, LOCALES, OG_LOCALE, PAGES, CREDIT_URL, WEB_APP_URL, STORE } from '../content/site.js';
 
 const { lang, pageKey, title, description, pageSlug } = Astro.props;
 const dir = DIR[lang];
@@ -20,13 +20,14 @@ const curSlug = pageSlug ?? PAGES[pageKey] ?? '';
 const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
 const canonical = site + localizedSlug(lang, curSlug);
 const alternates = LOCALES.map((l) => ({ l, href: site + localizedSlug(l, curSlug) }));
+const ogImage = site + '/og-image.png';
 
 const orgLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Awwad',
   url: site + '/',
-  sameAs: [LINKEDIN],
+  sameAs: [CREDIT_URL],
 };
 const appLd = {
   '@context': 'https://schema.org',
@@ -44,6 +45,9 @@ const appLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#0a0e14" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonical} />
     {alternates.map((a) => (
       <link rel="alternate" hreflang={a.l} href={a.href} />
@@ -55,16 +59,25 @@ const appLd = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Awwad" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Awwad" />
     <meta property="og:locale" content={OG_LOCALE[lang]} />
     {LOCALES.filter((l) => l !== lang).map((l) => (
       <meta property="og:locale:alternate" content={OG_LOCALE[l]} />
     ))}
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" href="/fonts/SalmaArabic-Black.otf" as="font" type="font/otf" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap"
       rel="stylesheet"
     />
 
@@ -86,6 +99,7 @@ const appLd = {
         <span>{tt.brand}</span>
       </a>
       <nav class="nav">
+        <a class="nav-login" href={WEB_APP_URL}>{tt.nav.login}</a>
         <a href={localizedPath(lang, 'break-habit')}>{tt.nav.break}</a>
         <a href={localizedPath(lang, 'build-habit')}>{tt.nav.build}</a>
         <a href={localizedSlug(lang, 'blog')}>{({ ar: 'المدوّنة', en: 'Blog', fr: 'Blog' })[lang]}</a>
@@ -99,6 +113,7 @@ const appLd = {
             aria-label={LANG_NAME[l]}>{l.toUpperCase()}</a>
         ))}
       </div>
+      <a class="nav-account" href={WEB_APP_URL}>{tt.nav.account}</a>
     </header>
 
     <main class="container">
@@ -110,84 +125,223 @@ const appLd = {
       <nav class="footer-nav">
         <a href={localizedPath(lang, 'privacy')}>{tt.nav.privacy}</a>
         <a href={localizedPath(lang, 'terms')}>{tt.nav.terms}</a>
-        <a href={localizedPath(lang, 'delete-account')}>{lang === 'ar' ? 'حذف الحساب' : lang === 'fr' ? 'Supprimer le compte' : 'Delete account'}</a>
       </nav>
+      <p class="volunteer">{tt.footer_volunteer}</p>
       <p class="copyright">
-        © {tt.footer_rights} —
-        <a href={LINKEDIN} target="_blank" rel="noopener">Morad Arafa</a>
+        © {tt.footer_rights} ·
+        <a href={CREDIT_URL} target="_blank" rel="noopener">Morad Arafa</a>
       </p>
     </footer>
 
+    <div id="aw-dl" class="aw-dl" aria-hidden="true">
+      <div class="aw-dl-box">
+        <button class="aw-dl-close" id="aw-dl-x" aria-label="close">✕</button>
+        <p class="aw-dl-title">{tt.dl_choose}</p>
+        {!(STORE.androidLive && STORE.iosLive) && (
+          <p class="aw-dl-soon">{tt.dl_soon}</p>
+        )}
+        <a class="btn" id="aw-dl-android" target="_blank" rel="noopener">{tt.dl_android}</a>
+        <a class="btn btn-ghost" id="aw-dl-ios" target="_blank" rel="noopener">{tt.dl_ios}</a>
+      </div>
+    </div>
+
+    <script is:inline define:vars={{ store: STORE, webApp: WEB_APP_URL }}>
+      (function () {
+        // Until an app is PUBLISHED (store.androidLive / store.iosLive), its
+        // download target is the live web app, never a dead store page.
+        var androidHref = store.androidLive ? store.android : webApp;
+        var iosHref = store.iosLive ? store.ios : webApp;
+        var modal = document.getElementById('aw-dl');
+        var a = document.getElementById('aw-dl-android');
+        var i = document.getElementById('aw-dl-ios');
+        if (a) a.href = androidHref;
+        if (i) i.href = iosHref;
+        var x = document.getElementById('aw-dl-x');
+        if (x) x.addEventListener('click', function () { modal.style.display = 'none'; });
+        if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) modal.style.display = 'none'; });
+        window.awDownload = function () {
+          var ua = (navigator.userAgent || '').toLowerCase();
+          if (ua.indexOf('android') > -1) { window.location.href = androidHref; return; }
+          if (/iphone|ipad|ipod/.test(ua)) { window.location.href = iosHref; return; }
+          if (modal) modal.style.display = 'flex';
+        };
+      })();
+    </script>
+
+
     <style is:global>
+      /* Salma Arabic — display font for headings (self-hosted). */
+      @font-face {
+        font-family: 'Salma Arabic';
+        src: url('/fonts/SalmaArabic-Bold.otf') format('opentype');
+        font-weight: 700; font-style: normal; font-display: swap;
+      }
+      @font-face {
+        font-family: 'Salma Arabic';
+        src: url('/fonts/SalmaArabic-Black.otf') format('opentype');
+        font-weight: 800 900; font-style: normal; font-display: swap;
+      }
       :root {
-        --bg: #0d1117; --surface: #161b22; --border: #2a3441;
-        --accent: #4f8ef7; --accent2: #2dd4bf; --accent3: #f59e0b;
-        --text: #e2e8f0; --muted: #7a8899; --heading: #f0f6ff;
+        --bg: #0a0e14; --surface: #121a24; --surface-2: #16202c;
+        --border: rgba(255,255,255,.08); --border-strong: rgba(255,255,255,.14);
+        --accent: #2dd4bf; --accent-strong: #14b8a6; --accent-ink: #04231e;
+        --text: #d6e0ec; --muted: #8294a6; --heading: #f3f8ff;
+        --radius: 18px; --maxw: 1100px;
       }
       * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
       body {
-        font-family: 'Cairo', system-ui, sans-serif;
-        background: var(--bg); color: var(--text);
-        line-height: 1.7; min-height: 100vh;
+        font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+        color: var(--text);
+        line-height: 1.75; min-height: 100dvh;
         display: flex; flex-direction: column;
+        -webkit-font-smoothing: antialiased; position: relative; overflow-x: hidden;
+        background-color: var(--bg);
+        background-image:
+          radial-gradient(60% 50% at 82% -5%, rgba(45,212,191,.11), transparent 60%),
+          radial-gradient(48% 42% at 8% 0%, rgba(79,142,247,.08), transparent 55%),
+          radial-gradient(70% 60% at 50% 112%, rgba(45,212,191,.06), transparent 60%);
+        background-attachment: fixed; background-repeat: no-repeat;
       }
-      a { color: var(--accent); text-decoration: none; }
-      a:hover { text-decoration: underline; }
-      .container { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; flex: 1; width: 100%; }
-      .site-header {
-        display: flex; align-items: center; gap: 18px;
-        padding: 14px 20px; border-bottom: 1px solid var(--border);
-        max-width: 1100px; margin: 0 auto; width: 100%; flex-wrap: wrap;
+      a { color: var(--accent); text-decoration: none; transition: color .2s; }
+      a:hover { color: var(--accent-strong); }
+      .container { max-width: 820px; margin: 0 auto; padding: 40px 22px 72px; flex: 1; width: 100%; }
+
+      h1, h2, h3, .brand, .section-title {
+        font-family: 'Salma Arabic', 'Cairo', system-ui, sans-serif;
+        color: var(--heading); letter-spacing: 0; line-height: 1.5;
       }
-      .brand { display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 20px; color: var(--heading); }
-      .brand:hover { text-decoration: none; }
-      .nav { display: flex; gap: 16px; margin-inline-start: auto; }
-      .nav a { color: var(--muted); font-size: 14px; }
-      .lang-switch { display: flex; gap: 6px; }
-      .lang-switch a {
-        font-size: 12px; color: var(--muted); padding: 3px 8px;
-        border: 1px solid var(--border); border-radius: 6px;
-      }
-      .lang-switch a.active { color: var(--accent); border-color: var(--accent); }
-      h1 { font-size: clamp(26px, 5vw, 40px); color: var(--heading); line-height: 1.25; }
-      h2 { color: var(--heading); margin-top: 8px; font-size: 22px; }
-      h3 { color: var(--heading); font-size: 17px; }
+      h1 { font-size: clamp(32px, 5.6vw, 50px); line-height: 1.45; font-weight: 700; }
+      h2 { font-size: clamp(20px, 3vw, 26px); margin-top: 6px; font-weight: 700; }
+      h3 { font-size: 17px; font-weight: 700; }
       p { color: var(--text); }
-      .hero { text-align: center; padding: 36px 0 12px; }
-      .hero .sub { color: var(--muted); font-size: 18px; margin-top: 12px; }
-      .slogan { color: var(--accent2); font-size: 14px; margin-top: 8px; }
+
+      .site-header {
+        position: sticky; top: 0; z-index: 20;
+        display: flex; align-items: center; gap: 16px;
+        padding: 13px 22px; width: 100%; max-width: var(--maxw); margin: 0 auto; flex-wrap: wrap;
+        background: rgba(10,14,20,.92);
+        border-bottom: 1px solid var(--border);
+      }
+      .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 22px; }
+      .brand:hover { color: var(--heading); }
+      .brand-mark {
+        display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px;
+        background: linear-gradient(145deg, rgba(45,212,191,.24), rgba(79,142,247,.12));
+        border: 1px solid var(--border-strong); font-size: 18px;
+      }
+      .nav { display: flex; gap: 4px; margin-inline-start: auto; }
+      .nav a {
+        color: var(--muted); font-size: 14px; font-weight: 600; padding: 7px 12px; border-radius: 9px;
+        transition: color .2s, background .2s;
+      }
+      .nav a:hover { color: var(--heading); background: var(--surface); }
+      .nav-login { color: var(--accent); font-weight: 700; }
+      .nav-account {
+        color: var(--accent); font-size: 14px; font-weight: 700;
+        padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border-strong);
+        background: var(--surface); white-space: nowrap;
+      }
+      .nav-account:hover { background: rgba(45,212,191,.08); color: var(--accent-strong); }
+      .lang-switch { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); }
+      .lang-switch a { font-size: 12px; font-weight: 700; color: var(--muted); padding: 4px 11px; border-radius: 999px; }
+      .lang-switch a.active { color: var(--accent-ink); background: var(--accent); }
+
+      .hero { text-align: center; padding: 48px 0 16px; }
+      .hero h1 { max-width: 20ch; margin-inline: auto; }
+      .slogan {
+        display: inline-block; color: var(--accent); font-weight: 700; font-size: 14px; margin-top: 16px;
+        padding: 5px 15px; border: 1px solid var(--border-strong); border-radius: 999px;
+        background: rgba(45,212,191,.10);
+      }
+      .hero .sub, .sub { color: var(--muted); font-size: clamp(16px, 2.2vw, 19px); margin-top: 16px; max-width: 54ch; margin-inline: auto; }
       .btn {
-        display: inline-block; background: var(--accent); color: #fff;
-        padding: 12px 26px; border-radius: 12px; font-weight: 700; margin-top: 22px;
+        display: inline-flex; align-items: center; gap: 8px;
+        background: var(--accent); color: var(--accent-ink);
+        padding: 13px 30px; border-radius: 14px; font-weight: 700; margin-top: 26px;
+        box-shadow: 0 8px 30px -10px rgba(45,212,191,.5);
+        transition: transform .2s, box-shadow .2s, background .2s;
       }
-      .btn:hover { text-decoration: none; opacity: .92; }
-      .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+      .btn:hover { color: var(--accent-ink); background: var(--accent-strong); transform: translateY(-2px); box-shadow: 0 14px 38px -12px rgba(45,212,191,.6); }
+      .btn:active { transform: translateY(0) scale(.98); }
+      .cta-row { display: flex; flex-direction: column; gap: 10px; justify-content: center; align-items: center; margin-top: 26px; }
+      .cta-row .btn { margin-top: 0; }
+      .btn-lg { padding: 17px 46px; font-size: 18px; border-radius: 16px; }
+      .btn-sm { padding: 10px 26px; font-size: 14px; }
+      .cta-or { color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .5px; }
+      .btn-ghost { background: transparent; color: var(--accent); border: 1px solid var(--border-strong); box-shadow: none; }
+      .btn-ghost:hover { background: rgba(45,212,191,.08); color: var(--accent-strong); }
+      .aw-dl { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.6); align-items: center; justify-content: center; padding: 20px; }
+      .aw-dl-box { position: relative; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 16px; padding: 30px 22px 24px; width: 100%; max-width: 340px; text-align: center; display: flex; flex-direction: column; gap: 12px; }
+      .aw-dl-title { font-weight: 700; color: var(--heading); margin-bottom: 4px; }
+      .aw-dl-soon { color: var(--muted); font-size: 12.5px; margin: -4px 0 6px; line-height: 1.7; }
+      .aw-dl-box .btn { margin-top: 0; justify-content: center; }
+      .aw-dl-close { position: absolute; top: 8px; inset-inline-end: 12px; background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; }
+
+      .section-title { text-align: center; margin: 56px 0 6px; font-size: clamp(23px, 3.8vw, 33px); font-weight: 700; }
+      .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 26px 0; }
       .card {
-        background: var(--surface); border: 1px solid var(--border);
-        border-radius: 16px; padding: 22px;
+        position: relative; display: block;
+        background: linear-gradient(180deg, var(--surface-2), var(--surface));
+        border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+        transition: transform .25s cubic-bezier(.16,1,.3,1), border-color .25s, box-shadow .25s;
       }
-      .card .icon { font-size: 30px; }
-      .card h3 { margin: 10px 0 6px; }
-      .card p { color: var(--muted); font-size: 14px; }
-      .features { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
-      .feature { display: flex; gap: 12px; align-items: flex-start; }
-      .feature .icon { font-size: 22px; }
-      .feature h3 { font-size: 15px; }
-      .feature p { color: var(--muted); font-size: 13px; }
-      .section-title { text-align: center; margin: 40px 0 4px; }
-      .prose h2 { margin-top: 26px; }
-      .prose p { color: var(--text); margin-top: 6px; }
+      a.card:hover { transform: translateY(-4px); border-color: var(--border-strong); color: var(--text); box-shadow: 0 18px 44px -22px rgba(0,0,0,.85); }
+      a.card:hover h3 { color: var(--accent); }
+      .card .icon { font-size: 32px; }
+      .card h3 { margin: 12px 0 6px; transition: color .2s; }
+      .card p { color: var(--muted); font-size: 14.5px; }
+      .features { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+      .feature {
+        display: flex; gap: 14px; align-items: flex-start;
+        background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px;
+      }
+      .feature .icon {
+        font-size: 20px; flex: none; display: grid; place-items: center; width: 40px; height: 40px;
+        border-radius: 11px; background: rgba(45,212,191,.10); border: 1px solid var(--border);
+      }
+      .feature h3 { font-size: 15.5px; }
+      .feature p { color: var(--muted); font-size: 13.5px; margin-top: 2px; }
+
+      .prose { max-width: 70ch; }
+      .prose h1 { margin-bottom: 6px; }
+      .prose h2 { margin-top: 30px; }
+      .prose p { color: var(--text); margin-top: 8px; }
+      .prose h3 { margin-top: 16px; color: var(--accent); }
+
       .site-footer {
-        border-top: 1px solid var(--border); padding: 28px 20px;
-        text-align: center; max-width: 1100px; margin: 0 auto; width: 100%;
+        border-top: 1px solid var(--border); padding: 36px 22px 40px;
+        text-align: center; max-width: var(--maxw); margin: 56px auto 0; width: 100%;
       }
-      .site-footer .disclaimer { color: var(--muted); font-size: 12px; max-width: 620px; margin: 0 auto 14px; }
-      .footer-nav { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
-      .footer-nav a { color: var(--muted); font-size: 13px; }
+      .site-footer .disclaimer { color: var(--muted); font-size: 12.5px; max-width: 620px; margin: 0 auto 16px; line-height: 1.7; }
+      .footer-nav { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+      .footer-nav a { color: var(--muted); font-size: 13px; font-weight: 600; }
+      .footer-nav a:hover { color: var(--accent); }
+      .volunteer { color: var(--accent); font-size: 12.5px; margin-bottom: 8px; opacity: .92; }
       .copyright { color: var(--muted); font-size: 13px; }
+
+      /* CSS-only reveal: a subtle slide that auto-plays on load. It animates
+         transform ONLY (never opacity), so content is always visible even if the
+         animation never runs (fail-open). No JS / IntersectionObserver dependency. */
+      @keyframes fadeUp { from { transform: translateY(14px); } to { transform: none; } }
+      .hero > *, .section-title, .card, .feature, .prose > h2, .prose > p {
+        animation: fadeUp .6s cubic-bezier(.16,1,.3,1) both;
+      }
+      .cards .card:nth-child(2) { animation-delay: .09s; }
+      .features .feature:nth-child(2) { animation-delay: .06s; }
+      .features .feature:nth-child(3) { animation-delay: .12s; }
+      .features .feature:nth-child(4) { animation-delay: .18s; }
+
       @media (max-width: 640px) {
         .cards, .features { grid-template-columns: 1fr; }
-        .nav { margin-inline-start: 0; width: 100%; }
+        .nav { margin-inline-start: 0; order: 3; width: 100%; justify-content: center; }
+        .hero { padding: 32px 0 8px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .hero > *, .section-title, .card, .feature, .prose > h2, .prose > p { animation: none; }
+        html { scroll-behavior: auto; }
+        .btn:hover, a.card:hover { transform: none; }
       }
     </style>
   </body>

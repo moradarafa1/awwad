@@ -1,6 +1,11 @@
 // Real local-notification implementation for mobile (Android/iOS).
-// Schedules a daily reminder at the user's chosen hour. Server-pushed nudges
-// (FCM) are wired in P4; this gives a zero-cost on-device reminder now.
+// All notifications are on-device (zero-cost); server push (FCM) is P4.
+//
+// Notification id namespace (keep stable):
+//   1001  daily habit reminder        (repeats daily at reminderHour)
+//   1002  daily Ibrahimic-prayer dhikr (repeats daily at dhikrHour)
+//   1003  one-off 3-day sign-up nudge  (fires once)
+//   2000+ badge/shield congratulations (immediate, one per badge)
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -10,12 +15,26 @@ import 'package:timezone/timezone.dart' as tz;
 final FlutterLocalNotificationsPlugin _plugin =
     FlutterLocalNotificationsPlugin();
 
-const _channelId = 'awwad_daily';
-const _channelName = 'Daily reminder';
-const _reminderId = 1001;
+const _habitChannelId = 'awwad_daily';
+const _habitChannelName = 'Daily reminder';
+const _dhikrChannelId = 'awwad_dhikr';
+const _dhikrChannelName = 'Morning dhikr';
+const _nudgeChannelId = 'awwad_account';
+const _nudgeChannelName = 'Account';
+const _badgeChannelId = 'awwad_badges';
+const _badgeChannelName = 'Achievements';
+
+const _reminderId = 1001; // legacy single habit reminder
+const _dhikrId = 1002;
+const _reengageId = 1003;
+const _badgeIdBase = 2000;
+const _habitReminderBase = 3000; // per-habit, per-time reminders (3000..3059)
+const _habitReminderMax = 60;
 
 bool _ready = false;
 
+/// Initialize the plugin + timezone DB. Does NOT request permission (call
+/// [ensureNotificationPermission] explicitly, after showing a rationale).
 Future<void> initNotifications() async {
   if (_ready) return;
   tzdata.initializeTimeZones();
@@ -27,27 +46,40 @@ Future<void> initNotifications() async {
   }
 
   const android = AndroidInitializationSettings('@mipmap/ic_launcher');
-  const ios = DarwinInitializationSettings();
+  const ios = DarwinInitializationSettings(
+    requestAlertPermission: false,
+    requestBadgePermission: false,
+    requestSoundPermission: false,
+  );
   await _plugin.initialize(
     const InitializationSettings(android: android, iOS: ios),
   );
-
-  await _plugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.requestNotificationsPermission();
-  await _plugin
-      .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>()
-      ?.requestPermissions(alert: true, badge: true, sound: true);
-
   _ready = true;
+}
+
+/// Explicitly request OS notification permission and return whether granted.
+/// Show an in-app rationale BEFORE calling this.
+Future<bool> ensureNotificationPermission() async {
+  await initNotifications();
+  final android = _plugin.resolvePlatformSpecificImplementation<
+      AndroidFlutterLocalNotificationsPlugin>();
+  if (android != null) {
+    final granted = await android.requestNotificationsPermission();
+    return granted ?? true; // older Android grants by default
+  }
+  final ios = _plugin.resolvePlatformSpecificImplementation<
+      IOSFlutterLocalNotificationsPlugin>();
+  if (ios != null) {
+    final granted =
+        await ios.requestPermissions(alert: true, badge: true, sound: true);
+    return granted ?? false;
+  }
+  return false;
 }
 
 tz.TZDateTime _nextInstanceOfHour(int hour) {
   final now = tz.TZDateTime.now(tz.local);
-  var scheduled =
-      tz.TZDateTime(tz.local, now.year, now.month, now.day, hour);
+  var scheduled = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour);
   if (scheduled.isBefore(now)) {
     scheduled = scheduled.add(const Duration(days: 1));
   }
@@ -58,8 +90,8 @@ Future<void> scheduleDailyReminder(int hour, String title, String body) async {
   await initNotifications();
   const details = NotificationDetails(
     android: AndroidNotificationDetails(
-      _channelId,
-      _channelName,
+      _habitChannelId,
+      _habitChannelName,
       channelDescription: 'Daily habit reminder',
       importance: Importance.high,
       priority: Priority.high,
@@ -79,6 +111,121 @@ Future<void> scheduleDailyReminder(int hour, String title, String body) async {
   );
 }
 
+/// Daily Ibrahimic-prayer dhikr. The [body] is the Arabic dhikr; a BigText
+/// style lets the full text expand on Android.
+Future<void> scheduleDhikrReminder(int hour, String title, String body) async {
+  await initNotifications();
+  final details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _dhikrChannelId,
+      _dhikrChannelName,
+      channelDescription: 'Daily morning dhikr',
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+      styleInformation: BigTextStyleInformation(body),
+    ),
+    iOS: const DarwinNotificationDetails(),
+  );
+  await _plugin.zonedSchedule(
+    _dhikrId,
+    title,
+    body,
+    _nextInstanceOfHour(hour),
+    details,
+    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+    matchDateTimeComponents: DateTimeComponents.time, // repeat daily
+  );
+}
+
+/// One-off sign-up re-engagement nudge (no matchDateTimeComponents => fires once).
+Future<void> scheduleReengageNudge(Duration delay, String title, String body) async {
+  await initNotifications();
+  const details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _nudgeChannelId,
+      _nudgeChannelName,
+      channelDescription: 'Account and sync',
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+    ),
+    iOS: DarwinNotificationDetails(),
+  );
+  await _plugin.zonedSchedule(
+    _reengageId,
+    title,
+    body,
+    tz.TZDateTime.now(tz.local).add(delay),
+    details,
+    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+  );
+}
+
+/// Immediate congratulation when a shield/badge is earned.
+Future<void> showBadgeNotification(int slot, String title, String body) async {
+  await initNotifications();
+  final details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _badgeChannelId,
+      _badgeChannelName,
+      channelDescription: 'Badges and shields',
+      importance: Importance.high,
+      priority: Priority.high,
+      styleInformation: BigTextStyleInformation(body),
+    ),
+    iOS: const DarwinNotificationDetails(),
+  );
+  await _plugin.show(_badgeIdBase + (slot.abs() % 900), title, body, details);
+}
+
+/// One per-habit, per-time daily reminder ([slot] 0.._habitReminderMax-1).
+Future<void> scheduleHabitReminder(
+    int slot, int hour, String title, String body) async {
+  if (slot < 0 || slot >= _habitReminderMax) return;
+  await initNotifications();
+  const details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _habitChannelId,
+      _habitChannelName,
+      channelDescription: 'Daily habit reminder',
+      importance: Importance.high,
+      priority: Priority.high,
+    ),
+    iOS: DarwinNotificationDetails(),
+  );
+  await _plugin.zonedSchedule(
+    _habitReminderBase + slot,
+    title,
+    body,
+    _nextInstanceOfHour(hour),
+    details,
+    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+    matchDateTimeComponents: DateTimeComponents.time, // repeat daily
+  );
+}
+
+/// Clears all per-habit reminders (and the legacy single one) before a reschedule.
+Future<void> cancelHabitReminders() async {
+  for (var i = 0; i < _habitReminderMax; i++) {
+    await _plugin.cancel(_habitReminderBase + i);
+  }
+  await _plugin.cancel(_reminderId);
+}
+
 Future<void> cancelReminders() async {
   await _plugin.cancel(_reminderId);
+  await cancelHabitReminders();
+}
+
+Future<void> cancelDhikr() async {
+  await _plugin.cancel(_dhikrId);
+}
+
+Future<void> cancelReengageNudge() async {
+  await _plugin.cancel(_reengageId);
 }

@@ -5,6 +5,7 @@ import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/catalog/badge_catalog.dart';
 import '../../core/state/app_state.dart';
+import 'habit_switcher.dart';
 
 class BadgesScreen extends ConsumerWidget {
   const BadgesScreen({super.key});
@@ -29,7 +30,7 @@ class BadgesScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).languageCode;
     final s = ref.watch(appControllerProvider);
-    final earnedKeys = {for (final b in s.badges) b.badgeKey};
+    final earnedKeys = {for (final b in s.activeBadges) b.badgeKey};
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -42,6 +43,8 @@ class BadgesScreen extends ConsumerWidget {
           const SizedBox(height: 6),
           Text('${earnedKeys.length} / ${kBadges.length}',
               style: const TextStyle(color: AppColors.muted)),
+          const SizedBox(height: 12),
+          const HabitSwitcher(),
           const SizedBox(height: 16),
           GridView.count(
             crossAxisCount: 3,

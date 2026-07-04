@@ -12,20 +12,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appName => 'عوّاد';
 
   @override
-  String get slogan => 'عوّاد.. دايماً بالخير.';
+  String get slogan => 'رفيقُ مَن زانَ عُمرَهُ، وحَسُنَ عملُهُ';
 
   @override
   String get onboardWelcomeTitle => 'أهلاً بك في عوّاد';
 
   @override
   String get onboardWelcomeBody =>
-      'ابدأ رحلتك لتغيير عادة أو بناء عادة جديدة — خطوة واحدة كل يوم.';
+      'ابدأ رحلتك لتغيير عادة أو بناء عادة جديدة، خطوةً واحدة كلّ يوم.';
 
   @override
   String get chooseLanguage => 'اختر لغتك';
 
   @override
-  String get getStarted => 'يلا نبدأ';
+  String get getStarted => 'لنبدأ';
 
   @override
   String get next => 'التالي';
@@ -34,10 +34,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get back => 'رجوع';
 
   @override
-  String get skip => 'تخطّي';
+  String get skip => 'تخطٍّ';
 
   @override
-  String get done => 'تم';
+  String get done => 'تمّ';
 
   @override
   String get save => 'حفظ';
@@ -62,17 +62,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get medicalDisclaimer =>
-      'عوّاد أداة دعم سلوكي ومتابعة ذاتية، وليست بديلاً عن الاستشارة الطبية أو النفسية المتخصّصة.';
+      'عوّاد أداة دعمٍ سلوكيٍّ ومتابعةٍ ذاتية، وليس بديلاً عن الاستشارة الطبية أو النفسية المتخصّصة.';
 
   @override
-  String get privacyNote => 'بياناتك خاصة بك ولا يراها أي مستخدم آخر.';
+  String get privacyNote => 'بياناتك خاصّة بك، ولا يراها أيّ مستخدمٍ آخر.';
 
   @override
-  String get surveyTitle => 'ساعدنا نفهمك أكتر (اختياري)';
+  String get surveyTitle => 'ساعدنا على فهمك أكثر';
 
   @override
   String get surveyBody =>
-      'إجابات اختيارية تساعدنا نطوّر التجربة ونعمل دراسات مجمّعة. تقدر تتخطّاها.';
+      'إجاباتٌ اختيارية تساعدنا على تطوير التجربة وإجراء دراساتٍ مجمّعة، ويمكنك تخطّيها.';
 
   @override
   String get surveyConsent =>
@@ -97,7 +97,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get country => 'الدولة';
 
   @override
-  String get referralSource => 'إزاي عرفت عننا؟';
+  String get referralSource => 'كيف عرفت عنّا؟';
 
   @override
   String get saveAndContinue => 'حفظ ومتابعة';
@@ -106,19 +106,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get skipSurvey => 'تخطّي الاستبيان';
 
   @override
-  String get chooseTrackTitle => 'إيه اللي حابب تعمله؟';
+  String get chooseTrackTitle => 'ماذا تريد أن تفعل؟';
 
   @override
   String get trackBreak => 'أتخلّص من عادة';
 
   @override
-  String get trackBreakDesc => 'عادة سيّئة عايز تبطّلها أو تقلّلها.';
+  String get trackBreakDesc => 'عادة سيّئة تريد التخلّص منها أو التقليل منها.';
 
   @override
   String get trackBuild => 'أبني عادة جديدة';
 
   @override
-  String get trackBuildDesc => 'عادة كويسة عايز تثبّتها في حياتك.';
+  String get trackBuildDesc => 'عادة حسنة تريد ترسيخها في حياتك.';
 
   @override
   String get chooseHabitTitle => 'اختر عادتك';
@@ -127,7 +127,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchHabits => 'ابحث عن عادة...';
 
   @override
-  String get customHabitTitle => 'عادتي مش موجودة';
+  String get customHabitTitle => 'عادتي غير موجودة';
 
   @override
   String get customHabitDesc => 'اكتب عادتك بنفسك';
@@ -142,10 +142,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get habitNameLabel => 'اسم العادة';
 
   @override
-  String get habitWhyLabel => 'ليه عايز تعملها؟ (دافعك)';
+  String get habitWhyLabel => 'لماذا تريد القيام بها؟ (دافعك)';
 
   @override
-  String get habitWhyHint => 'اكتب سببك — هيفكّرك في وقت الضعف';
+  String get habitWhyHint => 'اكتب سببك، فهو يُذكّرك في أوقات الضعف';
 
   @override
   String get reminderTime => 'وقت التذكير اليومي';
@@ -205,16 +205,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noteLabel => 'ملاحظة اليوم (اختياري)';
 
   @override
-  String get noteHint => 'كيف كان يومك؟ أي تحسّن لاحظته؟';
+  String get noteHint => 'كيف كان يومك؟ وما التحسّن الذي لاحظته؟';
 
   @override
   String get saveEntry => 'حفظ تسجيل اليوم';
 
   @override
-  String get entrySaved => 'تم الحفظ بنجاح ✅';
+  String get entrySaved => 'تمّ الحفظ بنجاح ✅';
 
   @override
-  String get alreadyLoggedToday => 'سجّلت النهاردة بالفعل — تقدر تعدّل.';
+  String get alreadyLoggedToday => 'سجّلت اليوم بالفعل، ويمكنك التعديل.';
 
   @override
   String get statsDaysLogged => 'يوم مسجّل';
@@ -232,7 +232,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statsWeek => 'الأسبوع';
 
   @override
-  String get weeklyUrgeTrend => 'اتجاه الرغبة — آخر الأيام';
+  String get weeklyUrgeTrend => 'اتجاه الرغبة في آخر الأيام';
 
   @override
   String get avgUrge => 'متوسط الرغبة';
@@ -244,22 +244,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get badgesTitle => 'دروعك وإنجازاتك';
 
   @override
-  String get badgeLocked => 'مقفول';
+  String get badgeLocked => 'مُغلق';
 
   @override
   String get badgeEarnedOn => 'حصلت عليه';
 
   @override
-  String get badgeCongrats => 'مبروك! درع جديد';
+  String get badgeCongrats => 'تهانينا! درعٌ جديد';
 
   @override
-  String get badgeKeepGoing => 'كمّل عشان تفتح الدرع الجاي';
+  String get badgeKeepGoing => 'واصِل لتفتح الدرع التالي';
 
   @override
   String get historyTitle => 'سجل الأيام السابقة';
 
   @override
-  String get noHistory => 'لا يوجد سجلات بعد';
+  String get noHistory => 'لا توجد سجلّات بعد';
 
   @override
   String get badgeClean => 'نظيف';
@@ -307,7 +307,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get syncTitle => 'حساب ومزامنة';
 
   @override
-  String get syncDesc => 'سجّل الدخول عشان بياناتك تتزامن على كل أجهزتك.';
+  String get syncDesc => 'سجّل الدخول كي تتزامن بياناتك على جميع أجهزتك.';
 
   @override
   String get emailLabel => 'البريد الإلكتروني';
@@ -347,25 +347,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deleteAccountBody =>
-      'حذف الحساب يمسح كل بياناتك نهائياً ولا يمكن التراجع. (المزامنة السحابية تُفعّل في تحديث قادم؛ حالياً البيانات على جهازك.)';
+      'حذف الحساب يمحو كلّ بياناتك نهائياً ولا يمكن التراجع. (المزامنة السحابية ستُفعَّل في تحديثٍ قادم؛ وحالياً بياناتك على جهازك.)';
 
   @override
   String get resetData => 'مسح كل البيانات';
 
   @override
   String get resetConfirm =>
-      'هل أنت متأكد من حذف كل البيانات؟ لا يمكن التراجع.';
+      'هل أنت متأكّد من حذف كل البيانات؟ لا يمكن التراجع.';
 
   @override
   String get streakStartTitle => 'ابدأ رحلتك اليوم';
 
   @override
-  String get streakStartBody => 'سجّل أول يوم وابنِ عادتك الجديدة';
+  String get streakStartBody => 'سجّل أوّل يوم وابنِ عادتك الجديدة';
 
   @override
-  String get motivationIntention => 'جدّد نيّتك، والنية الصادقة نص الطريق. 🤍';
+  String get motivationIntention =>
+      'جدّد نيّتك، والنيّة الصادقة نصف الطريق. 🤍';
 
   @override
   String get motivationPatience =>
-      'الصبر مفتاح الفرج — يوم نظيف جديد يُسجَّل لك.';
+      'الصبر مفتاح الفرج، ويومٌ نظيفٌ جديد يُسجَّل لك.';
 }

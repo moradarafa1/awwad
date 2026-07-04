@@ -1,10 +1,10 @@
 {
   "@@locale": "fr",
   "appName": "Awwad",
-  "slogan": "Awwad — toujours pour le meilleur.",
+  "slogan": "Awwad, toujours pour le meilleur.",
 
   "onboardWelcomeTitle": "Bienvenue sur Awwad",
-  "onboardWelcomeBody": "Commencez votre parcours pour arrêter une habitude ou en bâtir une nouvelle — un pas chaque jour.",
+  "onboardWelcomeBody": "Commencez votre parcours pour arrêter une habitude ou en bâtir une nouvelle, un pas chaque jour.",
   "chooseLanguage": "Choisissez votre langue",
   "getStarted": "Commencer",
   "next": "Suivant",
@@ -20,9 +20,9 @@
   "search": "Rechercher",
 
   "medicalDisclaimer": "Awwad est un outil d'auto-assistance comportementale et de suivi, et non un substitut à un avis médical ou psychologique professionnel.",
-  "privacyNote": "Vos données sont privées — aucun autre utilisateur ne peut les voir.",
+  "privacyNote": "Vos données sont privées, aucun autre utilisateur ne peut les voir.",
 
-  "surveyTitle": "Aidez-nous à mieux vous comprendre (facultatif)",
+  "surveyTitle": "Aidez-nous à mieux vous comprendre",
   "surveyBody": "Des réponses facultatives nous aident à améliorer l'expérience et à mener des études agrégées. Vous pouvez passer.",
   "surveyConsent": "J'accepte l'utilisation de ces données à des fins de recherche et d'amélioration.",
   "ageRange": "Tranche d'âge",
@@ -50,7 +50,7 @@
   "habitSetupTitle": "Configurez votre habitude",
   "habitNameLabel": "Nom de l'habitude",
   "habitWhyLabel": "Pourquoi le voulez-vous ? (votre motivation)",
-  "habitWhyHint": "Écrivez votre raison — elle vous rappellera dans les moments difficiles",
+  "habitWhyHint": "Écrivez votre raison, elle vous rappellera dans les moments difficiles",
   "reminderTime": "Heure du rappel quotidien",
   "startJourney": "Commencer le parcours",
 
@@ -75,14 +75,14 @@
   "noteHint": "Comment s'est passée votre journée ? Un progrès remarqué ?",
   "saveEntry": "Enregistrer le journal du jour",
   "entrySaved": "Enregistré avec succès ✅",
-  "alreadyLoggedToday": "Déjà enregistré aujourd'hui — vous pouvez le modifier.",
+  "alreadyLoggedToday": "Déjà enregistré aujourd'hui, vous pouvez le modifier.",
 
   "statsDaysLogged": "jours enregistrés",
   "statsCleanDays": "jours propres",
   "statsCurrentStreak": "série actuelle",
   "statsLongestStreak": "plus longue série",
   "statsWeek": "Semaine",
-  "weeklyUrgeTrend": "Tendance de l'envie — jours récents",
+  "weeklyUrgeTrend": "Tendance de l'envie, jours récents",
   "avgUrge": "Envie moy.",
   "avgResistance": "Résistance moy.",
 
@@ -129,6 +129,6 @@
 
   "streakStartTitle": "Commencez votre parcours aujourd'hui",
   "streakStartBody": "Enregistrez votre premier jour et bâtissez votre nouvelle habitude",
-  "motivationIntention": "Renouvelez votre intention — la sincérité est la moitié du chemin. 🤍",
-  "motivationPatience": "La patience est la clé du soulagement — un nouveau jour propre est enregistré."
+  "motivationIntention": "Renouvelez votre intention, la sincérité est la moitié du chemin. 🤍",
+  "motivationPatience": "La patience est la clé du soulagement, un nouveau jour propre est enregistré."
 }

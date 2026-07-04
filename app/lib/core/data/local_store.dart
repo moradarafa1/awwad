@@ -14,7 +14,8 @@ class LocalStore {
   final SharedPreferences _prefs;
 
   static const _kSettings = 'awwad_settings';
-  static const _kHabit = 'awwad_habit';
+  static const _kHabit = 'awwad_habit'; // legacy single-habit (migration source)
+  static const _kHabits = 'awwad_habits'; // multi-habit list
   static const _kEntries = 'awwad_entries';
   static const _kSurvey = 'awwad_survey';
   static const _kBadges = 'awwad_badges';
@@ -29,14 +30,24 @@ class LocalStore {
   Future<void> saveSettings(AppSettings s) =>
       _prefs.setString(_kSettings, jsonEncode(s.toJson()));
 
-  Habit? loadHabit() {
+  /// Legacy single-habit reader, kept only to migrate old installs.
+  Habit? loadLegacyHabit() {
     final raw = _prefs.getString(_kHabit);
     if (raw == null) return null;
     return Habit.fromJson(jsonDecode(raw) as Map<String, dynamic>);
   }
 
-  Future<void> saveHabit(Habit h) =>
-      _prefs.setString(_kHabit, jsonEncode(h.toJson()));
+  List<Habit> loadHabits() {
+    final raw = _prefs.getString(_kHabits);
+    if (raw == null) return const [];
+    final list = jsonDecode(raw) as List<dynamic>;
+    return list.map((e) => Habit.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  Future<void> saveHabits(List<Habit> habits) => _prefs.setString(
+      _kHabits, jsonEncode(habits.map((h) => h.toJson()).toList()));
+
+  Future<void> clearLegacyHabit() => _prefs.remove(_kHabit);
 
   List<DailyEntry> loadEntries() {
     final raw = _prefs.getString(_kEntries);
@@ -85,6 +96,7 @@ class LocalStore {
 
   Future<void> clearAll() async {
     await _prefs.remove(_kHabit);
+    await _prefs.remove(_kHabits);
     await _prefs.remove(_kEntries);
     await _prefs.remove(_kSurvey);
     await _prefs.remove(_kBadges);

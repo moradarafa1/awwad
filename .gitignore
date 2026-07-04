@@ -42,6 +42,10 @@ supabase/.temp/
 # ===== Claude / local session =====
 .claude/
 
+# ===== Netlify CLI local state =====
+.netlify/
+**/.netlify/
+
 # ===== OS / Editor =====
 .DS_Store
 Thumbs.db

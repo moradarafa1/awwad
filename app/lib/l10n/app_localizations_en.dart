@@ -12,14 +12,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appName => 'Awwad';
 
   @override
-  String get slogan => 'Awwad — always for the better.';
+  String get slogan => 'Awwad, always for the better.';
 
   @override
   String get onboardWelcomeTitle => 'Welcome to Awwad';
 
   @override
   String get onboardWelcomeBody =>
-      'Start your journey to break a habit or build a new one — one step every day.';
+      'Start your journey to break a habit or build a new one, one step every day.';
 
   @override
   String get chooseLanguage => 'Choose your language';
@@ -65,10 +65,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Awwad is a behavioral self-help and tracking tool, not a substitute for professional medical or psychological advice.';
 
   @override
-  String get privacyNote => 'Your data is private — no other user can see it.';
+  String get privacyNote => 'Your data is private, no other user can see it.';
 
   @override
-  String get surveyTitle => 'Help us understand you better (optional)';
+  String get surveyTitle => 'Help us understand you better';
 
   @override
   String get surveyBody =>
@@ -146,7 +146,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get habitWhyHint =>
-      'Write your reason — it will remind you in weak moments';
+      'Write your reason, it will remind you in weak moments';
 
   @override
   String get reminderTime => 'Daily reminder time';
@@ -215,7 +215,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get entrySaved => 'Saved successfully ✅';
 
   @override
-  String get alreadyLoggedToday => 'Already logged today — you can edit it.';
+  String get alreadyLoggedToday => 'Already logged today, you can edit it.';
 
   @override
   String get statsDaysLogged => 'days logged';
@@ -233,7 +233,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsWeek => 'Week';
 
   @override
-  String get weeklyUrgeTrend => 'Urge trend — recent days';
+  String get weeklyUrgeTrend => 'Urge trend, recent days';
 
   @override
   String get avgUrge => 'Avg urge';
@@ -365,9 +365,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get motivationIntention =>
-      'Renew your intention — sincerity is half the way. 🤍';
+      'Renew your intention, sincerity is half the way. 🤍';
 
   @override
   String get motivationPatience =>
-      'Patience is the key to relief — a new clean day is recorded for you.';
+      'Patience is the key to relief, a new clean day is recorded for you.';
 }

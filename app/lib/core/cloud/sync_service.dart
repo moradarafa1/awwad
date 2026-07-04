@@ -11,10 +11,10 @@ import '../models.dart';
 import 'supabase_service.dart';
 
 class CloudSnapshot {
-  final Habit? habit;
+  final List<Habit> habits;
   final List<DailyEntry> entries;
   final SurveyData? survey;
-  const CloudSnapshot({this.habit, this.entries = const [], this.survey});
+  const CloudSnapshot({this.habits = const [], this.entries = const [], this.survey});
 }
 
 class SyncService {
@@ -25,25 +25,28 @@ class SyncService {
 
   /// Push the local snapshot up. Safe to call repeatedly (idempotent upserts).
   static Future<void> pushAll({
-    required Habit? habit,
+    required List<Habit> habits,
     required List<DailyEntry> entries,
     required SurveyData? survey,
   }) async {
     final uid = _uid;
-    if (uid == null || habit == null) return;
+    if (uid == null || habits.isEmpty) return;
 
-    await _c.from('habits').upsert({
-      'id': habit.id,
-      'user_id': uid,
-      'track': habit.track,
-      'is_custom': habit.isCustom,
-      'title': habit.title,
-      'reason': habit.reason,
-      'template_key': habit.templateKey,
-      'total_weeks': habit.totalWeeks,
-      'reminder_hour': habit.reminderHour,
-      'config': {'catalog_key': habit.catalogKey, 'origin': 'offline'},
-    });
+    await _c.from('habits').upsert([
+      for (final habit in habits)
+        {
+          'id': habit.id,
+          'user_id': uid,
+          'track': habit.track,
+          'is_custom': habit.isCustom,
+          'title': habit.title,
+          'reason': habit.reason,
+          'template_key': habit.templateKey,
+          'total_weeks': habit.totalWeeks,
+          'reminder_hour': habit.reminderHour,
+          'config': {'catalog_key': habit.catalogKey, 'origin': 'offline'},
+        }
+    ]);
 
     if (entries.isNotEmpty) {
       await _c.from('daily_entries').upsert(
@@ -51,7 +54,7 @@ class SyncService {
             .map((e) => {
                   'id': e.id,
                   'user_id': uid,
-                  'habit_id': habit.id,
+                  'habit_id': e.habitId,
                   'entry_date': e.date,
                   'urge_level': e.urge,
                   'resistance_level': e.resistance,
@@ -82,24 +85,26 @@ class SyncService {
     final uid = _uid;
     if (uid == null) return const CloudSnapshot();
 
-    final habitRows = await _c.from('habits').select().eq('is_deleted', false).limit(1);
-    Habit? habit;
-    if (habitRows.isNotEmpty) {
-      final h = habitRows.first;
-      habit = Habit(
-        id: h['id'] as String,
-        track: h['track'] as String? ?? 'break',
-        catalogKey: (h['config'] as Map?)?['catalog_key'] as String?,
-        isCustom: h['is_custom'] as bool? ?? false,
-        title: h['title'] as String? ?? '',
-        reason: h['reason'] as String?,
-        templateKey: h['template_key'] as String? ?? 'generic',
-        totalWeeks: h['total_weeks'] as int? ?? 8,
-        reminderHour: h['reminder_hour'] as int? ?? 20,
-        createdAt:
-            DateTime.tryParse(h['created_at'] as String? ?? '') ?? DateTime.now(),
-      );
-    }
+    final habitRows = await _c
+        .from('habits')
+        .select()
+        .eq('is_deleted', false)
+        .order('created_at', ascending: true);
+    final habits = habitRows
+        .map((h) => Habit(
+              id: h['id'] as String,
+              track: h['track'] as String? ?? 'break',
+              catalogKey: (h['config'] as Map?)?['catalog_key'] as String?,
+              isCustom: h['is_custom'] as bool? ?? false,
+              title: h['title'] as String? ?? '',
+              reason: h['reason'] as String?,
+              templateKey: h['template_key'] as String? ?? 'generic',
+              totalWeeks: h['total_weeks'] as int? ?? 8,
+              reminderHour: h['reminder_hour'] as int? ?? 20,
+              createdAt: DateTime.tryParse(h['created_at'] as String? ?? '') ??
+                  DateTime.now(),
+            ))
+        .toList();
 
     final entryRows = await _c
         .from('daily_entries')
@@ -135,6 +140,6 @@ class SyncService {
       );
     }
 
-    return CloudSnapshot(habit: habit, entries: entries, survey: survey);
+    return CloudSnapshot(habits: habits, entries: entries, survey: survey);
   }
 }

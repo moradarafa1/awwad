@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/state/app_state.dart';
+import 'habit_switcher.dart';
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
@@ -12,6 +13,7 @@ class HistoryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final s = ref.watch(appControllerProvider);
+    final entries = s.activeEntries;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -21,8 +23,10 @@ class HistoryScreen extends ConsumerWidget {
           Text(l10n.historyTitle,
               style: const TextStyle(
                   fontSize: 22, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 12),
+          const HabitSwitcher(),
           const SizedBox(height: 16),
-          if (s.entries.isEmpty)
+          if (entries.isEmpty)
             Padding(
               padding: const EdgeInsets.all(40),
               child: Text(l10n.noHistory,
@@ -30,7 +34,7 @@ class HistoryScreen extends ConsumerWidget {
                   style: const TextStyle(color: AppColors.muted)),
             )
           else
-            ...s.entries.map((e) {
+            ...entries.map((e) {
               final clean = !e.didSlip;
               return Container(
                 margin: const EdgeInsets.only(bottom: 10),

@@ -1,0 +1,59 @@
+// Applies the user's notification preferences to the on-device schedule.
+// Shared by HomeShell (on launch) and Settings (on toggle change) so the two
+// never drift. All underlying calls are no-ops on web.
+
+import '../content/dhikr.dart';
+import '../models.dart';
+import 'notifications.dart';
+
+/// One scheduled habit reminder (a habit may have several times).
+class HabitReminderSpec {
+  final int hour;
+  final String title;
+  final String body;
+  const HabitReminderSpec(this.hour, this.title, this.body);
+}
+
+/// Build the reminder list for all habits at all their chosen times.
+List<HabitReminderSpec> habitRemindersFor(List<Habit> habits, String loc) {
+  final body = _kReminderBody[loc] ?? _kReminderBody['ar']!;
+  final out = <HabitReminderSpec>[];
+  for (final h in habits) {
+    for (final hour in h.times) {
+      out.add(HabitReminderSpec(hour, h.title, body));
+    }
+  }
+  return out;
+}
+
+Future<void> applyNotificationSchedule({
+  required bool enabled,
+  required List<HabitReminderSpec> habitReminders,
+  required bool dhikrEnabled,
+  required bool showReligious,
+  required int dhikrHour,
+  required String dhikrTitle,
+}) async {
+  await cancelHabitReminders(); // clear old set before (re)scheduling
+  if (!enabled) {
+    await cancelDhikr();
+    await cancelReengageNudge(); // honor a global opt-out for the pending nudge
+    return;
+  }
+  var slot = 0;
+  for (final r in habitReminders) {
+    if (slot >= 60) break;
+    await scheduleHabitReminder(slot++, r.hour, r.title, r.body);
+  }
+  if (dhikrEnabled && showReligious) {
+    await scheduleDhikrReminder(dhikrHour, dhikrTitle, kIbrahimicPrayer);
+  } else {
+    await cancelDhikr();
+  }
+}
+
+const Map<String, String> _kReminderBody = {
+  'ar': 'حان وقت تسجيل هذه العادة. خطوة صغيرة اليوم 🌿',
+  'en': 'Time to log this habit. One small step today 🌿',
+  'fr': "C'est l'heure d'enregistrer cette habitude. Un petit pas aujourd'hui 🌿",
+};

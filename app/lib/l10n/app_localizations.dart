@@ -109,7 +109,7 @@ abstract class AppLocalizations {
   /// No description provided for @slogan.
   ///
   /// In ar, this message translates to:
-  /// **'عوّاد.. دايماً بالخير.'**
+  /// **'رفيقُ مَن زانَ عُمرَهُ، وحَسُنَ عملُهُ'**
   String get slogan;
 
   /// No description provided for @onboardWelcomeTitle.
@@ -121,7 +121,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardWelcomeBody.
   ///
   /// In ar, this message translates to:
-  /// **'ابدأ رحلتك لتغيير عادة أو بناء عادة جديدة — خطوة واحدة كل يوم.'**
+  /// **'ابدأ رحلتك لتغيير عادة أو بناء عادة جديدة، خطوةً واحدة كلّ يوم.'**
   String get onboardWelcomeBody;
 
   /// No description provided for @chooseLanguage.
@@ -133,7 +133,7 @@ abstract class AppLocalizations {
   /// No description provided for @getStarted.
   ///
   /// In ar, this message translates to:
-  /// **'يلا نبدأ'**
+  /// **'لنبدأ'**
   String get getStarted;
 
   /// No description provided for @next.
@@ -151,13 +151,13 @@ abstract class AppLocalizations {
   /// No description provided for @skip.
   ///
   /// In ar, this message translates to:
-  /// **'تخطّي'**
+  /// **'تخطٍّ'**
   String get skip;
 
   /// No description provided for @done.
   ///
   /// In ar, this message translates to:
-  /// **'تم'**
+  /// **'تمّ'**
   String get done;
 
   /// No description provided for @save.
@@ -205,25 +205,25 @@ abstract class AppLocalizations {
   /// No description provided for @medicalDisclaimer.
   ///
   /// In ar, this message translates to:
-  /// **'عوّاد أداة دعم سلوكي ومتابعة ذاتية، وليست بديلاً عن الاستشارة الطبية أو النفسية المتخصّصة.'**
+  /// **'عوّاد أداة دعمٍ سلوكيٍّ ومتابعةٍ ذاتية، وليس بديلاً عن الاستشارة الطبية أو النفسية المتخصّصة.'**
   String get medicalDisclaimer;
 
   /// No description provided for @privacyNote.
   ///
   /// In ar, this message translates to:
-  /// **'بياناتك خاصة بك ولا يراها أي مستخدم آخر.'**
+  /// **'بياناتك خاصّة بك، ولا يراها أيّ مستخدمٍ آخر.'**
   String get privacyNote;
 
   /// No description provided for @surveyTitle.
   ///
   /// In ar, this message translates to:
-  /// **'ساعدنا نفهمك أكتر (اختياري)'**
+  /// **'ساعدنا على فهمك أكثر'**
   String get surveyTitle;
 
   /// No description provided for @surveyBody.
   ///
   /// In ar, this message translates to:
-  /// **'إجابات اختيارية تساعدنا نطوّر التجربة ونعمل دراسات مجمّعة. تقدر تتخطّاها.'**
+  /// **'إجاباتٌ اختيارية تساعدنا على تطوير التجربة وإجراء دراساتٍ مجمّعة، ويمكنك تخطّيها.'**
   String get surveyBody;
 
   /// No description provided for @surveyConsent.
@@ -271,7 +271,7 @@ abstract class AppLocalizations {
   /// No description provided for @referralSource.
   ///
   /// In ar, this message translates to:
-  /// **'إزاي عرفت عننا؟'**
+  /// **'كيف عرفت عنّا؟'**
   String get referralSource;
 
   /// No description provided for @saveAndContinue.
@@ -289,7 +289,7 @@ abstract class AppLocalizations {
   /// No description provided for @chooseTrackTitle.
   ///
   /// In ar, this message translates to:
-  /// **'إيه اللي حابب تعمله؟'**
+  /// **'ماذا تريد أن تفعل؟'**
   String get chooseTrackTitle;
 
   /// No description provided for @trackBreak.
@@ -301,7 +301,7 @@ abstract class AppLocalizations {
   /// No description provided for @trackBreakDesc.
   ///
   /// In ar, this message translates to:
-  /// **'عادة سيّئة عايز تبطّلها أو تقلّلها.'**
+  /// **'عادة سيّئة تريد التخلّص منها أو التقليل منها.'**
   String get trackBreakDesc;
 
   /// No description provided for @trackBuild.
@@ -313,7 +313,7 @@ abstract class AppLocalizations {
   /// No description provided for @trackBuildDesc.
   ///
   /// In ar, this message translates to:
-  /// **'عادة كويسة عايز تثبّتها في حياتك.'**
+  /// **'عادة حسنة تريد ترسيخها في حياتك.'**
   String get trackBuildDesc;
 
   /// No description provided for @chooseHabitTitle.
@@ -331,7 +331,7 @@ abstract class AppLocalizations {
   /// No description provided for @customHabitTitle.
   ///
   /// In ar, this message translates to:
-  /// **'عادتي مش موجودة'**
+  /// **'عادتي غير موجودة'**
   String get customHabitTitle;
 
   /// No description provided for @customHabitDesc.
@@ -361,13 +361,13 @@ abstract class AppLocalizations {
   /// No description provided for @habitWhyLabel.
   ///
   /// In ar, this message translates to:
-  /// **'ليه عايز تعملها؟ (دافعك)'**
+  /// **'لماذا تريد القيام بها؟ (دافعك)'**
   String get habitWhyLabel;
 
   /// No description provided for @habitWhyHint.
   ///
   /// In ar, this message translates to:
-  /// **'اكتب سببك — هيفكّرك في وقت الضعف'**
+  /// **'اكتب سببك، فهو يُذكّرك في أوقات الضعف'**
   String get habitWhyHint;
 
   /// No description provided for @reminderTime.
@@ -487,7 +487,7 @@ abstract class AppLocalizations {
   /// No description provided for @noteHint.
   ///
   /// In ar, this message translates to:
-  /// **'كيف كان يومك؟ أي تحسّن لاحظته؟'**
+  /// **'كيف كان يومك؟ وما التحسّن الذي لاحظته؟'**
   String get noteHint;
 
   /// No description provided for @saveEntry.
@@ -499,13 +499,13 @@ abstract class AppLocalizations {
   /// No description provided for @entrySaved.
   ///
   /// In ar, this message translates to:
-  /// **'تم الحفظ بنجاح ✅'**
+  /// **'تمّ الحفظ بنجاح ✅'**
   String get entrySaved;
 
   /// No description provided for @alreadyLoggedToday.
   ///
   /// In ar, this message translates to:
-  /// **'سجّلت النهاردة بالفعل — تقدر تعدّل.'**
+  /// **'سجّلت اليوم بالفعل، ويمكنك التعديل.'**
   String get alreadyLoggedToday;
 
   /// No description provided for @statsDaysLogged.
@@ -541,7 +541,7 @@ abstract class AppLocalizations {
   /// No description provided for @weeklyUrgeTrend.
   ///
   /// In ar, this message translates to:
-  /// **'اتجاه الرغبة — آخر الأيام'**
+  /// **'اتجاه الرغبة في آخر الأيام'**
   String get weeklyUrgeTrend;
 
   /// No description provided for @avgUrge.
@@ -565,7 +565,7 @@ abstract class AppLocalizations {
   /// No description provided for @badgeLocked.
   ///
   /// In ar, this message translates to:
-  /// **'مقفول'**
+  /// **'مُغلق'**
   String get badgeLocked;
 
   /// No description provided for @badgeEarnedOn.
@@ -577,13 +577,13 @@ abstract class AppLocalizations {
   /// No description provided for @badgeCongrats.
   ///
   /// In ar, this message translates to:
-  /// **'مبروك! درع جديد'**
+  /// **'تهانينا! درعٌ جديد'**
   String get badgeCongrats;
 
   /// No description provided for @badgeKeepGoing.
   ///
   /// In ar, this message translates to:
-  /// **'كمّل عشان تفتح الدرع الجاي'**
+  /// **'واصِل لتفتح الدرع التالي'**
   String get badgeKeepGoing;
 
   /// No description provided for @historyTitle.
@@ -595,7 +595,7 @@ abstract class AppLocalizations {
   /// No description provided for @noHistory.
   ///
   /// In ar, this message translates to:
-  /// **'لا يوجد سجلات بعد'**
+  /// **'لا توجد سجلّات بعد'**
   String get noHistory;
 
   /// No description provided for @badgeClean.
@@ -691,7 +691,7 @@ abstract class AppLocalizations {
   /// No description provided for @syncDesc.
   ///
   /// In ar, this message translates to:
-  /// **'سجّل الدخول عشان بياناتك تتزامن على كل أجهزتك.'**
+  /// **'سجّل الدخول كي تتزامن بياناتك على جميع أجهزتك.'**
   String get syncDesc;
 
   /// No description provided for @emailLabel.
@@ -769,7 +769,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteAccountBody.
   ///
   /// In ar, this message translates to:
-  /// **'حذف الحساب يمسح كل بياناتك نهائياً ولا يمكن التراجع. (المزامنة السحابية تُفعّل في تحديث قادم؛ حالياً البيانات على جهازك.)'**
+  /// **'حذف الحساب يمحو كلّ بياناتك نهائياً ولا يمكن التراجع. (المزامنة السحابية ستُفعَّل في تحديثٍ قادم؛ وحالياً بياناتك على جهازك.)'**
   String get deleteAccountBody;
 
   /// No description provided for @resetData.
@@ -781,7 +781,7 @@ abstract class AppLocalizations {
   /// No description provided for @resetConfirm.
   ///
   /// In ar, this message translates to:
-  /// **'هل أنت متأكد من حذف كل البيانات؟ لا يمكن التراجع.'**
+  /// **'هل أنت متأكّد من حذف كل البيانات؟ لا يمكن التراجع.'**
   String get resetConfirm;
 
   /// No description provided for @streakStartTitle.
@@ -793,19 +793,19 @@ abstract class AppLocalizations {
   /// No description provided for @streakStartBody.
   ///
   /// In ar, this message translates to:
-  /// **'سجّل أول يوم وابنِ عادتك الجديدة'**
+  /// **'سجّل أوّل يوم وابنِ عادتك الجديدة'**
   String get streakStartBody;
 
   /// No description provided for @motivationIntention.
   ///
   /// In ar, this message translates to:
-  /// **'جدّد نيّتك، والنية الصادقة نص الطريق. 🤍'**
+  /// **'جدّد نيّتك، والنيّة الصادقة نصف الطريق. 🤍'**
   String get motivationIntention;
 
   /// No description provided for @motivationPatience.
   ///
   /// In ar, this message translates to:
-  /// **'الصبر مفتاح الفرج — يوم نظيف جديد يُسجَّل لك.'**
+  /// **'الصبر مفتاح الفرج، ويومٌ نظيفٌ جديد يُسجَّل لك.'**
   String get motivationPatience;
 }
 

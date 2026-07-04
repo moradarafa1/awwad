@@ -6,6 +6,7 @@ import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
 import '../../core/cloud/supabase_service.dart';
 import '../../core/cloud/sync_service.dart';
+import '../../core/notifications/notifications.dart';
 import '../../core/state/app_state.dart';
 
 // Optional cloud account screen (P2). Only reachable when SUPABASE_URL/ANON_KEY
@@ -25,6 +26,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _otp = TextEditingController();
+  final _country = TextEditingController();
+  final _whatsapp = TextEditingController();
+  String? _gender; // 'male' | 'female' — mandatory at sign-up
+  DateTime? _birthDate;
+  bool _showOptional = false;
 
   @override
   void dispose() {
@@ -32,7 +38,54 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     _email.dispose();
     _password.dispose();
     _otp.dispose();
+    _country.dispose();
+    _whatsapp.dispose();
     super.dispose();
+  }
+
+  // Accept Arabic-Indic (٠-٩) and Persian (۰-۹) digits, normalize to Latin.
+  String _normDigits(String s) {
+    const ar = '٠١٢٣٤٥٦٧٨٩';
+    const fa = '۰۱۲۳۴۵۶۷۸۹';
+    final b = StringBuffer();
+    for (final ch in s.split('')) {
+      final ai = ar.indexOf(ch);
+      final fi = fa.indexOf(ch);
+      if (ai >= 0) {
+        b.write(ai);
+      } else if (fi >= 0) {
+        b.write(fi);
+      } else {
+        b.write(ch);
+      }
+    }
+    return b.toString();
+  }
+
+  String _tr(String k) =>
+      (_regStrings[Localizations.localeOf(context).languageCode] ??
+          _regStrings['en']!)[k]!;
+
+  Widget _genderChip(String value, String label) {
+    final sel = _gender == value;
+    return GestureDetector(
+      onTap: () => setState(() => _gender = value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color:
+              sel ? AppColors.accent.withValues(alpha: 0.16) : AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border:
+              Border.all(color: sel ? AppColors.accent : AppColors.border),
+        ),
+        child: Text(label,
+            style: TextStyle(
+                color: sel ? AppColors.heading : AppColors.muted,
+                fontWeight: FontWeight.w700)),
+      ),
+    );
   }
 
   void _toast(String m) {
@@ -57,24 +110,36 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final ctrl = ref.read(appControllerProvider.notifier);
     final snap = await SyncService.pullAll();
     final local = ref.read(appControllerProvider);
-    if (local.habit == null && snap.habit != null) {
-      await ctrl.importSnapshot(snap.habit!, snap.entries, snap.survey);
+    if (local.habits.isEmpty && snap.habits.isNotEmpty) {
+      await ctrl.importSnapshot(snap.habits, snap.entries, snap.survey);
     }
     final cur = ref.read(appControllerProvider);
     await SyncService.pushAll(
-        habit: cur.habit, entries: cur.entries, survey: cur.survey);
+        habits: cur.habits, entries: cur.entries, survey: cur.survey);
+    // The user now has an account, so cancel any pending sign-up nudge.
+    await cancelReengageNudge();
     if (mounted) Navigator.of(context).pop();
   }
 
   Future<void> _submit() async {
     final email = _email.text.trim();
     if (_signUp) {
+      if (_gender == null) {
+        _toast(_tr('chooseGender'));
+        return;
+      }
       await _run(() async {
         await SupabaseService.signUp(
           name: _name.text.trim(),
           email: email,
           password: _password.text,
+          gender: _gender!,
           locale: ref.read(appControllerProvider).settings.locale ?? 'ar',
+          country: _country.text.trim().isEmpty ? null : _country.text.trim(),
+          birthDate: _birthDate?.toIso8601String().split('T').first,
+          whatsapp: _whatsapp.text.trim().isEmpty
+              ? null
+              : _normDigits(_whatsapp.text.trim()),
         );
         AnalyticsService.instance.track('signup_succeeded', {'method': 'email'});
         await _syncAfterAuth();
@@ -118,7 +183,73 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             TextField(
                 controller: _name,
                 decoration: InputDecoration(labelText: l10n.nameLabel)),
+            const SizedBox(height: 16),
+            Text('${_tr('gender')} *',
+                style: const TextStyle(
+                    color: AppColors.text, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Row(children: [
+              Expanded(child: _genderChip('male', _tr('male'))),
+              const SizedBox(width: 10),
+              Expanded(child: _genderChip('female', _tr('female'))),
+            ]),
             const SizedBox(height: 12),
+            InkWell(
+              onTap: () => setState(() => _showOptional = !_showOptional),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(children: [
+                  Icon(_showOptional ? Icons.expand_less : Icons.expand_more,
+                      color: AppColors.muted, size: 20),
+                  const SizedBox(width: 6),
+                  Text(_tr('optional'),
+                      style: const TextStyle(color: AppColors.muted)),
+                ]),
+              ),
+            ),
+            if (_showOptional) ...[
+              const SizedBox(height: 8),
+              TextField(
+                  controller: _country,
+                  decoration: InputDecoration(labelText: _tr('country'))),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () async {
+                  final now = DateTime.now();
+                  final d = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime(now.year - 20),
+                    firstDate: DateTime(1940),
+                    lastDate: now,
+                  );
+                  if (d != null) setState(() => _birthDate = d);
+                },
+                child: InputDecorator(
+                  decoration: InputDecoration(labelText: _tr('birthDate')),
+                  child: Text(
+                    _birthDate == null
+                        ? _tr('pick')
+                        : _birthDate!.toIso8601String().split('T').first,
+                    style: TextStyle(
+                        color: _birthDate == null
+                            ? AppColors.muted
+                            : AppColors.text),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                  controller: _whatsapp,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                      labelText: _tr('whatsapp'),
+                      hintText: '+20 / +966 ...')),
+            ],
+            const SizedBox(height: 10),
+            Text(_tr('notice'),
+                style: const TextStyle(
+                    color: AppColors.muted, fontSize: 12, height: 1.6)),
+            const SizedBox(height: 14),
           ],
           TextField(
               controller: _email,
@@ -170,3 +301,45 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
   }
 }
+
+const Map<String, Map<String, String>> _regStrings = {
+  'ar': {
+    'gender': 'النوع',
+    'male': 'ذكر',
+    'female': 'أنثى',
+    'chooseGender': 'من فضلك اختر النوع',
+    'optional': 'معلومات إضافية (اختيارية)',
+    'country': 'الدولة',
+    'birthDate': 'تاريخ الميلاد',
+    'pick': 'اختر التاريخ',
+    'whatsapp': 'رقم واتساب (مع كود الدولة)',
+    'notice':
+        'إضافة هذه المعلومات اختيارية تماماً، ولا تُستخدم لأيّ غرضٍ تجاريّ، وإنّما لأغراض البحث والتطوير فقط.',
+  },
+  'en': {
+    'gender': 'Gender',
+    'male': 'Male',
+    'female': 'Female',
+    'chooseGender': 'Please choose your gender',
+    'optional': 'Additional info (optional)',
+    'country': 'Country',
+    'birthDate': 'Date of birth',
+    'pick': 'Pick a date',
+    'whatsapp': 'WhatsApp number (with country code)',
+    'notice':
+        'Adding this information is entirely optional and is never used for any commercial purpose, only for research and development.',
+  },
+  'fr': {
+    'gender': 'Sexe',
+    'male': 'Homme',
+    'female': 'Femme',
+    'chooseGender': 'Veuillez choisir votre sexe',
+    'optional': 'Informations supplémentaires (facultatif)',
+    'country': 'Pays',
+    'birthDate': 'Date de naissance',
+    'pick': 'Choisir une date',
+    'whatsapp': 'Numéro WhatsApp (avec indicatif)',
+    'notice':
+        "L'ajout de ces informations est totalement facultatif et n'est jamais utilisé à des fins commerciales, uniquement pour la recherche et le développement.",
+  },
+};

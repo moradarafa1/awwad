@@ -74,15 +74,35 @@ ThemeData buildAwwadTheme() {
         borderSide: const BorderSide(color: AppColors.accent),
       ),
     ),
+    // Glass (iOS "Liquid Glass") primary buttons: translucent tinted fill with
+    // a luminous border and bright bold text, instead of a flat solid fill.
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.accent,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.accent.withValues(alpha: 0.26),
+        foregroundColor: AppColors.heading,
+        disabledBackgroundColor: AppColors.surface2.withValues(alpha: 0.6),
+        disabledForegroundColor: AppColors.muted,
         minimumSize: const Size.fromHeight(52),
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        side: BorderSide(color: AppColors.accent.withValues(alpha: 0.6)),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
-        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+      ).copyWith(
+        overlayColor: WidgetStateProperty.all(
+            AppColors.accent.withValues(alpha: 0.14)),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.text,
+        backgroundColor: Colors.white.withValues(alpha: 0.04),
+        side: BorderSide(color: AppColors.text.withValues(alpha: 0.18)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
     ),
     dividerTheme: const DividerThemeData(color: AppColors.border, thickness: 1),
