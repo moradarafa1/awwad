@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +10,7 @@ import '../../core/content/dhikr.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/notifications/notif_scheduler.dart';
 import '../../core/state/app_state.dart';
+import '../../core/widgets/ambient_background.dart';
 import 'daily_log_screen.dart';
 import 'stats_screen.dart';
 import 'badges_screen.dart';
@@ -93,7 +96,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
         duration: const Duration(seconds: 6),
         content: Text(
           '🔥 ${l10n.statsCurrentStreak}: ${s.currentStreak} · ${l10n.saveEntry}',
-          style: const TextStyle(color: AppColors.text),
+          style: TextStyle(color: AppColors.text),
         ),
         action: SnackBarAction(
           label: l10n.navToday,
@@ -118,13 +121,53 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       'fr': 'Pomodoro',
     }[Localizations.localeOf(context).languageCode] ?? 'Pomodoro';
     return Scaffold(
-      body: SafeArea(child: IndexedStack(index: index, children: _screens)),
-      bottomNavigationBar: NavigationBarTheme(
+      body: AmbientBackground(
+        child: SafeArea(child: IndexedStack(index: index, children: _screens)),
+      ),
+      backgroundColor: AppColors.bg,
+      // Floating "liquid glass" dock: blurred, translucent, luminous hairline.
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(26),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.surface
+                    .withValues(alpha: AppColors.isDark ? 0.58 : 0.72),
+                borderRadius: BorderRadius.circular(26),
+                border: Border.all(color: AppColors.hairline),
+              ),
+              child: MediaQuery.removePadding(
+                context: context,
+                removeBottom: true,
+                child: _buildNavBar(l10n, index, pomodoroLabel),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavBar(
+      AppLocalizations l10n, int index, String pomodoroLabel) {
+    return NavigationBarTheme(
         data: NavigationBarThemeData(
-          backgroundColor: AppColors.surface,
-          indicatorColor: AppColors.accent.withValues(alpha: 0.18),
-          labelTextStyle: WidgetStateProperty.all(
-              const TextStyle(fontSize: 11, color: AppColors.muted)),
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          height: 66,
+          indicatorColor: AppColors.accent.withValues(alpha: 0.22),
+          labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(
+              fontSize: 11,
+              fontWeight: states.contains(WidgetState.selected)
+                  ? FontWeight.w700
+                  : FontWeight.w500,
+              color: states.contains(WidgetState.selected)
+                  ? AppColors.heading
+                  : AppColors.muted)),
         ),
         child: NavigationBar(
           selectedIndex: index,
@@ -156,8 +199,6 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 selectedIcon: const Icon(Icons.settings),
                 label: l10n.navSettings),
           ],
-        ),
-      ),
-    );
+        ));
   }
 }

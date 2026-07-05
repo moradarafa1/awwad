@@ -116,7 +116,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(wasFocus ? s['doneFocus']! : s['doneBreak']!,
-            style: const TextStyle(color: AppColors.text)),
+            style: TextStyle(color: AppColors.text)),
       ));
     }
   }
@@ -183,7 +183,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(_fmt(_remaining),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 56,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.heading)),
@@ -220,7 +220,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.text,
                     minimumSize: const Size.fromHeight(52),
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(color: AppColors.border),
                   ),
                   icon: const Icon(Icons.refresh),
                   label: Text(t['reset']!),
@@ -230,7 +230,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
             const SizedBox(height: 24),
             // Focus length selector (only meaningful for focus phase)
             Text(t['focusLength']!,
-                style: const TextStyle(color: AppColors.muted, fontSize: 13)),
+                style: TextStyle(color: AppColors.muted, fontSize: 13)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -261,15 +261,15 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.local_fire_department,
+                  Icon(Icons.local_fire_department,
                       color: AppColors.accent3),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(t['sessions']!,
-                        style: const TextStyle(color: AppColors.text)),
+                        style: TextStyle(color: AppColors.text)),
                   ),
                   Text('$_completedFocus',
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: AppColors.heading,
                           fontSize: 20,
                           fontWeight: FontWeight.w800)),
@@ -278,7 +278,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
             ),
             const SizedBox(height: 18),
             Text(t['hint']!,
-                style: const TextStyle(
+                style: TextStyle(
                     color: AppColors.muted, fontSize: 13, height: 1.6)),
           ],
         ),

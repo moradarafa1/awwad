@@ -1,30 +1,52 @@
-# Supabase keep-alive — prevents the free project pausing after 7 days idle.
-# Works with NO repo secrets: the project URL and the PUBLIC anon key (the same
-# key shipped inside the app) are embedded as defaults. Optionally override them
-# with repo secrets SUPABASE_URL / SUPABASE_ANON_KEY. The secret service_role
-# key is NEVER used here.
-# For extra safety also set up a 2nd independent pinger (cron-job.org / UptimeRobot).
+# Supabase keep-alive - prevents the free project pausing for "insufficient activity".
+#
+# HISTORY (2026-07-04): a single REST SELECT every 3 days was NOT enough - Supabase
+# still sent the "going to be paused" email while this workflow was green. The scanner
+# wants real, repeated activity. So this now runs DAILY and generates three distinct
+# signals: a REST read, a genuine DB WRITE (rpc/heartbeat, migration 0007), and an
+# Edge Function invocation. A local Windows scheduled task (ops/keep-alive-local.ps1)
+# is the independent backup pinger.
+#
+# Works with NO repo secrets: the URL and the PUBLIC anon key are embedded as defaults
+# (same key shipped in the app). Repo secrets SUPABASE_URL / SUPABASE_ANON_KEY override.
+# The secret service_role key is NEVER used here.
 name: supabase-keep-alive
 on:
   schedule:
-    - cron: '17 6 */3 * *' # every 3 days at 06:17 UTC
+    - cron: '23 5 * * *' # daily 05:23 UTC (GitHub may delay; daily gives slack)
   workflow_dispatch: {}
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase (real SELECT keeps the DB warm)
+      - name: Ping Supabase (read + write + edge invocation)
         run: |
           set -e
           URL="${{ secrets.SUPABASE_URL }}"
           ANON="${{ secrets.SUPABASE_ANON_KEY }}"
-          # Public defaults (safe to commit) if no secrets are configured.
           if [ -z "$URL" ]; then URL="https://kdczbzzjezyhfxgpegqc.supabase.co"; fi
           if [ -z "$ANON" ]; then ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkY3pienpqZXp5aGZ4Z3BlZ3FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1MzUxNzcsImV4cCI6MjA5ODExMTE3N30.U1EEeJ_kCauZnXWVTlb-Whm5DyEIgGqkwEUpG8pI2vQ"; fi
+
+          # 1) REST read
           code=$(curl -s -o /dev/null -w "%{http_code}" \
             "$URL/rest/v1/habit_catalog?select=id&limit=1" \
-            -H "apikey: $ANON" \
-            -H "Authorization: Bearer $ANON")
-          echo "HTTP $code"
-          test "$code" = "200"
+            -H "apikey: $ANON" -H "Authorization: Bearer $ANON")
+          echo "read: HTTP $code"; test "$code" = "200"
+
+          # 2) Real DB write via the dedicated heartbeat RPC (migration 0007)
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            "$URL/rest/v1/rpc/heartbeat" \
+            -H "apikey: $ANON" -H "Authorization: Bearer $ANON" \
+            -H "Content-Type: application/json" \
+            -d '{"src":"github-actions"}')
+          echo "write: HTTP $code"; test "$code" = "200"
+
+          # 3) Edge Function invocation (send-engagement is a safe no-op; any
+          #    2xx/4xx proves the function runtime executed)
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            "$URL/functions/v1/send-engagement" \
+            -H "apikey: $ANON" -H "Authorization: Bearer $ANON" \
+            -H "Content-Type: application/json" -d '{}')
+          echo "edge: HTTP $code"
+          case "$code" in 2*|400|401|405) exit 0 ;; *) exit 1 ;; esac

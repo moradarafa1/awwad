@@ -56,9 +56,9 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         title: Text(_s(_kStr['advisoryTitle']!),
-            style: const TextStyle(color: AppColors.heading)),
+            style: TextStyle(color: AppColors.heading)),
         content: Text(_s(_kStr['advisoryBody']!),
-            style: const TextStyle(color: AppColors.text, height: 1.6)),
+            style: TextStyle(color: AppColors.text, height: 1.6)),
         actions: [
           FilledButton(
               onPressed: () => Navigator.pop(ctx),
@@ -125,12 +125,12 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.tips_and_updates_outlined,
+                    Icon(Icons.tips_and_updates_outlined,
                         color: AppColors.accent, size: 20),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(_s(_kStr['advisoryBody']!),
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 12, color: AppColors.muted, height: 1.6)),
                     ),
                   ],
@@ -159,7 +159,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
               if (canConfirm) ...[
                 const SizedBox(height: 22),
                 Text(_s(_kStr['nameLabel']!),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontWeight: FontWeight.w700, color: AppColors.muted)),
                 const SizedBox(height: 8),
                 TextField(
@@ -167,7 +167,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                     onChanged: (_) => setState(() {})),
                 const SizedBox(height: 14),
                 Text(_s(_kStr['whyLabel']!),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontWeight: FontWeight.w700, color: AppColors.muted)),
                 const SizedBox(height: 8),
                 TextField(
@@ -178,7 +178,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                 ),
                 const SizedBox(height: 14),
                 Text(_s(_kStr['reminder']!),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontWeight: FontWeight.w700, color: AppColors.muted)),
                 const SizedBox(height: 8),
                 ReminderTimesPicker(
@@ -231,7 +231,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(title,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppColors.heading)),
@@ -270,7 +270,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
         TextField(
           decoration: InputDecoration(
             hintText: _s(_kStr['search']!),
-            prefixIcon: const Icon(Icons.search, color: AppColors.muted),
+            prefixIcon: Icon(Icons.search, color: AppColors.muted),
             isDense: true,
           ),
           onChanged: (v) => setState(() => _query = v),
@@ -299,7 +299,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                 const Text('✏️', style: TextStyle(fontSize: 18)),
                 const SizedBox(width: 10),
                 Text(_s(_kStr['custom']!),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontWeight: FontWeight.w700,
                         color: AppColors.heading)),
               ],
@@ -311,7 +311,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 8, top: 4),
             child: Text(categoryName(entry.key, _loc),
-                style: const TextStyle(
+                style: TextStyle(
                     color: AppColors.muted,
                     fontSize: 12,
                     fontWeight: FontWeight.w700)),
@@ -368,7 +368,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Text(_s(_kStr['allChosen']!),
-                style: const TextStyle(color: AppColors.muted, fontSize: 13)),
+                style: TextStyle(color: AppColors.muted, fontSize: 13)),
           ),
       ],
     );

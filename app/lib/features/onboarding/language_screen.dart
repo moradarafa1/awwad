@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/state/app_state.dart';
+import '../../core/widgets/ambient_background.dart';
 import '../../core/widgets/glass_button.dart';
 
 /// First screen on a fresh install: pick the language. Choosing one sets the
@@ -17,17 +18,18 @@ class LanguageScreen extends ConsumerWidget {
     final ctrl = ref.read(appControllerProvider.notifier);
 
     return Scaffold(
-      body: SafeArea(
+      body: AmbientBackground(
+        child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
           child: Column(
             children: [
               const Spacer(),
-              const Text('🌱', style: TextStyle(fontSize: 60)),
+              Image.asset('assets/logo/mark.png', width: 108, height: 108),
               const SizedBox(height: 14),
               Text(l10n.appName,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.w900,
                       color: AppColors.heading)),
@@ -35,10 +37,10 @@ class LanguageScreen extends ConsumerWidget {
               Text(l10n.slogan,
                   textAlign: TextAlign.center,
                   style:
-                      const TextStyle(color: AppColors.accent2, fontSize: 14)),
+                      TextStyle(color: AppColors.accent2, fontSize: 14)),
               const SizedBox(height: 28),
               Text(l10n.chooseLanguage,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontWeight: FontWeight.w700, color: AppColors.muted)),
               const SizedBox(height: 14),
               GlassButton(
@@ -57,18 +59,19 @@ class LanguageScreen extends ConsumerWidget {
               const Spacer(),
               Row(
                 children: [
-                  const Icon(Icons.info_outline,
+                  Icon(Icons.info_outline,
                       color: AppColors.accent3, size: 18),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(l10n.medicalDisclaimer,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 11, color: AppColors.muted, height: 1.6)),
                   ),
                 ],
               ),
             ],
           ),
+        ),
         ),
       ),
     );

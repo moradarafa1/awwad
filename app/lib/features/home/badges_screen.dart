@@ -42,7 +42,7 @@ class BadgesScreen extends ConsumerWidget {
                   fontSize: 22, fontWeight: FontWeight.w900)),
           const SizedBox(height: 6),
           Text('${earnedKeys.length} / ${kBadges.length}',
-              style: const TextStyle(color: AppColors.muted)),
+              style: TextStyle(color: AppColors.muted)),
           const SizedBox(height: 12),
           const HabitSwitcher(),
           const SizedBox(height: 16),

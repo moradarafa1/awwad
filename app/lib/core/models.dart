@@ -13,6 +13,7 @@ class AppSettings {
   final bool notifPromptShown; // notification-permission rationale shown once
   final bool dhikrEnabled; // daily Ibrahimic-prayer dhikr notification
   final int dhikrHour; // when the daily dhikr fires
+  final bool darkMode; // dark (default) vs light theme
 
   const AppSettings({
     this.locale,
@@ -26,6 +27,7 @@ class AppSettings {
     this.notifPromptShown = false,
     this.dhikrEnabled = true,
     this.dhikrHour = 8,
+    this.darkMode = true,
   });
 
   AppSettings copyWith({
@@ -41,6 +43,7 @@ class AppSettings {
     bool? notifPromptShown,
     bool? dhikrEnabled,
     int? dhikrHour,
+    bool? darkMode,
   }) =>
       AppSettings(
         locale: locale ?? this.locale,
@@ -55,6 +58,7 @@ class AppSettings {
         notifPromptShown: notifPromptShown ?? this.notifPromptShown,
         dhikrEnabled: dhikrEnabled ?? this.dhikrEnabled,
         dhikrHour: dhikrHour ?? this.dhikrHour,
+        darkMode: darkMode ?? this.darkMode,
       );
 
   Map<String, dynamic> toJson() => {
@@ -69,6 +73,7 @@ class AppSettings {
         'notifPromptShown': notifPromptShown,
         'dhikrEnabled': dhikrEnabled,
         'dhikrHour': dhikrHour,
+        'darkMode': darkMode,
       };
 
   factory AppSettings.fromJson(Map<String, dynamic> j) => AppSettings(
@@ -83,6 +88,7 @@ class AppSettings {
         notifPromptShown: j['notifPromptShown'] as bool? ?? false,
         dhikrEnabled: j['dhikrEnabled'] as bool? ?? true,
         dhikrHour: j['dhikrHour'] as int? ?? 8,
+        darkMode: j['darkMode'] as bool? ?? true,
       );
 }
 

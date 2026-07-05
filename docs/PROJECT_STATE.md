@@ -422,6 +422,49 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-05 (rebrand + liquid glass + light mode + evidence-based content)** -
+  **(1) NEW LOGO**: professional Kufi wordmark of عوّاد where the shadda above the و IS the
+  sprout (two gradient leaves on a stem growing from the waw head); baseline = soil, waw root
+  dips below it, alef = tallest stem, geometric ع with open eye + hook. Designed via a
+  5-concept parallel workflow, visually judged, hand-refined. Vector masters:
+  `assets/icons/logo-master.svg` (full icon) + `logo-mark.svg` (transparent mark). ALL assets
+  regenerated from them: launcher icons (android/ios/web via flutter_launcher_icons), native
+  splash, site favicon/apple-touch/icon-192/512/og-image, Play icon 512 + feature graphic
+  1024x500, site header brand + 404 + in-app brand (`app/assets/logo/mark.png`, replaces 🌱 on
+  Language/AuthChoice screens). **(2) LIQUID GLASS UI**: GlassButton now uses a real
+  BackdropFilter (blur 18 + saturation-boost color matrix, Apple's recipe) + specular top
+  highlight + springy press-scale; floating glass bottom dock (blur 24, translucent, hairline
+  border, MediaQuery.removePadding); AmbientBackground radial glows behind every screen (cheap,
+  gradient-only); translucent cards; Cupertino page transitions everywhere. **(3) DARK/LIGHT
+  MODE**: `AppColors` converted from const fields to palette-backed getters (`Palette` +
+  `kDarkPalette`/`kLightPalette`, light accents darkened for WCAG AA on white);
+  `settings.darkMode` (default true) + Settings toggle; `buildAwwadTheme(dark:)`;
+  136 invalid-const sites de-consted via 5 parallel agents; analyze clean. **(4) SUPABASE
+  PAUSE FIX** (email 2026-07-04 "insufficient activity" DESPITE green 3-day pings - a single
+  REST SELECT per 3 days is not enough): migration `0007_ops_heartbeat` adds a locked table +
+  SECURITY DEFINER `heartbeat()` RPC (anon-callable, only bumps a timestamp; advisor-checked);
+  keep-alive.yml now DAILY with 3 signals (REST read + rpc/heartbeat WRITE + edge-function
+  invocation); independent local backup pinger `ops/keep-alive-local.ps1` registered as Windows
+  task `AwwadSupabaseKeepAlive` (every 2 days, logged, tested green). **(5) CURATED VIDEOS
+  (owner rule)**: the suggested-video card now exists ONLY for habits with REAL verified videos
+  (<30 min, trusted source: واعي / الشيخ مصطفى العدوي), programmatically verified twice
+  (find + adversarial re-fetch of lengthSeconds/author). 10 habits qualified (secret_habit,
+  gossip, pray_on_time, adhkar, keeping_ties, daily_charity, istighfar, gratitude,
+  honor_parents, dua); all others show NO card; the generic YouTube-search fallback removed.
+  Generated into `habit_daily_content.dart` `kHabitVideos`. **(6) EVIDENCE-BASED PROGRESSIVE
+  TRACKING**: new `habit_stages.dart` - 4 recovery stages for break (HRT: awareness ->
+  competing response -> environment control -> maintenance/relapse-prevention) and 4 commitment
+  stages for build (foundation -> consistency -> consolidation -> established), thresholds 0/7/
+  30/60 aligned with shields; daily log shows a stage card (X of 4 + focus + 3 tips + progress
+  bar to next stage) for BOTH tracks (replaces the old week-based `_phaseBanner`), and
+  checklist order adapts to the stage (environment leads from stage 3). Per-habit content for
+  ALL 36 habits designed + adversarially verified via workflow: 34 custom slider pairs
+  (`kHabitMetricsOverrides`), 36 tailored daily questions (`kHabitQuestions`, e.g. anger:
+  "هل انفجرت غضباً اليوم؟"), 18 new BUILD checklists (`kExtraCompeting`/`kExtraEnvironment`,
+  rendered with build-specific group titles "خطوات اليوم"/"تهيئة البيئة"; build habits without
+  tailored lists show none instead of the break-oriented seeded fallback). Assembled
+  programmatically (`assemble_daily_content.mjs`), em-dash-stripped. New `habit_stages_test`
+  (4 tests). Verified: analyze clean, 12/12 tests, site 112 pages 0 em-dashes, site redeployed.
 - **2026-07-04 (DEPLOY + store-ready release kit)** - Full review pass on all four surfaces,
   then shipped: **(1) Netlify deploys** - marketing site → https://awwad-habits.netlify.app
   (site id `0b65cc50-...`), Flutter web app (cloud build) → https://awwad-app.netlify.app

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Awwad mark only (transparent): the عوّاد kufi wordmark with the
+       shadda-sprout over the waw. Used for adaptive-icon foreground, splash,
+       and in-app/site brand marks. Kept centered via the translate below. -->
+  <defs>
+    <linearGradient id="leafL" x1="640" y1="470" x2="700" y2="330" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+    <linearGradient id="leafR" x1="560" y1="470" x2="500" y2="330" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2dd4bf"/>
+      <stop offset="1" stop-color="#34d399"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(-29,-29)">
+    <g fill="none" stroke="#2dd4bf" stroke-width="68" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M236 664H788"/>
+      <path d="M846 470V396H762V664"/>
+      <path d="M762 528H820"/>
+      <path d="M448 300V664"/>
+      <path d="M368 468H284V664"/>
+      <path d="M596 664C592 728 576 762 528 782"/>
+    </g>
+    <circle cx="600" cy="600" r="56" fill="#2dd4bf"/>
+    <path d="M600 546V492" fill="none" stroke="#34d399" stroke-width="26" stroke-linecap="round"/>
+    <path d="M600 490C588 424 618 380 690 372C694 436 658 480 600 490Z" fill="url(#leafL)"/>
+    <path d="M600 490C608 432 586 390 518 384C514 444 546 482 600 490Z" fill="url(#leafR)"/>
+  </g>
+</svg>

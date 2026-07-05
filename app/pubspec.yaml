@@ -58,6 +58,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true   # enables gen-l10n (AppLocalizations)
+  assets:
+    - assets/logo/mark.png
 
 flutter_launcher_icons:
   android: true

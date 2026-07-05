@@ -54,7 +54,7 @@ class AwwadApp extends ConsumerWidget {
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context).appName,
       debugShowCheckedModeBanner: false,
-      theme: buildAwwadTheme(),
+      theme: buildAwwadTheme(dark: settings.darkMode),
       locale: settings.locale != null ? Locale(settings.locale!) : null,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

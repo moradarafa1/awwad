@@ -27,7 +27,7 @@ class FieldsManagerScreen extends ConsumerWidget {
         children: [
           for (final group in _groups) ...[
             Text(groupTitle(group, locale),
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 15,
                     color: AppColors.heading)),
@@ -77,7 +77,7 @@ class FieldsManagerScreen extends ConsumerWidget {
           ),
           if (!f.isSystem)
             IconButton(
-              icon: const Icon(Icons.delete_outline,
+              icon: Icon(Icons.delete_outline,
                   size: 20, color: AppColors.danger),
               onPressed: () => ctrl.deleteField(f.id),
             ),

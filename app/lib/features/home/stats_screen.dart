@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_daily_content.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import 'habit_switcher.dart';
@@ -19,7 +20,7 @@ class StatsScreen extends ConsumerWidget {
     final s = ref.watch(appControllerProvider);
     final recent = s.activeEntries.take(7).toList().reversed.toList();
     final habit = s.activeHabit;
-    final metrics =
+    final metrics = kHabitMetricsOverrides[habit?.catalogKey] ??
         metricsForHabit(habit?.catalogKey, habit?.track ?? 'break');
     final last7 = const {
       'ar': 'آخر ٧ أيام',
@@ -71,7 +72,7 @@ class StatsScreen extends ConsumerWidget {
                 SizedBox(
                   height: 160,
                   child: recent.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text('·',
                               style: TextStyle(color: AppColors.muted)))
                       : BarChart(

@@ -31,7 +31,7 @@ class HistoryScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(40),
               child: Text(l10n.noHistory,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.muted)),
+                  style: TextStyle(color: AppColors.muted)),
             )
           else
             ...entries.map((e) {
@@ -50,7 +50,7 @@ class HistoryScreen extends ConsumerWidget {
                     Row(
                       children: [
                         Text('📅 ${e.date}',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: AppColors.accent,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 12)),
@@ -103,12 +103,12 @@ class HistoryScreen extends ConsumerWidget {
         child: Row(
           children: [
             Text(k,
-                style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+                style: TextStyle(color: AppColors.muted, fontSize: 12)),
             const Spacer(),
             Flexible(
               child: Text(v,
                   textAlign: TextAlign.end,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: AppColors.text,
                       fontSize: 12,
                       fontWeight: FontWeight.w600)),

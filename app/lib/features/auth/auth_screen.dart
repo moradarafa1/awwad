@@ -177,7 +177,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         padding: const EdgeInsets.all(20),
         children: [
           Text(l10n.syncDesc,
-              style: const TextStyle(color: AppColors.muted, height: 1.6)),
+              style: TextStyle(color: AppColors.muted, height: 1.6)),
           const SizedBox(height: 20),
           if (_signUp) ...[
             TextField(
@@ -185,7 +185,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 decoration: InputDecoration(labelText: l10n.nameLabel)),
             const SizedBox(height: 16),
             Text('${_tr('gender')} *',
-                style: const TextStyle(
+                style: TextStyle(
                     color: AppColors.text, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             Row(children: [
@@ -203,7 +203,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       color: AppColors.muted, size: 20),
                   const SizedBox(width: 6),
                   Text(_tr('optional'),
-                      style: const TextStyle(color: AppColors.muted)),
+                      style: TextStyle(color: AppColors.muted)),
                 ]),
               ),
             ),
@@ -247,7 +247,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             ],
             const SizedBox(height: 10),
             Text(_tr('notice'),
-                style: const TextStyle(
+                style: TextStyle(
                     color: AppColors.muted, fontSize: 12, height: 1.6)),
             const SizedBox(height: 14),
           ],

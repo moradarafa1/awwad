@@ -77,7 +77,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(signedIn ? email : _s(_kStr['guest']!, loc),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
                           color: AppColors.heading)),
@@ -86,7 +86,7 @@ class ProfileScreen extends ConsumerWidget {
                           ? _s(_kStr['synced']!, loc)
                           : _s(_kStr['guestSub']!, loc),
                       style:
-                          const TextStyle(color: AppColors.muted, fontSize: 12)),
+                          TextStyle(color: AppColors.muted, fontSize: 12)),
                 ],
               ),
             ),
@@ -108,17 +108,17 @@ class ProfileScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.lock_outline,
+                      leading: Icon(Icons.lock_outline,
                           color: AppColors.accent),
                       title: Text(_s(_kAcc['changePw']!, loc),
                           style: const TextStyle(fontSize: 14)),
-                      trailing: const Icon(Icons.chevron_right,
+                      trailing: Icon(Icons.chevron_right,
                           color: AppColors.muted),
                       onTap: () => _changePassword(context, loc),
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.logout, color: AppColors.muted),
+                      leading: Icon(Icons.logout, color: AppColors.muted),
                       title: Text(_s(_kAcc['signOut']!, loc),
                           style: const TextStyle(fontSize: 14)),
                       onTap: () => _signOut(context, loc),
@@ -194,7 +194,7 @@ class ProfileScreen extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         title: Text(_s(_kAcc['changePw']!, loc),
-            style: const TextStyle(color: AppColors.heading)),
+            style: TextStyle(color: AppColors.heading)),
         content: TextField(
           controller: ctrl,
           obscureText: true,
@@ -257,7 +257,7 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Text(_s(_kStr['noBadges']!, loc),
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: AppColors.muted, height: 1.5, fontSize: 13)),
             ),
           ],
@@ -287,13 +287,13 @@ class ProfileScreen extends ConsumerWidget {
                     style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 2),
                 Text(top.t(loc),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontWeight: FontWeight.w900,
                         fontSize: 17,
                         color: AppColors.heading)),
                 const SizedBox(height: 4),
                 Text('${_s(_kStr['earnedCount']!, loc)}: $count / ${kBadges.length}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: AppColors.muted, fontSize: 12)),
               ],
             ),

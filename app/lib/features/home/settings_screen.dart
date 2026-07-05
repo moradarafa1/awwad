@@ -23,6 +23,12 @@ import 'profile_screen.dart';
 const _linkedInUrl = 'https://www.facebook.com/MoradArafaOfficial/';
 
 const Map<String, Map<String, String>> _kSet = {
+  'darkMode': {'ar': 'الوضع الداكن', 'en': 'Dark mode', 'fr': 'Mode sombre'},
+  'darkModeSub': {
+    'ar': 'أطفئه للتبديل إلى الوضع الفاتح',
+    'en': 'Turn off to switch to the light theme',
+    'fr': 'Désactivez pour passer au thème clair'
+  },
   'notif': {'ar': 'الإشعارات', 'en': 'Notifications', 'fr': 'Notifications'},
   'notifSub': {
     'ar': 'تذكير يومي وتهنئة بالأوسمة',
@@ -87,6 +93,27 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
 
+          // appearance: dark / light mode
+          SectionCard(
+            child: SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: s.settings.darkMode,
+              activeThumbColor: AppColors.accent,
+              title: Text(_set('darkMode', loc),
+                  style: const TextStyle(fontSize: 13)),
+              subtitle: Text(_set('darkModeSub', loc),
+                  style:
+                      TextStyle(fontSize: 11, color: AppColors.muted)),
+              secondary: Icon(
+                  s.settings.darkMode
+                      ? Icons.dark_mode_outlined
+                      : Icons.light_mode_outlined,
+                  color: AppColors.accent2),
+              onChanged: (v) => ctrl.setDarkMode(v),
+            ),
+          ),
+          const SizedBox(height: 12),
+
           // notifications + reminders + dhikr + religious content
           SectionCard(
             child: Column(
@@ -98,7 +125,7 @@ class SettingsScreen extends ConsumerWidget {
                   title: Text(_set('notif', loc),
                       style: const TextStyle(fontSize: 13)),
                   subtitle: Text(_set('notifSub', loc),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 11, color: AppColors.muted)),
                   onChanged: (v) async {
                     // Turning ON: request OS permission first (skip on web,
@@ -125,7 +152,7 @@ class SettingsScreen extends ConsumerWidget {
                   title: Text(_set('dhikr', loc),
                       style: const TextStyle(fontSize: 13)),
                   subtitle: Text(_set('dhikrSub', loc),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 11, color: AppColors.muted)),
                   onChanged: (v) async {
                     await ctrl.setDhikrEnabled(v);
@@ -155,11 +182,11 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.person_outline,
+                  leading: Icon(Icons.person_outline,
                       color: AppColors.accent),
                   title: Text(_set('profile', loc),
                       style: const TextStyle(fontSize: 13)),
-                  trailing: const Icon(Icons.chevron_right,
+                  trailing: Icon(Icons.chevron_right,
                       color: AppColors.muted),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) => const ProfileScreen())),
@@ -168,10 +195,10 @@ class SettingsScreen extends ConsumerWidget {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading:
-                      const Icon(Icons.flag_outlined, color: AppColors.accent),
+                      Icon(Icons.flag_outlined, color: AppColors.accent),
                   title: Text(_set('habits', loc),
                       style: const TextStyle(fontSize: 13)),
-                  trailing: const Icon(Icons.chevron_right,
+                  trailing: Icon(Icons.chevron_right,
                       color: AppColors.muted),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) => const HabitsScreen())),
@@ -189,7 +216,7 @@ class SettingsScreen extends ConsumerWidget {
                       children: [
                         ListTile(
                           contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.sync, color: AppColors.accent2),
+                          leading: Icon(Icons.sync, color: AppColors.accent2),
                           title: Text(l10n.syncNow,
                               style: const TextStyle(fontSize: 13)),
                           onTap: () => _syncNow(context, ref),
@@ -197,7 +224,7 @@ class SettingsScreen extends ConsumerWidget {
                         const Divider(),
                         ListTile(
                           contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.logout, color: AppColors.muted),
+                          leading: Icon(Icons.logout, color: AppColors.muted),
                           title: Text(l10n.signOut,
                               style: const TextStyle(fontSize: 13)),
                           onTap: () => SupabaseService.signOut(),
@@ -206,14 +233,14 @@ class SettingsScreen extends ConsumerWidget {
                     )
                   : ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.cloud_outlined,
+                      leading: Icon(Icons.cloud_outlined,
                           color: AppColors.accent),
                       title: Text(l10n.syncTitle,
                           style: const TextStyle(fontSize: 13)),
                       subtitle: Text(l10n.syncDesc,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 11, color: AppColors.muted)),
-                      trailing: const Icon(Icons.chevron_right,
+                      trailing: Icon(Icons.chevron_right,
                           color: AppColors.muted),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => const AuthScreen())),
@@ -226,10 +253,10 @@ class SettingsScreen extends ConsumerWidget {
           SectionCard(
             child: ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.tune, color: AppColors.accent),
+              leading: Icon(Icons.tune, color: AppColors.accent),
               title:
                   Text(l10n.customizeFields, style: const TextStyle(fontSize: 13)),
-              trailing: const Icon(Icons.chevron_right, color: AppColors.muted),
+              trailing: Icon(Icons.chevron_right, color: AppColors.muted),
               onTap: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => const FieldsManagerScreen())),
             ),
@@ -242,7 +269,7 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.download_outlined,
+                  leading: Icon(Icons.download_outlined,
                       color: AppColors.accent2),
                   title: Text(l10n.exportData,
                       style: const TextStyle(fontSize: 13)),
@@ -251,20 +278,20 @@ class SettingsScreen extends ConsumerWidget {
                 const Divider(),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.person_remove_outlined,
+                  leading: Icon(Icons.person_remove_outlined,
                       color: AppColors.danger),
                   title: Text(l10n.deleteAccountTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 13, color: AppColors.danger)),
                   onTap: () => _confirmDelete(context, ref),
                 ),
                 const Divider(),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.delete_outline,
+                  leading: Icon(Icons.delete_outline,
                       color: AppColors.danger),
                   title: Text(l10n.resetData,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 13, color: AppColors.danger)),
                   onTap: () => _confirmReset(context, ref),
                 ),
@@ -279,17 +306,17 @@ class SettingsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(l10n.appName,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
                         color: AppColors.heading)),
                 Text(l10n.slogan,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: AppColors.accent2, fontSize: 12)),
                 const SizedBox(height: 12),
                 Text(l10n.medicalDisclaimer,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: AppColors.muted, fontSize: 11, height: 1.5)),
                 const SizedBox(height: 14),
                 const Divider(),
@@ -298,12 +325,12 @@ class SettingsScreen extends ConsumerWidget {
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    const Text('© جميع الحقوق محفوظة، ',
+                    Text('© جميع الحقوق محفوظة، ',
                         style: TextStyle(
                             color: AppColors.muted, fontSize: 12)),
                     InkWell(
                       onTap: _openLinkedIn,
-                      child: const Text('Morad Arafa',
+                      child: Text('Morad Arafa',
                           style: TextStyle(
                               color: AppColors.accent,
                               fontSize: 12,

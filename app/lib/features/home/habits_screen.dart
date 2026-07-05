@@ -36,7 +36,7 @@ class HabitsScreen extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
           children: [
             Text(_s(_kStr['intro']!, loc),
-                style: const TextStyle(
+                style: TextStyle(
                     color: AppColors.muted, fontSize: 13, height: 1.6)),
             const SizedBox(height: 18),
             _section(context, ref, loc, '🚭', _s(_kStr['breakTrack']!, loc),
@@ -71,13 +71,13 @@ class HabitsScreen extends ConsumerWidget {
             Text(emoji, style: const TextStyle(fontSize: 18)),
             const SizedBox(width: 8),
             Text(title,
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 15,
                     color: AppColors.heading)),
             const Spacer(),
             Text('${habits.length}/$kMaxHabitsPerTrack',
-                style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+                style: TextStyle(color: AppColors.muted, fontSize: 12)),
           ],
         ),
         const SizedBox(height: 10),
@@ -85,7 +85,7 @@ class HabitsScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Text(_s(_kStr['none']!, loc),
-                style: const TextStyle(color: AppColors.muted, fontSize: 13)),
+                style: TextStyle(color: AppColors.muted, fontSize: 13)),
           )
         else
           ...habits.map(
@@ -128,12 +128,12 @@ class HabitsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(h.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: AppColors.heading)),
                   if (active)
                     Text(_s(_kStr['active']!, loc),
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: AppColors.accent, fontSize: 11)),
                 ],
               ),
@@ -147,7 +147,7 @@ class HabitsScreen extends ConsumerWidget {
                     style: const TextStyle(fontSize: 12)),
               ),
             IconButton(
-              icon: const Icon(Icons.alarm, color: AppColors.accent, size: 20),
+              icon: Icon(Icons.alarm, color: AppColors.accent, size: 20),
               tooltip: _s(_kStr['reminders']!, loc),
               onPressed: () => _editReminders(context, ref, loc, h),
             ),
@@ -174,7 +174,7 @@ class HabitsScreen extends ConsumerWidget {
         builder: (ctx, setLocal) => AlertDialog(
           backgroundColor: AppColors.surface,
           title: Text('${_s(_kStr['reminders']!, loc)} - ${h.title}',
-              style: const TextStyle(color: AppColors.heading, fontSize: 16)),
+              style: TextStyle(color: AppColors.heading, fontSize: 16)),
           content: ReminderTimesPicker(
             hours: hours,
             onChanged: (v) => setLocal(() => hours = v),
@@ -213,9 +213,9 @@ class HabitsScreen extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         title: Text(_s(_kStr['delTitle']!, loc),
-            style: const TextStyle(color: AppColors.heading)),
+            style: TextStyle(color: AppColors.heading)),
         content: Text('${_s(_kStr['delBody']!, loc)}\n\n"${h.title}"',
-            style: const TextStyle(color: AppColors.text)),
+            style: TextStyle(color: AppColors.text)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),

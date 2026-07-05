@@ -53,7 +53,7 @@ class ReminderTimesPicker extends StatelessWidget {
       children: [
         if (hours.isEmpty)
           Text(emptyLabel,
-              style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+              style: TextStyle(color: AppColors.muted, fontSize: 12)),
         ...hours.map((h) => Container(
               padding: const EdgeInsets.only(left: 6, right: 12),
               decoration: BoxDecoration(
@@ -67,13 +67,13 @@ class ReminderTimesPicker extends StatelessWidget {
                   InkWell(
                     onTap: () => onChanged([...hours]..remove(h)),
                     customBorder: const CircleBorder(),
-                    child: const Padding(
-                      padding: EdgeInsets.all(4),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
                       child: Icon(Icons.close, size: 14, color: AppColors.accent),
                     ),
                   ),
                   Text(_fmt(h),
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: AppColors.heading,
                           fontWeight: FontWeight.w700,
                           fontSize: 13)),
@@ -93,10 +93,10 @@ class ReminderTimesPicker extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.add_alarm, size: 16, color: AppColors.muted),
+                Icon(Icons.add_alarm, size: 16, color: AppColors.muted),
                 const SizedBox(width: 6),
                 Text(addLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: AppColors.muted, fontSize: 13)),
               ],
             ),

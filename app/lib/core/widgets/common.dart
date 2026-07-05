@@ -55,14 +55,14 @@ class MotivationBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.w800,
                           color: AppColors.heading,
                           fontSize: 14)),
                   if (subtitle != null) ...[
                     const SizedBox(height: 3),
                     Text(subtitle!,
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: AppColors.muted, fontSize: 11)),
                   ]
                 ],
@@ -77,12 +77,12 @@ class MotivationBanner extends StatelessWidget {
 class StatTile extends StatelessWidget {
   final String value;
   final String label;
-  final Color color;
+  final Color? color;
   const StatTile(
       {super.key,
       required this.value,
       required this.label,
-      this.color = AppColors.accent});
+      this.color});
 
   @override
   Widget build(BuildContext context) => Container(
@@ -96,11 +96,13 @@ class StatTile extends StatelessWidget {
           children: [
             Text(value,
                 style: TextStyle(
-                    fontSize: 24, fontWeight: FontWeight.w900, color: color)),
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: color ?? AppColors.accent)),
             const SizedBox(height: 5),
             Text(label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 10, color: AppColors.muted)),
+                style: TextStyle(fontSize: 10, color: AppColors.muted)),
           ],
         ),
       );
@@ -111,32 +113,35 @@ class ChoiceChipTile extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  final Color color;
+  final Color? color;
   const ChoiceChipTile({
     super.key,
     required this.label,
     required this.selected,
     required this.onTap,
-    this.color = AppColors.accent,
+    this.color,
   });
 
   @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: selected ? color.withValues(alpha: 0.15) : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: selected ? color : AppColors.border),
-          ),
-          child: Text(label,
-              style: TextStyle(
-                  fontSize: 13,
-                  color: selected ? color : AppColors.muted,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w400)),
+  Widget build(BuildContext context) {
+    final color = this.color ?? AppColors.accent;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? color.withValues(alpha: 0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: selected ? color : AppColors.border),
         ),
-      );
+        child: Text(label,
+            style: TextStyle(
+                fontSize: 13,
+                color: selected ? color : AppColors.muted,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w400)),
+      ),
+    );
+  }
 }

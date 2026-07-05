@@ -48,7 +48,7 @@ class _BadgeCelebrationDialogState extends State<_BadgeCelebrationDialog> {
           backgroundColor: AppColors.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
-            side: const BorderSide(color: AppColors.accent3),
+            side: BorderSide(color: AppColors.accent3),
           ),
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -58,14 +58,14 @@ class _BadgeCelebrationDialogState extends State<_BadgeCelebrationDialog> {
                 Text(widget.def.icon, style: const TextStyle(fontSize: 64)),
                 const SizedBox(height: 12),
                 Text(l10n.badgeCongrats,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: AppColors.accent3,
                         fontWeight: FontWeight.w700,
                         fontSize: 13)),
                 const SizedBox(height: 6),
                 Text(widget.def.t(locale),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
                         color: AppColors.heading)),
@@ -73,7 +73,7 @@ class _BadgeCelebrationDialogState extends State<_BadgeCelebrationDialog> {
                 Text(widget.def.d(locale),
                     textAlign: TextAlign.center,
                     style:
-                        const TextStyle(color: AppColors.muted, height: 1.5)),
+                        TextStyle(color: AppColors.muted, height: 1.5)),
                 const SizedBox(height: 18),
                 FilledButton(
                   onPressed: () => Navigator.of(context).pop(),
@@ -88,7 +88,7 @@ class _BadgeCelebrationDialogState extends State<_BadgeCelebrationDialog> {
           blastDirectionality: BlastDirectionality.explosive,
           shouldLoop: false,
           numberOfParticles: 24,
-          colors: const [
+          colors: [
             AppColors.accent,
             AppColors.accent2,
             AppColors.accent3,

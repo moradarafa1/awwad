@@ -59,9 +59,9 @@ class HabitSwitcher extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         title: Text(tr(_kRemoveTitle),
-            style: const TextStyle(color: AppColors.heading)),
+            style: TextStyle(color: AppColors.heading)),
         content: Text('${tr(_kRemoveBody)}\n\n"${h.title}"',
-            style: const TextStyle(color: AppColors.text)),
+            style: TextStyle(color: AppColors.text)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -161,10 +161,10 @@ class _AddChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.add, size: 18, color: AppColors.accent),
+            Icon(Icons.add, size: 18, color: AppColors.accent),
             const SizedBox(width: 4),
             Text(label,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.accent)),

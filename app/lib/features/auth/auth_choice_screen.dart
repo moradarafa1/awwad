@@ -6,6 +6,7 @@ import '../../app/theme.dart';
 import '../../core/cloud/supabase_service.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/state/app_state.dart';
+import '../../core/widgets/ambient_background.dart';
 import '../../core/widgets/glass_button.dart';
 import 'auth_screen.dart';
 
@@ -46,28 +47,29 @@ class _AuthChoiceScreenState extends ConsumerState<AuthChoiceScreen> {
     final canSignIn = SupabaseService.configured;
 
     return Scaffold(
-      body: SafeArea(
+      body: AmbientBackground(
+        child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
           child: Column(
             children: [
               const Spacer(),
-              const Text('🌱', style: TextStyle(fontSize: 60)),
+              Image.asset('assets/logo/mark.png', width: 108, height: 108),
               const SizedBox(height: 14),
               Text(l10n.appName,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.w900,
                       color: AppColors.heading)),
               const SizedBox(height: 6),
               Text(l10n.slogan,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.accent2, fontSize: 14)),
+                  style: TextStyle(color: AppColors.accent2, fontSize: 14)),
               const SizedBox(height: 18),
               Text(_s(_kStr['intro']!, loc),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: AppColors.muted, height: 1.7, fontSize: 14)),
               const Spacer(),
               if (canSignIn) ...[
@@ -92,10 +94,11 @@ class _AuthChoiceScreenState extends ConsumerState<AuthChoiceScreen> {
               const SizedBox(height: 12),
               Text(_s(_kStr['guestNote']!, loc),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: AppColors.muted, fontSize: 11, height: 1.5)),
             ],
           ),
+        ),
         ),
       ),
     );

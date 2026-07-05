@@ -241,6 +241,12 @@ class AppController extends Notifier<AppState> {
         .track('religious_content_toggled', {'visible': show});
   }
 
+  Future<void> setDarkMode(bool dark) async {
+    final s = state.settings.copyWith(darkMode: dark);
+    state = state.copyWith(settings: s);
+    await _store.saveSettings(s);
+  }
+
   Future<void> setReminderHour(int hour) async {
     final s = state.settings.copyWith(reminderHour: hour);
     state = state.copyWith(settings: s);

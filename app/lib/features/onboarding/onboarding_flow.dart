@@ -9,6 +9,7 @@ import '../../core/catalog/countries.dart';
 import '../../core/models.dart';
 import '../../core/state/app_state.dart';
 import '../../core/analytics/analytics.dart';
+import '../../core/widgets/ambient_background.dart';
 import '../../core/widgets/common.dart';
 import '../../core/widgets/reminder_times_picker.dart';
 
@@ -95,18 +96,20 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            _progressBar(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                child: _buildStep(l10n),
+      body: AmbientBackground(
+        child: SafeArea(
+          child: Column(
+            children: [
+              _progressBar(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                  child: _buildStep(l10n),
+                ),
               ),
-            ),
-            _bottomBar(l10n),
-          ],
+              _bottomBar(l10n),
+            ],
+          ),
         ),
       ),
     );
@@ -170,7 +173,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
         const SizedBox(height: 16),
         // Country — optional, searchable list of all countries (localized).
         Text(l10n.country,
-            style: const TextStyle(
+            style: TextStyle(
                 fontWeight: FontWeight.w700, color: AppColors.muted)),
         const SizedBox(height: 8),
         InkWell(
@@ -194,7 +197,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                             : AppColors.text),
                   ),
                 ),
-                const Icon(Icons.expand_more, color: AppColors.muted, size: 20),
+                Icon(Icons.expand_more, color: AppColors.muted, size: 20),
               ],
             ),
           ),
@@ -227,7 +230,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: const TextStyle(
+            style: TextStyle(
                 fontWeight: FontWeight.w700, color: AppColors.muted)),
         const SizedBox(height: 8),
         Wrap(
@@ -293,14 +296,14 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
                           color: AppColors.heading)),
                   const SizedBox(height: 4),
                   Text(desc,
                       style:
-                          const TextStyle(color: AppColors.muted, fontSize: 12)),
+                          TextStyle(color: AppColors.muted, fontSize: 12)),
                 ],
               ),
             ),
@@ -353,13 +356,13 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
         const SizedBox(height: 18),
         Text(l10n.habitNameLabel,
-            style: const TextStyle(
+            style: TextStyle(
                 fontWeight: FontWeight.w700, color: AppColors.muted)),
         const SizedBox(height: 8),
         TextField(controller: _nameCtrl),
         const SizedBox(height: 16),
         Text(l10n.habitWhyLabel,
-            style: const TextStyle(
+            style: TextStyle(
                 fontWeight: FontWeight.w700, color: AppColors.muted)),
         const SizedBox(height: 8),
         TextField(
@@ -369,11 +372,11 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
         ),
         const SizedBox(height: 16),
         Text(l10n.reminderTime,
-            style: const TextStyle(
+            style: TextStyle(
                 fontWeight: FontWeight.w700, color: AppColors.muted)),
         const SizedBox(height: 4),
         Text(_reminderHint(),
-            style: const TextStyle(color: AppColors.muted, fontSize: 11)),
+            style: TextStyle(color: AppColors.muted, fontSize: 11)),
         const SizedBox(height: 8),
         ReminderTimesPicker(
           hours: _reminderHours,
@@ -387,7 +390,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   Widget _bottomBar(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 18),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.bg,
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
@@ -399,7 +402,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.text,
                 minimumSize: const Size(64, 52),
-                side: const BorderSide(color: AppColors.border),
+                side: BorderSide(color: AppColors.border),
               ),
               child: Text(l10n.back),
             ),
@@ -530,7 +533,7 @@ class _HabitPickerState extends State<_HabitPicker> {
         TextField(
           decoration: InputDecoration(
             hintText: l10n.searchHabits,
-            prefixIcon: const Icon(Icons.search, color: AppColors.muted),
+            prefixIcon: Icon(Icons.search, color: AppColors.muted),
             isDense: true,
           ),
           onChanged: (v) => setState(() => _query = v),
@@ -543,7 +546,7 @@ class _HabitPickerState extends State<_HabitPicker> {
           Padding(
             padding: const EdgeInsets.only(bottom: 8, top: 4),
             child: Text(categoryName(entry.key, widget.locale),
-                style: const TextStyle(
+                style: TextStyle(
                     color: AppColors.muted,
                     fontSize: 12,
                     fontWeight: FontWeight.w700)),
@@ -620,11 +623,11 @@ class _HabitPickerState extends State<_HabitPicker> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(l10n.customHabitTitle,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: AppColors.heading)),
                       Text(l10n.customHabitDesc,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: AppColors.muted, fontSize: 12)),
                     ],
                   ),
@@ -697,7 +700,7 @@ class _CountrySheetState extends State<_CountrySheet> {
                 decoration: InputDecoration(
                   hintText: hint,
                   prefixIcon:
-                      const Icon(Icons.search, color: AppColors.muted),
+                      Icon(Icons.search, color: AppColors.muted),
                   isDense: true,
                 ),
                 onChanged: (v) => setState(() => _q = v),
@@ -707,14 +710,14 @@ class _CountrySheetState extends State<_CountrySheet> {
               child: list.isEmpty
                   ? Center(
                       child: Text('·',
-                          style: const TextStyle(color: AppColors.muted)))
+                          style: TextStyle(color: AppColors.muted)))
                   : ListView.builder(
                       itemCount: list.length,
                       itemBuilder: (_, i) {
                         final c = list[i];
                         return ListTile(
                           title: Text(c.name(widget.locale),
-                              style: const TextStyle(color: AppColors.text)),
+                              style: TextStyle(color: AppColors.text)),
                           onTap: () => Navigator.of(context).pop(c),
                         );
                       },
