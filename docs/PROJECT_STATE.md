@@ -422,6 +422,48 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-06 (FINAL logo: owner-supplied plant design)** - Owner delivered a finished logo
+  design (`تصميم لوجو عواد.zip`, added to the repo at `assets/brand/`: `awad-app-icon.svg`,
+  `awad-plant.svg`, `awad-plant-mono.svg`, README + design doc). It is a bright, organic sprout:
+  two lime veined leaves (#8FBF44 / #9FCE57 with #C6E58C/#CBE892 veins) on an olive stem
+  (#5E8A31), on a dark rounded square (#12161F). Installed everywhere: rewrote
+  `assets/icons/icon-full.svg` (full 1024 icon) + `icon-foreground.svg` (transparent plant,
+  adaptive-safe), regenerated `icon-1024.png` / `icon-foreground-1024.png` / `splash-logo.png`,
+  all Android/iOS/web launcher icons (flutter_launcher_icons), native splash, site
+  favicon/apple-touch/192/512, og-image + Play feature graphic (plant + عوّاد + Awwad),
+  play-icon-512, the in-app `app/assets/logo/sprout.png` (shown on Language + AuthChoice with the
+  appName text, Cairo), and the site header + 404 mark (`web/public/logo-mark.png`, replaces the
+  🌱 emoji). The earlier hero-heading removal + flat onboarding buttons are kept. Verified:
+  analyze clean, tests pass, web/AAB/APK rebuilt, site 112 pages 0 em-dashes, site + web app
+  redeployed. (Supersedes the sprout/Kufi/Salma-wordmark logo experiments; those SVG drafts
+  remain in the repo but unused.)
+- **2026-07-05 (FINAL logo: Salma wordmark with leaf-shadda)** - Owner iterated once more:
+  the logo is now the WORDMARK «عواد» set in Salma Arabic Black (the site's own curvy display
+  font - matching the hero screenshot), with NO sharp edges (glyphs drawn as a path and stroked
+  with a round-join/round-cap pen so every terminal is soft), in the distinctive green gradient
+  (#4ade80 -> #16a34a), and the shadda over the و drawn as a creative two-leaf sprout (bezier
+  leaves + tiny stem growing straight out of the waw head). Renderer:
+  `scratchpad/make-wordmark.ps1` (params for font size / word Y / leaf base; -SkipBg for the
+  transparent master). Assets regenerated from it: icon-1024 / adaptive foreground / splash,
+  all launcher icons, site favicon/apple-touch/192/512, og-image + Play feature graphic (now
+  wordmark + tashkeel slogan in Salma, like the site hero), play-icon-512, and a tight-cropped
+  `app/assets/logo/wordmark.png` used on the Language + AuthChoice screens (replaces the emoji
+  AND the appName text - the wordmark IS the name; wrapped in Semantics(label: appName)).
+  Flat onboarding buttons from the previous entry kept. Verified: analyze clean, tests pass,
+  web/AAB/APK rebuilt, site rebuilt + redeployed.
+- **2026-07-05 (owner revert: sprout logo + flat onboarding buttons)** - Owner asked to undo
+  the new Kufi wordmark logo (back to the previous green sprout) and to make the onboarding
+  buttons simple instead of the puffy liquid-glass style. Done: restored
+  `assets/icons/icon-1024.png` + `icon-foreground-1024.png` + `splash-logo.png` from git
+  (pre-rebrand sprout), regenerated ALL launcher icons / splash / site favicons / og-image /
+  Play graphics from the sprout; reverted the in-app welcome + auth-choice marks and the site
+  header + 404 mark back to the 🌱 emoji; removed the transient `logo-mark.png` assets (+ their
+  pubspec asset entry). `GlassButton` rewritten as a FLAT pill (accent-tint fill + thin colored
+  border, no BackdropFilter / specular / heavy shadow), matching the habit-switcher chip look;
+  it is used only on the language + sign-in screens. The rest of the liquid-glass UI (glass nav
+  dock, ambient glow, dark/light mode) is unchanged. NOTE: `logo-master.svg`/`logo-mark.svg`
+  (the Kufi masters) are kept in the repo but no longer referenced. Verified: analyze clean,
+  12 tests, web/AAB/APK rebuilt, site 112 pages 0 em-dashes, site + web app redeployed.
 - **2026-07-05 (rebrand + liquid glass + light mode + evidence-based content)** -
   **(1) NEW LOGO**: professional Kufi wordmark of عوّاد where the shadda above the و IS the
   sprout (two gradient leaves on a stem growing from the waw head); baseline = soil, waw root

@@ -54,7 +54,7 @@ class _AuthChoiceScreenState extends ConsumerState<AuthChoiceScreen> {
           child: Column(
             children: [
               const Spacer(),
-              Image.asset('assets/logo/mark.png', width: 108, height: 108),
+              Image.asset('assets/logo/sprout.png', width: 96, height: 96),
               const SizedBox(height: 14),
               Text(l10n.appName,
                   textAlign: TextAlign.center,

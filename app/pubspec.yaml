@@ -59,7 +59,7 @@ flutter:
   uses-material-design: true
   generate: true   # enables gen-l10n (AppLocalizations)
   assets:
-    - assets/logo/mark.png
+    - assets/logo/sprout.png
 
 flutter_launcher_icons:
   android: true

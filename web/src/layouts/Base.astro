@@ -95,7 +95,7 @@ const appLd = {
   <body>
     <header class="site-header">
       <a class="brand" href={localizedPath(lang, 'home')}>
-        <span class="brand-mark"><img src="/logo-mark.png" alt="" width="22" height="22" /></span>
+        <span class="brand-mark"><img src="/logo-mark.png" alt="" width="24" height="24" /></span>
         <span>{tt.brand}</span>
       </a>
       <nav class="nav">
@@ -247,8 +247,7 @@ const appLd = {
       .lang-switch a { font-size: 12px; font-weight: 700; color: var(--muted); padding: 4px 11px; border-radius: 999px; }
       .lang-switch a.active { color: var(--accent-ink); background: var(--accent); }
 
-      .hero { text-align: center; padding: 48px 0 16px; }
-      .hero h1 { max-width: 20ch; margin-inline: auto; }
+      .hero { text-align: center; padding: 20px 0 12px; }
       .slogan {
         display: inline-block; color: var(--accent); font-weight: 700; font-size: 14px; margin-top: 16px;
         padding: 5px 15px; border: 1px solid var(--border-strong); border-radius: 999px;
@@ -336,7 +335,7 @@ const appLd = {
       @media (max-width: 640px) {
         .cards, .features { grid-template-columns: 1fr; }
         .nav { margin-inline-start: 0; order: 3; width: 100%; justify-content: center; }
-        .hero { padding: 32px 0 8px; }
+        .hero { padding: 16px 0 8px; }
       }
       @media (prefers-reduced-motion: reduce) {
         .hero > *, .section-title, .card, .feature, .prose > h2, .prose > p { animation: none; }
