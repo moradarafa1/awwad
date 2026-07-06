@@ -6,7 +6,7 @@ import sitemap from '@astrojs/sitemap';
 // The Flutter web app lives on its own Netlify site (awwad-app) with noindex,
 // so it is intentionally NOT part of this marketing site's sitemap.
 export default defineConfig({
-  site: 'https://awwad-habits.netlify.app',
+  site: 'https://moradarafa1.github.io',
   trailingSlash: 'ignore',
   i18n: {
     defaultLocale: 'ar',

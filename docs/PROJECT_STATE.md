@@ -422,6 +422,27 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-06 (HOSTING MOVED to GitHub Pages - Netlify blocked by owner's ISP)** - The owner
+  could not open either Netlify site. Diagnosed: the ISP blocks Netlify's edge IPs at the TCP
+  level (`Test-NetConnection awwad-habits.netlify.app:443` = False, IP 63.176.x; while
+  google/cloudflare/pages.dev/vercel.app/github.io all = True; api.netlify.com works, which is
+  why deploys succeed). The Netlify deploys are healthy and reachable worldwide, just not from
+  the owner's network. FIX: mirrored both onto **GitHub Pages** (github.io is reachable). Created
+  the public user-page repo **github.com/moradarafa1/moradarafa1.github.io** (contains only the
+  built static output - safe; the Flutter build ships only the public anon key). Layout: the
+  marketing site at the ROOT and the Flutter web app under **/app/** = one domain, "linked
+  together". LIVE + verified 200 from the owner's machine:
+  - Site: **https://moradarafa1.github.io/**
+  - Web app: **https://moradarafa1.github.io/app/**
+  Config changed for this: `web/astro.config.mjs` site -> `https://moradarafa1.github.io`,
+  `web/public/robots.txt` sitemap, `web/src/content/site.js` `WEB_APP_URL` ->
+  `https://moradarafa1.github.io/app/`; the Flutter web app is built with `--base-href /app/`
+  (needs `MSYS_NO_PATHCONV=1` in Git Bash or the `/app/` arg gets path-mangled) + a `404.html`
+  copy of index.html for SPA fallback; a root `.nojekyll` is REQUIRED (Astro's `_astro/` folder
+  starts with `_`, which Jekyll would drop). Deploy = assemble (site dist at root, app build/web
+  at /app/, .nojekyll) into a staging dir and push to the github.io repo's main branch. Netlify
+  sites are kept as a global fallback but are the owner's-ISP-blocked path. TODO if wanted:
+  Cloudflare Pages (cleaner *.pages.dev URLs) needs the owner to `wrangler login`.
 - **2026-07-06 (FINAL logo: owner-supplied plant design)** - Owner delivered a finished logo
   design (`تصميم لوجو عواد.zip`, added to the repo at `assets/brand/`: `awad-app-icon.svg`,
   `awad-plant.svg`, `awad-plant-mono.svg`, README + design doc). It is a bright, organic sprout:

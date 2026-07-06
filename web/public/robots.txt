@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # The Flutter web app runs on the app.* subdomain and is intentionally noindex.
-Sitemap: https://awwad-habits.netlify.app/sitemap-index.xml
+Sitemap: https://moradarafa1.github.io/sitemap-index.xml
