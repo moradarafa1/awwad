@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Network access (Supabase auth/sync). Required in the main manifest so it
+         ships in RELEASE builds; Flutter only auto-adds it to the debug manifest. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Local notifications (daily reminder) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
