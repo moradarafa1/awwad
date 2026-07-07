@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/catalog/badge_catalog.dart';
+import '../../core/cloud/net_errors.dart';
 import '../../core/cloud/supabase_service.dart';
 import '../../core/state/app_state.dart';
 import '../auth/auth_screen.dart';
@@ -227,8 +228,9 @@ class ProfileScreen extends ConsumerWidget {
       }
     } catch (e) {
       if (context.mounted) {
+        final key = isNetworkError(e) ? 'errNetwork' : 'errGeneric';
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.toString())));
+            .showSnackBar(SnackBar(content: Text(_s(_kAcc[key]!, loc))));
       }
     }
   }
@@ -345,4 +347,14 @@ const Map<String, Map<String, String>> _kAcc = {
   'done': {'ar': 'تم تغيير كلمة المرور ✅', 'en': 'Password changed ✅', 'fr': 'Mot de passe changé ✅'},
   'signOut': {'ar': 'تسجيل الخروج', 'en': 'Sign out', 'fr': 'Se déconnecter'},
   'signedOut': {'ar': 'تم تسجيل الخروج', 'en': 'Signed out', 'fr': 'Déconnecté'},
+  'errNetwork': {
+    'ar': 'تعذّر الاتصال بالخادم. تأكّد من اتصالك بالإنترنت ثم أعد المحاولة.',
+    'en': 'Could not reach the server. Check your internet connection and try again.',
+    'fr': 'Impossible de joindre le serveur. Vérifiez votre connexion internet puis réessayez.'
+  },
+  'errGeneric': {
+    'ar': 'حدث خطأ غير متوقّع. أعد المحاولة لاحقاً.',
+    'en': 'Something went wrong. Please try again later.',
+    'fr': "Une erreur s'est produite. Réessayez plus tard."
+  },
 };

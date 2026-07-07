@@ -39,6 +39,14 @@ class SupabaseService {
   static bool get signedIn => currentUser != null;
 
   // ---- auth ----
+  // Registration goes through the `signup` edge function, which creates the
+  // account already CONFIRMED server-side. This removes the dependency on
+  // confirmation emails: the project has no custom SMTP yet and Supabase's
+  // built-in mailer is capped at ~2 emails/hour (over_email_send_rate_limit,
+  // hit live 2026-07-06). The function returns GoTrue-style error codes
+  // (user_already_exists / weak_password / email_address_invalid) so the UI's
+  // localized error mapping works unchanged. When Brevo SMTP is configured,
+  // this can revert to plain client.auth.signUp.
   static Future<AuthResponse> signUp({
     required String name,
     required String email,
@@ -50,20 +58,29 @@ class SupabaseService {
     String? whatsapp,
   }) async {
     await init();
-    return client.auth.signUp(
-      email: email,
-      password: password,
-      data: {
-        'full_name': name,
-        'locale': locale,
-        'gender': gender,
-        if (country != null && country.trim().isNotEmpty) 'country': country.trim(),
-        if (birthDate != null && birthDate.trim().isNotEmpty)
-          'birth_date': birthDate.trim(),
-        if (whatsapp != null && whatsapp.trim().isNotEmpty)
-          'whatsapp': whatsapp.trim(),
-      },
-    );
+    try {
+      await client.functions.invoke('signup', body: {
+        'email': email,
+        'password': password,
+        'data': {
+          'full_name': name,
+          'locale': locale,
+          'gender': gender,
+          if (country != null && country.trim().isNotEmpty)
+            'country': country.trim(),
+          if (birthDate != null && birthDate.trim().isNotEmpty)
+            'birth_date': birthDate.trim(),
+          if (whatsapp != null && whatsapp.trim().isNotEmpty)
+            'whatsapp': whatsapp.trim(),
+        },
+      });
+    } on FunctionException catch (e) {
+      // Re-throw with the function's error code in the message so the UI's
+      // substring-based localized mapping picks the right text.
+      throw Exception('signup failed: ${e.details}');
+    }
+    // Account is confirmed; establish the session right away.
+    return client.auth.signInWithPassword(email: email, password: password);
   }
 
   static Future<AuthResponse> signInWithPassword(

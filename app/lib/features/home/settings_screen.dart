@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
+import '../../core/cloud/net_errors.dart';
 import '../../core/cloud/supabase_service.dart';
 import '../../core/cloud/sync_service.dart';
 import '../../core/content/dhikr.dart';
@@ -382,19 +383,27 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
+  // Message language follows the RESOLVED UI locale (system-derived when the
+  // user never picked one), not settings.locale which stays null by default.
+  String _sync(String key, BuildContext context) {
+    final loc = Localizations.localeOf(context).languageCode;
+    return _kSyncErr[key]![loc] ?? _kSyncErr[key]!['ar']!;
+  }
+
   Future<void> _syncNow(BuildContext context, WidgetRef ref) async {
     final s = ref.read(appControllerProvider);
     try {
       await SyncService.pushAll(
           habits: s.habits, entries: s.entries, survey: s.survey);
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('تمت المزامنة ✅')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(_sync('syncedOk', context))));
       }
     } catch (e) {
       if (context.mounted) {
+        final key = isNetworkError(e) ? 'network' : 'generic';
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.toString())));
+            .showSnackBar(SnackBar(content: Text(_sync(key, context))));
       }
     }
   }
@@ -410,7 +419,7 @@ class SettingsScreen extends ConsumerWidget {
     AnalyticsService.instance.track('data_exported', {'format': 'json'});
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم نسخ بياناتك (JSON) إلى الحافظة ✅')),
+        SnackBar(content: Text(_sync('exported', context))),
       );
     }
   }
@@ -468,3 +477,27 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 }
+
+// Localized sync feedback: raw exceptions must never be shown to users.
+const Map<String, Map<String, String>> _kSyncErr = {
+  'network': {
+    'ar': 'تعذّر الاتصال بالخادم. تأكّد من اتصالك بالإنترنت ثم أعد المحاولة.',
+    'en': 'Could not reach the server. Check your internet connection and try again.',
+    'fr': 'Impossible de joindre le serveur. Vérifiez votre connexion internet puis réessayez.',
+  },
+  'generic': {
+    'ar': 'حدث خطأ غير متوقّع. أعد المحاولة لاحقاً.',
+    'en': 'Something went wrong. Please try again later.',
+    'fr': "Une erreur s'est produite. Réessayez plus tard.",
+  },
+  'syncedOk': {
+    'ar': 'تمت المزامنة ✅',
+    'en': 'Synced ✅',
+    'fr': 'Synchronisé ✅',
+  },
+  'exported': {
+    'ar': 'تم نسخ بياناتك (JSON) إلى الحافظة ✅',
+    'en': 'Your data (JSON) was copied to the clipboard ✅',
+    'fr': 'Vos données (JSON) ont été copiées dans le presse-papiers ✅',
+  },
+};

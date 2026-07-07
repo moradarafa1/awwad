@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
+import '../../core/cloud/net_errors.dart';
 import '../../core/cloud/supabase_service.dart';
 import '../../core/cloud/sync_service.dart';
 import '../../core/notifications/notifications.dart';
@@ -95,12 +96,52 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
   }
 
+  // Map raw auth/network exceptions to a localized human message; the raw
+  // exception text (English, with internal URLs) must never reach the user.
+  String _friendlyError(Object e) {
+    final s = e.toString().toLowerCase();
+    if (isNetworkError(e)) {
+      return _tr('errNetwork');
+    }
+    if (s.contains('invalid login credentials') ||
+        s.contains('invalid_credentials')) {
+      return _tr('errBadCredentials');
+    }
+    if (s.contains('already registered') ||
+        s.contains('user_already_exists') ||
+        s.contains('email_exists')) {
+      return _tr('errEmailExists');
+    }
+    if (s.contains('weak_password') ||
+        s.contains('password should be at least')) {
+      return _tr('errWeakPassword');
+    }
+    if (s.contains('email_address_invalid') ||
+        s.contains('validation_failed') ||
+        s.contains('invalid format')) {
+      return _tr('errBadEmail');
+    }
+    if (s.contains('otp_expired') ||
+        s.contains('token has expired') ||
+        s.contains('invalid token') ||
+        s.contains('otp_disabled')) {
+      return _tr('errBadOtp');
+    }
+    if (s.contains('rate limit') || s.contains('too many requests')) {
+      return _tr('errRateLimit');
+    }
+    if (s.contains('email not confirmed')) {
+      return _tr('errEmailNotConfirmed');
+    }
+    return _tr('errGeneric');
+  }
+
   Future<void> _run(Future<void> Function() action) async {
     setState(() => _busy = true);
     try {
       await action();
     } catch (e) {
-      _toast(e.toString());
+      _toast(_friendlyError(e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -129,7 +170,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         return;
       }
       await _run(() async {
-        await SupabaseService.signUp(
+        final res = await SupabaseService.signUp(
           name: _name.text.trim(),
           email: email,
           password: _password.text,
@@ -141,6 +182,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               ? null
               : _normDigits(_whatsapp.text.trim()),
         );
+        if (res.session == null) {
+          // Email confirmation is required: the account exists but there is
+          // no session yet, so syncing would silently no-op. Tell the user to
+          // open the confirmation email, then switch to the sign-in form.
+          AnalyticsService.instance.track('signup_succeeded',
+              {'method': 'email', 'pending_confirmation': true});
+          _toast(_tr('confirmEmailSent'));
+          if (mounted) setState(() => _signUp = false);
+          return;
+        }
         AnalyticsService.instance.track('signup_succeeded', {'method': 'email'});
         await _syncAfterAuth();
       });
@@ -315,6 +366,21 @@ const Map<String, Map<String, String>> _regStrings = {
     'whatsapp': 'رقم واتساب (مع كود الدولة)',
     'notice':
         'إضافة هذه المعلومات اختيارية تماماً، ولا تُستخدم لأيّ غرضٍ تجاريّ، وإنّما لأغراض البحث والتطوير فقط.',
+    'errNetwork':
+        'تعذّر الاتصال بالخادم. تأكّد من اتصالك بالإنترنت ثم أعد المحاولة.',
+    'errBadCredentials': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+    'errEmailExists':
+        'هذا البريد مسجّل بالفعل. جرّب تسجيل الدخول بدلاً من إنشاء حساب.',
+    'errWeakPassword': 'كلمة المرور ضعيفة. استخدم ستة أحرف على الأقل.',
+    'errBadEmail': 'البريد الإلكتروني غير صالح. تحقّق من كتابته.',
+    'errBadOtp': 'الرمز غير صحيح أو انتهت صلاحيته. اطلب رمزاً جديداً.',
+    'errRateLimit':
+        'محاولات كثيرة خلال وقت قصير. انتظر قليلاً ثم أعد المحاولة.',
+    'errEmailNotConfirmed':
+        'البريد الإلكتروني لم يُفعَّل بعد. افتح رسالة التفعيل في بريدك.',
+    'errGeneric': 'حدث خطأ غير متوقّع. أعد المحاولة لاحقاً.',
+    'confirmEmailSent':
+        'تم إنشاء الحساب. أرسلنا رسالة تفعيل إلى بريدك؛ افتحها ثم سجّل الدخول.',
   },
   'en': {
     'gender': 'Gender',
@@ -328,6 +394,20 @@ const Map<String, Map<String, String>> _regStrings = {
     'whatsapp': 'WhatsApp number (with country code)',
     'notice':
         'Adding this information is entirely optional and is never used for any commercial purpose, only for research and development.',
+    'errNetwork':
+        'Could not reach the server. Check your internet connection and try again.',
+    'errBadCredentials': 'Incorrect email or password.',
+    'errEmailExists':
+        'This email is already registered. Try signing in instead.',
+    'errWeakPassword': 'Password is too weak. Use at least 6 characters.',
+    'errBadEmail': 'Invalid email address. Please check the spelling.',
+    'errBadOtp': 'The code is invalid or has expired. Request a new one.',
+    'errRateLimit': 'Too many attempts. Please wait a moment and try again.',
+    'errEmailNotConfirmed':
+        'Email not confirmed yet. Open the confirmation email in your inbox.',
+    'errGeneric': 'Something went wrong. Please try again later.',
+    'confirmEmailSent':
+        'Account created. We sent a confirmation email; open it, then sign in.',
   },
   'fr': {
     'gender': 'Sexe',
@@ -341,5 +421,21 @@ const Map<String, Map<String, String>> _regStrings = {
     'whatsapp': 'Numéro WhatsApp (avec indicatif)',
     'notice':
         "L'ajout de ces informations est totalement facultatif et n'est jamais utilisé à des fins commerciales, uniquement pour la recherche et le développement.",
+    'errNetwork':
+        'Impossible de joindre le serveur. Vérifiez votre connexion internet puis réessayez.',
+    'errBadCredentials': 'Email ou mot de passe incorrect.',
+    'errEmailExists':
+        'Cet email est déjà enregistré. Essayez de vous connecter.',
+    'errWeakPassword':
+        'Mot de passe trop faible. Utilisez au moins 6 caractères.',
+    'errBadEmail': "Adresse email invalide. Vérifiez l'orthographe.",
+    'errBadOtp': 'Code invalide ou expiré. Demandez un nouveau code.',
+    'errRateLimit':
+        'Trop de tentatives. Patientez un moment puis réessayez.',
+    'errEmailNotConfirmed':
+        "Email non confirmé. Ouvrez l'email de confirmation dans votre boîte.",
+    'errGeneric': "Une erreur s'est produite. Réessayez plus tard.",
+    'confirmEmailSent':
+        "Compte créé. Nous avons envoyé un email de confirmation ; ouvrez-le puis connectez-vous.",
   },
 };
