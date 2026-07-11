@@ -42,7 +42,7 @@ Authentication → Emails → SMTP: host `smtp-relay.brevo.com`, port 587، user
 # المفاتيح العامة مدمجة في السكربت:
 ops\build-app-cloud.ps1     # يشغّل التطبيق على Chrome مع المزامنة مفعّلة
 ```
-خطوات الاختبار: سجّل حساب جديد → أكمل الأونبوردنج → سجّل يوم → افتح الإعدادات → «حساب ومزامنة» → سجّل دخول → «زامن الآن». ثم تحقّق في DB:
+خطوات الاختبار: سجّل حساب جديد → أكمل الأونبوردنج → سجّل يوم → افتح الإعدادات → «إنشاء حساب» → سجّل دخول → «زامن الآن». ثم تحقّق في DB:
 ```sql
 select count(*) from public.profiles;
 select count(*) from public.daily_entries;

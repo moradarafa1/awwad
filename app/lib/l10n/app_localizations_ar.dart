@@ -304,7 +304,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signOut => 'تسجيل الخروج';
 
   @override
-  String get syncTitle => 'حساب ومزامنة';
+  String get syncTitle => 'إنشاء حساب';
 
   @override
   String get syncDesc => 'سجّل الدخول كي تتزامن بياناتك على جميع أجهزتك.';

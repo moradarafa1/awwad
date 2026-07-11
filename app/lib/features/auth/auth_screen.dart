@@ -10,16 +10,28 @@ import '../../core/cloud/sync_service.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/state/app_state.dart';
 
+// Email-OTP sign-in. Requires the custom SMTP (Brevo) + the Arabic
+// {{ .Token }} code template configured on 2026-07-11 (live-tested: /otp 200,
+// code email delivered). If SMTP ever breaks, flip to false so the UI never
+// offers a code that cannot arrive.
+const bool kOtpLoginEnabled = true;
+
 // Optional cloud account screen (P2). Only reachable when SUPABASE_URL/ANON_KEY
 // were provided at build time. Implements email+password + an email-OTP path.
 class AuthScreen extends ConsumerStatefulWidget {
-  const AuthScreen({super.key});
+  const AuthScreen({super.key, this.startInSignUp = false});
+
+  /// Opens on the create-account form instead of sign-in (used by the
+  /// Settings entry and the post-first-log prompt, which both invite the
+  /// user to CREATE an account).
+  final bool startInSignUp;
+
   @override
   ConsumerState<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends ConsumerState<AuthScreen> {
-  bool _signUp = false;
+  late bool _signUp = widget.startInSignUp;
   bool _otpMode = false;
   bool _otpSent = false;
   bool _busy = false;
@@ -121,10 +133,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         s.contains('invalid format')) {
       return _tr('errBadEmail');
     }
+    if (s.contains('otp_disabled') ||
+        s.contains('signups not allowed')) {
+      // shouldCreateUser=false: requesting a code for an unknown email.
+      return _tr('errNoAccount');
+    }
     if (s.contains('otp_expired') ||
         s.contains('token has expired') ||
-        s.contains('invalid token') ||
-        s.contains('otp_disabled')) {
+        s.contains('invalid token')) {
       return _tr('errBadOtp');
     }
     if (s.contains('rate limit') || s.contains('too many requests')) {
@@ -147,18 +163,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
   }
 
+  // Runs AFTER auth succeeded. A sync hiccup here must never read as a failed
+  // sign-in/sign-up (seen live 2026-07-11: signup + login succeeded, then one
+  // sync request dropped and the app wrongly showed "cannot reach the server",
+  // so the user kept retrying an account that already existed).
   Future<void> _syncAfterAuth() async {
-    final ctrl = ref.read(appControllerProvider.notifier);
-    final snap = await SyncService.pullAll();
-    final local = ref.read(appControllerProvider);
-    if (local.habits.isEmpty && snap.habits.isNotEmpty) {
-      await ctrl.importSnapshot(snap.habits, snap.entries, snap.survey);
+    var syncOk = true;
+    try {
+      final ctrl = ref.read(appControllerProvider.notifier);
+      final snap = await SyncService.pullAll();
+      final local = ref.read(appControllerProvider);
+      if (local.habits.isEmpty && snap.habits.isNotEmpty) {
+        await ctrl.importSnapshot(snap.habits, snap.entries, snap.survey);
+      }
+      final cur = ref.read(appControllerProvider);
+      await SyncService.pushAll(
+          habits: cur.habits, entries: cur.entries, survey: cur.survey);
+    } catch (_) {
+      syncOk = false; // Signed in fine; sync can be re-run from Settings.
     }
-    final cur = ref.read(appControllerProvider);
-    await SyncService.pushAll(
-        habits: cur.habits, entries: cur.entries, survey: cur.survey);
-    // The user now has an account, so cancel any pending sign-up nudge.
-    await cancelReengageNudge();
+    try {
+      // The user now has an account, so cancel any pending sign-up nudge.
+      await cancelReengageNudge();
+    } catch (_) {}
+    if (!syncOk) _toast(_tr('syncLater'));
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -223,7 +251,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.syncTitle)),
+      appBar: AppBar(title: Text(_signUp ? l10n.signUp : l10n.signIn)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -296,10 +324,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       labelText: _tr('whatsapp'),
                       hintText: '+20 / +966 ...')),
             ],
-            const SizedBox(height: 10),
-            Text(_tr('notice'),
-                style: TextStyle(
-                    color: AppColors.muted, fontSize: 12, height: 1.6)),
             const SizedBox(height: 14),
           ],
           TextField(
@@ -332,7 +356,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         : l10n.signIn)),
           ),
           const SizedBox(height: 12),
-          if (!_signUp)
+          if (!_signUp && kOtpLoginEnabled)
             TextButton(
               onPressed: () => setState(() {
                 _otpMode = !_otpMode;
@@ -364,8 +388,6 @@ const Map<String, Map<String, String>> _regStrings = {
     'birthDate': 'تاريخ الميلاد',
     'pick': 'اختر التاريخ',
     'whatsapp': 'رقم واتساب (مع كود الدولة)',
-    'notice':
-        'إضافة هذه المعلومات اختيارية تماماً، ولا تُستخدم لأيّ غرضٍ تجاريّ، وإنّما لأغراض البحث والتطوير فقط.',
     'errNetwork':
         'تعذّر الاتصال بالخادم. تأكّد من اتصالك بالإنترنت ثم أعد المحاولة.',
     'errBadCredentials': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
@@ -374,6 +396,9 @@ const Map<String, Map<String, String>> _regStrings = {
     'errWeakPassword': 'كلمة المرور ضعيفة. استخدم ستة أحرف على الأقل.',
     'errBadEmail': 'البريد الإلكتروني غير صالح. تحقّق من كتابته.',
     'errBadOtp': 'الرمز غير صحيح أو انتهت صلاحيته. اطلب رمزاً جديداً.',
+    'errNoAccount': 'لا يوجد حساب بهذا البريد الإلكتروني. أنشئ حساباً أولاً.',
+    'syncLater':
+        'تم تسجيل الدخول بنجاح. تعذّرت مزامنة بياناتك الآن؛ يمكنك تشغيلها لاحقاً من الإعدادات.',
     'errRateLimit':
         'محاولات كثيرة خلال وقت قصير. انتظر قليلاً ثم أعد المحاولة.',
     'errEmailNotConfirmed':
@@ -392,8 +417,6 @@ const Map<String, Map<String, String>> _regStrings = {
     'birthDate': 'Date of birth',
     'pick': 'Pick a date',
     'whatsapp': 'WhatsApp number (with country code)',
-    'notice':
-        'Adding this information is entirely optional and is never used for any commercial purpose, only for research and development.',
     'errNetwork':
         'Could not reach the server. Check your internet connection and try again.',
     'errBadCredentials': 'Incorrect email or password.',
@@ -402,6 +425,9 @@ const Map<String, Map<String, String>> _regStrings = {
     'errWeakPassword': 'Password is too weak. Use at least 6 characters.',
     'errBadEmail': 'Invalid email address. Please check the spelling.',
     'errBadOtp': 'The code is invalid or has expired. Request a new one.',
+    'errNoAccount': 'No account exists with this email. Create an account first.',
+    'syncLater':
+        'Signed in successfully. Sync failed for now; you can run it later from Settings.',
     'errRateLimit': 'Too many attempts. Please wait a moment and try again.',
     'errEmailNotConfirmed':
         'Email not confirmed yet. Open the confirmation email in your inbox.',
@@ -419,8 +445,6 @@ const Map<String, Map<String, String>> _regStrings = {
     'birthDate': 'Date de naissance',
     'pick': 'Choisir une date',
     'whatsapp': 'Numéro WhatsApp (avec indicatif)',
-    'notice':
-        "L'ajout de ces informations est totalement facultatif et n'est jamais utilisé à des fins commerciales, uniquement pour la recherche et le développement.",
     'errNetwork':
         'Impossible de joindre le serveur. Vérifiez votre connexion internet puis réessayez.',
     'errBadCredentials': 'Email ou mot de passe incorrect.',
@@ -430,6 +454,10 @@ const Map<String, Map<String, String>> _regStrings = {
         'Mot de passe trop faible. Utilisez au moins 6 caractères.',
     'errBadEmail': "Adresse email invalide. Vérifiez l'orthographe.",
     'errBadOtp': 'Code invalide ou expiré. Demandez un nouveau code.',
+    'errNoAccount':
+        "Aucun compte n'existe avec cet email. Créez d'abord un compte.",
+    'syncLater':
+        'Connexion réussie. La synchronisation a échoué pour le moment ; relancez-la plus tard depuis les réglages.',
     'errRateLimit':
         'Trop de tentatives. Patientez un moment puis réessayez.',
     'errEmailNotConfirmed':

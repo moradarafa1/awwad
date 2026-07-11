@@ -75,9 +75,26 @@ class SupabaseService {
         },
       });
     } on FunctionException catch (e) {
+      final details = 'signup failed: ${e.details}';
+      if (details.contains('user_already_exists')) {
+        // The account already exists - typically because a PREVIOUS attempt
+        // actually succeeded server-side while the phone missed the response
+        // (seen live 2026-07-11: user created + signed in, then the post-auth
+        // sync request dropped, so the app showed an error and the user
+        // retried). If the entered password matches, just sign the user in:
+        // the retry becomes seamless instead of a dead end.
+        try {
+          return await client.auth
+              .signInWithPassword(email: email, password: password);
+        } on AuthException {
+          // Password does not match the existing account: surface
+          // already-exists so the UI tells the user to sign in instead.
+          throw Exception(details);
+        }
+      }
       // Re-throw with the function's error code in the message so the UI's
       // substring-based localized mapping picks the right text.
-      throw Exception('signup failed: ${e.details}');
+      throw Exception(details);
     }
     // Account is confirmed; establish the session right away.
     return client.auth.signInWithPassword(email: email, password: password);

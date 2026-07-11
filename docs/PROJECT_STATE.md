@@ -167,7 +167,7 @@ Paid (owner only, when shipping): domain (~$12/yr), Apple Developer ($99/yr), Go
 > (`~/.claude/.../memory/project_awwad.md`), NEVER in this repo. This section lists
 > public-safe values + where the secrets live.
 
-- **GitHub:** https://github.com/moradarafa1/awwad.git (private). Latest pushed commit: `24aa8c2` (DB fix + security). NOTE: today's later work (blog, Pomodoro, registration, Fusha, slogan, migration 0006) is committed locally but may not be pushed yet - check `git log`.
+- **GitHub:** https://github.com/moradarafa1/awwad.git (private). **Fully pushed & in sync as of 2026-07-11:** local `main` == `origin/main` at `042379d` (release networking fixes: signup edge fn, localized errors, Gradle heap). Working tree clean, no stash, no other branches.
 - **Supabase project ref:** `kdczbzzjezyhfxgpegqc` (region ap-southeast-1, Singapore). Postgres 17.
 - **Supabase URL:** `https://kdczbzzjezyhfxgpegqc.supabase.co`
 - **anon key (public, safe to ship):** in `ops/build-app-cloud.ps1` and used via `--dart-define`. Publishable.
@@ -433,11 +433,18 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 3. ~~Add GitHub repo secrets so keep-alive runs.~~ DONE (2026-06-28): keep-alive.yml now
    embeds the public URL + anon key as defaults (no secrets needed); pushed (commit `0abb313`)
    and a manual run passed green. Secrets still override if ever set.
-4. **Configure Supabase Auth email** (dashboard): turn on confirmations. Built-in email ~3-4/hr
-   for testing; Brevo SMTP for production volume.
-5. **Push latest commits to GitHub.** Only the keep-alive fix (commit `0abb313`) was pushed;
-   ALL of the 2026-06-28 work (multi-habit, notifications, new habits, reminders, content,
-   glass UI, docs) is committed/working **locally only** — push when the owner asks.
+4. ~~Brevo SMTP~~ **DONE (2026-07-11 round 4): Brevo SMTP live.** Account moradarafa.business@
+   gmail.com (company "Awwad", free 300/day), SMTP login `b1b09a001@smtp-brevo.com`, host
+   smtp-relay.brevo.com:587 (key in local AI memory). Supabase auth config now: custom SMTP +
+   sender «عوّاد | Awwad» + Arabic {{ .Token }} magic-link template + rate_limit_email_sent=30/h.
+   GOTCHA solved: Brevo's "Blocking unauthorized IP addresses" was ACTIVE by default on the new
+   account (Security -> Authorized IPs) and made every Supabase send fail with
+   `525 5.7.1 Unauthorized IP address`; owner deactivated it for API+SMTP keys -> /otp returns
+   200, email delivered. `kOtpLoginEnabled=true` again. REMAINING (owner): revoke the Supabase
+   PAT at supabase.com/dashboard/account/tokens.
+5. ~~**Push latest commits to GitHub.**~~ DONE (verified 2026-07-11): local `main` == `origin/main`
+   at `042379d`; `git fetch` shows 0 ahead/behind, working tree clean, no stash, no other
+   branches. All prior work is already on GitHub.
 6. ~~Deploy the Flutter web-app + Astro site.~~ DONE (2026-07-04): live at
    https://awwad-app.netlify.app and https://awwad-habits.netlify.app (see §5). Remaining:
    buy the domain, then update `astro.config.mjs` site, `robots.txt`, `WEB_APP_URL` + Netlify
@@ -460,6 +467,70 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-11 round 4 (BREVO SMTP LIVE - email OTP login works end to end)** - Owner created
+  the Brevo account (free 300/day) and connected a Brevo MCP (server d2d3d85a; account/senders
+  readable in-session; SMTP keys are UI-only by design). Configured via Management PAT:
+  smtp-relay.brevo.com:587, login `b1b09a001@smtp-brevo.com`, sender «عوّاد | Awwad»
+  <moradarafa.business@gmail.com> (verified+active), rate_limit_email_sent 2/h -> 30/h; the
+  free-tier template lock lifted once custom SMTP was set, so the Arabic magic-link template
+  (subject «رمز الدخول إلى عوّاد», big {{ .Token }} code, 8 digits per mailer_otp_length) is now
+  live. DEBUGGED: first sends failed `525 "5.7.1 Unauthorized IP address"` - root cause was
+  Brevo's "Blocking unauthorized IP addresses" (Security -> Authorized IPs), ACTIVE by default
+  on this new account for BOTH API and SMTP keys with an empty allow list = everything blocked;
+  the empty-list page is misleading (the toggle rows sit ABOVE the list). Owner deactivated both
+  -> `/auth/v1/otp` 200, Arabic code email delivered. `kOtpLoginEnabled=true` (the «إرسال رمز»
+  button is back); analyze clean, 12/12 tests, web+APK+AAB rebuilt and web redeployed to Pages.
+  If email breaks again: check Brevo blocking wasn't re-activated, then auth logs (get_logs).
+- **2026-07-11 round 3 (SERVER AUTH CONFIG via PAT + account-screen UX pass)** - Chrome-profile
+  mismatch made the dashboard-session route unusable (two Chrome profiles; the connected
+  extension lives in the one whose Supabase session expired), so the owner generated a
+  Management API personal access token (stored ONLY in the local AI memory; revoke after the
+  Brevo step). Via `PATCH /v1/projects/{ref}/config/auth`: **site_url** `http://localhost:3000`
+  -> `https://moradarafa1.github.io/app/` and **uri_allow_list** = github.io + both netlify
+  fallbacks (verified by re-GET) - dead-localhost email redirects are gone. **HARD LIMIT
+  DISCOVERED: the free tier CANNOT modify email templates while on the default mailer**
+  (PATCH -> 400 "Email template modification is not available for free tier projects using the
+  default email provider") => **Brevo SMTP is a PREREQUISITE** for the Arabic {{ .Token }}
+  code email (and the app's type-a-code OTP flow). Config facts: mailer_otp_length=8,
+  rate_limit_email_sent=2/hr, smtp_host=null. Consequently the email-OTP entry («إرسال رمز»)
+  is HIDDEN behind `kOtpLoginEnabled=false` (auth_screen.dart) until SMTP + template land.
+  OWNER-REQUESTED UX: AuthScreen AppBar title is now dynamic «إنشاء حساب»/«تسجيل الدخول»
+  (replaces «حساب ومزامنة»); Settings' signed-out row renamed to «إنشاء حساب» (syncTitle in all
+  3 .arb) and both it and the post-first-log prompt open the screen in CREATE mode (new
+  `startInSignUp` param; AuthChoice/Profile keep sign-in mode); the research/optional-info
+  notice paragraph («إضافة هذه المعلومات اختيارية...») REMOVED (existed only in auth_screen
+  _regStrings x3; two stale internal docs updated too). Verified: gen-l10n, analyze clean,
+  12/12 tests, web+APK+AAB rebuilt (INTERNET perm re-verified), web app redeployed to Pages
+  (commit 4035700, live main.dart.js byte-identical). NEXT: owner creates a free Brevo account
+  -> SMTP key; then one PATCH sets smtp_* + Arabic code template (+ raise rate_limit_email_sent),
+  flip kOtpLoginEnabled=true, rebuild, redeploy, and REVOKE the PAT.
+- **2026-07-11 round 2 (AUTH RELIABILITY: signup retries + sync-failure UX + email-config diagnosis)** -
+  Owner hit "تعذّر الاتصال بالخادم" / "خطأ غير متوقع" on the register screen, plus OTP emails
+  landing in spam containing a LINK (not a code) that redirected to a dead localhost:3000.
+  LIVE-LOG DIAGNOSIS (auth+api logs, 15:50-16:44 UTC): the owner's first signup at 15:51:58
+  actually SUCCEEDED end-to-end (admin/users 200 -> password /token 200 -> 3 pull GETs 200);
+  the FAILURE was the post-auth PUSH request never reaching the server (network drop) - the app
+  wrapped auth+sync in one try/catch, reported the whole thing as "cannot reach server", and the
+  retry then hit user_already_exists (422 at 15:52:13). The clicked email link was an EXPIRED
+  9-Jul magic link; /verify 303-redirected to the DEFAULT Site URL http://localhost:3000.
+  APP FIXES (analyze clean, 12/12 tests): (1) SupabaseService.signUp - on user_already_exists
+  the app now tries signInWithPassword with the entered credentials and signs the user in
+  seamlessly (retry-after-partial-failure is no longer a dead end); wrong password -> localized
+  "already registered" message. (2) auth_screen._syncAfterAuth - sync errors are caught
+  separately: user sees "تم تسجيل الدخول... المزامنة لاحقاً من الإعدادات" toast and the screen
+  closes signed-in (auth success is never reported as failure). (3) New errNoAccount mapping:
+  otp_disabled/"signups not allowed" (shouldCreateUser=false, unknown email) now says "لا يوجد
+  حساب بهذا البريد" instead of the misleading bad-code message; + syncLater/errNoAccount strings
+  ar/en/fr. VERIFIED live via curl: fresh signup 200, duplicate -> 400 user_already_exists,
+  password login 200 (test user cleaned). Deployed signup fn v1 confirmed to have proper CORS.
+  Rebuilt web + release APK (62MB, INTERNET perm verified) + AAB; web app pushed to GitHub
+  Pages (github.io repo commit eb6fc92). Server config was resolved in round 3 (next entry)
+  via an owner-provided Management API token.
+- **2026-07-11 (git sync verified - nothing to push)** - Owner asked to push local commits.
+  Checked the private source repo: `git fetch` then compared - local `main` is fully in sync with
+  `origin/main` at `042379d` (0 commits ahead/behind), working tree clean, no stash, no other
+  branches. Nothing to push; all work through the 2026-07-07 signup/networking round was already
+  on GitHub. Corrected the stale §5 + TODO #5 that still claimed local-only work.
 - **2026-07-07 round 3 (SIGNUP EDGE FUNCTION - registration no longer needs emails)** - Owner
   delegated the email-confirmation decision ("do what's best/cheapest"). Dashboard toggle and
   Brevo both need owner accounts/access we don't have (no CLI token, MCP has no auth-config

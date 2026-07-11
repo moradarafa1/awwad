@@ -685,7 +685,7 @@ abstract class AppLocalizations {
   /// No description provided for @syncTitle.
   ///
   /// In ar, this message translates to:
-  /// **'حساب ومزامنة'**
+  /// **'إنشاء حساب'**
   String get syncTitle;
 
   /// No description provided for @syncDesc.

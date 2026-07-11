@@ -241,8 +241,8 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
       AnalyticsService.instance.track('account_prompt_accepted', {});
       await cancelReengageNudge();
       if (mounted) {
-        await Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_) => const AuthScreen()));
+        await Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => const AuthScreen(startInSignUp: true)));
       }
     } else {
       AnalyticsService.instance.track('account_prompt_declined', {});

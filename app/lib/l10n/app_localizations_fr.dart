@@ -308,7 +308,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get signOut => 'Se déconnecter';
 
   @override
-  String get syncTitle => 'Compte et synchro';
+  String get syncTitle => 'Créer un compte';
 
   @override
   String get syncDesc =>

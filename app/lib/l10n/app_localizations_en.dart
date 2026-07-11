@@ -305,7 +305,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signOut => 'Sign out';
 
   @override
-  String get syncTitle => 'Account & sync';
+  String get syncTitle => 'Create account';
 
   @override
   String get syncDesc => 'Sign in so your data syncs across all your devices.';

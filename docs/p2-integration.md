@@ -10,7 +10,7 @@
      --dart-define=SUPABASE_URL=https://YOUR.supabase.co \
      --dart-define=SUPABASE_ANON_KEY=YOUR_ANON_KEY
    ```
-3. أول ما المفاتيح موجودة، يظهر في الإعدادات قسم **«حساب ومزامنة»** (مخفي بدونها).
+3. أول ما المفاتيح موجودة، يظهر في الإعدادات قسم **«إنشاء حساب»** (كان اسمه «حساب ومزامنة»؛ مخفي بدون المفاتيح).
 
 ## اللي اتعمل (كود جاهز)
 - `core/cloud/supabase_service.dart`: تهيئة + تسجيل/دخول بإيميل وباسورد + **OTP بالإيميل** (`sendLoginOtp`/`verifyEmailOtp`) + استدعاء Edge Functions (`login-guard`, `register-trusted-device`).

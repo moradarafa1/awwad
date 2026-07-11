@@ -244,7 +244,8 @@ class SettingsScreen extends ConsumerWidget {
                       trailing: Icon(Icons.chevron_right,
                           color: AppColors.muted),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => const AuthScreen())),
+                          builder: (_) =>
+                              const AuthScreen(startInSignUp: true))),
                     ),
             ),
             const SizedBox(height: 12),
