@@ -481,6 +481,14 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
   -> `/auth/v1/otp` 200, Arabic code email delivered. `kOtpLoginEnabled=true` (the «إرسال رمز»
   button is back); analyze clean, 12/12 tests, web+APK+AAB rebuilt and web redeployed to Pages.
   If email breaks again: check Brevo blocking wasn't re-activated, then auth logs (get_logs).
+  **FINAL E2E CONFIRMATION:** full live curl suite passed (signup 200, password login 200,
+  duplicate -> user_already_exists, admin-generated OTP code verify -> real access_token session,
+  real /otp send -> 200) and the **owner CONFIRMED the Arabic code email arrived in the inbox**.
+  rate_limit_email_sent later raised to 100/h. Live web app boots with 0 console errors. Source
+  pushed (private repo commit 6f3e241), Pages commit 809fc91 (byte-identical live). Login + signup
+  are now fully working end to end. **REMAINING OWNER ACTIONS (non-blocking): (1) revoke the
+  Management PAT at supabase.com/dashboard/account/tokens - no longer needed; (2) install the new
+  release APK on the device.**
 - **2026-07-11 round 3 (SERVER AUTH CONFIG via PAT + account-screen UX pass)** - Chrome-profile
   mismatch made the dashboard-session route unusable (two Chrome profiles; the connected
   extension lives in the one whose Supabase session expired), so the owner generated a
