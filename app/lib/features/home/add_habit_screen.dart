@@ -24,6 +24,9 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
   bool _custom = false;
   final _nameCtrl = TextEditingController();
   final _whyCtrl = TextEditingController();
+  // Custom-habit slider labels: the user defines what to measure daily.
+  final _metricPrimaryCtrl = TextEditingController();
+  final _metricSecondaryCtrl = TextEditingController();
   List<int> _reminderHours = [20];
   String _query = '';
   bool _advisoryShown = false;
@@ -45,6 +48,8 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
   void dispose() {
     _nameCtrl.dispose();
     _whyCtrl.dispose();
+    _metricPrimaryCtrl.dispose();
+    _metricSecondaryCtrl.dispose();
     super.dispose();
   }
 
@@ -83,6 +88,13 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
       templateKey: _custom ? 'generic' : (_picked?.templateKey ?? 'generic'),
       reminderHour: _reminderHours.isNotEmpty ? _reminderHours.first : 20,
       reminderHours: _reminderHours,
+      customMetricPrimary: _custom && _metricPrimaryCtrl.text.trim().isNotEmpty
+          ? _metricPrimaryCtrl.text.trim()
+          : null,
+      customMetricSecondary:
+          _custom && _metricSecondaryCtrl.text.trim().isNotEmpty
+              ? _metricSecondaryCtrl.text.trim()
+              : null,
       createdAt: DateTime.now(),
     );
     final ok = await ref.read(appControllerProvider.notifier).addHabit(habit);
@@ -176,6 +188,33 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                   decoration:
                       InputDecoration(hintText: _s(_kStr['whyHint']!)),
                 ),
+                if (_custom) ...[
+                  const SizedBox(height: 14),
+                  Text(_s(_kStr['metricsTitle']!),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.muted)),
+                  const SizedBox(height: 4),
+                  Text(_s(_kStr['metricsHint']!),
+                      style: TextStyle(
+                          fontSize: 11.5,
+                          color: AppColors.muted,
+                          height: 1.6)),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _metricPrimaryCtrl,
+                    decoration: InputDecoration(
+                        labelText: _s(_kStr['metricP']!),
+                        hintText: _s(_kStr['metricPHint']!)),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _metricSecondaryCtrl,
+                    decoration: InputDecoration(
+                        labelText: _s(_kStr['metricS']!),
+                        hintText: _s(_kStr['metricSHint']!)),
+                  ),
+                ],
                 const SizedBox(height: 14),
                 Text(_s(_kStr['reminder']!),
                     style: TextStyle(
@@ -410,6 +449,39 @@ const Map<String, Map<String, String>> _kStr = {
     'ar': 'دافعك يذكّرك في أوقات الفتور',
     'en': 'Your motivation, for the hard moments',
     'fr': 'Votre motivation, pour les moments difficiles'
+  },
+  'metricsTitle': {
+    'ar': 'مؤشرا قياسك اليومي (اختياري)',
+    'en': 'Your two daily measures (optional)',
+    'fr': 'Vos deux mesures quotidiennes (facultatif)'
+  },
+  'metricsHint': {
+    'ar':
+        'حدد بنفسك ما يقيسه المؤشران في التسجيل اليومي كي يناسب عادتك تماماً. اتركهما فارغين للمقاييس الافتراضية.',
+    'en':
+        'Define what the two daily sliders measure so they fit your habit exactly. Leave empty for the defaults.',
+    'fr':
+        "Définissez ce que mesurent les deux curseurs quotidiens pour votre habitude. Laissez vide pour les valeurs par défaut."
+  },
+  'metricP': {
+    'ar': 'المؤشر الأول',
+    'en': 'First measure',
+    'fr': 'Première mesure'
+  },
+  'metricPHint': {
+    'ar': 'مثال: صفحات القراءة اليوم',
+    'en': 'e.g. Pages read today',
+    'fr': 'ex. Pages lues aujourd\'hui'
+  },
+  'metricS': {
+    'ar': 'المؤشر الثاني',
+    'en': 'Second measure',
+    'fr': 'Seconde mesure'
+  },
+  'metricSHint': {
+    'ar': 'مثال: مستوى التركيز',
+    'en': 'e.g. Focus level',
+    'fr': 'ex. Niveau de concentration'
   },
   'reminder': {'ar': 'وقت التذكير', 'en': 'Reminder time', 'fr': 'Heure du rappel'},
   'capReached': {

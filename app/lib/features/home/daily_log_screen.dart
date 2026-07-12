@@ -279,8 +279,13 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     // The two daily sliders are habit-aware: break = urge/resistance, build =
     // progress/quality, prayer = delay/early+sunnah (see metricsForHabit).
     // Generated per-habit overrides (habit_daily_content) beat both.
-    final metrics = kHabitMetricsOverrides[habit?.catalogKey] ??
-        metricsForHabit(habit?.catalogKey, habit?.track ?? 'break');
+    final metrics = resolveMetrics(
+      catalogKey: habit?.catalogKey,
+      track: habit?.track ?? 'break',
+      customPrimary: habit?.customMetricPrimary,
+      customSecondary: habit?.customMetricSecondary,
+      generatedOverride: kHabitMetricsOverrides[habit?.catalogKey],
+    );
     // Per-habit tailored checklists (fall back to the generic seeded fields).
     final crLabels = _labelsFor(habit?.catalogKey, 'competing_response', s, locale);
     final envLabels = _labelsFor(habit?.catalogKey, 'environment_action', s, locale);

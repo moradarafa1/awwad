@@ -111,6 +111,11 @@ class Habit {
   final int totalWeeks;
   final int reminderHour; // legacy single time (kept for migration)
   final List<int> reminderHours; // one or more daily reminder hours
+  // User-typed labels for the two daily sliders (custom habits): lets the
+  // user define what THEY want to measure (e.g. "صفحات القراءة"). Empty/null
+  // falls back to generated/catalog/track metrics.
+  final String? customMetricPrimary;
+  final String? customMetricSecondary;
   final DateTime createdAt;
 
   const Habit({
@@ -124,6 +129,8 @@ class Habit {
     this.totalWeeks = 8,
     this.reminderHour = 20,
     this.reminderHours = const [],
+    this.customMetricPrimary,
+    this.customMetricSecondary,
     required this.createdAt,
   });
 
@@ -135,7 +142,9 @@ class Habit {
           {String? title,
           String? reason,
           int? reminderHour,
-          List<int>? reminderHours}) =>
+          List<int>? reminderHours,
+          String? customMetricPrimary,
+          String? customMetricSecondary}) =>
       Habit(
         id: id,
         track: track,
@@ -147,6 +156,9 @@ class Habit {
         totalWeeks: totalWeeks,
         reminderHour: reminderHour ?? this.reminderHour,
         reminderHours: reminderHours ?? this.reminderHours,
+        customMetricPrimary: customMetricPrimary ?? this.customMetricPrimary,
+        customMetricSecondary:
+            customMetricSecondary ?? this.customMetricSecondary,
         createdAt: createdAt,
       );
 
@@ -161,6 +173,8 @@ class Habit {
         'totalWeeks': totalWeeks,
         'reminderHour': reminderHour,
         'reminderHours': reminderHours,
+        'customMetricPrimary': customMetricPrimary,
+        'customMetricSecondary': customMetricSecondary,
         'createdAt': createdAt.toIso8601String(),
       };
 
@@ -176,6 +190,8 @@ class Habit {
         reminderHour: j['reminderHour'] as int? ?? 20,
         reminderHours:
             (j['reminderHours'] as List<dynamic>?)?.cast<int>() ?? const [],
+        customMetricPrimary: j['customMetricPrimary'] as String?,
+        customMetricSecondary: j['customMetricSecondary'] as String?,
         createdAt:
             DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now(),
       );

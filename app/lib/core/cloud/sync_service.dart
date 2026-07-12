@@ -44,7 +44,14 @@ class SyncService {
           'template_key': habit.templateKey,
           'total_weeks': habit.totalWeeks,
           'reminder_hour': habit.reminderHour,
-          'config': {'catalog_key': habit.catalogKey, 'origin': 'offline'},
+          'config': {
+            'catalog_key': habit.catalogKey,
+            'origin': 'offline',
+            if ((habit.customMetricPrimary ?? '').isNotEmpty)
+              'metric_p': habit.customMetricPrimary,
+            if ((habit.customMetricSecondary ?? '').isNotEmpty)
+              'metric_s': habit.customMetricSecondary,
+          },
         }
     ]);
 
@@ -95,6 +102,10 @@ class SyncService {
               id: h['id'] as String,
               track: h['track'] as String? ?? 'break',
               catalogKey: (h['config'] as Map?)?['catalog_key'] as String?,
+              customMetricPrimary:
+                  (h['config'] as Map?)?['metric_p'] as String?,
+              customMetricSecondary:
+                  (h['config'] as Map?)?['metric_s'] as String?,
               isCustom: h['is_custom'] as bool? ?? false,
               title: h['title'] as String? ?? '',
               reason: h['reason'] as String?,

@@ -502,6 +502,22 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-12 round 4 (CUSTOM habit metrics + advanced analytics)** - Owner-requested:
+  **(1) Custom-habit user-defined sliders**: Habit model gained customMetricPrimary/Secondary
+  (json + copyWith + cloud roundtrip via habits.config metric_p/metric_s in sync_service);
+  new `customMetrics()` + `resolveMetrics()` in habit_catalog.dart (priority: user-typed >
+  generated override > catalog > track default) now used by daily_log AND stats; AddHabitScreen
+  shows two optional labeled fields (with examples) when creating a CUSTOM habit (onboarding
+  custom stays simple deliberately - fields available post-onboarding). **(2) Advanced
+  analytics** `features/home/analytics_section.dart` in Stats (needs >=3 entries): 30-day
+  dual-metric trend LineChart, weekday success bars with "most challenging day" insight
+  (danger-colored, needs >=2 logs/weekday), week-over-week clean-days comparison chip, top-5
+  mood distribution. **(3) Competitor research workflow** produced a 14-feature decision table
+  (streak freeze/repair, flexible scheduling, relapse journal + trigger analysis, prayer-time
+  linked habits, accountability partner via FCM, recovery timeline, money-saved calc, daily
+  pledge, habit stacking, Quran/dhikr streaks, rank levels, lessons program, mood correlation,
+  notes-on-completion) - AWAITING OWNER DECISIONS, table in the chat + workflow output
+  wf_aed940eb-5bc. Verified: analyze clean, 18/18 tests.
 - **2026-07-12 round 3 (AUTO-SYNC replaces the manual sync button)** - Owner: the signed-in
   menu should show only the conventional «تسجيل الخروج», not «زامن الآن». Since that button was
   the ONLY ongoing push path, sync is now fully AUTOMATIC: (a) push on app open

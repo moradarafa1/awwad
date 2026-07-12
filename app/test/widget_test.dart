@@ -5,6 +5,7 @@ import 'package:awwad/core/catalog/badge_catalog.dart';
 import 'package:awwad/core/state/app_state.dart';
 import 'package:awwad/features/home/month_heatmap.dart';
 import 'package:awwad/core/platform/usage_stats.dart';
+import 'package:awwad/core/catalog/habit_catalog.dart';
 
 // Lightweight unit tests for the offline core logic (no widgets needed yet).
 // Streak / badge logic is the riskiest engineering in P1, so it is tested here.
@@ -141,6 +142,27 @@ void main() {
       expect(daysInMonth(DateTime(2028, 2, 1)), 29); // leap year
       expect(daysInMonth(DateTime(2026, 12, 1)), 31);
       expect(daysInMonth(DateTime(2026, 4, 1)), 30);
+    });
+
+    test('resolveMetrics priority: custom beats override beats default', () {
+      // Custom labels win when BOTH are set.
+      final custom = resolveMetrics(
+          track: 'build',
+          customPrimary: 'صفحات القراءة',
+          customSecondary: 'التركيز',
+          generatedOverride: kBreakMetrics);
+      expect(custom.primary.l('ar'), 'صفحات القراءة');
+      expect(custom.secondary.l('en'), 'التركيز');
+      // One empty custom label -> falls back to the override.
+      final override = resolveMetrics(
+          track: 'build',
+          customPrimary: 'x',
+          customSecondary: '',
+          generatedOverride: kBreakMetrics);
+      expect(override.primary.l('ar'), kBreakMetrics.primary.l('ar'));
+      // Nothing set -> track default.
+      final def = resolveMetrics(track: 'build');
+      expect(def.primary.l('ar'), kBuildMetrics.primary.l('ar'));
     });
 
     test('splitMinutes formats hours and minutes', () {

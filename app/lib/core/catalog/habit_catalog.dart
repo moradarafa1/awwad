@@ -139,6 +139,40 @@ HabitMetrics metricsForHabit(String? catalogKey, String track) {
   return track == 'build' ? kBuildMetrics : kBreakMetrics;
 }
 
+/// Builds slider metrics from USER-TYPED labels (custom habits). The label is
+/// shown as typed in every locale (it is the user's own wording); anchors are
+/// generic low/high.
+HabitMetrics customMetrics(String primary, String secondary) => HabitMetrics(
+      primary: HabitMetric(
+        label: {'ar': primary, 'en': primary, 'fr': primary},
+        low: const {'ar': 'منخفض', 'en': 'Low', 'fr': 'Bas'},
+        high: const {'ar': 'مرتفع', 'en': 'High', 'fr': 'Élevé'},
+      ),
+      secondary: HabitMetric(
+        label: {'ar': secondary, 'en': secondary, 'fr': secondary},
+        low: const {'ar': 'منخفض', 'en': 'Low', 'fr': 'Bas'},
+        high: const {'ar': 'مرتفع', 'en': 'High', 'fr': 'Élevé'},
+      ),
+    );
+
+/// FULL metric resolution for a habit instance, in priority order:
+/// user-typed custom labels > generated per-habit override > catalog metrics
+/// > track default. Pass kHabitMetricsOverrides[catalogKey] as
+/// [generatedOverride] (kept as a parameter so this file stays independent of
+/// the generated content file).
+HabitMetrics resolveMetrics({
+  String? catalogKey,
+  required String track,
+  String? customPrimary,
+  String? customSecondary,
+  HabitMetrics? generatedOverride,
+}) {
+  final p = customPrimary?.trim() ?? '';
+  final s = customSecondary?.trim() ?? '';
+  if (p.isNotEmpty && s.isNotEmpty) return customMetrics(p, s);
+  return generatedOverride ?? metricsForHabit(catalogKey, track);
+}
+
 /// The واعي recommendation attached to the secret-habit track.
 const HabitResource _waaiResource = HabitResource(
   url: kWaaiUrl,
