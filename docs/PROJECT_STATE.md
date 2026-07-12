@@ -505,9 +505,14 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
   تسجيل الدخول» (opens signup form; sign-in one tap away); signed-in shows sync+sign-out
   (unchanged); **delete-account entry REMOVED from the app** per owner decision - store
   policy stays satisfied via the website's delete-account page (linked from store listings);
-  `_confirmDelete` deleted; ADDED best-in-class items: share-the-app (copies site link),
-  contact-us (mailto moradarafa600@gmail.com), privacy-policy link, version line (1.0.0 -
-  manual const, bump on releases). Verified: analyze clean, 17/17 tests.
+  `_confirmDelete` deleted; ADDED best-in-class items: share-the-app, contact-us (mailto
+  moradarafa600@gmail.com), privacy-policy link, version line (1.0.0 - manual const, bump on
+  releases). SHARE upgraded same day (owner request): now opens the NATIVE OS share sheet via
+  share_plus 13.2.0 with a platform-aware link - Android shares the deterministic Play URL
+  (play.google.com/store/apps/details?id=com.awwad.awwad, live the moment the app publishes),
+  iOS shares the website until the App Store id exists (TODO(stores) marker in
+  settings_screen.dart `_appStoreUrl`), web shares the site; desktop-web fallback = copy to
+  clipboard + toast. Verified: analyze clean, 17/17 tests.
 - **2026-07-12 (POWER FEATURES wave 1+2: SOS «لحظة ضعف» + DNS content shield)** - Owner
   approved the prioritized power-features roadmap (see §12 "Power features roadmap"). SHIPPED:
   **(1) SOS screen** `features/sos/sos_screen.dart` - urge-surfing support for break habits:

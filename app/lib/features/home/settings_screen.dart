@@ -1,8 +1,10 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:awwad/l10n/app_localizations.dart';
@@ -24,6 +26,27 @@ import 'habits_screen.dart';
 import 'profile_screen.dart';
 
 const _linkedInUrl = 'https://www.facebook.com/MoradArafaOfficial/';
+
+// Share links per platform. The Play link is deterministic (package id) and
+// starts working the moment the app is published; the App Store link is a
+// TODO until Apple assigns an id - until then iOS shares the website.
+const _playStoreUrl =
+    'https://play.google.com/store/apps/details?id=com.awwad.awwad';
+// TODO(stores): replace with the real App Store URL after iOS publishing.
+const _appStoreUrl = 'https://moradarafa1.github.io/';
+const _siteUrl = 'https://moradarafa1.github.io/';
+
+String shareLinkForPlatform() {
+  if (kIsWeb) return _siteUrl;
+  switch (defaultTargetPlatform) {
+    case TargetPlatform.android:
+      return _playStoreUrl;
+    case TargetPlatform.iOS:
+      return _appStoreUrl;
+    default:
+      return _siteUrl;
+  }
+}
 
 const Map<String, Map<String, String>> _kSet = {
   'darkMode': {'ar': 'الوضع الداكن', 'en': 'Dark mode', 'fr': 'Mode sombre'},
@@ -60,6 +83,11 @@ const Map<String, Map<String, String>> _kSet = {
     'ar': 'تم نسخ رابط عوّاد. الصقه في أي محادثة.',
     'en': 'Awwad link copied. Paste it anywhere.',
     'fr': 'Lien copié. Collez-le où vous voulez.'
+  },
+  'shareMsg': {
+    'ar': 'جرّب تطبيق «عوّاد»: رفيقك لكسر العادات السيئة وبناء عادات حسنة.',
+    'en': 'Try "Awwad": your companion to break bad habits and build good ones.',
+    'fr': "Essayez « Awwad » : votre compagnon pour briser les mauvaises habitudes et en bâtir de bonnes."
   },
   'contact': {
     'ar': 'تواصل معنا',
@@ -369,12 +397,20 @@ class SettingsScreen extends ConsumerWidget {
                   title: Text(_set('share', loc),
                       style: const TextStyle(fontSize: 13)),
                   onTap: () async {
-                    await Clipboard.setData(const ClipboardData(
-                        text:
-                            'عوّاد - رفيقك لكسر العادات السيئة وبناء الحسنة\nhttps://moradarafa1.github.io/'));
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(_set('shareCopied', loc))));
+                    final text =
+                        '${_set('shareMsg', loc)}\n${shareLinkForPlatform()}';
+                    try {
+                      // Native OS share sheet (WhatsApp, Telegram, etc.).
+                      await SharePlus.instance
+                          .share(ShareParams(text: text));
+                    } catch (_) {
+                      // Fallback (e.g. desktop web browsers without the
+                      // Web Share API): copy the message instead.
+                      await Clipboard.setData(ClipboardData(text: text));
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(_set('shareCopied', loc))));
+                      }
                     }
                   },
                 ),
