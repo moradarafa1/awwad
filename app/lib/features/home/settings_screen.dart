@@ -10,9 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
-import '../../core/cloud/net_errors.dart';
 import '../../core/cloud/supabase_service.dart';
-import '../../core/cloud/sync_service.dart';
 import '../../core/content/dhikr.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/notifications/notif_scheduler.dart';
@@ -267,25 +265,16 @@ class SettingsScreen extends ConsumerWidget {
           // cloud account & sync (only when the build was given Supabase keys)
           if (SupabaseService.configured) ...[
             SectionCard(
+              // Signed in: just "sign out" (the conventional item). Sync is
+              // now fully AUTOMATIC (on app open + after every saved entry),
+              // so the old manual "sync now" button was removed.
               child: SupabaseService.signedIn
-                  ? Column(
-                      children: [
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(Icons.sync, color: AppColors.accent2),
-                          title: Text(l10n.syncNow,
-                              style: const TextStyle(fontSize: 13)),
-                          onTap: () => _syncNow(context, ref),
-                        ),
-                        const Divider(),
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(Icons.logout, color: AppColors.muted),
-                          title: Text(l10n.signOut,
-                              style: const TextStyle(fontSize: 13)),
-                          onTap: () => SupabaseService.signOut(),
-                        ),
-                      ],
+                  ? ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.logout, color: AppColors.muted),
+                      title: Text(l10n.signOut,
+                          style: const TextStyle(fontSize: 13)),
+                      onTap: () => SupabaseService.signOut(),
                     )
                   : ListTile(
                       contentPadding: EdgeInsets.zero,
@@ -531,24 +520,6 @@ class SettingsScreen extends ConsumerWidget {
   String _sync(String key, BuildContext context) {
     final loc = Localizations.localeOf(context).languageCode;
     return _kSyncErr[key]![loc] ?? _kSyncErr[key]!['ar']!;
-  }
-
-  Future<void> _syncNow(BuildContext context, WidgetRef ref) async {
-    final s = ref.read(appControllerProvider);
-    try {
-      await SyncService.pushAll(
-          habits: s.habits, entries: s.entries, survey: s.survey);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(_sync('syncedOk', context))));
-      }
-    } catch (e) {
-      if (context.mounted) {
-        final key = isNetworkError(e) ? 'network' : 'generic';
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(_sync(key, context))));
-      }
-    }
   }
 
   Future<void> _export(BuildContext context, WidgetRef ref) async {

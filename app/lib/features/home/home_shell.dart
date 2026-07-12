@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
+import '../../core/cloud/supabase_service.dart';
+import '../../core/cloud/sync_service.dart';
 import '../../core/content/dhikr.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/notifications/notif_scheduler.dart';
@@ -47,7 +49,21 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _maybeNudge();
       _setupNotifications();
+      _autoSync();
     });
+  }
+
+  // Auto-sync on app open: replaces the removed manual "sync now" button.
+  // Push-only upserts (idempotent), silent fail-open, never blocks startup.
+  Future<void> _autoSync() async {
+    if (!SupabaseService.signedIn) return;
+    try {
+      final s = ref.read(appControllerProvider);
+      await SyncService.pushAll(
+          habits: s.habits, entries: s.entries, survey: s.survey);
+    } catch (_) {
+      // Offline or transient failure: the next open / save retries.
+    }
   }
 
   // Ask for notification consent once (with an in-app rationale), then schedule

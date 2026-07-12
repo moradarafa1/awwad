@@ -227,6 +227,20 @@ cd /d/Claude/awwad/app
 #   'D:\Android\Sdk\build-tools\36.0.0\aapt.exe' dump permissions app/build/app/outputs/flutter-apk/app-release.apk | grep INTERNET
 ```
 
+### App (iOS — requires a Mac with Xcode; repo is READY, no code changes needed)
+```bash
+git clone https://github.com/moradarafa1/awwad.git && cd awwad/app
+flutter pub get
+flutter build ipa --release \
+  --dart-define=SUPABASE_URL=https://kdczbzzjezyhfxgpegqc.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=<anon key from ops/build-app-cloud.ps1>
+# Bundle id com.awwad.awwad, display name «عوّاد», ar/en/fr locales and the
+# encryption-exempt flag are already configured in app/ios/. Signing needs an
+# Apple Developer account selected in Xcode (Runner target). Note: the iOS
+# side of the native channels (dns_shield/usage_stats) is not implemented -
+# the Dart layer fails open, so those two screens show manual guidance on iOS.
+```
+
 ### Verify app
 ```bash
 cd /d/Claude/awwad/app
@@ -488,6 +502,14 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-12 round 3 (AUTO-SYNC replaces the manual sync button)** - Owner: the signed-in
+  menu should show only the conventional «تسجيل الخروج», not «زامن الآن». Since that button was
+  the ONLY ongoing push path, sync is now fully AUTOMATIC: (a) push on app open
+  (home_shell._autoSync, silent fail-open, never blocks startup) and (b) fire-and-forget push
+  after every saved daily entry (daily_log._save, unawaited + swallowed errors). Settings
+  signed-in section = a single sign-out tile; _syncNow removed. Also added the iOS build
+  command to §6 for the owner's plan to build the iPhone version from GitHub on a Mac.
+  Verified: analyze clean, 17/17 tests.
 - **2026-07-12 round 2 (WAVE 3: phone-usage monitoring + settings-menu audit)** - Executed by
   the in-session wakeup after the usage-limit reset (owner pre-authorized). **(1) Usage
   monitoring (phase A)**: new `awwad/usage_stats` MethodChannel in MainActivity.kt

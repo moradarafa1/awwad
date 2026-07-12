@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -23,6 +25,7 @@ import '../auth/auth_screen.dart';
 import '../phone/usage_screen.dart';
 import '../sos/sos_screen.dart';
 import '../../core/cloud/supabase_service.dart';
+import '../../core/cloud/sync_service.dart';
 
 // "Stage X of 4" prefix for the progressive stage card (see habit_stages.dart).
 const Map<String, String> _kStageOf = {
@@ -186,6 +189,15 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
           competingResponses: _selectedCR.toList(),
           environment: _selectedEnv.toList(),
         );
+    // Auto-sync: signed-in users should never need a manual "sync now"
+    // button - every saved entry is pushed in the background (silent
+    // fail-open; offline-first is preserved).
+    if (SupabaseService.signedIn) {
+      final st = ref.read(appControllerProvider);
+      unawaited(SyncService.pushAll(
+              habits: st.habits, entries: st.entries, survey: st.survey)
+          .catchError((_) {}));
+    }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.entrySaved), backgroundColor: AppColors.success),
