@@ -17,6 +17,7 @@ import '../../core/notifications/notif_scheduler.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import '../auth/auth_screen.dart';
+import '../shield/dns_shield_screen.dart';
 import 'fields_manager_screen.dart';
 import 'habits_screen.dart';
 import 'profile_screen.dart';
@@ -250,6 +251,23 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
           ],
+
+          // content shield (phone-wide porn blocking via Private DNS)
+          SectionCard(
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading:
+                  Icon(Icons.shield_outlined, color: AppColors.accent2),
+              title: Text(
+                  dnsShieldTitle(
+                      Localizations.localeOf(context).languageCode),
+                  style: const TextStyle(fontSize: 13)),
+              trailing: Icon(Icons.chevron_right, color: AppColors.muted),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => const DnsShieldScreen())),
+            ),
+          ),
+          const SizedBox(height: 12),
 
           // personalization
           SectionCard(

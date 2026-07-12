@@ -44,6 +44,8 @@
 | `otp_sent` | إرسال كود OTP | — |
 | `otp_verified` | تأكيد كود OTP | `success: bool` |
 | `device_trusted` | توثيق جهاز | — |
+| `sos_opened` | فتح شاشة «لحظة ضعف» | — |
+| `sos_won` | إنهاء لحظة الضعف بنجاح (زر انتصرت) | — |
 | `entry_saved` | حفظ تسجيل يومي | `did_slip: bool`, `urge: int`, `resistance: int`, `events_count: int` |
 | `streak_milestone` | بلوغ حدّ ستريك | `days: int` |
 | `badge_earned` | فتح درع | `badge_key: string`, `tier: string` |

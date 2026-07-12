@@ -48,6 +48,8 @@ class AnalyticsService {
     'otp_sent',
     'otp_verified',
     'device_trusted',
+    'sos_opened',
+    'sos_won',
   };
 
   void track(String name, [Map<String, Object?> props = const {}]) {

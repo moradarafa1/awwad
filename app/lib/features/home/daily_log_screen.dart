@@ -20,6 +20,7 @@ import 'badge_celebration.dart';
 import 'habit_switcher.dart';
 import 'home_shell.dart';
 import '../auth/auth_screen.dart';
+import '../sos/sos_screen.dart';
 import '../../core/cloud/supabase_service.dart';
 
 // "Stage X of 4" prefix for the progressive stage card (see habit_stages.dart).
@@ -327,6 +328,11 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
                       color: AppColors.success)),
             ],
           ),
+          // Urge-surfing SOS entry: break habits fight cravings in the moment.
+          if (isBreak) ...[
+            const SizedBox(height: 14),
+            const SosEntryButton(),
+          ],
           const SizedBox(height: 14),
           if (s.settings.showReligiousContent)
             MotivationBanner(

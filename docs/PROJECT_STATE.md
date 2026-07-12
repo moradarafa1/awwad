@@ -410,6 +410,24 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
    progress/quality metrics and no checklists — design per-habit content via a Workflow, verify
    adversarially, then sync app + seed + live DB.
 
+0c. **Power features roadmap (owner-approved 2026-07-12, ordered by importance x commonality x
+   practicality).** DONE: (1) SOS «لحظة ضعف» screen; (2) DNS content shield (Private DNS guided
+   setup + live verification). NEXT (in order):
+   (3) App-usage monitoring + per-app daily limits + overrun warnings (= item 0b below;
+       UsageStatsManager + PACKAGE_USAGE_STATS; needs a DEDICATED MOBILE SESSION with the
+       owner's device for permission-flow iterations; hard-blocking overlay = later phase,
+       Play-policy-sensitive).
+   (4) Home-screen widget (streak + quick log; home_widget package).
+   (5) Auto prayer-times reminders for prayer habits (offline adhan calculation by location).
+   (6) Late-night usage detection for `late_nights` (depends on (3)'s usage plumbing).
+   (7) Shareable monthly report image (calendar + streaks).
+   (8) NEW catalog habit «غض البصر» (lower-gaze, break track) wired to the DNS shield + SOS
+       (needs catalog + seed + live DB sync, all three together).
+   REJECTED as infeasible (documented for the owner): system-wide realtime blur of
+   opposite-gender faces/bodies over other apps - requires continuous screen capture + on-device
+   ML + overlay; battery/latency/accuracy prohibitive, Play-rejection risk for the whole app,
+   impossible on iOS. Network-level blocking (the shield) + SOS is the practical substitute.
+
 0b. **Phone-usage control for `phone_addiction` (owner-requested).** Goal: Awwad lets the user
    pick apps and limits/monitors time on them. **Feasibility & plan:**
    - **Android (doable):** read per-app usage via `UsageStatsManager` (needs the special
@@ -470,6 +488,26 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-12 (POWER FEATURES wave 1+2: SOS «لحظة ضعف» + DNS content shield)** - Owner
+  approved the prioritized power-features roadmap (see §12 "Power features roadmap"). SHIPPED:
+  **(1) SOS screen** `features/sos/sos_screen.dart` - urge-surfing support for break habits:
+  animated paced breathing (4-2-6 cycle), 5-minute "urge wave" countdown with progress, the
+  user's own reason-for-starting card, the habit's tailored competing responses as quick
+  actions (reuses kHabitChecklists), adhkar card (respects religious toggle), «انتصرت» /
+  restart buttons; entry = prominent gradient button on the Today tab (break habits only);
+  new analytics events sos_opened/sos_won (allow-list + tracking-plan.md). Pure Flutter -
+  works on Android/iOS/web with zero permissions. **(2) DNS content shield**
+  `features/shield/dns_shield_screen.dart` + `core/platform/dns_shield.dart` + MethodChannel
+  in MainActivity.kt (first native Kotlin in the project): guided 4-step setup of Android
+  Private DNS with Cloudflare family resolver (family.cloudflare-dns.com) = phone-wide porn/
+  malware blocking across ALL apps with ZERO app permissions; live VERIFICATION by reading
+  Settings.Global private_dns_mode/specifier (no permission needed), auto re-check on
+  app resume (lifecycle observer), copy-hostname + open-settings buttons (tries the direct
+  PRIVATE_DNS_SETTINGS panel, falls back to wireless/settings), honest-notes card (not
+  tamper-proof; iPhone manual path). Fail-open everywhere: web/iOS degrade to manual guidance,
+  never crash. Entries: Settings tile («درع المحتوى») + a link inside SOS for secret_habit.
+  Verified: analyze clean, 16/16 tests. NOTE: the Kotlin channel is untested on a real device
+  yet - owner tests with the new APK; worst case = status shows "unknown" (fail-open).
 - **2026-07-11 round 5 (AUTH MODEL REDESIGN: OTP moved to signup+reset, + MONTH CALENDAR)** -
   Owner defined the correct OTP model: the emailed code belongs to SIGNUP (email verification)
   and FORGOT-PASSWORD - not passwordless login (he tested signup with a second email and no code
