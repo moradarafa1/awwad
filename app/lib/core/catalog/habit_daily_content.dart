@@ -73,7 +73,7 @@ const Map<String, Map<String, String>> kHabitQuestions = {
   'excessive_gaming': {'ar': 'هل تجاوزت وقت اللعب المسموح اليوم؟', 'en': 'Did you exceed your gaming limit today?', 'fr': 'Avez-vous dépassé votre limite de jeu aujourd\'hui ?'},
   'procrastination': {'ar': 'هل سوّفت مهامك اليوم؟', 'en': 'Did you procrastinate on your tasks today?', 'fr': 'Avez-vous procrastiné sur vos tâches aujourd\'hui ?'},
   'junk_food': {'ar': 'هل أكلت وجبة غير صحية اليوم؟', 'en': 'Did you eat junk food today?', 'fr': 'Avez-vous mangé de la malbouffe aujourd\'hui ?'},
-  'oversleeping': {'ar': 'هل عدت إلى النوم بعد الاستيقاظ اليوم؟', 'en': 'Did you go back to sleep after waking today?', 'fr': 'Vous êtes-vous rendormi après le réveil aujourd\'hui ?'},
+  'oversleeping': {'ar': 'هل نمت أكثر من حاجتك اليوم؟', 'en': 'Did you sleep more than you needed today?', 'fr': 'Avez-vous dormi plus que nécessaire aujourd\'hui ?'},
   'gossip': {'ar': 'هل اغتبت أحداً اليوم؟', 'en': 'Did you backbite anyone today?', 'fr': 'Avez-vous médit de quelqu\'un aujourd\'hui ?'},
   'bad_language': {'ar': 'هل نطقت بلفظ سيئ اليوم؟', 'en': 'Did you use bad language today?', 'fr': 'Avez-vous dit une grossièreté aujourd\'hui ?'},
   'impulse_buying': {'ar': 'هل اشتريت شيئاً بلا تخطيط اليوم؟', 'en': 'Did you buy anything unplanned today?', 'fr': 'Avez-vous fait un achat imprévu aujourd\'hui ?'},
@@ -85,8 +85,8 @@ const Map<String, Map<String, String>> kHabitQuestions = {
   'wake_fajr': {'ar': 'هل استيقظت وصلّيت الفجر في وقته اليوم؟', 'en': 'Did you wake up and pray Fajr on time today?', 'fr': 'Vous êtes-vous levé pour prier le Fajr à l\'heure aujourd\'hui ?'},
   'daily_quran': {'ar': 'هل قرأت وِردك من القرآن اليوم؟', 'en': 'Did you read your Qur\'an portion today?', 'fr': 'Avez-vous lu votre portion du Coran aujourd\'hui ?'},
   'adhkar': {'ar': 'هل حصّنت يومك بأذكار الصباح والمساء؟', 'en': 'Did you fortify your day with the morning and evening adhkar?', 'fr': 'Avez-vous protégé votre journée par les adhkar du matin et du soir ?'},
-  'voluntary_fasting': {'ar': 'هل صمت تطوعاً اليوم؟', 'en': 'Did you fast voluntarily today?', 'fr': 'Avez-vous accompli un jeûne surérogatoire aujourd\'hui ?'},
-  'qiyam': {'ar': 'هل قمت الليل ولو بركعتين؟', 'en': 'Did you pray at night, even two rak\'ahs?', 'fr': 'Avez-vous prié la nuit, ne serait-ce que deux rak\'ahs ?'},
+  'voluntary_fasting': {'ar': 'هل التزمت بخطة صيامك لهذا اليوم؟', 'en': 'Did you keep to your fasting plan for today?', 'fr': 'Avez-vous respecté votre programme de jeûne pour aujourd\'hui ?'},
+  'qiyam': {'ar': 'هل قمت الليلة الماضية ولو بركعتين؟', 'en': 'Did you pray qiyam last night, even two rak\'ahs?', 'fr': 'Avez-vous prié la nuit dernière, ne serait-ce que deux rak\'ahs ?'},
   'keeping_ties': {'ar': 'هل وصلت اليوم أحداً من أرحامك؟', 'en': 'Did you connect with a relative today?', 'fr': 'Avez-vous contacté un proche parent aujourd\'hui ?'},
   'daily_charity': {'ar': 'هل تصدقت اليوم ولو بالقليل؟', 'en': 'Did you give charity today, even a little?', 'fr': 'Avez-vous donné une aumône aujourd\'hui, même modeste ?'},
   'istighfar': {'ar': 'هل حافظت على ورد الاستغفار اليوم؟', 'en': 'Did you keep up your istighfar today?', 'fr': 'Avez-vous maintenu votre istighfar aujourd\'hui ?'},
@@ -187,7 +187,7 @@ const Map<String, HabitMetrics> kHabitMetricsOverrides = {
     secondary: HabitMetric(label: {'ar': 'أذكار المساء', 'en': 'Evening adhkar', 'fr': 'Adhkar du soir'}, low: {'ar': 'فاتتني', 'en': 'Missed', 'fr': 'Manqués'}, high: {'ar': 'كاملة', 'en': 'Complete', 'fr': 'Complets'}),
   ),
   'voluntary_fasting': HabitMetrics(
-    primary: HabitMetric(label: {'ar': 'إتمام صيام اليوم', 'en': 'Today\'s fast', 'fr': 'Jeûne du jour'}, low: {'ar': 'لم أصم', 'en': 'No fast', 'fr': 'Pas de jeûne'}, high: {'ar': 'أتممته كاملاً', 'en': 'Completed fully', 'fr': 'Complété entièrement'}),
+    primary: HabitMetric(label: {'ar': 'الالتزام بخطة الصيام اليوم', 'en': 'Keeping today\'s fasting plan', 'fr': 'Respect du programme de jeûne'}, low: {'ar': 'لم ألتزم', 'en': 'Not kept', 'fr': 'Non respecté'}, high: {'ar': 'التزمت كاملاً', 'en': 'Fully kept', 'fr': 'Pleinement respecté'}),
     secondary: HabitMetric(label: {'ar': 'حفظ الصيام من اللغو', 'en': 'Guarding the fast', 'fr': 'Préserver le jeûne'}, low: {'ar': 'غفلت كثيراً', 'en': 'Slipped often', 'fr': 'Souvent négligé'}, high: {'ar': 'حفظت لساني وجوارحي', 'en': 'Fully guarded', 'fr': 'Bien préservé'}),
   ),
   'qiyam': HabitMetrics(
@@ -220,7 +220,7 @@ const Map<String, HabitMetrics> kHabitMetricsOverrides = {
   ),
   'gratitude': HabitMetrics(
     primary: HabitMetric(label: {'ar': 'استحضار نعم الله اليوم', 'en': 'Noticing blessings today', 'fr': 'Conscience des bienfaits'}, low: {'ar': 'غفلة', 'en': 'Heedless', 'fr': 'Inattention'}, high: {'ar': 'استحضار دائم', 'en': 'All day long', 'fr': 'Toute la journée'}),
-    secondary: HabitMetric(label: {'ar': 'حضور القلب في الحمد والدعاء', 'en': 'Heart presence', 'fr': 'Présence du cœur'}, low: {'ar': 'باللسان فقط', 'en': 'Words only', 'fr': 'Paroles seulement'}, high: {'ar': 'بقلب خاشع', 'en': 'Deeply felt', 'fr': 'Profondément ressenti'}),
+    secondary: HabitMetric(label: {'ar': 'حضور القلب في الحمد والشكر', 'en': 'Heart presence', 'fr': 'Présence du cœur'}, low: {'ar': 'باللسان فقط', 'en': 'Words only', 'fr': 'Paroles seulement'}, high: {'ar': 'بقلب خاشع', 'en': 'Deeply felt', 'fr': 'Profondément ressenti'}),
   ),
   'learn_skill': HabitMetrics(
     primary: HabitMetric(label: {'ar': 'وقت التعلّم اليوم', 'en': 'Learning time today', 'fr': 'Temps d\'apprentissage du jour'}, low: {'ar': 'لا شيء', 'en': 'None', 'fr': 'Rien'}, high: {'ar': 'جلسة كاملة', 'en': 'Full session', 'fr': 'Séance complète'}),

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
+import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_daily_content.dart';
 import '../../core/state/app_state.dart';
 import 'habit_switcher.dart';
 
@@ -12,8 +14,19 @@ class HistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).languageCode;
     final s = ref.watch(appControllerProvider);
     final entries = s.activeEntries;
+    // Per-habit slider labels (same resolution as the log/stats screens):
+    // a build habit must not show break-track labels like "urge level".
+    final habit = s.activeHabit;
+    final metrics = resolveMetrics(
+      catalogKey: habit?.catalogKey,
+      track: habit?.track ?? 'break',
+      customPrimary: habit?.customMetricPrimary,
+      customSecondary: habit?.customMetricSecondary,
+      generatedOverride: kHabitMetricsOverrides[habit?.catalogKey],
+    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -83,8 +96,8 @@ class HistoryScreen extends ConsumerWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    _row(l10n.urgeLevel, '${e.urge}/10'),
-                    _row(l10n.resistanceLevel, '${e.resistance}/10'),
+                    _row(metrics.primary.l(locale), '${e.urge}/10'),
+                    _row(metrics.secondary.l(locale), '${e.resistance}/10'),
                     if (e.moodEmoji != null)
                       _row(l10n.moodLabel, '${e.moodEmoji} ${e.moodLabel ?? ''}'),
                     if (e.note != null && e.note!.isNotEmpty)

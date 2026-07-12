@@ -502,6 +502,26 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-12 round 5 (PER-HABIT CONTENT AUDIT: 12 confirmed fixes across all 36 habits)** -
+  The long-queued "deep appropriateness review" (old TODO 0a) executed via an adversarial
+  audit workflow (2 expert auditors + 11 per-finding verifiers; 13 findings verified, 12
+  confirmed, 1 rejected). ALL 12 FIXED: (1) junk_food hadith meaning INVERTED in ar («خير
+  وعاء» -> «ما ملأ ابن آدم وعاءً شراً من بطنه») - high; (2) secret_habit ar item
+  self-contradictory (hold phone vs busy hands) - aligned to en/fr; (3) secret_habit gained a
+  6th competing response: voluntary fasting per the «يا معشر الشباب» prophetic remedy;
+  (4) oversleeping question broadened («هل نمت أكثر من حاجتك اليوم؟») - old one only caught
+  going-back-to-sleep; (5+6) bad_language + impulse_buying FRENCH strings had all apostrophes
+  stripped («d eau», «J ecris») - 18 fr strings restored; (7) HIGH: history_screen showed
+  break-track labels (شدة الرغبة) for ALL build habits - now uses resolveMetrics like
+  log/stats; (8) voluntary_fasting question reframed to PLAN adherence («هل التزمت بخطة
+  صيامك؟») - honest non-fasting days no longer break the streak; (9) voluntary_fasting primary
+  metric relabeled to plan-adherence (charts no longer collapse on non-fasting days);
+  (10) wake_fajr got defaultReminderHours [4,21] (was falling back to 20:00 evening!);
+  (11) adhkar evening reminder 21:00 -> 17:00 (between Asr and Maghrib per the habit's own
+  coaching); (12) gratitude habit RENAMED «الحمد والدعاء» -> «الحمد والشكر» (clashed with the
+  separate «الدعاء اليومي» habit) - synced in catalog + seed.sql + LIVE DB (verified) +
+  STORE_LISTINGS.md + secondary metric label. Verified: analyze clean, 18/18 tests, 0
+  em-dashes in content files.
 - **2026-07-12 round 4 (CUSTOM habit metrics + advanced analytics)** - Owner-requested:
   **(1) Custom-habit user-defined sliders**: Habit model gained customMetricPrimary/Secondary
   (json + copyWith + cloud roundtrip via habits.config metric_p/metric_s in sync_service);
