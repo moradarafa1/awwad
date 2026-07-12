@@ -17,6 +17,7 @@ import '../../core/notifications/notif_scheduler.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import '../auth/auth_screen.dart';
+import '../phone/usage_screen.dart';
 import '../shield/dns_shield_screen.dart';
 import 'fields_manager_screen.dart';
 import 'habits_screen.dart';
@@ -49,6 +50,31 @@ const Map<String, Map<String, String>> _kSet = {
     'ar': 'الإشعارات غير مسموح بها. فعّلها لعوّاد من إعدادات النظام.',
     'en': 'Notifications are blocked. Enable them for Awwad in system settings.',
     'fr': "Les notifications sont bloquées. Activez-les pour Awwad dans les réglages système."
+  },
+  'share': {
+    'ar': 'شارك عوّاد مع من تحب',
+    'en': 'Share Awwad with someone',
+    'fr': 'Partager Awwad'
+  },
+  'shareCopied': {
+    'ar': 'تم نسخ رابط عوّاد. الصقه في أي محادثة.',
+    'en': 'Awwad link copied. Paste it anywhere.',
+    'fr': 'Lien copié. Collez-le où vous voulez.'
+  },
+  'contact': {
+    'ar': 'تواصل معنا',
+    'en': 'Contact us',
+    'fr': 'Nous contacter'
+  },
+  'privacy': {
+    'ar': 'سياسة الخصوصية',
+    'en': 'Privacy policy',
+    'fr': 'Politique de confidentialité'
+  },
+  'version': {
+    'ar': 'الإصدار',
+    'en': 'Version',
+    'fr': 'Version'
   },
 };
 
@@ -237,7 +263,7 @@ class SettingsScreen extends ConsumerWidget {
                       contentPadding: EdgeInsets.zero,
                       leading: Icon(Icons.cloud_outlined,
                           color: AppColors.accent),
-                      title: Text(l10n.syncTitle,
+                      title: Text('${l10n.signUp} / ${l10n.signIn}',
                           style: const TextStyle(fontSize: 13)),
                       subtitle: Text(l10n.syncDesc,
                           style: TextStyle(
@@ -252,19 +278,39 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 12),
           ],
 
-          // content shield (phone-wide porn blocking via Private DNS)
+          // content shield + phone usage (protection tools)
           SectionCard(
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading:
-                  Icon(Icons.shield_outlined, color: AppColors.accent2),
-              title: Text(
-                  dnsShieldTitle(
-                      Localizations.localeOf(context).languageCode),
-                  style: const TextStyle(fontSize: 13)),
-              trailing: Icon(Icons.chevron_right, color: AppColors.muted),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => const DnsShieldScreen())),
+            child: Column(
+              children: [
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.shield_outlined,
+                      color: AppColors.accent2),
+                  title: Text(
+                      dnsShieldTitle(
+                          Localizations.localeOf(context).languageCode),
+                      style: const TextStyle(fontSize: 13)),
+                  trailing:
+                      Icon(Icons.chevron_right, color: AppColors.muted),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const DnsShieldScreen())),
+                ),
+                if (!kIsWeb) ...[
+                  const Divider(),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading:
+                        Icon(Icons.timelapse, color: AppColors.accent2),
+                    title: Text(usageScreenTitle(loc),
+                        style: const TextStyle(fontSize: 13)),
+                    trailing:
+                        Icon(Icons.chevron_right, color: AppColors.muted),
+                    onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (_) => const UsageScreen())),
+                  ),
+                ],
+              ],
             ),
           ),
           const SizedBox(height: 12),
@@ -296,16 +342,9 @@ class SettingsScreen extends ConsumerWidget {
                   onTap: () => _export(context, ref),
                 ),
                 const Divider(),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(Icons.person_remove_outlined,
-                      color: AppColors.danger),
-                  title: Text(l10n.deleteAccountTitle,
-                      style: TextStyle(
-                          fontSize: 13, color: AppColors.danger)),
-                  onTap: () => _confirmDelete(context, ref),
-                ),
-                const Divider(),
+                // NOTE (owner decision 2026-07-12): NO in-app delete-account
+                // entry. Store policy is satisfied by the website's
+                // delete-account page, which the store listing links to.
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(Icons.delete_outline,
@@ -314,6 +353,49 @@ class SettingsScreen extends ConsumerWidget {
                       style: TextStyle(
                           fontSize: 13, color: AppColors.danger)),
                   onTap: () => _confirmReset(context, ref),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // community & support (share / contact / privacy)
+          SectionCard(
+            child: Column(
+              children: [
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.ios_share, color: AppColors.accent),
+                  title: Text(_set('share', loc),
+                      style: const TextStyle(fontSize: 13)),
+                  onTap: () async {
+                    await Clipboard.setData(const ClipboardData(
+                        text:
+                            'عوّاد - رفيقك لكسر العادات السيئة وبناء الحسنة\nhttps://moradarafa1.github.io/'));
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(_set('shareCopied', loc))));
+                    }
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.mail_outline, color: AppColors.accent),
+                  title: Text(_set('contact', loc),
+                      style: const TextStyle(fontSize: 13)),
+                  onTap: () => _openUrl(
+                      'mailto:moradarafa600@gmail.com?subject=عوّاد'),
+                ),
+                const Divider(),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.privacy_tip_outlined,
+                      color: AppColors.accent),
+                  title: Text(_set('privacy', loc),
+                      style: const TextStyle(fontSize: 13)),
+                  onTap: () =>
+                      _openUrl('https://moradarafa1.github.io/privacy'),
                 ),
               ],
             ),
@@ -333,6 +415,10 @@ class SettingsScreen extends ConsumerWidget {
                 Text(l10n.slogan,
                     style: TextStyle(
                         color: AppColors.accent2, fontSize: 12)),
+                const SizedBox(height: 4),
+                Text('${_set('version', loc)} 1.0.0',
+                    style: TextStyle(
+                        color: AppColors.muted, fontSize: 10.5)),
                 const SizedBox(height: 12),
                 Text(l10n.medicalDisclaimer,
                     textAlign: TextAlign.center,
@@ -395,12 +481,14 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _openLinkedIn() async {
-    final uri = Uri.parse(_linkedInUrl);
+  Future<void> _openUrl(String url) async {
+    final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
+
+  Future<void> _openLinkedIn() => _openUrl(_linkedInUrl);
 
   // Message language follows the RESOLVED UI locale (system-derived when the
   // user never picked one), not settings.locale which stays null by default.
@@ -440,34 +528,6 @@ class SettingsScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_sync('exported', context))),
       );
-    }
-  }
-
-  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
-    final l10n = AppLocalizations.of(context);
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text(l10n.deleteAccountTitle),
-        content: Text(l10n.deleteAccountBody),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text(l10n.cancel)),
-          FilledButton(
-              style:
-                  FilledButton.styleFrom(backgroundColor: AppColors.danger),
-              onPressed: () => Navigator.pop(context, true),
-              child: Text(l10n.delete)),
-        ],
-      ),
-    );
-    if (ok == true) {
-      AnalyticsService.instance
-          .track('account_deletion_requested', {'source': 'in_app'});
-      // Cloud path (P2): call account-export-delete edge function, then sign out.
-      await ref.read(appControllerProvider.notifier).resetAll();
     }
   }
 

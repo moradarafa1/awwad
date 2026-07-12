@@ -4,6 +4,7 @@ import 'package:awwad/core/models.dart';
 import 'package:awwad/core/catalog/badge_catalog.dart';
 import 'package:awwad/core/state/app_state.dart';
 import 'package:awwad/features/home/month_heatmap.dart';
+import 'package:awwad/core/platform/usage_stats.dart';
 
 // Lightweight unit tests for the offline core logic (no widgets needed yet).
 // Streak / badge logic is the riskiest engineering in P1, so it is tested here.
@@ -140,6 +141,13 @@ void main() {
       expect(daysInMonth(DateTime(2028, 2, 1)), 29); // leap year
       expect(daysInMonth(DateTime(2026, 12, 1)), 31);
       expect(daysInMonth(DateTime(2026, 4, 1)), 30);
+    });
+
+    test('splitMinutes formats hours and minutes', () {
+      expect(splitMinutes(0), (hours: 0, minutes: 0));
+      expect(splitMinutes(59), (hours: 0, minutes: 59));
+      expect(splitMinutes(60), (hours: 1, minutes: 0));
+      expect(splitMinutes(145), (hours: 2, minutes: 25));
     });
 
     test('grid row count fits the month', () {

@@ -413,10 +413,10 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 0c. **Power features roadmap (owner-approved 2026-07-12, ordered by importance x commonality x
    practicality).** DONE: (1) SOS «لحظة ضعف» screen; (2) DNS content shield (Private DNS guided
    setup + live verification). NEXT (in order):
-   (3) App-usage monitoring + per-app daily limits + overrun warnings (= item 0b below;
-       UsageStatsManager + PACKAGE_USAGE_STATS; needs a DEDICATED MOBILE SESSION with the
-       owner's device for permission-flow iterations; hard-blocking overlay = later phase,
-       Play-policy-sensitive).
+   (3) DONE phase A (2026-07-12 round 2): app-usage monitoring + per-app daily limits +
+       on-open warnings (see changelog). Remaining phases: periodic BACKGROUND overrun
+       warnings, then optional hard-blocking overlay (Play-policy-sensitive). Native code
+       pending owner device validation.
    (4) Home-screen widget (streak + quick log; home_widget package).
    (5) Auto prayer-times reminders for prayer habits (offline adhan calculation by location).
    (6) Late-night usage detection for `late_nights` (depends on (3)'s usage plumbing).
@@ -488,6 +488,26 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-12 round 2 (WAVE 3: phone-usage monitoring + settings-menu audit)** - Executed by
+  the in-session wakeup after the usage-limit reset (owner pre-authorized). **(1) Usage
+  monitoring (phase A)**: new `awwad/usage_stats` MethodChannel in MainActivity.kt
+  (hasPermission via AppOpsManager.unsafeCheckOpNoThrow, openSettings ->
+  ACTION_USAGE_ACCESS_SETTINGS, todayUsage via queryAndAggregateUsageStats filtered to
+  launchable apps with labels); PACKAGE_USAGE_STATS + LAUNCHER <queries> visibility added to
+  the manifest; fail-open Dart layer `core/platform/usage_stats.dart` (+ per-app daily limits
+  stored as JSON in SharedPreferences key `app_usage_limits_v1`); trilingual
+  `features/phone/usage_screen.dart` (permission gate with lifecycle re-check, today's per-app
+  list sorted desc, tap-to-set limit dialog with 15/30/60/120 presets + custom, progress bars,
+  over-limit red banner, pull-to-refresh); entries: Today-tab card for `phone_addiction` +
+  Settings tile (hidden on web). Background periodic warnings = later phase (checks happen
+  on screen open now). NATIVE CODE UNTESTED ON DEVICE - owner validates with the new APK.
+  **(2) Settings-menu audit (owner-requested)**: signed-out row now titled «إنشاء حساب /
+  تسجيل الدخول» (opens signup form; sign-in one tap away); signed-in shows sync+sign-out
+  (unchanged); **delete-account entry REMOVED from the app** per owner decision - store
+  policy stays satisfied via the website's delete-account page (linked from store listings);
+  `_confirmDelete` deleted; ADDED best-in-class items: share-the-app (copies site link),
+  contact-us (mailto moradarafa600@gmail.com), privacy-policy link, version line (1.0.0 -
+  manual const, bump on releases). Verified: analyze clean, 17/17 tests.
 - **2026-07-12 (POWER FEATURES wave 1+2: SOS «لحظة ضعف» + DNS content shield)** - Owner
   approved the prioritized power-features roadmap (see §12 "Power features roadmap"). SHIPPED:
   **(1) SOS screen** `features/sos/sos_screen.dart` - urge-surfing support for break habits:

@@ -20,6 +20,7 @@ import 'badge_celebration.dart';
 import 'habit_switcher.dart';
 import 'home_shell.dart';
 import '../auth/auth_screen.dart';
+import '../phone/usage_screen.dart';
 import '../sos/sos_screen.dart';
 import '../../core/cloud/supabase_service.dart';
 
@@ -332,6 +333,11 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
           if (isBreak) ...[
             const SizedBox(height: 14),
             const SosEntryButton(),
+          ],
+          // Phone-usage monitor entry for the phone-addiction habit.
+          if (habit?.catalogKey == 'phone_addiction') ...[
+            const SizedBox(height: 10),
+            const UsageEntryButton(),
           ],
           const SizedBox(height: 14),
           if (s.settings.showReligiousContent)
