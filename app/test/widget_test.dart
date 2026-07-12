@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:awwad/core/models.dart';
 import 'package:awwad/core/catalog/badge_catalog.dart';
 import 'package:awwad/core/state/app_state.dart';
+import 'package:awwad/features/home/month_heatmap.dart';
 
 // Lightweight unit tests for the offline core logic (no widgets needed yet).
 // Streak / badge logic is the riskiest engineering in P1, so it is tested here.
@@ -114,6 +115,43 @@ void main() {
         ],
       );
       expect(state.ownedCatalogKeys, contains('secret_habit'));
+    });
+  });
+
+  group('month heatmap math', () {
+    test('leading offset for Arabic week (Saturday start)', () {
+      // July 2026 starts on Wednesday (weekday=3 -> Sun0-based 3).
+      // Saturday-start week (firstDow=6): Sat,Sun,Mon,Tue lead -> 4 blanks.
+      expect(leadingOffset(DateTime(2026, 7, 1), 6), 4);
+      // A month starting exactly on Saturday has no blanks.
+      expect(leadingOffset(DateTime(2026, 8, 1), 6), 0); // 1 Aug 2026 = Sat
+    });
+
+    test('leading offset for Monday/Sunday starts', () {
+      // 1 July 2026 = Wednesday. Monday-start (firstDow=1) -> 2 blanks.
+      expect(leadingOffset(DateTime(2026, 7, 1), 1), 2);
+      // Sunday-start (firstDow=0) -> 3 blanks.
+      expect(leadingOffset(DateTime(2026, 7, 1), 0), 3);
+    });
+
+    test('daysInMonth handles lengths and leap years', () {
+      expect(daysInMonth(DateTime(2026, 7, 1)), 31);
+      expect(daysInMonth(DateTime(2026, 2, 1)), 28);
+      expect(daysInMonth(DateTime(2028, 2, 1)), 29); // leap year
+      expect(daysInMonth(DateTime(2026, 12, 1)), 31);
+      expect(daysInMonth(DateTime(2026, 4, 1)), 30);
+    });
+
+    test('grid row count fits the month', () {
+      // 4 leading blanks + 31 days = 35 cells -> exactly 5 rows.
+      final leading = leadingOffset(DateTime(2026, 7, 1), 6);
+      final rows = (leading + daysInMonth(DateTime(2026, 7, 1)) + 6) ~/ 7;
+      expect(rows, 5);
+      // Worst case: 31-day month starting on the last column -> 6 rows.
+      // 1 Nov 2026 = Sunday; Monday-start week -> leading 6; 6+30=36 -> 6 rows.
+      final l2 = leadingOffset(DateTime(2026, 11, 1), 1);
+      expect(l2, 6);
+      expect((l2 + daysInMonth(DateTime(2026, 11, 1)) + 6) ~/ 7, 6);
     });
   });
 }

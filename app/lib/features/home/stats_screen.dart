@@ -9,6 +9,8 @@ import '../../core/catalog/habit_daily_content.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import 'habit_switcher.dart';
+import 'home_shell.dart' show homeTabProvider;
+import 'month_heatmap.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -61,6 +63,17 @@ class StatsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
+          if (habit != null) ...[
+            MonthHeatmapCard(
+              entries: s.activeEntries,
+              habit: habit,
+              primaryMetricLabel: metrics.primary.l(locale),
+              secondaryMetricLabel: metrics.secondary.l(locale),
+              onLogToday: () =>
+                  ref.read(homeTabProvider.notifier).state = 0,
+            ),
+            const SizedBox(height: 16),
+          ],
           SectionCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

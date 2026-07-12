@@ -74,8 +74,22 @@ class _AuthChoiceScreenState extends ConsumerState<AuthChoiceScreen> {
               const Spacer(),
               if (canSignIn) ...[
                 GlassButton(
+                  label: _s(_kStr['create']!, loc),
+                  icon: Icons.person_add_alt_1_outlined,
+                  onTap: () async {
+                    await ctrl.setAuthChoice(guest: false);
+                    if (context.mounted) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) =>
+                              const AuthScreen(startInSignUp: true)));
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+                GlassButton(
                   label: _s(_kStr['signin']!, loc),
                   icon: Icons.cloud_sync_outlined,
+                  primary: false,
                   onTap: () async {
                     await ctrl.setAuthChoice(guest: false);
                     if (context.mounted) {
@@ -111,10 +125,15 @@ const Map<String, Map<String, String>> _kStr = {
     'en': 'Sign in to save and sync your progress across devices, or continue as a guest with data kept on this device.',
     'fr': 'Connectez-vous pour sauvegarder et synchroniser votre progression, ou continuez en invité avec vos données sur cet appareil.'
   },
+  'create': {
+    'ar': 'إنشاء حساب',
+    'en': 'Create account',
+    'fr': 'Créer un compte'
+  },
   'signin': {
-    'ar': 'تسجيل الدخول / إنشاء حساب',
-    'en': 'Sign in / Create account',
-    'fr': 'Se connecter / Créer un compte'
+    'ar': 'تسجيل الدخول',
+    'en': 'Sign in',
+    'fr': 'Se connecter'
   },
   'guest': {
     'ar': 'المتابعة كزائر',

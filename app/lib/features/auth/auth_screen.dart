@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
 
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
@@ -10,14 +11,14 @@ import '../../core/cloud/sync_service.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/state/app_state.dart';
 
-// Email-OTP sign-in. Requires the custom SMTP (Brevo) + the Arabic
-// {{ .Token }} code template configured on 2026-07-11 (live-tested: /otp 200,
-// code email delivered). If SMTP ever breaks, flip to false so the UI never
-// offers a code that cannot arrive.
-const bool kOtpLoginEnabled = true;
+/// Which top-level flow the screen is showing.
+enum _AuthMode { signIn, signUp, reset }
 
-// Optional cloud account screen (P2). Only reachable when SUPABASE_URL/ANON_KEY
-// were provided at build time. Implements email+password + an email-OTP path.
+// Cloud account screen (P2). Only reachable when SUPABASE_URL/ANON_KEY were
+// provided at build time. Flows:
+//   - sign-in: email + password (+ "forgot password?" -> reset flow)
+//   - sign-up: form -> emailed verification CODE -> verify -> session
+//   - reset:   email -> emailed reset CODE -> code + new password -> session
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key, this.startInSignUp = false});
 
@@ -31,10 +32,15 @@ class AuthScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthScreenState extends ConsumerState<AuthScreen> {
-  late bool _signUp = widget.startInSignUp;
-  bool _otpMode = false;
-  bool _otpSent = false;
+  late _AuthMode _mode =
+      widget.startInSignUp ? _AuthMode.signUp : _AuthMode.signIn;
+  bool _codeStep = false; // signUp: verify code; reset: code + new password
   bool _busy = false;
+  // The recovery code is ONE-TIME: verifyOTP consumes it and signs the user
+  // in even if the subsequent updateUser fails (e.g. same_password). Track
+  // that so a retry goes straight to changePassword instead of re-consuming
+  // the burned code and dead-ending on otp_expired.
+  bool _recoveryVerified = false;
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -124,6 +130,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         s.contains('email_exists')) {
       return _tr('errEmailExists');
     }
+    if (s.contains('same_password') ||
+        s.contains('different from the old')) {
+      return _tr('errSamePassword');
+    }
     if (s.contains('weak_password') ||
         s.contains('password should be at least')) {
       return _tr('errWeakPassword');
@@ -133,17 +143,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         s.contains('invalid format')) {
       return _tr('errBadEmail');
     }
-    if (s.contains('otp_disabled') ||
+    if (s.contains('user not found') ||
+        s.contains('user_not_found') ||
+        s.contains('otp_disabled') ||
         s.contains('signups not allowed')) {
-      // shouldCreateUser=false: requesting a code for an unknown email.
       return _tr('errNoAccount');
     }
     if (s.contains('otp_expired') ||
         s.contains('token has expired') ||
-        s.contains('invalid token')) {
+        s.contains('invalid token') ||
+        s.contains('invalid otp')) {
       return _tr('errBadOtp');
     }
-    if (s.contains('rate limit') || s.contains('too many requests')) {
+    if (s.contains('rate limit') ||
+        s.contains('rate_limit') ||
+        s.contains('you can only request this after') ||
+        s.contains('too many requests')) {
       return _tr('errRateLimit');
     }
     if (s.contains('email not confirmed')) {
@@ -157,7 +172,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     try {
       await action();
     } catch (e) {
-      _toast(_friendlyError(e));
+      // mounted guard: _friendlyError -> _tr reads State.context, which is
+      // gone if the user backed out while the request was in flight.
+      if (mounted) _toast(_friendlyError(e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -186,79 +203,220 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       // The user now has an account, so cancel any pending sign-up nudge.
       await cancelReengageNudge();
     } catch (_) {}
-    if (!syncOk) _toast(_tr('syncLater'));
+    if (!syncOk && mounted) _toast(_tr('syncLater'));
     if (mounted) Navigator.of(context).pop();
   }
 
-  Future<void> _submit() async {
-    final email = _email.text.trim();
-    if (_signUp) {
-      if (_gender == null) {
-        _toast(_tr('chooseGender'));
+  // ---- flow steps ----
+
+  Future<void> _submitSignUpForm() async {
+    if (_gender == null) {
+      _toast(_tr('chooseGender'));
+      return;
+    }
+    if (_password.text.length < 6) {
+      _toast(_tr('errWeakPassword'));
+      return;
+    }
+    await _run(() async {
+      final res = await SupabaseService.signUp(
+        name: _name.text.trim(),
+        email: _email.text.trim(),
+        password: _password.text,
+        gender: _gender!,
+        locale: ref.read(appControllerProvider).settings.locale ?? 'ar',
+        country: _country.text.trim().isEmpty ? null : _country.text.trim(),
+        birthDate: _birthDate?.toIso8601String().split('T').first,
+        whatsapp: _whatsapp.text.trim().isEmpty
+            ? null
+            : _normDigits(_whatsapp.text.trim()),
+      );
+      if (SupabaseService.signUpHitExistingEmail(res)) {
+        // Confirmed account already exists for this email: no code was sent.
+        throw Exception('signup failed: user_already_exists');
+      }
+      if (res.session != null) {
+        // Server had auto-confirm on: signed in directly.
+        AnalyticsService.instance
+            .track('signup_succeeded', {'method': 'email'});
+        await _syncAfterAuth();
         return;
       }
-      await _run(() async {
-        final res = await SupabaseService.signUp(
-          name: _name.text.trim(),
-          email: email,
-          password: _password.text,
-          gender: _gender!,
-          locale: ref.read(appControllerProvider).settings.locale ?? 'ar',
-          country: _country.text.trim().isEmpty ? null : _country.text.trim(),
-          birthDate: _birthDate?.toIso8601String().split('T').first,
-          whatsapp: _whatsapp.text.trim().isEmpty
-              ? null
-              : _normDigits(_whatsapp.text.trim()),
-        );
-        if (res.session == null) {
-          // Email confirmation is required: the account exists but there is
-          // no session yet, so syncing would silently no-op. Tell the user to
-          // open the confirmation email, then switch to the sign-in form.
-          AnalyticsService.instance.track('signup_succeeded',
-              {'method': 'email', 'pending_confirmation': true});
-          _toast(_tr('confirmEmailSent'));
-          if (mounted) setState(() => _signUp = false);
+      // Verification code sent (or re-sent for an unconfirmed account).
+      AnalyticsService.instance.track('otp_sent');
+      _otp.clear();
+      if (!mounted) return;
+      setState(() => _codeStep = true);
+      _toast(_tr('codeSentInfo'));
+    });
+  }
+
+  Future<void> _submitSignUpCode() async {
+    final code = _normDigits(_otp.text.trim());
+    if (code.isEmpty) {
+      _toast(_tr('errBadOtp'));
+      return;
+    }
+    await _run(() async {
+      await SupabaseService.verifySignupCode(_email.text.trim(), code);
+      AnalyticsService.instance.track('otp_verified', {'success': true});
+      // Reconcile the password with what the user just typed: when the email
+      // belonged to an EXISTING UNCONFIRMED account, GoTrue ignored the new
+      // password at signUp ("can't be sure of their claimed identity"), so
+      // without this the stored password would silently stay the OLD one and
+      // the next sign-in with the just-typed password would fail. For a
+      // fresh signup this is a same_password no-op rejection - swallowed.
+      if (_password.text.length >= 6) {
+        try {
+          await SupabaseService.changePassword(_password.text);
+        } catch (_) {}
+      }
+      AnalyticsService.instance.track('signup_succeeded', {'method': 'email'});
+      await _syncAfterAuth();
+    });
+  }
+
+  Future<void> _resendSignUpCode() async {
+    await _run(() async {
+      await SupabaseService.resendSignupCode(_email.text.trim());
+      AnalyticsService.instance.track('otp_sent');
+      if (mounted) _toast(_tr('codeSentInfo'));
+    });
+  }
+
+  Future<void> _submitSignIn() async {
+    await _run(() async {
+      try {
+        await SupabaseService.signInWithPassword(
+            _email.text.trim(), _password.text);
+      } on AuthException catch (e) {
+        final s = '${e.message} ${e.code ?? ''}'.toLowerCase();
+        if (s.contains('not confirmed') || s.contains('email_not_confirmed')) {
+          // Account exists but the email was never verified: re-send the
+          // code and jump straight to the verification step.
+          try {
+            await SupabaseService.resendSignupCode(_email.text.trim());
+          } catch (_) {}
+          _otp.clear();
+          if (!mounted) return;
+          setState(() {
+            _mode = _AuthMode.signUp;
+            _codeStep = true;
+          });
+          _toast(_tr('confirmFirst'));
           return;
         }
-        AnalyticsService.instance.track('signup_succeeded', {'method': 'email'});
-        await _syncAfterAuth();
-      });
-    } else if (_otpMode) {
-      if (!_otpSent) {
-        await _run(() async {
-          await SupabaseService.sendLoginOtp(email);
-          AnalyticsService.instance.track('otp_sent');
-          setState(() => _otpSent = true);
-        });
-      } else {
-        await _run(() async {
-          await SupabaseService.verifyEmailOtp(email, _otp.text.trim());
-          AnalyticsService.instance.track('otp_verified', {'success': true});
-          await _syncAfterAuth();
-        });
+        rethrow;
       }
-    } else {
-      await _run(() async {
-        await SupabaseService.signInWithPassword(email, _password.text);
-        AnalyticsService.instance
-            .track('login_succeeded', {'otp_required': false, 'trusted_device': false});
-        await _syncAfterAuth();
-      });
+      AnalyticsService.instance.track(
+          'login_succeeded', {'otp_required': false, 'trusted_device': false});
+      await _syncAfterAuth();
+    });
+  }
+
+  Future<void> _submitResetEmail() async {
+    await _run(() async {
+      await SupabaseService.sendPasswordResetCode(_email.text.trim());
+      AnalyticsService.instance.track('otp_sent');
+      _otp.clear();
+      _password.clear();
+      _recoveryVerified = false; // a fresh code invalidates prior progress
+      if (!mounted) return;
+      setState(() => _codeStep = true);
+      _toast(_tr('resetSentNote'));
+    });
+  }
+
+  Future<void> _submitResetCode() async {
+    final code = _normDigits(_otp.text.trim());
+    if (!_recoveryVerified && code.isEmpty) {
+      _toast(_tr('errBadOtp'));
+      return;
+    }
+    if (_password.text.length < 6) {
+      _toast(_tr('errWeakPassword'));
+      return;
+    }
+    await _run(() async {
+      // The code is one-time: once verified we are signed in, so a RETRY
+      // after a failed updateUser (same_password / network blip) must go
+      // straight to changePassword instead of re-consuming the burned code.
+      if (!_recoveryVerified) {
+        await SupabaseService.verifyRecoveryCode(_email.text.trim(), code);
+        _recoveryVerified = true;
+        AnalyticsService.instance.track('otp_verified', {'success': true});
+      }
+      await SupabaseService.changePassword(_password.text);
+      AnalyticsService.instance.track(
+          'login_succeeded', {'otp_required': true, 'trusted_device': false});
+      if (mounted) _toast(_tr('resetDone'));
+      await _syncAfterAuth();
+    });
+  }
+
+  Future<void> _submit() async {
+    switch (_mode) {
+      case _AuthMode.signUp:
+        _codeStep ? await _submitSignUpCode() : await _submitSignUpForm();
+      case _AuthMode.signIn:
+        await _submitSignIn();
+      case _AuthMode.reset:
+        _codeStep ? await _submitResetCode() : await _submitResetEmail();
+    }
+  }
+
+  String _title(AppLocalizations l10n) {
+    switch (_mode) {
+      case _AuthMode.signUp:
+        return l10n.signUp;
+      case _AuthMode.signIn:
+        return l10n.signIn;
+      case _AuthMode.reset:
+        return _tr('resetTitle');
+    }
+  }
+
+  String _submitLabel(AppLocalizations l10n) {
+    switch (_mode) {
+      case _AuthMode.signUp:
+        return _codeStep ? _tr('verifyCreate') : l10n.signUp;
+      case _AuthMode.signIn:
+        return l10n.signIn;
+      case _AuthMode.reset:
+        return _codeStep ? _tr('resetApply') : l10n.sendCode;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final inCode = _codeStep && _mode != _AuthMode.signIn;
     return Scaffold(
-      appBar: AppBar(title: Text(_signUp ? l10n.signUp : l10n.signIn)),
+      appBar: AppBar(title: Text(_title(l10n))),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Text(l10n.syncDesc,
-              style: TextStyle(color: AppColors.muted, height: 1.6)),
+          if (_mode == _AuthMode.signIn || _mode == _AuthMode.signUp && !inCode)
+            Text(l10n.syncDesc,
+                style: TextStyle(color: AppColors.muted, height: 1.6)),
+          if (_mode == _AuthMode.reset && !inCode)
+            Text(_tr('resetInfo'),
+                style: TextStyle(color: AppColors.muted, height: 1.6)),
+          if (inCode) ...[
+            Text(
+                _mode == _AuthMode.signUp
+                    ? _tr('codeSentInfo')
+                    : _tr('resetCodeInfo'),
+                style: TextStyle(color: AppColors.muted, height: 1.6)),
+            const SizedBox(height: 8),
+            Text(_email.text.trim(),
+                textDirection: TextDirection.ltr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: AppColors.heading, fontWeight: FontWeight.w700)),
+          ],
           const SizedBox(height: 20),
-          if (_signUp) ...[
+          if (_mode == _AuthMode.signUp && !inCode) ...[
             TextField(
                 controller: _name,
                 decoration: InputDecoration(labelText: l10n.nameLabel)),
@@ -326,21 +484,32 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             ],
             const SizedBox(height: 14),
           ],
-          TextField(
-              controller: _email,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(labelText: l10n.emailLabel)),
-          const SizedBox(height: 12),
-          if (!_otpMode)
+          if (!inCode) ...[
+            TextField(
+                controller: _email,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(labelText: l10n.emailLabel)),
+            const SizedBox(height: 12),
+          ],
+          if (_mode != _AuthMode.reset && !inCode)
             TextField(
                 controller: _password,
                 obscureText: true,
                 decoration: InputDecoration(labelText: l10n.passwordLabel)),
-          if (_otpMode && _otpSent)
+          if (inCode) ...[
             TextField(
                 controller: _otp,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: l10n.otpHint)),
+            if (_mode == _AuthMode.reset) ...[
+              const SizedBox(height: 12),
+              TextField(
+                  controller: _password,
+                  obscureText: true,
+                  decoration:
+                      InputDecoration(labelText: _tr('newPassword'))),
+            ],
+          ],
           const SizedBox(height: 20),
           FilledButton(
             onPressed: _busy ? null : _submit,
@@ -349,28 +518,53 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     height: 18,
                     width: 18,
                     child: CircularProgressIndicator(strokeWidth: 2))
-                : Text(_signUp
-                    ? l10n.signUp
-                    : (_otpMode
-                        ? (_otpSent ? l10n.signIn : l10n.sendCode)
-                        : l10n.signIn)),
+                : Text(_submitLabel(l10n)),
           ),
           const SizedBox(height: 12),
-          if (!_signUp && kOtpLoginEnabled)
+          if (inCode) ...[
             TextButton(
-              onPressed: () => setState(() {
-                _otpMode = !_otpMode;
-                _otpSent = false;
-              }),
-              child: Text(_otpMode ? l10n.passwordLabel : l10n.sendCode),
+              onPressed: _busy
+                  ? null
+                  : (_mode == _AuthMode.signUp
+                      ? _resendSignUpCode
+                      : _submitResetEmail),
+              child: Text(_tr('resendCode')),
             ),
-          TextButton(
-            onPressed: () => setState(() {
-              _signUp = !_signUp;
-              _otpMode = false;
-            }),
-            child: Text(_signUp ? l10n.signIn : l10n.signUp),
-          ),
+            TextButton(
+              onPressed: _busy
+                  ? null
+                  : () => setState(() => _codeStep = false),
+              child: Text(_tr('back')),
+            ),
+          ] else ...[
+            if (_mode == _AuthMode.signIn)
+              TextButton(
+                onPressed: () => setState(() {
+                  _mode = _AuthMode.reset;
+                  _codeStep = false;
+                }),
+                child: Text(_tr('forgotPassword')),
+              ),
+            if (_mode == _AuthMode.reset)
+              TextButton(
+                onPressed: () => setState(() {
+                  _mode = _AuthMode.signIn;
+                  _codeStep = false;
+                }),
+                child: Text(l10n.signIn),
+              )
+            else
+              TextButton(
+                onPressed: () => setState(() {
+                  _mode = _mode == _AuthMode.signUp
+                      ? _AuthMode.signIn
+                      : _AuthMode.signUp;
+                  _codeStep = false;
+                }),
+                child:
+                    Text(_mode == _AuthMode.signUp ? l10n.signIn : l10n.signUp),
+              ),
+          ],
         ],
       ),
     );
@@ -388,24 +582,41 @@ const Map<String, Map<String, String>> _regStrings = {
     'birthDate': 'تاريخ الميلاد',
     'pick': 'اختر التاريخ',
     'whatsapp': 'رقم واتساب (مع كود الدولة)',
+    'codeSentInfo':
+        'أرسلنا رمز تحقق إلى بريدك الإلكتروني. افتح بريدك (وتحقق من مجلد الرسائل غير المرغوبة) ثم أدخل الرمز هنا.',
+    'verifyCreate': 'تأكيد الرمز وإنشاء الحساب',
+    'resendCode': 'لم يصلك الرمز؟ أعد الإرسال',
+    'back': 'رجوع',
+    'forgotPassword': 'نسيت كلمة المرور؟',
+    'resetTitle': 'إعادة تعيين كلمة المرور',
+    'resetInfo':
+        'أدخل بريدك الإلكتروني وسنرسل إليك رمزاً لتعيين كلمة مرور جديدة.',
+    'resetSentNote':
+        'إن كان البريد مسجّلاً لدينا فستصلك رسالة بالرمز خلال لحظات. تحقق أيضاً من مجلد الرسائل غير المرغوبة.',
+    'resetCodeInfo':
+        'أدخل الرمز المرسل إلى بريدك، ثم اكتب كلمة المرور الجديدة.',
+    'newPassword': 'كلمة المرور الجديدة',
+    'resetApply': 'تعيين كلمة المرور والدخول',
+    'resetDone': 'تم تغيير كلمة المرور وتسجيل دخولك بنجاح.',
+    'confirmFirst':
+        'حسابك بحاجة إلى تأكيد البريد أولاً. أرسلنا رمزاً جديداً إلى بريدك؛ أدخله هنا.',
     'errNetwork':
         'تعذّر الاتصال بالخادم. تأكّد من اتصالك بالإنترنت ثم أعد المحاولة.',
     'errBadCredentials': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
     'errEmailExists':
         'هذا البريد مسجّل بالفعل. جرّب تسجيل الدخول بدلاً من إنشاء حساب.',
     'errWeakPassword': 'كلمة المرور ضعيفة. استخدم ستة أحرف على الأقل.',
+    'errSamePassword': 'كلمة المرور الجديدة يجب أن تختلف عن القديمة.',
     'errBadEmail': 'البريد الإلكتروني غير صالح. تحقّق من كتابته.',
     'errBadOtp': 'الرمز غير صحيح أو انتهت صلاحيته. اطلب رمزاً جديداً.',
     'errNoAccount': 'لا يوجد حساب بهذا البريد الإلكتروني. أنشئ حساباً أولاً.',
-    'syncLater':
-        'تم تسجيل الدخول بنجاح. تعذّرت مزامنة بياناتك الآن؛ يمكنك تشغيلها لاحقاً من الإعدادات.',
     'errRateLimit':
         'محاولات كثيرة خلال وقت قصير. انتظر قليلاً ثم أعد المحاولة.',
     'errEmailNotConfirmed':
-        'البريد الإلكتروني لم يُفعَّل بعد. افتح رسالة التفعيل في بريدك.',
+        'البريد الإلكتروني لم يُؤكَّد بعد. أدخل الرمز المرسل إلى بريدك.',
     'errGeneric': 'حدث خطأ غير متوقّع. أعد المحاولة لاحقاً.',
-    'confirmEmailSent':
-        'تم إنشاء الحساب. أرسلنا رسالة تفعيل إلى بريدك؛ افتحها ثم سجّل الدخول.',
+    'syncLater':
+        'تم تسجيل الدخول بنجاح. تعذّرت مزامنة بياناتك الآن؛ يمكنك تشغيلها لاحقاً من الإعدادات.',
   },
   'en': {
     'gender': 'Gender',
@@ -417,23 +628,40 @@ const Map<String, Map<String, String>> _regStrings = {
     'birthDate': 'Date of birth',
     'pick': 'Pick a date',
     'whatsapp': 'WhatsApp number (with country code)',
+    'codeSentInfo':
+        'We sent a verification code to your email. Open your inbox (check spam too) and enter the code here.',
+    'verifyCreate': 'Verify code & create account',
+    'resendCode': "Didn't get the code? Resend",
+    'back': 'Back',
+    'forgotPassword': 'Forgot your password?',
+    'resetTitle': 'Reset password',
+    'resetInfo':
+        "Enter your email and we'll send you a code to set a new password.",
+    'resetSentNote':
+        'If this email is registered, a code is on its way. Check your spam folder too.',
+    'resetCodeInfo':
+        'Enter the code we sent to your email, then type your new password.',
+    'newPassword': 'New password',
+    'resetApply': 'Set password & sign in',
+    'resetDone': 'Password changed and you are signed in.',
+    'confirmFirst':
+        'Your account needs email confirmation first. We sent a new code to your email; enter it here.',
     'errNetwork':
         'Could not reach the server. Check your internet connection and try again.',
     'errBadCredentials': 'Incorrect email or password.',
     'errEmailExists':
         'This email is already registered. Try signing in instead.',
     'errWeakPassword': 'Password is too weak. Use at least 6 characters.',
+    'errSamePassword': 'The new password must differ from the old one.',
     'errBadEmail': 'Invalid email address. Please check the spelling.',
     'errBadOtp': 'The code is invalid or has expired. Request a new one.',
     'errNoAccount': 'No account exists with this email. Create an account first.',
-    'syncLater':
-        'Signed in successfully. Sync failed for now; you can run it later from Settings.',
     'errRateLimit': 'Too many attempts. Please wait a moment and try again.',
     'errEmailNotConfirmed':
-        'Email not confirmed yet. Open the confirmation email in your inbox.',
+        'Email not confirmed yet. Enter the code we sent to your inbox.',
     'errGeneric': 'Something went wrong. Please try again later.',
-    'confirmEmailSent':
-        'Account created. We sent a confirmation email; open it, then sign in.',
+    'syncLater':
+        'Signed in successfully. Sync failed for now; you can run it later from Settings.',
   },
   'fr': {
     'gender': 'Sexe',
@@ -445,6 +673,24 @@ const Map<String, Map<String, String>> _regStrings = {
     'birthDate': 'Date de naissance',
     'pick': 'Choisir une date',
     'whatsapp': 'Numéro WhatsApp (avec indicatif)',
+    'codeSentInfo':
+        'Nous avons envoyé un code de vérification à votre email. Ouvrez votre boîte (vérifiez aussi les spams) puis saisissez le code ici.',
+    'verifyCreate': 'Vérifier le code et créer le compte',
+    'resendCode': 'Code non reçu ? Renvoyer',
+    'back': 'Retour',
+    'forgotPassword': 'Mot de passe oublié ?',
+    'resetTitle': 'Réinitialiser le mot de passe',
+    'resetInfo':
+        'Saisissez votre email et nous vous enverrons un code pour définir un nouveau mot de passe.',
+    'resetSentNote':
+        'Si cet email est enregistré, un code est en route. Vérifiez aussi vos spams.',
+    'resetCodeInfo':
+        'Saisissez le code envoyé à votre email, puis votre nouveau mot de passe.',
+    'newPassword': 'Nouveau mot de passe',
+    'resetApply': 'Définir le mot de passe et se connecter',
+    'resetDone': 'Mot de passe changé, vous êtes connecté.',
+    'confirmFirst':
+        "Votre compte doit d'abord être confirmé. Nous avons envoyé un nouveau code à votre email ; saisissez-le ici.",
     'errNetwork':
         'Impossible de joindre le serveur. Vérifiez votre connexion internet puis réessayez.',
     'errBadCredentials': 'Email ou mot de passe incorrect.',
@@ -452,18 +698,18 @@ const Map<String, Map<String, String>> _regStrings = {
         'Cet email est déjà enregistré. Essayez de vous connecter.',
     'errWeakPassword':
         'Mot de passe trop faible. Utilisez au moins 6 caractères.',
+    'errSamePassword':
+        "Le nouveau mot de passe doit différer de l'ancien.",
     'errBadEmail': "Adresse email invalide. Vérifiez l'orthographe.",
     'errBadOtp': 'Code invalide ou expiré. Demandez un nouveau code.',
     'errNoAccount':
         "Aucun compte n'existe avec cet email. Créez d'abord un compte.",
-    'syncLater':
-        'Connexion réussie. La synchronisation a échoué pour le moment ; relancez-la plus tard depuis les réglages.',
     'errRateLimit':
         'Trop de tentatives. Patientez un moment puis réessayez.',
     'errEmailNotConfirmed':
-        "Email non confirmé. Ouvrez l'email de confirmation dans votre boîte.",
+        'Email non confirmé. Saisissez le code envoyé à votre boîte.',
     'errGeneric': "Une erreur s'est produite. Réessayez plus tard.",
-    'confirmEmailSent':
-        "Compte créé. Nous avons envoyé un email de confirmation ; ouvrez-le puis connectez-vous.",
+    'syncLater':
+        'Connexion réussie. La synchronisation a échoué pour le moment ; relancez-la plus tard depuis les réglages.',
   },
 };

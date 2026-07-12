@@ -1,12 +1,16 @@
 // signup — creates a CONFIRMED account server-side (admin.createUser with
 // email_confirm), so registration never depends on confirmation emails.
 //
-// WHY: email confirmation is ON but the project has no custom SMTP; Supabase's
+// STATUS 2026-07-11: RETIRED from the client. Brevo SMTP is live, so the app
+// now uses plain auth.signUp with an emailed Arabic verification code
+// ({{ .Token }} in the Confirmation template) + verifyOTP(type: signup).
+// This function stays DEPLOYED as an emergency fallback: if email delivery
+// ever breaks, the app can temporarily switch back to invoking it so
+// registration keeps working without emails.
+//
+// ORIGINAL WHY: email confirmation was ON with no custom SMTP; Supabase's
 // built-in mailer allows ~2 emails/hour, so real users could not finish
-// signing up (over_email_send_rate_limit, hit live on 2026-07-06). This
-// function removes email from the signup path entirely. When Brevo SMTP is
-// configured later, the client can switch back to plain auth.signUp and this
-// function can be retired.
+// signing up (over_email_send_rate_limit, hit live on 2026-07-06).
 //
 // Flow: client POSTs {email, password, data} → validate → admin.createUser
 // (triggers still create profile+subscription) → client then signs in with

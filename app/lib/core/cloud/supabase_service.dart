@@ -7,6 +7,16 @@
 //
 // SECURITY: only the public anon key is used here. The service_role key is NEVER
 // in the client — privileged work happens in Edge Functions.
+//
+// AUTH MODEL (since 2026-07-11, Brevo SMTP live):
+//   - Sign-up = plain auth.signUp with "Confirm email" ON: the user receives an
+//     Arabic verification CODE ({{ .Token }} in the Confirmation template) and
+//     the app verifies it with verifyOTP(type: signup) -> session.
+//   - Forgot password = resetPasswordForEmail -> Arabic CODE (Recovery
+//     template) -> verifyOTP(type: recovery) -> session -> updateUser(password).
+//   - The old `signup` edge function (admin-created, pre-confirmed accounts) is
+//     retired from the client but stays deployed as an emergency fallback for
+//     times when email delivery is down.
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -38,15 +48,17 @@ class SupabaseService {
   static User? get currentUser => configured && _inited ? client.auth.currentUser : null;
   static bool get signedIn => currentUser != null;
 
-  // ---- auth ----
-  // Registration goes through the `signup` edge function, which creates the
-  // account already CONFIRMED server-side. This removes the dependency on
-  // confirmation emails: the project has no custom SMTP yet and Supabase's
-  // built-in mailer is capped at ~2 emails/hour (over_email_send_rate_limit,
-  // hit live 2026-07-06). The function returns GoTrue-style error codes
-  // (user_already_exists / weak_password / email_address_invalid) so the UI's
-  // localized error mapping works unchanged. When Brevo SMTP is configured,
-  // this can revert to plain client.auth.signUp.
+  // ---- auth: sign-up with email verification code ----
+
+  /// Starts registration. GoTrue sends a verification CODE to [email]
+  /// (Confirmation template carries {{ .Token }}); the account gets a session
+  /// only after [verifySignupCode]. Metadata keys mirror what the
+  /// `handle_new_user` DB trigger provisions into `profiles`.
+  ///
+  /// Anti-enumeration: when the email already belongs to a CONFIRMED account,
+  /// GoTrue returns an obfuscated user whose `identities` list is EMPTY and
+  /// sends nothing - callers must check [signUpHitExistingEmail] on the result.
+  /// For an existing UNCONFIRMED account it re-sends the code instead.
   static Future<AuthResponse> signUp({
     required String name,
     required String email,
@@ -58,47 +70,45 @@ class SupabaseService {
     String? whatsapp,
   }) async {
     await init();
-    try {
-      await client.functions.invoke('signup', body: {
-        'email': email,
-        'password': password,
-        'data': {
-          'full_name': name,
-          'locale': locale,
-          'gender': gender,
-          if (country != null && country.trim().isNotEmpty)
-            'country': country.trim(),
-          if (birthDate != null && birthDate.trim().isNotEmpty)
-            'birth_date': birthDate.trim(),
-          if (whatsapp != null && whatsapp.trim().isNotEmpty)
-            'whatsapp': whatsapp.trim(),
-        },
-      });
-    } on FunctionException catch (e) {
-      final details = 'signup failed: ${e.details}';
-      if (details.contains('user_already_exists')) {
-        // The account already exists - typically because a PREVIOUS attempt
-        // actually succeeded server-side while the phone missed the response
-        // (seen live 2026-07-11: user created + signed in, then the post-auth
-        // sync request dropped, so the app showed an error and the user
-        // retried). If the entered password matches, just sign the user in:
-        // the retry becomes seamless instead of a dead end.
-        try {
-          return await client.auth
-              .signInWithPassword(email: email, password: password);
-        } on AuthException {
-          // Password does not match the existing account: surface
-          // already-exists so the UI tells the user to sign in instead.
-          throw Exception(details);
-        }
-      }
-      // Re-throw with the function's error code in the message so the UI's
-      // substring-based localized mapping picks the right text.
-      throw Exception(details);
-    }
-    // Account is confirmed; establish the session right away.
-    return client.auth.signInWithPassword(email: email, password: password);
+    return client.auth.signUp(email: email, password: password, data: {
+      'full_name': name,
+      'locale': locale,
+      'gender': gender,
+      if (country != null && country.trim().isNotEmpty)
+        'country': country.trim(),
+      if (birthDate != null && birthDate.trim().isNotEmpty)
+        'birth_date': birthDate.trim(),
+      if (whatsapp != null && whatsapp.trim().isNotEmpty)
+        'whatsapp': whatsapp.trim(),
+    });
   }
+
+  /// True when a signUp response is GoTrue's obfuscated "this email is already
+  /// registered and confirmed" reply. Verified against GoTrue source: the fake
+  /// user has identities == [] (EMPTY ARRAY, never null); a real fresh or
+  /// unconfirmed user always carries exactly one identity. Do not key on
+  /// confirmation_sent_at (the fake user carries a fresh one too).
+  static bool signUpHitExistingEmail(AuthResponse res) {
+    final user = res.user;
+    return user != null &&
+        res.session == null &&
+        (user.identities?.isEmpty ?? false);
+  }
+
+  /// Confirms the emailed sign-up code and establishes the session.
+  static Future<AuthResponse> verifySignupCode(String email, String token) async {
+    await init();
+    return client.auth
+        .verifyOTP(email: email, token: token, type: OtpType.signup);
+  }
+
+  /// Re-sends the sign-up verification code (rate-limited server-side).
+  static Future<void> resendSignupCode(String email) async {
+    await init();
+    await client.auth.resend(type: OtpType.signup, email: email);
+  }
+
+  // ---- auth: password sign-in ----
 
   static Future<AuthResponse> signInWithPassword(
       String email, String password) async {
@@ -106,14 +116,21 @@ class SupabaseService {
     return client.auth.signInWithPassword(email: email, password: password);
   }
 
-  /// Sends a 6-digit email OTP to an already-registered user (never creates one).
-  static Future<void> sendLoginOtp(String email) async {
+  // ---- auth: forgot password (code-based, no deep links) ----
+
+  /// Sends the password-reset CODE (Recovery template carries {{ .Token }}).
+  static Future<void> sendPasswordResetCode(String email) async {
     await init();
-    return client.auth.signInWithOtp(email: email, shouldCreateUser: false);
+    await client.auth.resetPasswordForEmail(email);
   }
 
-  static Future<AuthResponse> verifyEmailOtp(String email, String token) {
-    return client.auth.verifyOTP(email: email, token: token, type: OtpType.email);
+  /// Verifies the reset code; on success the user is signed in and the caller
+  /// should immediately set the new password via [changePassword].
+  static Future<AuthResponse> verifyRecoveryCode(
+      String email, String token) async {
+    await init();
+    return client.auth
+        .verifyOTP(email: email, token: token, type: OtpType.recovery);
   }
 
   static Future<void> signOut() => client.auth.signOut();

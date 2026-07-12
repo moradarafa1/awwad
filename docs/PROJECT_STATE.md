@@ -253,8 +253,12 @@ cd /d/Claude/awwad/web && npm install && npm run build   # -> web/dist (111 page
 ## 7. Current state by surface
 
 ### Flutter app — multi-habit, mature
-- **First open:** `AuthChoiceScreen` (sign in / continue as guest = offline on device); also
-  requests OS notification permission directly (no extra dialog). Gated by `settings.authChoiceMade`.
+- **First open:** `AuthChoiceScreen` (create account / sign in / continue as guest = offline on
+  device); also requests OS notification permission directly (no extra dialog). Gated by
+  `settings.authChoiceMade`.
+- **Auth flows (since 2026-07-11):** sign-up = `auth.signUp` + emailed Arabic verification code
+  -> `verifyOTP(type: signup)`; sign-in = password (+ «نسيت كلمة المرور؟» -> emailed code ->
+  `verifyOTP(type: recovery)` -> new password). All emails via Brevo SMTP. No passwordless login.
 - **Onboarding:** welcome+language → optional survey → track → habit pick (36-habit catalog +
   custom, hides already-owned) → setup (name/why + **multi-time `ReminderTimesPicker`**).
 - **Multi-habit:** `AppState.habits` list (cap 3 break + 3 build, `kMaxHabitsPerTrack`),
@@ -327,10 +331,9 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 - `account-export-delete` (verify_jwt=false; supports logged-out email-OTP delete path).
 - `send-engagement` (verify_jwt=false; cron; P1 no-op until FCM/device_tokens land in P4).
 - `signup` (verify_jwt=true, deployed 2026-07-07): creates accounts CONFIRMED via
-  admin.createUser so registration never depends on confirmation emails (no custom SMTP;
-  built-in mailer ~2/hour). The app's `SupabaseService.signUp` invokes it then signs in with
-  password. Returns GoTrue-style error codes. Retire when Brevo SMTP lands (revert to plain
-  `auth.signUp`).
+  admin.createUser. **RETIRED from the client on 2026-07-11** (Brevo SMTP landed; the app now
+  uses plain `auth.signUp` + emailed verification code). Kept deployed as an emergency fallback
+  for email-delivery outages.
 
 `service_role` is auto-injected into the edge runtime as `SUPABASE_SERVICE_ROLE_KEY`.
 
@@ -467,6 +470,40 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-11 round 5 (AUTH MODEL REDESIGN: OTP moved to signup+reset, + MONTH CALENDAR)** -
+  Owner defined the correct OTP model: the emailed code belongs to SIGNUP (email verification)
+  and FORGOT-PASSWORD - not passwordless login (he tested signup with a second email and no code
+  was requested/sent, because the old edge-fn path created accounts pre-confirmed). REBUILT AUTH:
+  client now uses plain `auth.signUp` (Confirm-email ON) -> Arabic verification code (Confirmation
+  template, set via PAT) -> `verifyOTP(type: signup)` -> session; forgot-password on the sign-in
+  form -> `resetPasswordForEmail` -> Arabic code (Recovery template) -> `verifyOTP(type:
+  recovery)` -> `updateUser(password)`. The passwordless «إرسال رمز» toggle was REMOVED; the
+  `signup` edge fn is RETIRED from the client (kept deployed as emergency fallback).
+  AuthChoiceScreen (first open) now offers THREE choices: «إنشاء حساب» (primary) / «تسجيل
+  الدخول» / «المتابعة كزائر». A design workflow verified the exact GoTrue contract against
+  source (obfuscated existing-email reply detected via `identities?.isEmpty ?? false`;
+  unconfirmed re-signup resends the code and IGNORES the new password; PKCE does not break raw
+  code entry). An ADVERSARIAL REVIEW workflow (2 reviewers + per-finding verifiers, 9 agents)
+  confirmed 6 real defects, ALL FIXED: (1) reset flow re-consumed the one-time recovery code
+  after a failed updateUser -> `_recoveryVerified` flag skips re-verify on retry; (2) unconfirmed
+  re-signup left the OLD password active -> best-effort `changePassword` right after signup-code
+  verify (same_password swallowed for fresh signups); (3) `_tr()`/context-after-dispose crashes
+  when backing out mid-request -> mounted guards on every post-await toast; (4) RTL month arrows
+  were double-mirrored (chevron IconData already carries matchTextDirection=true) -> hand-swap
+  removed; (5) heatmap month not re-clamped on habit switch -> didUpdateWidget resets to current
+  month; (6) day-details sheet overflowed with long notes -> SingleChildScrollView. NEW FEATURE:
+  `features/home/month_heatmap.dart` - competitive monthly calendar heatmap in Stats (locale
+  week start via MaterialLocalizations - Saturday for ar; RTL grid mirroring for free via Row
+  direction; theme-role colors dark+light incl. WCAG-checked ink rule; break vs build legends;
+  today ring; future days inert; month completion % with mid-month-start forgiveness; per-day
+  bottom sheet with mood, 10-segment metric bars and note; «سجّل اليوم الآن» jumps to the Today
+  tab; nav clamped to createdAt..now). 4 new unit tests for the grid math (offset/leap/rows).
+  E2E-VERIFIED LIVE against the real project: real signUp 200 (+1 identity, no session, Brevo
+  accepted the email), unconfirmed password login -> email_not_confirmed, full signup-code loop
+  -> session, duplicate confirmed signup -> obfuscated identities:[], full recovery loop ->
+  session -> new password works + old rejected, resend -> 429 rate-limit as designed. Templates
+  set via PAT: mailer_subjects/templates_confirmation + _recovery (Arabic, {{ .Token }}).
+  Verified: analyze clean, 16/16 tests. Test users cleaned.
 - **2026-07-11 round 4 (BREVO SMTP LIVE - email OTP login works end to end)** - Owner created
   the Brevo account (free 300/day) and connected a Brevo MCP (server d2d3d85a; account/senders
   readable in-session; SMTP keys are UI-only by design). Configured via Management PAT:
