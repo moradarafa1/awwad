@@ -502,6 +502,33 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-12 round 6 (COMPETITOR FEATURES BATCH: 6 new features + CRITICAL streak fix)** -
+  Owner approved implementing the competitor-research table («اعمل كله واختبر»). SHIPPED:
+  **(1) Streak protection**: DailyEntry.entryType 'log'|'skip' - excused days (سفر/مرض) via a
+  confirm dialog under the save button; transparent to streaks/badges/stats; distinct neutral
+  cell + legend + sheet text in the heatmap. **(2) Streak repair**: when yesterday has no entry,
+  an amber banner offers a 3-way backfill sheet (clean/slip/excused) via
+  backfillYesterday/skipDay. **(3) Relapse journal**: trigger chips (10 trilingual triggers,
+  kSlipTriggers in new core/catalog/motivation.dart) appear when the slip answer is chosen;
+  stored on the entry; TriggersCard in Stats shows the top-3 recurring triggers. **(4) Ranks**:
+  8 streak-based ranks (بذرة العزم -> العوّاد, thresholds aligned with shields) as a chip line
+  on Today with days-to-next-rank. **(5) Recovery timeline**: 7 generic neuroplasticity
+  milestones (kRecoveryTimeline, non-medical wording) as a Stats card with reached/next +
+  progress bar (break habits). **(6) Money/time-saved calculator**: Habit.costPerDay/
+  minutesPerDay set at add-time for break habits; gradient SavingsCard shows money+hours
+  reclaimed based on clean days. DB migration 0008 applied LIVE (daily_entries entry_type +
+  trigger_key) + sync roundtrip (entries columns + habits.config cost/minutes). **CRITICAL FIX
+  from the adversarial review workflow**: currentStreak/longestStreak were GAP-BLIND since P1 -
+  a user logging twice a month kept an unbroken "streak" and could farm shield badges; streaks
+  are now CALENDAR-AWARE (unexcused missing day breaks; skip passes; pending TODAY does not
+  break; longestStreak walks the real calendar). Legacy sparse data will show lower (correct)
+  streaks. Tests rewritten date-RELATIVE (fixed dates would rot) + gap/pending-today cases;
+  20/20 pass, analyze clean. NOT implemented from the table (documented): flexible scheduling,
+  prayer-time reminders, habit stacking, lessons program (next wave - deeper model changes);
+  accountability partner (needs owner's Firebase account, P4); Quran/dhikr streaks (already
+  covered by existing habits + heatmap). NOTE: review workflow's ui-sync reviewer + 2 verifiers
+  died on API errors (connection closed); the streak finding was fully verified, ui-sync
+  dimension self-checked manually instead.
 - **2026-07-12 round 5 (PER-HABIT CONTENT AUDIT: 12 confirmed fixes across all 36 habits)** -
   The long-queued "deep appropriateness review" (old TODO 0a) executed via an adversarial
   audit workflow (2 expert auditors + 11 per-finding verifiers; 13 findings verified, 12

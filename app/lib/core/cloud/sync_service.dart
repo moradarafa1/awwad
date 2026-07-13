@@ -51,6 +51,9 @@ class SyncService {
               'metric_p': habit.customMetricPrimary,
             if ((habit.customMetricSecondary ?? '').isNotEmpty)
               'metric_s': habit.customMetricSecondary,
+            if (habit.costPerDay != null) 'cost_per_day': habit.costPerDay,
+            if (habit.minutesPerDay != null)
+              'minutes_per_day': habit.minutesPerDay,
           },
         }
     ]);
@@ -69,6 +72,8 @@ class SyncService {
                   'mood_label': e.moodLabel,
                   'mood_emoji': e.moodEmoji,
                   'note': e.note,
+                  'entry_type': e.entryType,
+                  'trigger_key': e.trigger,
                 })
             .toList(),
         onConflict: 'habit_id,entry_date',
@@ -106,6 +111,10 @@ class SyncService {
                   (h['config'] as Map?)?['metric_p'] as String?,
               customMetricSecondary:
                   (h['config'] as Map?)?['metric_s'] as String?,
+              costPerDay:
+                  ((h['config'] as Map?)?['cost_per_day'] as num?)?.toDouble(),
+              minutesPerDay:
+                  ((h['config'] as Map?)?['minutes_per_day'] as num?)?.toInt(),
               isCustom: h['is_custom'] as bool? ?? false,
               title: h['title'] as String? ?? '',
               reason: h['reason'] as String?,
@@ -133,6 +142,8 @@ class SyncService {
               moodEmoji: e['mood_emoji'] as String?,
               moodLabel: e['mood_label'] as String?,
               note: e['note'] as String?,
+              entryType: e['entry_type'] as String? ?? 'log',
+              trigger: e['trigger_key'] as String?,
               createdAt: DateTime.tryParse(e['created_at'] as String? ?? '') ??
                   DateTime.now(),
             ))

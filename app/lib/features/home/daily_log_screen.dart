@@ -13,6 +13,7 @@ import '../../core/catalog/habit_catalog.dart';
 import '../../core/catalog/habit_content.dart';
 import '../../core/catalog/habit_daily_content.dart';
 import '../../core/catalog/habit_stages.dart';
+import '../../core/catalog/motivation.dart';
 import '../../core/connectivity/online.dart';
 import '../../core/models.dart';
 import '../../core/notifications/notifications.dart';
@@ -104,6 +105,78 @@ const Map<String, Map<String, String>> _kBadgeCongrats = {
 };
 
 // "Did you do the habit today?" for build habits (break habits ask "did you slip?").
+const Map<String, String> _kTriggerQ = {
+  'ar': 'ما الذي دفعك إلى التعثر؟ (اختياري، يساعدك على كشف النمط)',
+  'en': 'What triggered the slip? (optional, reveals your pattern)',
+  'fr': "Qu'est-ce qui a déclenché l'écart ? (facultatif)",
+};
+
+const Map<String, Map<String, String>> _kSkip = {
+  'btn': {
+    'ar': 'يوم سفر أو مرض؟ أعفِ هذا اليوم من السلسلة',
+    'en': 'Traveling or sick? Excuse today from the streak',
+    'fr': "Voyage ou maladie ? Exempter ce jour de la série",
+  },
+  'title': {
+    'ar': 'إعفاء اليوم',
+    'en': 'Excuse today',
+    'fr': "Exempter ce jour",
+  },
+  'body': {
+    'ar':
+        'اليوم المُعفى لا يكسر سلسلتك ولا يزيدها، ويُعرض بلون مختلف في السجل. استخدمه للسفر والمرض والأعذار الحقيقية فقط.',
+    'en':
+        'An excused day neither breaks nor extends your streak and shows differently in history. Use it for real excuses only.',
+    'fr':
+        "Un jour exempté ne casse ni n'allonge votre série. À réserver aux vraies excuses.",
+  },
+  'cancel': {'ar': 'إلغاء', 'en': 'Cancel', 'fr': 'Annuler'},
+  'ok': {'ar': 'إعفاء اليوم', 'en': 'Excuse it', 'fr': 'Exempter'},
+};
+
+const Map<String, Map<String, String>> _kRepair = {
+  'q': {
+    'ar': 'فاتك تسجيل يوم أمس. أنقذ سلسلتك الآن.',
+    'en': "You missed logging yesterday. Rescue your streak now.",
+    'fr': "Vous n'avez pas enregistré hier. Sauvez votre série.",
+  },
+  'fix': {'ar': 'استدراك', 'en': 'Fix it', 'fr': 'Corriger'},
+  'title': {
+    'ar': 'كيف كان يوم أمس؟',
+    'en': 'How was yesterday?',
+    'fr': "Comment était hier ?",
+  },
+  'clean': {
+    'ar': 'كان يوماً موفقاً بلا تعثر',
+    'en': 'A clean day, no slip',
+    'fr': 'Une bonne journée, sans écart',
+  },
+  'slip': {
+    'ar': 'حدث تعثر بالأمس',
+    'en': 'There was a slip',
+    'fr': 'Il y a eu un écart',
+  },
+  'skip': {
+    'ar': 'كان عذراً (سفر أو مرض)، أعفِه',
+    'en': 'It was an excuse (travel/sick), exempt it',
+    'fr': "C'était une excuse, exempter",
+  },
+};
+
+const Map<String, Map<String, String>> _kRank = {
+  'label': {'ar': 'رتبتك', 'en': 'Your rank', 'fr': 'Votre rang'},
+  'toNext': {
+    'ar': 'أيام إلى الرتبة التالية',
+    'en': 'days to the next rank',
+    'fr': 'jours avant le rang suivant',
+  },
+  'top': {
+    'ar': 'أعلى رتبة، ثبّتك الله',
+    'en': 'Top rank, keep it up',
+    'fr': 'Rang maximal, continuez',
+  },
+};
+
 const Map<String, String> _kDoneQuestion = {
   'ar': 'هل أدّيت العادة اليوم؟',
   'en': 'Did you do the habit today?',
@@ -140,6 +213,7 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
   double _urge = 5, _resistance = 5;
   bool? _didSlip;
   String? _moodEmoji, _moodLabel;
+  String? _trigger; // slip trigger key (relapse journal)
   final _noteCtrl = TextEditingController();
   final Set<String> _selectedCR = {};
   final Set<String> _selectedEnv = {};
@@ -160,16 +234,18 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     _didSlip = null;
     _moodEmoji = null;
     _moodLabel = null;
+    _trigger = null;
     _noteCtrl.clear();
     _selectedCR.clear();
     _selectedEnv.clear();
     final e = s.entryForToday();
-    if (e != null) {
+    if (e != null && !e.isSkip) {
       _urge = e.urge.toDouble();
       _resistance = e.resistance.toDouble();
       _didSlip = e.didSlip;
       _moodEmoji = e.moodEmoji;
       _moodLabel = e.moodLabel;
+      _trigger = e.trigger;
       _noteCtrl.text = e.note ?? '';
       _selectedCR.addAll(e.competingResponses);
       _selectedEnv.addAll(e.environment);
@@ -186,6 +262,7 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
           moodEmoji: _moodEmoji,
           moodLabel: _moodLabel,
           note: _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim(),
+          trigger: _trigger,
           competingResponses: _selectedCR.toList(),
           environment: _selectedEnv.toList(),
         );
@@ -268,6 +345,144 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     }
   }
 
+  String _dl(Map<String, Map<String, String>> m, String k, String locale) =>
+      m[k]?[locale] ?? m[k]?['ar'] ?? '';
+
+  Widget _rankLine(int streak, String locale) {
+    final r = rankForStreak(streak);
+    final nx = nextRank(streak);
+    final nextTxt = nx == null
+        ? _dl(_kRank, 'top', locale)
+        : '${nx.minStreak - streak} ${_dl(_kRank, 'toNext', locale)} ${nx.emoji}';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.accent2.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border:
+            Border.all(color: AppColors.accent2.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text('${r.emoji} ${_dl(_kRank, 'label', locale)}: ${r.n(locale)}',
+                style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12.5,
+                    color: AppColors.accent2)),
+          ),
+          Text(nextTxt,
+              style: TextStyle(fontSize: 11, color: AppColors.muted)),
+        ],
+      ),
+    );
+  }
+
+  Widget _yesterdayBanner(String locale) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.accent3.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border:
+            Border.all(color: AppColors.accent3.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.history, size: 18, color: AppColors.accent3),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(_dl(_kRepair, 'q', locale),
+                style: TextStyle(
+                    fontSize: 12, color: AppColors.text, height: 1.5)),
+          ),
+          TextButton(
+            onPressed: () => _repairSheet(locale),
+            child: Text(_dl(_kRepair, 'fix', locale),
+                style: const TextStyle(fontSize: 12)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _repairSheet(String locale) {
+    final ctrl = ref.read(appControllerProvider.notifier);
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(_dl(_kRepair, 'title', locale),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.heading)),
+              const SizedBox(height: 14),
+              FilledButton(
+                onPressed: () async {
+                  await ctrl.backfillYesterday(didSlip: false);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+                child: Text(_dl(_kRepair, 'clean', locale)),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed: () async {
+                  await ctrl.backfillYesterday(didSlip: true);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+                child: Text(_dl(_kRepair, 'slip', locale)),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () async {
+                  await ctrl.skipDay(dayKey(
+                      DateTime.now().subtract(const Duration(days: 1))));
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+                child: Text(_dl(_kRepair, 'skip', locale)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmSkipToday(String locale) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(_dl(_kSkip, 'title', locale)),
+        content: Text(_dl(_kSkip, 'body', locale),
+            style: TextStyle(color: AppColors.text, height: 1.6)),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(_dl(_kSkip, 'cancel', locale))),
+          FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(_dl(_kSkip, 'ok', locale))),
+        ],
+      ),
+    );
+    if (ok == true) {
+      await ref
+          .read(appControllerProvider.notifier)
+          .skipDay(dayKey(DateTime.now()));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -346,6 +561,17 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
                       color: AppColors.success)),
             ],
           ),
+          // Rank chip (levels): streak-based, consistent with the shields.
+          const SizedBox(height: 10),
+          _rankLine(s.currentStreak, locale),
+          // Streak repair: yesterday has no entry -> offer quick backfill or
+          // an excused day, so one forgotten evening does not kill the streak.
+          if (habit != null &&
+              s.entryForYesterday() == null &&
+              DateTime.now().difference(habit.createdAt).inDays >= 1) ...[
+            const SizedBox(height: 10),
+            _yesterdayBanner(locale),
+          ],
           // Urge-surfing SOS entry: break habits fight cravings in the moment.
           if (isBreak) ...[
             const SizedBox(height: 14),
@@ -425,6 +651,31 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
                     ),
                   ],
                 ),
+                // Relapse journal: capture WHAT triggered the slip so the
+                // stats screen can reveal the user's recurring patterns.
+                if (_didSlip == true) ...[
+                  const SizedBox(height: 12),
+                  Text(_kTriggerQ[locale] ?? _kTriggerQ['ar']!,
+                      style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.muted)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final t in kSlipTriggers)
+                        ChoiceChipTile(
+                          label: '${t.emoji} ${t.l(locale)}',
+                          selected: _trigger == t.key,
+                          color: AppColors.accent3,
+                          onTap: () => setState(() =>
+                              _trigger = _trigger == t.key ? null : t.key),
+                        ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -515,6 +766,13 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
             icon: const Icon(Icons.save_outlined),
             label: Text(l10n.saveEntry),
           ),
+          // Excused day (travel/sickness): transparent to the streak.
+          if (s.entryForToday() == null)
+            TextButton(
+              onPressed: () => _confirmSkipToday(locale),
+              child: Text(_kSkip['btn']![locale] ?? _kSkip['btn']!['ar']!,
+                  style: TextStyle(fontSize: 12, color: AppColors.muted)),
+            ),
           if (s.entryForToday() != null) ...[
             const SizedBox(height: 8),
             Text(l10n.alreadyLoggedToday,

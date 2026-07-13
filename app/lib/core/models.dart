@@ -116,6 +116,10 @@ class Habit {
   // falls back to generated/catalog/track metrics.
   final String? customMetricPrimary;
   final String? customMetricSecondary;
+  // Money/time-saved calculator (break habits): what one day of the habit
+  // used to cost. Null = calculator hidden.
+  final double? costPerDay;
+  final int? minutesPerDay;
   final DateTime createdAt;
 
   const Habit({
@@ -131,6 +135,8 @@ class Habit {
     this.reminderHours = const [],
     this.customMetricPrimary,
     this.customMetricSecondary,
+    this.costPerDay,
+    this.minutesPerDay,
     required this.createdAt,
   });
 
@@ -159,6 +165,8 @@ class Habit {
         customMetricPrimary: customMetricPrimary ?? this.customMetricPrimary,
         customMetricSecondary:
             customMetricSecondary ?? this.customMetricSecondary,
+        costPerDay: costPerDay,
+        minutesPerDay: minutesPerDay,
         createdAt: createdAt,
       );
 
@@ -175,6 +183,8 @@ class Habit {
         'reminderHours': reminderHours,
         'customMetricPrimary': customMetricPrimary,
         'customMetricSecondary': customMetricSecondary,
+        'costPerDay': costPerDay,
+        'minutesPerDay': minutesPerDay,
         'createdAt': createdAt.toIso8601String(),
       };
 
@@ -192,6 +202,8 @@ class Habit {
             (j['reminderHours'] as List<dynamic>?)?.cast<int>() ?? const [],
         customMetricPrimary: j['customMetricPrimary'] as String?,
         customMetricSecondary: j['customMetricSecondary'] as String?,
+        costPerDay: (j['costPerDay'] as num?)?.toDouble(),
+        minutesPerDay: j['minutesPerDay'] as int?,
         createdAt:
             DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now(),
       );
@@ -209,6 +221,11 @@ class DailyEntry {
   final String? note;
   final List<String> competingResponses; // selected labels (snapshot)
   final List<String> environment; // selected labels (snapshot)
+  // 'log' = a normal daily log; 'skip' = an EXCUSED day (travel/sickness):
+  // it neither breaks nor extends the streak and is drawn distinctly.
+  final String entryType;
+  // Trigger key behind a slip (relapse journal): 'stress', 'boredom', ...
+  final String? trigger;
   final DateTime createdAt;
 
   const DailyEntry({
@@ -223,8 +240,12 @@ class DailyEntry {
     this.note,
     this.competingResponses = const [],
     this.environment = const [],
+    this.entryType = 'log',
+    this.trigger,
     required this.createdAt,
   });
+
+  bool get isSkip => entryType == 'skip';
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -238,6 +259,8 @@ class DailyEntry {
         'note': note,
         'competingResponses': competingResponses,
         'environment': environment,
+        'entryType': entryType,
+        'trigger': trigger,
         'createdAt': createdAt.toIso8601String(),
       };
 
@@ -254,6 +277,8 @@ class DailyEntry {
         competingResponses:
             (j['competingResponses'] as List<dynamic>? ?? []).cast<String>(),
         environment: (j['environment'] as List<dynamic>? ?? []).cast<String>(),
+        entryType: j['entryType'] as String? ?? 'log',
+        trigger: j['trigger'] as String?,
         createdAt:
             DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now(),
       );

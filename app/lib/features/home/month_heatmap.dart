@@ -217,6 +217,8 @@ class _MonthHeatmapCardState extends State<MonthHeatmapCard> {
                   _isBreak ? _tr('legendClean') : _tr('legendDone')),
               _legendItem(_isBreak ? AppColors.danger : AppColors.accent3,
                   _isBreak ? _tr('legendSlip') : _tr('legendMissed')),
+              _legendItem(
+                  AppColors.muted.withValues(alpha: 0.30), _tr('legendSkip')),
               _legendItem(null, _tr('legendEmpty')),
             ],
           ),
@@ -257,7 +259,11 @@ class _MonthHeatmapCardState extends State<MonthHeatmapCard> {
     Color? fill;
     Color ink;
     Border? border;
-    if (entry != null) {
+    if (entry != null && entry.isSkip) {
+      // Excused day (travel/sickness): distinct neutral fill.
+      fill = AppColors.muted.withValues(alpha: 0.30);
+      ink = AppColors.heading;
+    } else if (entry != null) {
       fill = entry.didSlip
           ? (_isBreak ? AppColors.danger : AppColors.accent3)
           : AppColors.accent2;
@@ -349,7 +355,11 @@ class _MonthHeatmapCardState extends State<MonthHeatmapCard> {
                       fontSize: 14,
                       color: AppColors.heading)),
               const SizedBox(height: 14),
-              if (entry == null) ...[
+              if (entry != null && entry.isSkip) ...[
+                Text(_tr('skippedDay'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppColors.muted)),
+              ] else if (entry == null) ...[
                 Text(_tr('noEntry'),
                     textAlign: TextAlign.center,
                     style: TextStyle(color: AppColors.muted)),
@@ -482,6 +492,8 @@ const Map<String, Map<String, String>> _calStrings = {
     'legendDone': 'أُنجزت العادة',
     'legendMissed': 'لم تُنجَز',
     'legendEmpty': 'بدون تسجيل',
+    'legendSkip': 'يوم مُعفى',
+    'skippedDay': 'يوم مُعفى (سفر أو مرض): لا يؤثر في سلسلتك.',
     'monthLogged': 'أيام مسجّلة هذا الشهر',
     'monthCompletion': 'نسبة الالتزام',
     'noEntry': 'لا يوجد تسجيل في هذا اليوم.',
@@ -493,6 +505,8 @@ const Map<String, Map<String, String>> _calStrings = {
     'legendDone': 'Habit done',
     'legendMissed': 'Missed',
     'legendEmpty': 'Not logged',
+    'legendSkip': 'Excused day',
+    'skippedDay': 'Excused day (travel/sickness): does not affect your streak.',
     'monthLogged': 'Days logged this month',
     'monthCompletion': 'Consistency',
     'noEntry': 'No entry on this day.',
@@ -504,6 +518,8 @@ const Map<String, Map<String, String>> _calStrings = {
     'legendDone': 'Habitude accomplie',
     'legendMissed': 'Manquée',
     'legendEmpty': 'Non enregistré',
+    'legendSkip': 'Jour exempté',
+    'skippedDay': "Jour exempté (voyage/maladie) : sans effet sur la série.",
     'monthLogged': 'Jours enregistrés ce mois',
     'monthCompletion': 'Assiduité',
     'noEntry': "Aucune entrée ce jour-là.",

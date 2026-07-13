@@ -6,6 +6,7 @@ import 'package:awwad/core/state/app_state.dart';
 import 'package:awwad/features/home/month_heatmap.dart';
 import 'package:awwad/core/platform/usage_stats.dart';
 import 'package:awwad/core/catalog/habit_catalog.dart';
+import 'package:awwad/core/catalog/motivation.dart';
 
 // Lightweight unit tests for the offline core logic (no widgets needed yet).
 // Streak / badge logic is the riskiest engineering in P1, so it is tested here.
@@ -77,13 +78,17 @@ void main() {
             createdAt: DateTime.parse('$date 12:00:00'));
 
     test('stats are computed only for the active habit', () {
+      // Relative dates: streaks are calendar-aware (a gap to today breaks
+      // the CURRENT streak), so fixed old dates would read as broken.
+      String k(int daysAgo) =>
+          dayKey(DateTime.now().subtract(Duration(days: daysAgo)));
       final state = AppState(
         settings: const AppSettings(activeHabitId: 'a'),
         habits: [habit('a', 'break'), habit('b', 'build')],
         entries: [
-          entryFor('a', '2026-06-03'),
-          entryFor('a', '2026-06-02'),
-          entryFor('b', '2026-06-03', slip: true),
+          entryFor('a', k(0)),
+          entryFor('a', k(1)),
+          entryFor('b', k(0), slip: true),
         ],
       );
       expect(state.daysLogged, 2); // only habit a
@@ -142,6 +147,52 @@ void main() {
       expect(daysInMonth(DateTime(2028, 2, 1)), 29); // leap year
       expect(daysInMonth(DateTime(2026, 12, 1)), 31);
       expect(daysInMonth(DateTime(2026, 4, 1)), 30);
+    });
+
+    test('skip days pass through; slips and GAPS break streaks', () {
+      // Dates relative to the real clock: streaks are calendar-aware now.
+      String k(int daysAgo) =>
+          dayKey(DateTime.now().subtract(Duration(days: daysAgo)));
+      AppState stateWith(List<DailyEntry> entries) => AppState(
+            settings: const AppSettings(activeHabitId: 'h'),
+            habits: [
+              Habit(
+                  id: 'h',
+                  track: 'break',
+                  title: 'x',
+                  createdAt: DateTime(2026, 1, 1)),
+            ],
+            entries: entries,
+          );
+      DailyEntry skip(String date) => DailyEntry(
+          id: 's$date', habitId: 'h', date: date, urge: 0, resistance: 0,
+          didSlip: false, entryType: 'skip', createdAt: DateTime(2026, 1, 2));
+
+      // clean(today), SKIP(-1), clean(-2), slip(-3): skip passes, slip breaks.
+      final a = stateWith(
+          [_entry(k(0)), skip(k(1)), _entry(k(2)), _entry(k(3), slip: true)]);
+      expect(a.currentStreak, 2);
+      expect(a.cleanDays, 2);
+      expect(a.daysLogged, 3);
+      expect(a.longestStreak, 2);
+
+      // clean(today), clean(-3): the unexcused GAP breaks the streak.
+      final b = stateWith([_entry(k(0)), _entry(k(3))]);
+      expect(b.currentStreak, 1);
+      expect(b.longestStreak, 1);
+
+      // clean(-1), clean(-2), nothing today yet: pending today must not break.
+      final c = stateWith([_entry(k(1)), _entry(k(2))]);
+      expect(c.currentStreak, 2);
+      expect(c.longestStreak, 2);
+    });
+
+    test('ranks resolve from streak with correct next rank', () {
+      expect(rankForStreak(0).name['ar'], 'بذرة العزم');
+      expect(rankForStreak(8).name['ar'], 'راسخ الأسبوع');
+      expect(rankForStreak(90).name['ar'], 'قلب من ماس');
+      expect(nextRank(8)!.minStreak, 14);
+      expect(nextRank(500), isNull);
     });
 
     test('resolveMetrics priority: custom beats override beats default', () {

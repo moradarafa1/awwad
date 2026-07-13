@@ -27,6 +27,9 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
   // Custom-habit slider labels: the user defines what to measure daily.
   final _metricPrimaryCtrl = TextEditingController();
   final _metricSecondaryCtrl = TextEditingController();
+  // Money/time-saved calculator inputs (break habits, optional).
+  final _costCtrl = TextEditingController();
+  final _minutesCtrl = TextEditingController();
   List<int> _reminderHours = [20];
   String _query = '';
   bool _advisoryShown = false;
@@ -50,6 +53,8 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
     _whyCtrl.dispose();
     _metricPrimaryCtrl.dispose();
     _metricSecondaryCtrl.dispose();
+    _costCtrl.dispose();
+    _minutesCtrl.dispose();
     super.dispose();
   }
 
@@ -95,6 +100,12 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
           _custom && _metricSecondaryCtrl.text.trim().isNotEmpty
               ? _metricSecondaryCtrl.text.trim()
               : null,
+      costPerDay: _track == 'break'
+          ? double.tryParse(_costCtrl.text.trim())
+          : null,
+      minutesPerDay: _track == 'break'
+          ? int.tryParse(_minutesCtrl.text.trim())
+          : null,
       createdAt: DateTime.now(),
     );
     final ok = await ref.read(appControllerProvider.notifier).addHabit(habit);
@@ -213,6 +224,41 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                     decoration: InputDecoration(
                         labelText: _s(_kStr['metricS']!),
                         hintText: _s(_kStr['metricSHint']!)),
+                  ),
+                ],
+                if (_track == 'break') ...[
+                  const SizedBox(height: 14),
+                  Text(_s(_kStr['savingsTitle']!),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.muted)),
+                  const SizedBox(height: 4),
+                  Text(_s(_kStr['savingsHint']!),
+                      style: TextStyle(
+                          fontSize: 11.5,
+                          color: AppColors.muted,
+                          height: 1.6)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _costCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              labelText: _s(_kStr['costLabel']!)),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: _minutesCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              labelText: _s(_kStr['minutesLabel']!)),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
                 const SizedBox(height: 14),
@@ -482,6 +528,29 @@ const Map<String, Map<String, String>> _kStr = {
     'ar': 'مثال: مستوى التركيز',
     'en': 'e.g. Focus level',
     'fr': 'ex. Niveau de concentration'
+  },
+  'savingsTitle': {
+    'ar': 'حاسبة التوفير (اختياري)',
+    'en': 'Savings calculator (optional)',
+    'fr': "Calculateur d'économies (facultatif)"
+  },
+  'savingsHint': {
+    'ar':
+        'كم كانت تكلفك هذه العادة يومياً؟ سنريك كم وفّرت من مال ووقت مع كل يوم نظيف.',
+    'en':
+        'What did this habit cost you daily? We will show money and time saved with every clean day.',
+    'fr':
+        "Combien cette habitude vous coûtait-elle par jour ? Nous afficherons vos économies."
+  },
+  'costLabel': {
+    'ar': 'التكلفة اليومية',
+    'en': 'Daily cost',
+    'fr': 'Coût quotidien'
+  },
+  'minutesLabel': {
+    'ar': 'دقائق مستهلكة يومياً',
+    'en': 'Minutes lost daily',
+    'fr': 'Minutes perdues par jour'
   },
   'reminder': {'ar': 'وقت التذكير', 'en': 'Reminder time', 'fr': 'Heure du rappel'},
   'capReached': {

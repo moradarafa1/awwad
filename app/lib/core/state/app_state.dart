@@ -111,37 +111,63 @@ class AppState {
         ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder)));
 
   // ----- derived stats for the ACTIVE habit (computed locally; offline) -----
-  int get daysLogged => activeEntries.length;
-  int get cleanDays => activeEntries.where((e) => !e.didSlip).length;
+  // SKIP entries (excused days: travel/sickness) are TRANSPARENT everywhere:
+  // they neither break nor extend streaks and never count as logged/clean.
+  int get daysLogged => activeEntries.where((e) => !e.isSkip).length;
+  int get cleanDays =>
+      activeEntries.where((e) => !e.isSkip && !e.didSlip).length;
 
+  // Streaks are CALENDAR-AWARE: a day with no entry and no excuse BREAKS the
+  // streak (that is what the repair banner protects against); an excused skip
+  // passes through; TODAY without an entry does not break (day not over yet).
   int get currentStreak {
+    final byDay = {for (final e in activeEntries) e.date: e};
+    if (byDay.isEmpty) return 0;
     var s = 0;
-    for (final e in activeEntries) {
-      if (!e.didSlip) {
+    var d = DateTime.now();
+    if (byDay[dayKey(d)] == null) {
+      d = d.subtract(const Duration(days: 1)); // today still pending
+    }
+    while (true) {
+      final e = byDay[dayKey(d)];
+      if (e == null) break; // missed, unexcused day -> broken
+      if (!e.isSkip) {
+        if (e.didSlip) break;
         s++;
-      } else {
-        break;
       }
+      d = d.subtract(const Duration(days: 1));
     }
     return s;
   }
 
   int get longestStreak {
+    final byDay = {for (final e in activeEntries) e.date: e};
+    if (byDay.isEmpty) return 0;
+    final dates = byDay.keys.toList()..sort();
+    final p = dates.first.split('-').map(int.parse).toList();
+    var d = DateTime(p[0], p[1], p[2]);
+    final now = DateTime.now();
+    // Today without an entry must not reset an ongoing run.
+    final end = byDay[dayKey(now)] != null
+        ? DateTime(now.year, now.month, now.day)
+        : DateTime(now.year, now.month, now.day)
+            .subtract(const Duration(days: 1));
     var longest = 0, run = 0;
-    final asc = activeEntries.reversed.toList();
-    for (final e in asc) {
-      if (!e.didSlip) {
+    while (!d.isAfter(end)) {
+      final e = byDay[dayKey(d)];
+      if (e == null || (!e.isSkip && e.didSlip)) {
+        run = 0; // gap or slip breaks the run
+      } else if (!e.isSkip) {
         run++;
         if (run > longest) longest = run;
-      } else {
-        run = 0;
-      }
+      } // skip: pass through
+      d = DateTime(d.year, d.month, d.day + 1);
     }
     return longest;
   }
 
   bool get hasComeback =>
-      activeEntries.any((e) => e.didSlip) && currentStreak >= 1;
+      activeEntries.any((e) => !e.isSkip && e.didSlip) && currentStreak >= 1;
 
   int get weekNumber {
     final h = activeHabit;
@@ -152,16 +178,27 @@ class AppState {
   }
 
   double get avgUrge {
-    final recent = activeEntries.take(7).toList();
+    final recent = activeEntries.where((e) => !e.isSkip).take(7).toList();
     if (recent.isEmpty) return 0;
     return recent.map((e) => e.urge).reduce((a, b) => a + b) / recent.length;
   }
 
   double get avgResistance {
-    final recent = activeEntries.take(7).toList();
+    final recent = activeEntries.where((e) => !e.isSkip).take(7).toList();
     if (recent.isEmpty) return 0;
     return recent.map((e) => e.resistance).reduce((a, b) => a + b) /
         recent.length;
+  }
+
+  /// Yesterday's entry for the active habit, or null (streak-repair banner).
+  DailyEntry? entryForYesterday() {
+    final id = activeHabitId;
+    if (id == null) return null;
+    final y = dayKey(DateTime.now().subtract(const Duration(days: 1)));
+    for (final e in entries) {
+      if (e.date == y && e.habitId == id) return e;
+    }
+    return null;
   }
 
   DailyEntry? entryForToday() {
@@ -380,6 +417,54 @@ class AppController extends Notifier<AppState> {
   }
 
   // ---------- daily log ----------
+  /// Marks [date] (a dayKey) as an EXCUSED day for the active habit
+  /// (travel/sickness): transparent to streaks, drawn distinctly.
+  Future<void> skipDay(String date) async {
+    final habit = state.activeHabit;
+    if (habit == null) return;
+    final entry = DailyEntry(
+      id: _uuid.v4(),
+      habitId: habit.id,
+      date: date,
+      urge: 0,
+      resistance: 0,
+      didSlip: false,
+      entryType: 'skip',
+      createdAt: DateTime.now(),
+    );
+    final list = [
+      ...state.entries
+          .where((e) => !(e.date == date && e.habitId == habit.id)),
+      entry,
+    ];
+    final sorted = _sorted(list);
+    state = state.copyWith(entries: sorted);
+    await _store.saveEntries(sorted);
+  }
+
+  /// Streak repair: backfill YESTERDAY with a quick log (neutral sliders).
+  /// Badges are re-evaluated on the next normal save.
+  Future<void> backfillYesterday({required bool didSlip}) async {
+    final habit = state.activeHabit;
+    if (habit == null) return;
+    final y = dayKey(DateTime.now().subtract(const Duration(days: 1)));
+    if (state.entries.any((e) => e.date == y && e.habitId == habit.id)) {
+      return; // already covered
+    }
+    final entry = DailyEntry(
+      id: _uuid.v4(),
+      habitId: habit.id,
+      date: y,
+      urge: 5,
+      resistance: 5,
+      didSlip: didSlip,
+      createdAt: DateTime.now(),
+    );
+    final sorted = _sorted([...state.entries, entry]);
+    state = state.copyWith(entries: sorted);
+    await _store.saveEntries(sorted);
+  }
+
   Future<List<EarnedBadge>> saveEntry({
     required int urge,
     required int resistance,
@@ -387,6 +472,7 @@ class AppController extends Notifier<AppState> {
     String? moodEmoji,
     String? moodLabel,
     String? note,
+    String? trigger,
     List<String> competingResponses = const [],
     List<String> environment = const [],
   }) async {
@@ -405,6 +491,7 @@ class AppController extends Notifier<AppState> {
       moodEmoji: moodEmoji,
       moodLabel: moodLabel,
       note: note,
+      trigger: didSlip ? trigger : null,
       competingResponses: competingResponses,
       environment: environment,
       createdAt: existing?.createdAt ?? DateTime.now(),

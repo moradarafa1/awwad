@@ -10,6 +10,7 @@ import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import 'analytics_section.dart';
 import 'habit_switcher.dart';
+import 'journey_cards.dart';
 import 'home_shell.dart' show homeTabProvider;
 import 'month_heatmap.dart';
 
@@ -134,6 +135,13 @@ class StatsScreen extends ConsumerWidget {
               ],
             ),
           ),
+          // Break-habit journey cards: recovery timeline, savings, triggers.
+          if (habit != null && habit.track == 'break') ...[
+            const SizedBox(height: 14),
+            RecoveryTimelineCard(streak: s.currentStreak),
+            SavingsCard(habit: habit, cleanDays: s.cleanDays),
+            TriggersCard(entries: s.activeEntries),
+          ],
           const SizedBox(height: 14),
           AnalyticsSection(
             entries: s.activeEntries,
