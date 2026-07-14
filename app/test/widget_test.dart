@@ -214,6 +214,40 @@ void main() {
       expect(monthly.skipBlockedBy(), 'month');
     });
 
+    test('skip quota windows renew per whole period from the anchor', () {
+      String k(int daysAgo) =>
+          dayKey(DateTime.now().subtract(Duration(days: daysAgo)));
+      DailyEntry skip(String date) => DailyEntry(
+          id: 's$date', habitId: 'h', date: date, urge: 0, resistance: 0,
+          didSlip: false, entryType: 'skip', createdAt: DateTime(2026, 1, 1));
+      AppState st(List<DailyEntry> e) => AppState(
+            settings: const AppSettings(activeHabitId: 'h'),
+            habits: [
+              Habit(id: 'h', track: 'break', title: 'x', createdAt: DateTime(2026, 1, 1)),
+            ],
+            entries: e,
+          );
+      // WEEK renewal: anchor 8 days ago; the current week window started at
+      // anchor+7 (yesterday), so both old skips fall outside it.
+      final week = st([skip(k(8)), skip(k(7))]);
+      expect(week.weeklySkipUsage.used, 0);
+      expect(week.skipBlockedBy(), isNull);
+
+      // MONTH renewal: 4 skips exhausted the FIRST 30-day window (anchor 35
+      // days ago); today sits in the second window (started anchor+30), so
+      // the monthly quota is fresh again.
+      final month = st([skip(k(35)), skip(k(34)), skip(k(33)), skip(k(32))]);
+      expect(month.monthlySkipUsage.used, 0);
+      expect(month.weeklySkipUsage.used, 0);
+      expect(month.skipBlockedBy(), isNull);
+
+      // Mid-window: anchor 3 days ago, still inside the first week window,
+      // so both skips count and the weekly quota is hit.
+      final mid = st([skip(k(3)), skip(k(2))]);
+      expect(mid.weeklySkipUsage.used, 2);
+      expect(mid.skipBlockedBy(), 'week');
+    });
+
     test('ranks resolve from streak with correct next rank', () {
       expect(rankForStreak(0).name['ar'], 'بذرة العزم');
       expect(rankForStreak(8).name['ar'], 'راسخ الأسبوع');

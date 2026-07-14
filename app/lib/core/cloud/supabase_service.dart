@@ -59,6 +59,9 @@ class SupabaseService {
   static User? get currentUser => configured && _inited ? client.auth.currentUser : null;
   static bool get signedIn => currentUser != null;
 
+  /// True once the cloud layer is usable (built with keys AND initialized).
+  static bool get ready => configured && _inited;
+
   // ---- auth: sign-up with email verification code ----
 
   /// Starts registration. GoTrue sends a verification CODE to [email]

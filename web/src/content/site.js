@@ -34,6 +34,13 @@ export const STORE = {
   iosLive: false,
 };
 
+// Google Tag Manager container id (e.g. 'GTM-XXXXXXX'). EMPTY string = GTM is
+// rendered NOWHERE and the site stays cookie-free; the dataLayer pushes
+// (page_view + cta_click) still run so the container works the moment this is
+// set. NOTE for the owner: once a real id is set, GTM/GA cookies apply and the
+// privacy page should be updated accordingly (see docs/tracking-plan.md).
+export const GTM_ID = '';
+
 export const t = {
   ar: {
     brand: 'عوّاد',

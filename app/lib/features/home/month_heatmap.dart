@@ -321,8 +321,14 @@ class _MonthHeatmapCardState extends State<MonthHeatmapCard> {
           ),
         ),
         const SizedBox(width: 5),
-        Text(label,
-            style: TextStyle(fontSize: 11, color: AppColors.muted)),
+        // Bounded by the Wrap that hosts these items: the French legend labels
+        // are long enough to overflow a legend row on a narrow screen.
+        Flexible(
+          child: Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 11, color: AppColors.muted)),
+        ),
       ],
     );
   }

@@ -522,6 +522,21 @@ class _HabitPickerState extends State<_HabitPicker> {
     for (final h in filtered) {
       byCat.putIfAbsent(h.category, () => []).add(h);
     }
+    // Widest a chip label may be: the Wrap line (screen - 40 page padding)
+    // minus the chip's own chrome (24 padding + 2 border + the icon and the
+    // optional islamic marker). The emoji Texts scale with the OS font
+    // setting, so they are measured scaled, not at their nominal size.
+    final scaler = MediaQuery.textScalerOf(context);
+    final iconW = scaler.scale(18) * 1.3 + 8; // emoji advance + gap
+    final islamicW = scaler.scale(12) * 1.3 + 6;
+    double labelMaxWidth(bool isIslamic) =>
+        (MediaQuery.sizeOf(context).width -
+                40 - // page padding
+                24 - // chip padding
+                2 - // border
+                iconW -
+                (isIslamic ? islamicW : 0))
+            .clamp(72.0, 420.0);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -575,11 +590,21 @@ class _HabitPickerState extends State<_HabitPicker> {
                     children: [
                       Text(h.icon, style: const TextStyle(fontSize: 18)),
                       const SizedBox(width: 8),
-                      Text(h.t(widget.locale),
-                          style: TextStyle(
-                              color: sel ? AppColors.accent : AppColors.text,
-                              fontWeight:
-                                  sel ? FontWeight.w700 : FontWeight.w500)),
+                      // The Wrap hands this Row UNBOUNDED width, so a bare Text
+                      // (and a Flexible) can never wrap: long titles (e.g. fr
+                      // "Trichotillomanie...") would hard-overflow. Bound the
+                      // label explicitly, then let it take a second line.
+                      ConstrainedBox(
+                        constraints:
+                            BoxConstraints(maxWidth: labelMaxWidth(h.isIslamic)),
+                        child: Text(h.t(widget.locale),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: sel ? AppColors.accent : AppColors.text,
+                                fontWeight:
+                                    sel ? FontWeight.w700 : FontWeight.w500)),
+                      ),
                       if (h.isIslamic) ...[
                         const SizedBox(width: 6),
                         const Text('🕌', style: TextStyle(fontSize: 12)),

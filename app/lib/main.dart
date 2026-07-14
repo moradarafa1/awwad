@@ -22,6 +22,7 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     final prefs = await SharedPreferences.getInstance();
     final store = LocalStore(prefs);
+    AnalyticsService.instance.locale = store.loadSettings().locale ?? 'ar';
     AnalyticsService.instance.track('app_opened', {
       'is_first_open':
           store.loadHabits().isEmpty && store.loadLegacyHabit() == null
@@ -35,9 +36,12 @@ void main() {
       ),
     );
 
-    // Initialize cloud AFTER the first frame; failures are swallowed by the zone.
+    // Initialize cloud AFTER the first frame; failures are swallowed by the
+    // zone. Once ready, push any buffered analytics events (fail-open).
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      unawaited(SupabaseService.init());
+      unawaited(SupabaseService.init()
+          .then((_) => AnalyticsService.instance.flush())
+          .catchError((_) {}));
     });
   }, (error, stack) {
     // Cloud/async errors must not crash the app. (Logged in debug only.)

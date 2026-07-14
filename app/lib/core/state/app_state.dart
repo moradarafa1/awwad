@@ -319,6 +319,7 @@ class AppController extends Notifier<AppState> {
     final s = state.settings.copyWith(locale: locale);
     state = state.copyWith(settings: s);
     await _store.saveSettings(s);
+    AnalyticsService.instance.locale = locale;
     AnalyticsService.instance.track('language_selected', {'locale': locale});
   }
 
@@ -563,6 +564,8 @@ class AppController extends Notifier<AppState> {
       'did_slip': didSlip,
       'urge': urge,
       'resistance': resistance,
+      'habit_track': habit.track,
+      'catalog_key': habit.catalogKey,
     });
 
     return _evaluateAndAwardBadges();

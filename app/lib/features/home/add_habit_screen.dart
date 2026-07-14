@@ -207,18 +207,24 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                           color: AppColors.muted,
                           height: 1.6)),
                   const SizedBox(height: 8),
+                  // maxLength keeps a user-typed slider label displayable
+                  // everywhere it is echoed (daily log, stats, heatmap sheet).
                   TextField(
                     controller: _metricPrimaryCtrl,
+                    maxLength: 30,
                     decoration: InputDecoration(
                         labelText: _s(_kStr['metricP']!),
-                        hintText: _s(_kStr['metricPHint']!)),
+                        hintText: _s(_kStr['metricPHint']!),
+                        counterText: ''),
                   ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: _metricSecondaryCtrl,
+                    maxLength: 30,
                     decoration: InputDecoration(
                         labelText: _s(_kStr['metricS']!),
-                        hintText: _s(_kStr['metricSHint']!)),
+                        hintText: _s(_kStr['metricSHint']!),
+                        counterText: ''),
                   ),
                 ],
                 if (_track == 'break') ...[
@@ -329,6 +335,21 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
     for (final h in all) {
       byCat.putIfAbsent(h.category, () => []).add(h);
     }
+    // The Wrap gives each pill's inner Row UNBOUNDED width, so a bare label
+    // Text can never wrap and would hard-overflow. Bound it explicitly to the
+    // Wrap line (screen - 32 page padding) minus the pill's own chrome. The
+    // emoji Texts scale with the OS font setting, so measure them scaled.
+    final scaler = MediaQuery.textScalerOf(context);
+    final iconW = scaler.scale(16) * 1.3 + 8; // emoji advance + gap
+    final islamicW = scaler.scale(12) * 1.3 + 6;
+    double labelMaxWidth(bool isIslamic) =>
+        (MediaQuery.sizeOf(context).width -
+                32 - // page padding
+                24 - // pill padding
+                2 - // border
+                iconW -
+                (isIslamic ? islamicW : 0))
+            .clamp(72.0, 420.0);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -363,10 +384,14 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
               children: [
                 const Text('✏️', style: TextStyle(fontSize: 18)),
                 const SizedBox(width: 10),
-                Text(_s(_kStr['custom']!),
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.heading)),
+                Expanded(
+                  child: Text(_s(_kStr['custom']!),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.heading)),
+                ),
               ],
             ),
           ),
@@ -412,11 +437,17 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                     children: [
                       Text(h.icon, style: const TextStyle(fontSize: 16)),
                       const SizedBox(width: 8),
-                      Text(h.t(_loc),
-                          style: TextStyle(
-                              color: sel ? AppColors.accent : AppColors.text,
-                              fontWeight:
-                                  sel ? FontWeight.w700 : FontWeight.w500)),
+                      ConstrainedBox(
+                        constraints:
+                            BoxConstraints(maxWidth: labelMaxWidth(h.isIslamic)),
+                        child: Text(h.t(_loc),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: sel ? AppColors.accent : AppColors.text,
+                                fontWeight:
+                                    sel ? FontWeight.w700 : FontWeight.w500)),
+                      ),
                       if (h.isIslamic) ...[
                         const SizedBox(width: 6),
                         const Text('🕌', style: TextStyle(fontSize: 12)),

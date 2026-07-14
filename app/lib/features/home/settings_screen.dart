@@ -148,12 +148,16 @@ class SettingsScreen extends ConsumerWidget {
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 13)),
                 const SizedBox(height: 10),
-                Row(
+                // A Wrap, not a Row: three equal thirds of a 320dp screen do
+                // not fit «العربية» / «English» / «Français» (they were being
+                // broken into four stacked fragments each). Intrinsic-width
+                // chips that flow onto a second line read correctly instead.
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
                     _lang('العربية', 'ar', s.settings.locale, ctrl),
-                    const SizedBox(width: 8),
                     _lang('English', 'en', s.settings.locale, ctrl),
-                    const SizedBox(width: 8),
                     _lang('Français', 'fr', s.settings.locale, ctrl),
                   ],
                 ),
@@ -530,12 +534,12 @@ class SettingsScreen extends ConsumerWidget {
   Widget _lang(
       String label, String code, String? current, AppController ctrl) {
     final sel = current == code;
-    return Expanded(
-      child: ChoiceChipTile(
-        label: label,
-        selected: sel,
-        onTap: () => ctrl.setLocale(code),
-      ),
+    // Intrinsic width (no Expanded): the chip sizes to its own label inside
+    // the Wrap above.
+    return ChoiceChipTile(
+      label: label,
+      selected: sel,
+      onTap: () => ctrl.setLocale(code),
     );
   }
 

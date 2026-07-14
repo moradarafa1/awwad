@@ -77,32 +77,41 @@ class _UsageScreenState extends State<UsageScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(u.label, style: const TextStyle(fontSize: 16)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(_tr('limitPrompt'),
-                style: TextStyle(color: AppColors.muted, fontSize: 13)),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              children: [
-                for (final m in const [15, 30, 60, 120])
-                  ActionChip(
-                    label: Text('$m ${_tr('min')}'),
-                    onPressed: () => Navigator.pop(ctx, m),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration:
-                  InputDecoration(labelText: _tr('customMinutes')),
-            ),
-          ],
+        title: Text(u.label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 16)),
+        // Scrollable: this content holds a TextField, so the keyboard (plus a
+        // large font scale, which pushes the chips onto extra rows) would
+        // otherwise clip the dialog.
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(_tr('limitPrompt'),
+                  style: TextStyle(color: AppColors.muted, fontSize: 13)),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final m in const [15, 30, 60, 120])
+                    ActionChip(
+                      label: Text('$m ${_tr('min')}'),
+                      onPressed: () => Navigator.pop(ctx, m),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                decoration:
+                    InputDecoration(labelText: _tr('customMinutes')),
+              ),
+            ],
+          ),
         ),
         actions: [
           if (current != null)
@@ -217,10 +226,12 @@ class _UsageScreenState extends State<UsageScreen>
                         children: [
                           Icon(Icons.timelapse, color: AppColors.accent2),
                           const SizedBox(width: 8),
-                          Text('${_tr('totalToday')}: ${_fmt(total)}',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.accent2)),
+                          Flexible(
+                            child: Text('${_tr('totalToday')}: ${_fmt(total)}',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.accent2)),
+                          ),
                         ],
                       ),
                     ),

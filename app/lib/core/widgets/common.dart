@@ -20,7 +20,13 @@ class SectionCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.border),
         ),
-        child: child,
+        // A transparent Material INSIDE the coloured box: without it, a
+        // ListTile/InkWell in a card paints its ink on the Scaffold's Material,
+        // i.e. BEHIND this box, so taps show no ripple at all.
+        child: Material(
+          type: MaterialType.transparency,
+          child: child,
+        ),
       );
 }
 

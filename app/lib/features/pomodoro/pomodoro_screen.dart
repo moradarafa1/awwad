@@ -145,14 +145,16 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Phase selector
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            // Phase selector. A Wrap (not a Row): the three pills together are
+            // wider than a 360dp screen in French, so they must flow to a
+            // second line instead of overflowing.
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 _phaseChip(t['focus']!, _Phase.focus),
-                const SizedBox(width: 8),
                 _phaseChip(t['short']!, _Phase.shortBreak),
-                const SizedBox(width: 8),
                 _phaseChip(t['long']!, _Phase.longBreak),
               ],
             ),
@@ -179,21 +181,31 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
                         strokeCap: StrokeCap.round,
                       ),
                     ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(_fmt(_remaining),
-                            style: TextStyle(
-                                fontSize: 56,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.heading)),
-                        const SizedBox(height: 4),
-                        Text(phaseLabel,
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: _phaseColor)),
-                      ],
+                    // The dial is a fixed 240x240 circle: at a large OS font
+                    // scale the 56px digits alone overflow it, so scale the
+                    // whole stack down to fit instead of clipping it.
+                    Padding(
+                      padding: const EdgeInsets.all(28),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(_fmt(_remaining),
+                                style: TextStyle(
+                                    fontSize: 56,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.heading)),
+                            const SizedBox(height: 4),
+                            Text(phaseLabel,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: _phaseColor)),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -205,25 +217,45 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
             Row(
               children: [
                 Expanded(
+                  flex: 3,
                   child: FilledButton.icon(
                     onPressed: _running ? _pause : _start,
                     style: FilledButton.styleFrom(backgroundColor: _phaseColor),
                     icon: Icon(_running ? Icons.pause : Icons.play_arrow),
-                    label: Text(_running
-                        ? t['pause']!
-                        : (_remaining == _total ? t['start']! : t['resume']!)),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                          _running
+                              ? t['pause']!
+                              : (_remaining == _total
+                                  ? t['start']!
+                                  : t['resume']!),
+                          maxLines: 1),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                OutlinedButton.icon(
-                  onPressed: _reset,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.text,
-                    minimumSize: const Size.fromHeight(52),
-                    side: BorderSide(color: AppColors.border),
+                // Flexible (never a bare child) + a FINITE minimumSize: a bare
+                // child of a Row gets UNBOUNDED width, and Size.fromHeight(52)
+                // means an INFINITE minimum width, which together threw
+                // "BoxConstraints forces an infinite width" on every frame.
+                // The loose fit lets the label scale down on narrow screens
+                // instead of pushing the row into an overflow.
+                Flexible(
+                  flex: 2,
+                  child: OutlinedButton.icon(
+                    onPressed: _reset,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.text,
+                      minimumSize: const Size(64, 52),
+                      side: BorderSide(color: AppColors.border),
+                    ),
+                    icon: const Icon(Icons.refresh),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(t['reset']!, maxLines: 1),
+                    ),
                   ),
-                  icon: const Icon(Icons.refresh),
-                  label: Text(t['reset']!),
                 ),
               ],
             ),

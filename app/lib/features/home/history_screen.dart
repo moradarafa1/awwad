@@ -110,13 +110,18 @@ Widget _historyCard(BuildContext context, DailyEntry e, AppLocalizations l10n,
       children: [
         Row(
           children: [
-            Text('📅 ${e.date}',
-                style: TextStyle(
-                    color: AppColors.accent,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12)),
-            const Spacer(),
-            Container(
+            Expanded(
+              child: Text('📅 ${e.date}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: AppColors.accent,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12)),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Container(
               padding:
                   const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
@@ -136,6 +141,8 @@ Widget _historyCard(BuildContext context, DailyEntry e, AppLocalizations l10n,
                       : (clean
                           ? '✅ ${l10n.badgeClean}'
                           : '⚠️ ${l10n.badgeSlip}'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
@@ -144,6 +151,7 @@ Widget _historyCard(BuildContext context, DailyEntry e, AppLocalizations l10n,
                           : (clean
                               ? AppColors.success
                               : AppColors.danger))),
+              ),
             ),
           ],
         ),
@@ -161,13 +169,23 @@ Widget _historyCard(BuildContext context, DailyEntry e, AppLocalizations l10n,
   );
 }
 
+// Key on the start, value on the end. BOTH sides must flex: the key can be a
+// long (or user-typed) metric label and the value can be a whole note.
 Widget _row(String k, String v) => Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(k, style: TextStyle(color: AppColors.muted, fontSize: 12)),
-          const Spacer(),
-          Flexible(
+          Expanded(
+            flex: 2,
+            child: Text(k,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: AppColors.muted, fontSize: 12)),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            flex: 3,
             child: Text(v,
                 textAlign: TextAlign.end,
                 style: TextStyle(

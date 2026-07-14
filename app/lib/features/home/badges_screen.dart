@@ -46,55 +46,64 @@ class BadgesScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           const HabitSwitcher(),
           const SizedBox(height: 16),
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.82,
-            children: kBadges.map((b) {
-              final earned = earnedKeys.contains(b.key);
-              final color = _tierColor(b.tier);
-              return Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: earned
-                      ? color.withValues(alpha: 0.1)
-                      : AppColors.surface,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                      color: earned ? color : AppColors.border),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Opacity(
-                      opacity: earned ? 1 : 0.3,
-                      child: Text(b.icon,
-                          style: const TextStyle(fontSize: 34)),
+          // A fixed-aspect GridView pinned every cell to a height that ignores
+          // the text scale (and was already too short at the default scale on
+          // a 320dp phone). A Wrap of fixed-WIDTH cells lets each cell take
+          // the height its content actually needs.
+          LayoutBuilder(builder: (context, c) {
+            final cellW = (c.maxWidth - 24) / 3; // 3 columns, 2 x 12 spacing
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: kBadges.map((b) {
+                final earned = earnedKeys.contains(b.key);
+                final color = _tierColor(b.tier);
+                return SizedBox(
+                  width: cellW,
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: earned
+                          ? color.withValues(alpha: 0.1)
+                          : AppColors.surface,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: earned ? color : AppColors.border),
                     ),
-                    const SizedBox(height: 6),
-                    Text(b.t(locale),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: earned
-                                ? AppColors.heading
-                                : AppColors.muted)),
-                    const SizedBox(height: 4),
-                    Text(earned ? l10n.badgeEarnedOn : l10n.badgeLocked,
-                        style: TextStyle(
-                            fontSize: 9,
-                            color: earned ? color : AppColors.muted)),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Opacity(
+                          opacity: earned ? 1 : 0.3,
+                          child: Text(b.icon,
+                              style: const TextStyle(fontSize: 34)),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(b.t(locale),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: earned
+                                    ? AppColors.heading
+                                    : AppColors.muted)),
+                        const SizedBox(height: 4),
+                        Text(earned ? l10n.badgeEarnedOn : l10n.badgeLocked,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: 9,
+                                color: earned ? color : AppColors.muted)),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          }),
         ],
       ),
     );

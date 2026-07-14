@@ -139,49 +139,54 @@ class ProfileScreen extends ConsumerWidget {
                 style: const TextStyle(
                     fontWeight: FontWeight.w800, fontSize: 15)),
             const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: 3,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 0.82,
-              children: kBadges.map((b) {
-                final got = earnedKeys.contains(b.key);
-                final color = _tierColor(b.tier);
-                return Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: got
-                        ? color.withValues(alpha: 0.1)
-                        : AppColors.surface,
-                    borderRadius: BorderRadius.circular(14),
-                    border:
-                        Border.all(color: got ? color : AppColors.border),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Opacity(
-                          opacity: got ? 1 : 0.3,
-                          child: Text(b.icon,
-                              style: const TextStyle(fontSize: 30))),
-                      const SizedBox(height: 6),
-                      Text(b.t(loc),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: got
-                                  ? AppColors.heading
-                                  : AppColors.muted)),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
+            // Fixed-WIDTH cells in a Wrap, not a fixed-aspect grid: a pinned
+            // cell height cannot grow with the OS font scale and clipped the
+            // badge labels (see badges_screen for the same fix).
+            LayoutBuilder(builder: (context, c) {
+              final cellW = (c.maxWidth - 24) / 3;
+              return Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: kBadges.map((b) {
+                  final got = earnedKeys.contains(b.key);
+                  final color = _tierColor(b.tier);
+                  return SizedBox(
+                    width: cellW,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: got
+                            ? color.withValues(alpha: 0.1)
+                            : AppColors.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        border:
+                            Border.all(color: got ? color : AppColors.border),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Opacity(
+                              opacity: got ? 1 : 0.3,
+                              child: Text(b.icon,
+                                  style: const TextStyle(fontSize: 30))),
+                          const SizedBox(height: 6),
+                          Text(b.t(loc),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: got
+                                      ? AppColors.heading
+                                      : AppColors.muted)),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              );
+            }),
           ],
         ),
       ),

@@ -49,9 +49,18 @@ class _AuthChoiceScreenState extends ConsumerState<AuthChoiceScreen> {
     return Scaffold(
       body: AmbientBackground(
         child: SafeArea(
-        child: Padding(
+        // Scrollable + min-height: the fixed Column (logo, slogan, intro, three
+        // buttons, guest note) is taller than a 320x640 screen once the OS font
+        // is scaled up. The Spacers still center it whenever there IS room.
+        child: LayoutBuilder(builder: (context, c) {
+        return SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
-          child: Column(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: c.maxHeight - 52),
+            // IntrinsicHeight gives the Column a bounded height inside the
+            // scroll view, which is what the Spacers need to work.
+            child: IntrinsicHeight(
+            child: Column(
             children: [
               const Spacer(),
               Image.asset('assets/logo/sprout.png', width: 96, height: 96),
@@ -111,8 +120,11 @@ class _AuthChoiceScreenState extends ConsumerState<AuthChoiceScreen> {
                   style: TextStyle(
                       color: AppColors.muted, fontSize: 11, height: 1.5)),
             ],
+            ),
+            ),
           ),
-        ),
+        );
+        }),
         ),
       ),
     );

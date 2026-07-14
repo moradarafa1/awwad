@@ -145,7 +145,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       backgroundColor: AppColors.bg,
       // Floating "liquid glass" dock: blurred, translucent, luminous hairline.
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+        // 6 (not 10) horizontal: with 6 tabs every dp of dock width buys ~1dp
+        // of label width, and the longest labels (الإحصائيات / Aujourd'hui)
+        // sit right at the limit on a 360dp screen.
+        padding: const EdgeInsets.fromLTRB(6, 0, 6, 10),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(26),
           child: BackdropFilter(
@@ -246,7 +249,16 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
   Widget _buildNavBar(
       AppLocalizations l10n, int index, String pomodoroLabel) {
-    return NavigationBarTheme(
+    // NavigationDestination.label is a plain String and the SDK renders it as
+    // a bare Text with NO ellipsis, inside an Expanded slot of (width - dock
+    // padding) / 6. So a long label is CLIPPED MID-GLYPH rather than shortened.
+    // Two guards, together enough for the longest labels (الإحصائيات, بومودورو,
+    // Aujourd'hui) on a 360dp screen: a 10px label size, and a text-scale cap
+    // for the dock only (the SDK's own cap of 1.3 is too generous for 6 tabs).
+    // Everything else in the app keeps the user's full accessibility scaling.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.15,
+      child: NavigationBarTheme(
         data: NavigationBarThemeData(
           backgroundColor: Colors.transparent,
           surfaceTintColor: Colors.transparent,
@@ -254,7 +266,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           height: 66,
           indicatorColor: AppColors.accent.withValues(alpha: 0.22),
           labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: states.contains(WidgetState.selected)
                   ? FontWeight.w700
                   : FontWeight.w500,
@@ -301,6 +313,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 selectedIcon: const Icon(Icons.settings),
                 label: l10n.navSettings),
           ],
-        ));
+        ),
+      ),
+    );
   }
 }

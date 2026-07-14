@@ -302,8 +302,14 @@ class AnalyticsSection extends StatelessWidget {
               decoration: BoxDecoration(
                   color: color, borderRadius: BorderRadius.circular(2))),
           const SizedBox(width: 5),
-          Text(label,
-              style: TextStyle(fontSize: 11, color: AppColors.muted)),
+          // The label is a metric name (possibly typed by the user for a
+          // custom habit), so it must shrink to the legend row.
+          Flexible(
+            child: Text(label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 11, color: AppColors.muted)),
+          ),
         ],
       );
 

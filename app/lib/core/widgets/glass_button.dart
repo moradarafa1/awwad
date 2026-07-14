@@ -51,10 +51,18 @@ class GlassButton extends StatelessWidget {
                 Icon(icon, size: 20, color: primary ? AppColors.accent : fg),
                 const SizedBox(width: 8),
               ],
-              Text(
-                label,
-                style: TextStyle(
-                    color: fg, fontWeight: FontWeight.w800, fontSize: 16),
+              // Flexible: the button is stretched by its parent, so a long
+              // label (French, or any locale at a large font scale) must
+              // shrink to the button instead of overflowing it.
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: fg, fontWeight: FontWeight.w800, fontSize: 16),
+                ),
               ),
             ],
           ),

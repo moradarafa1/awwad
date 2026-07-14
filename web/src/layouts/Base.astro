@@ -1,5 +1,5 @@
 ---
-import { t, DIR, LANG_NAME, LOCALES, OG_LOCALE, PAGES, CREDIT_URL, WEB_APP_URL, STORE } from '../content/site.js';
+import { t, DIR, LANG_NAME, LOCALES, OG_LOCALE, PAGES, CREDIT_URL, WEB_APP_URL, STORE, GTM_ID } from '../content/site.js';
 
 const { lang, pageKey, title, description, pageSlug } = Astro.props;
 const dir = DIR[lang];
@@ -86,13 +86,29 @@ const appLd = {
       <script type="application/ld+json" set:html={JSON.stringify(appLd)} />
     )}
 
-    <!-- privacy-light data layer (GTM-style, no third-party) -->
+    <!-- privacy-light data layer (GTM-style; third-party loads ONLY when
+         GTM_ID is set in site.js - empty id keeps the site cookie-free) -->
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ event: 'page_view', path: location.pathname, locale: document.documentElement.lang });
     </script>
+    {GTM_ID && (
+      <script is:inline define:vars={{ gtmId: GTM_ID }}>
+        (function (w, d, s, l, i) {
+          w[l] = w[l] || [];
+          w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+          var f = d.getElementsByTagName(s)[0], j = d.createElement(s);
+          j.async = true;
+          j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i;
+          f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', gtmId);
+      </script>
+    )}
   </head>
   <body>
+    {GTM_ID && (
+      <noscript><iframe src={'https://www.googletagmanager.com/ns.html?id=' + GTM_ID} height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    )}
     <header class="site-header">
       <a class="brand" href={localizedPath(lang, 'home')}>
         <span class="brand-mark"><img src="/logo-mark.png" alt="" width="24" height="24" /></span>
@@ -147,6 +163,12 @@ const appLd = {
 
     <script is:inline define:vars={{ store: STORE, webApp: WEB_APP_URL }}>
       (function () {
+        // Custom events for the data layer (consumed by GTM once GTM_ID is set;
+        // harmless no-op pushes otherwise).
+        function pushCta(cta) {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({ event: 'cta_click', cta: cta, locale: document.documentElement.lang });
+        }
         // Until an app is PUBLISHED (store.androidLive / store.iosLive), its
         // download target is the live web app, never a dead store page.
         var androidHref = store.androidLive ? store.android : webApp;
@@ -156,15 +178,23 @@ const appLd = {
         var i = document.getElementById('aw-dl-ios');
         if (a) a.href = androidHref;
         if (i) i.href = iosHref;
+        if (a) a.addEventListener('click', function () { pushCta(store.androidLive ? 'store' : 'webapp'); });
+        if (i) i.addEventListener('click', function () { pushCta(store.iosLive ? 'store' : 'webapp'); });
         var x = document.getElementById('aw-dl-x');
         if (x) x.addEventListener('click', function () { modal.style.display = 'none'; });
         if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) modal.style.display = 'none'; });
         window.awDownload = function () {
+          pushCta('download');
           var ua = (navigator.userAgent || '').toLowerCase();
           if (ua.indexOf('android') > -1) { window.location.href = androidHref; return; }
           if (/iphone|ipad|ipod/.test(ua)) { window.location.href = iosHref; return; }
           if (modal) modal.style.display = 'flex';
         };
+        // The "use the web version" CTA buttons (not the nav links).
+        var webCtas = document.querySelectorAll('.cta-row a.btn-ghost');
+        for (var k = 0; k < webCtas.length; k++) {
+          webCtas[k].addEventListener('click', function () { pushCta('webapp'); });
+        }
       })();
     </script>
 

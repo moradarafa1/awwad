@@ -70,12 +70,18 @@ class HabitsScreen extends ConsumerWidget {
           children: [
             Text(emoji, style: const TextStyle(fontSize: 18)),
             const SizedBox(width: 8),
-            Text(title,
-                style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 15,
-                    color: AppColors.heading)),
-            const Spacer(),
+            // Expanded (not Text + Spacer): the French section titles alone
+            // overflow this row at the DEFAULT font scale.
+            Expanded(
+              child: Text(title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      color: AppColors.heading)),
+            ),
+            const SizedBox(width: 8),
             Text('${habits.length}/$kMaxHabitsPerTrack',
                 style: TextStyle(color: AppColors.muted, fontSize: 12)),
           ],
@@ -138,17 +144,30 @@ class HabitsScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            // The three trailing controls are compact: at their default sizes
+            // they alone exceed the card on a narrow screen and squeezed the
+            // title out of the row.
             if (!active)
               TextButton(
                 onPressed: () => ref
                     .read(appControllerProvider.notifier)
                     .setActiveHabit(h.id),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
                 child: Text(_s(_kStr['focus']!, loc),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 12)),
               ),
             IconButton(
               icon: Icon(Icons.alarm, color: AppColors.accent, size: 20),
               tooltip: _s(_kStr['reminders']!, loc),
+              padding: EdgeInsets.zero,
+              visualDensity: VisualDensity.compact,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               onPressed: () => _editReminders(context, ref, loc, h),
             ),
             IconButton(
@@ -156,6 +175,9 @@ class HabitsScreen extends ConsumerWidget {
                   color: canDelete ? AppColors.danger : AppColors.border,
                   size: 20),
               tooltip: canDelete ? null : _s(_kStr['lastOne']!, loc),
+              padding: EdgeInsets.zero,
+              visualDensity: VisualDensity.compact,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               onPressed:
                   canDelete ? () => _confirmDelete(context, ref, loc, h) : null,
             ),

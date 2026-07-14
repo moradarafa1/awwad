@@ -95,9 +95,15 @@ class ReminderTimesPicker extends StatelessWidget {
               children: [
                 Icon(Icons.add_alarm, size: 16, color: AppColors.muted),
                 const SizedBox(width: 6),
-                Text(addLabel,
-                    style: TextStyle(
-                        color: AppColors.muted, fontSize: 13)),
+                // mainAxisSize.min does NOT protect the label: as a Wrap child
+                // the Row is still constrained by the (narrow) dialog width.
+                Flexible(
+                  child: Text(addLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: AppColors.muted, fontSize: 13)),
+                ),
               ],
             ),
           ),

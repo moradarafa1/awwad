@@ -302,6 +302,8 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
               habits: st.habits, entries: st.entries, survey: st.survey)
           .catchError((_) {}));
     }
+    // Analytics flush after every save (anonymous events allowed; fail-open).
+    unawaited(AnalyticsService.instance.flush().catchError((_) {}));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.entrySaved), backgroundColor: AppColors.success),
@@ -389,17 +391,30 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
         border:
             Border.all(color: AppColors.accent2.withValues(alpha: 0.35)),
       ),
+      // Both texts are flexible: the rank name and the "days to next rank"
+      // hint are long in Arabic and a non-flex trailing Text overflowed the
+      // row on narrow screens / large font scales.
       child: Row(
         children: [
           Expanded(
+            flex: 3,
             child: Text('${r.emoji} ${_dl(_kRank, 'label', locale)}: ${r.n(locale)}',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 12.5,
                     color: AppColors.accent2)),
           ),
-          Text(nextTxt,
-              style: TextStyle(fontSize: 11, color: AppColors.muted)),
+          const SizedBox(width: 8),
+          Flexible(
+            flex: 2,
+            child: Text(nextTxt,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+                style: TextStyle(fontSize: 11, color: AppColors.muted)),
+          ),
         ],
       ),
     );
@@ -472,9 +487,10 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
               const SizedBox(height: 8),
               TextButton(
                 onPressed: () async {
+                  Navigator.pop(ctx);
+                  if (await _skipQuotaBlocked(locale)) return;
                   await ctrl.skipDay(dayKey(
                       DateTime.now().subtract(const Duration(days: 1))));
-                  if (ctx.mounted) Navigator.pop(ctx);
                 },
                 child: Text(_dl(_kRepair, 'skip', locale)),
               ),
@@ -485,29 +501,34 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     );
   }
 
-  Future<void> _confirmSkipToday(String locale) async {
-    // Enforce the per-habit excused-day quota (2/week, 4/month).
+  /// Enforces the per-habit excused-day quota (2/week, 4/month): when the
+  /// quota is exhausted, shows the explanatory dialog and returns true.
+  Future<bool> _skipQuotaBlocked(String locale) async {
     final blocked = ref.read(appControllerProvider).skipBlockedBy();
-    if (blocked != null) {
-      await showDialog<void>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: AppColors.surface,
-          title: Text(_dl(_kSkip, 'quotaTitle', locale),
-              style: TextStyle(color: AppColors.heading)),
-          content: Text(
-              _dl(_kSkip, blocked == 'week' ? 'quotaWeek' : 'quotaMonth',
-                  locale),
-              style: TextStyle(color: AppColors.text, height: 1.6)),
-          actions: [
-            FilledButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(_dl(_kSkip, 'quotaOk', locale))),
-          ],
-        ),
-      );
-      return;
-    }
+    if (blocked == null) return false;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(_dl(_kSkip, 'quotaTitle', locale),
+            style: TextStyle(color: AppColors.heading)),
+        content: Text(
+            _dl(_kSkip, blocked == 'week' ? 'quotaWeek' : 'quotaMonth',
+                locale),
+            style: TextStyle(color: AppColors.text, height: 1.6)),
+        actions: [
+          FilledButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(_dl(_kSkip, 'quotaOk', locale))),
+        ],
+      ),
+    );
+    return true;
+  }
+
+  Future<void> _confirmSkipToday(String locale) async {
+    if (await _skipQuotaBlocked(locale)) return;
+    if (!mounted) return;
 
     final w = ref.read(appControllerProvider).weeklySkipUsage;
     final m = ref.read(appControllerProvider).monthlySkipUsage;
@@ -1142,10 +1163,17 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
       children: [
         Row(
           children: [
-            Text(label,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w700, fontSize: 13)),
-            const Spacer(),
+            // Expanded (not Text + Spacer): the label can be a long seeded
+            // metric name or a label the user typed for a custom habit, and a
+            // non-flex Text would hard-overflow the row.
+            Expanded(
+              child: Text(label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 13)),
+            ),
+            const SizedBox(width: 8),
             Text('${value.round()}',
                 style: TextStyle(
                     fontWeight: FontWeight.w900, fontSize: 18, color: color)),
@@ -1167,8 +1195,20 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(low, style: TextStyle(color: AppColors.muted, fontSize: 11)),
-            Text(high, style: TextStyle(color: AppColors.muted, fontSize: 11)),
+            Flexible(
+              child: Text(low,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: AppColors.muted, fontSize: 11)),
+            ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(high,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(color: AppColors.muted, fontSize: 11)),
+            ),
           ],
         ),
       ],

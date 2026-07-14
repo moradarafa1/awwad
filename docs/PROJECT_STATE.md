@@ -42,7 +42,33 @@ context or dropping anything:
 
 ---
 
-## 0.5 HANDOFF 2026-07-16 (context overflow — RESUME HERE, execute in order)
+## 0.5 HANDOFF 2026-07-14 round 2 (RESUME HERE)
+
+**Done this round (committed, NOT yet deployed):** skip quotas wired to the UI (both entry
+points) + rolling-window tests; TRACKING data layer live (app flushes `analytics_events` on
+open + after save, standard params, allow-list completed, anon INSERT verified against the
+live DB; site GTM scaffold behind `GTM_ID` in site.js, empty = no third-party, + `cta_click`
+dataLayer events; tracking-plan.md now carries the GA4/MMP mapping + MMP owner-gated note);
+BUTTON/LAYOUT OVERFLOW ROUND (13 real defects fixed, incl. a hard "infinite width" layout
+crash on the Pomodoro screen in EVERY locale) with `test/layout_overflow_test.dart` locking
+them down (pumps screens at 320dp + 1.3x text scale in ar/en/fr); LOGO fixed to be the
+owner's plant image itself (see §11 - never redraw it again).
+
+**EXECUTE NEXT, in order:**
+1. Full build (web `--base-href /app/` + apk + aab with the §6 dart-defines) + `npm run build`
+   in web/ + deploy GitHub Pages (site dist at root KEEPING app/, new app build at /app/,
+   404.html copy) + byte-match verify + push. Pages clone lives in this session's scratchpad;
+   re-clone github.com/moradarafa1/moradarafa1.github.io if gone. Last DEPLOYED commit is the
+   tab-titles round: the logo, signup rework, truce nav, tracking and all layout fixes are
+   NOT live yet. OWNER GATE: ask before deploying (owner chose "finish the remaining screens
+   first" on 2026-07-14; the screens are now done, so the next ask should be the deploy).
+2. Then TODO 0d Phase A (religious-habits engine) - the owner re-confirmed the full spec
+   (prayer-times by GPS + city fallback + editable times + 5-min-before toggle + adhan sound,
+   adhkar at fajr+30/asr+30, Kahf on Friday, islamweb-sourced duas, scholar videos <15min for
+   religious habits only, monthly report push). Start by registering
+   app/assets/data/{cities,reciters,scholar_videos}.json in pubspec.
+
+## 0.5-OLD HANDOFF 2026-07-16 (context overflow — superseded, kept for the file map)
 
 **State committed in this very commit (built earlier but NOT yet deployed to Pages):**
 seedling logo rolled out everywhere (masters assets/icons/*.svg + all derived/launcher/splash/site/store assets); signup form reworked (order: name* -> email* -> password* -> gender* -> optional extras LAST; starred labels; missing-field toasts + email regex on signup/sign-in/reset); password EYE toggles (auth screen ×2 + profile change-password via StatefulBuilder); Settings ACCOUNT CARD moved under Language, reactive via `SupabaseService.authRevision` (ValueNotifier bumped on init + onAuthStateChange) — signed-in shows «حسابك» + email -> ProfileScreen, signed-out shows create/sign-in (fixes "asks to sign in although logged in"); RESET flow split into TWO steps (code-only -> verify -> new-password-only; `_recoveryVerified` gates fields/labels/resend); savings calculator = cost field ONLY (minutes removed everywhere); reminder labels renamed «وقت التذكير بتسجيل تقدمك اليومي» (arb ×3 + add_habit + habits_screen); BOTTOM NAV: History tab REPLACED by «هُدنة» ACTION (danger shield icon; index 3 intercepted in home_shell -> if 0 break habits: hint toast; if 1: straight to SOS; if >1: bottom-sheet picker «أي عادة تحتاج هُدنة الآن؟» -> `SosScreen(habitId:)` (new param resolves habit over active)); HISTORY merged into Stats as sub-tab (`statsSubTabProvider`, segmented toggle الإحصائيات|السجل, embeddable `HistoryList` in history_screen.dart, skip days render with ➖ chip); AppState SKIP QUOTAS added — LOGIC ONLY, **NOT WIRED TO UI YET**: kSkipsPerWeek=2 (rolling 7d), kSkipsPerMonth=4 (rolling 30d), anchored at the habit's FIRST-ever skip, renewing per whole period (`weeklySkipUsage`/`monthlySkipUsage`/`skipBlockedBy()` -> null|'week'|'month').
@@ -416,6 +442,14 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 11. Brand & content rules
 
+- **LOGO (owner ruling 2026-07-14): the mark IS `app/assets/logo/sprout.png`, the plant shown
+  next to «أبني عادة جديدة» in the app. NEVER re-draw it in SVG.** Every icon is COMPOSITED
+  from that PNG by `ops/icongen/gen.mjs` (app icon = plant on the #12161F rounded tile),
+  `ops/icongen/site-icons.mjs` (favicon/192/512/apple-touch/logo-mark/play-icon) and
+  `ops/icongen/banners.mjs` (og-image 1200x630 + play-feature 1024x500). A previous round
+  shipped a hand-drawn "emoji-style seedling" instead; the owner rejected it («هي هي دي، مش
+  تصنعها من جديد»). To change any icon: edit sprout.png, re-run the three scripts, then
+  `flutter pub run flutter_launcher_icons` + `flutter_native_splash:create`.
 - **Name:** عوّاد / Awwad. **Slogan:** «رفيقٌ مَن زانَ عُمرَه، وحُسُنُ عملَه» (note the
   tashkeel on حُسُنُ: ح, س, ن all carry damma). Set in `app_ar.arb` `slogan` + `site.js` ar `slogan`.
 - **Colors:** dark theme. App accents: blue `#4f8ef7`, teal `#2dd4bf`, amber `#f59e0b`.
@@ -504,8 +538,10 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
      encouragement, and PER-HABIT relapse solutions (scientific/HRT for behavioral,
      islamweb-sourced for religious; sensible generic template for CUSTOM habits).
      Content generated + adversarially verified per the established workflow pattern.
-   DATA PREP (workflow launched 2026-07-14): cities JSON, reciters JSON w/ mp3quran ids,
-   verified scholar videos per religious habit.
+   DATA PREP (workflow 2026-07-14): DONE — committed at
+   app/assets/data/{cities,reciters,scholar_videos}.json (306 cities / 50 reciters /
+   25 verified videos). Deliberately NOT registered in pubspec `assets:` yet to avoid
+   shipping unused bytes; ADD THE pubspec REGISTRATION as the first step of Phase A.
 
 0b. **Phone-usage control for `phone_addiction` (owner-requested).** Goal: Awwad lets the user
    pick apps and limits/monitors time on them. **Feasibility & plan:**
@@ -567,6 +603,45 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-14 round 2 (skip quotas wired + TRACKING layer + LAYOUT-OVERFLOW round + logo
+  corrected)** - **(1) SKIP QUOTAS UI**: `skipBlockedBy()` now gates BOTH skip entry points
+  (`_confirmSkipToday` and the skip option in the yesterday-repair sheet) via a shared
+  `_skipQuotaBlocked()`; the confirm dialog shows the remaining week/month allowance; ar/en/fr
+  MSA copy; rolling-window tests (anchor renewal at week/month boundaries, exhausted week,
+  exhausted month). **(2) TRACKING DATA LAYER**: `AnalyticsService` no longer only buffers - it
+  batch-INSERTs into Supabase `analytics_events` on app open (after cloud init) and after every
+  saved entry, fail-open, 200-event cap, user_id stamped at flush; every event is enriched with
+  {platform, app_version, locale} and habit events carry habit_track/catalog_key; the allow-list
+  gained the 13 events that were being tracked but would have tripped the debug assert. Anon
+  INSERT policy + grants verified against the LIVE DB with a real REST insert (201, row deleted
+  after). WEB: `GTM_ID` const in site.js (EMPTY = no GTM script, no cookies) + conditional GTM
+  head/noscript in Base.astro + `cta_click` dataLayer pushes (download/webapp/store) on the CTAs;
+  docs/tracking-plan.md rewritten with the standard params, the flush contract, the full event
+  catalog, a GA4/MMP name-mapping table and the owner-gated MMP note. **(3) LAYOUT/OVERFLOW
+  ROUND** (audit workflow + an empirical pump-every-screen workflow at 320dp x 1.3 text scale in
+  ar/en/fr): 13 real defects fixed. CRITICAL: pomodoro Reset button had `minimumSize:
+  Size.fromHeight(52)` = an INFINITE min width inside a Row -> "BoxConstraints forces an infinite
+  width" EVERY FRAME in EVERY locale (a separate sweep proved it was the only instance of that
+  bug class). Also: pomodoro phase Row -> Wrap + dial FittedBox; daily-log rank line and slider
+  header/captions made flexible + 30-char cap on user-typed metric labels; habit-picker chips
+  (onboarding + add-habit) bounded by a text-scale-aware ConstrainedBox; "custom habit" tile;
+  badge grids in Badges + Profile switched from a fixed-aspect GridView to intrinsic-height Wrap
+  cells (they clipped even at the default font scale); habits-screen section headers (broken at
+  1.0 in fr) and tile controls; reminder-times "add" chip; GlassButton label; auth-choice screen
+  made scrollable; signup "optional" row; usage-screen total row + limit dialog (now scrollable
+  so the keyboard cannot clip it); settings language Row -> Wrap (labels were breaking into 4
+  lines); SectionCard now hosts a transparent Material so ListTile ripples are visible.
+  Round 2 of the same pass (screens the first sweep never reached): the Stats HISTORY sub-tab
+  was broken in ALL locales (date/status header row and every key/value row overflowed by
+  28-101px), and the trend-chart + heatmap legends overflowed; onboarding pumped clean.
+  New `test/layout_overflow_test.dart` (28 cases: pomodoro, daily log, badges, profile, habits,
+  settings, auth-choice, add-habit picker, stats + history sub-tab, onboarding walk-through,
+  each in ar/en/fr at 320dp x 1.3) locks all of this down. **(4) LOGO CORRECTED**:
+  the icons were a hand-drawn "emoji-style seedling"; the owner asked for the plant itself
+  («هي هي دي، مش تصنعها من جديد»), so ops/icongen now COMPOSITES `app/assets/logo/sprout.png`
+  onto the brand tile (new gen.mjs + site-icons.mjs + banners.mjs) and every launcher/splash/
+  site/store asset was regenerated from it (see §11). Verified: analyze clean, all tests green,
+  site 112 pages, 0 em-dashes.
 - **2026-07-14 (SEEDLING LOGO REDESIGN + tab titles + signup-form rework + marketing PDF)** -
   **(1) Marketing kit PDF** (owner request): docs/marketing/Awwad_Marketing_Kit.pdf (also
   copied to the owner's OneDrive Desktop) - cover + trilingual-sourced Arabic explainer
