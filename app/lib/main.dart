@@ -52,7 +52,11 @@ class AwwadApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appControllerProvider).settings;
     return MaterialApp(
-      onGenerateTitle: (context) => AppLocalizations.of(context).appName,
+      // Browser-tab / task-switcher title = brand + slogan (owner request).
+      onGenerateTitle: (context) {
+        final l = AppLocalizations.of(context);
+        return '${l.appName} | ${l.slogan}';
+      },
       debugShowCheckedModeBanner: false,
       theme: buildAwwadTheme(dark: settings.darkMode),
       locale: settings.locale != null ? Locale(settings.locale!) : null,

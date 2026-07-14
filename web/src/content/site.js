@@ -51,7 +51,7 @@ export const t = {
     dl_soon: 'قريباً على المتاجر، استخدم إصدار الويب الآن',
     pages: {
       home: {
-        title: 'عوّاد | تخلَّص من عادةٍ سيّئة أو ابنِ عادةً جديدة',
+        title: 'عوّاد | رفيقٌ مَن زانَ عُمرَه، وحُسُنُ عملَه',
         description: 'تطبيقٌ عربيّ يساعدك على التخلُّص من عادةٍ سيّئة أو بناء عادةٍ جديدة، بمنهجٍ علميّ (HRT) وروحٍ داعمةٍ متوافقةٍ مع قيمك. مجّانيّ، يحفظ خصوصيّتك، ويعمل دون اتصال بالإنترنت.',
         h1: 'لليوم فقط، خطوة واحدة لنتغير',
         sub: 'رفيقك اليوميّ لتغيير العادات: خطوةٌ واحدةٌ كلّ يوم، بمنهجٍ علميٍّ وروحٍ داعمة.',
@@ -152,7 +152,7 @@ export const t = {
     dl_soon: 'Coming soon to the stores, use the web version for now',
     pages: {
       home: {
-        title: 'Awwad | Break a bad habit or build a new one',
+        title: 'Awwad | Always for the better',
         description: 'An app that helps you break a bad habit or build a new one with an evidence-based method (HRT) and a supportive, values-aligned tone. Free, private, works offline.',
         h1: 'Just for today, one step to change',
         sub: 'Your daily companion for changing habits: one step a day, with a proven method and a supportive spirit.',
@@ -253,7 +253,7 @@ export const t = {
     dl_soon: 'Bientôt sur les stores, utilisez la version web en attendant',
     pages: {
       home: {
-        title: 'Awwad | Arrêtez une mauvaise habitude ou bâtissez-en une nouvelle',
+        title: 'Awwad | Toujours pour le meilleur',
         description: "Une app qui vous aide à arrêter une mauvaise habitude ou à en bâtir une nouvelle avec une méthode éprouvée (HRT) et un ton bienveillant aligné sur vos valeurs. Gratuit, privé, hors ligne.",
         h1: "Juste pour aujourd'hui, un pas pour changer",
         sub: "Votre compagnon quotidien pour changer vos habitudes : un pas par jour, avec une méthode éprouvée.",
