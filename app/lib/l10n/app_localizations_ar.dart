@@ -148,7 +148,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get habitWhyHint => 'اكتب سببك، فهو يُذكّرك في أوقات الضعف';
 
   @override
-  String get reminderTime => 'وقت التذكير اليومي';
+  String get reminderTime => 'وقت التذكير بتسجيل تقدمك اليومي';
 
   @override
   String get startJourney => 'ابدأ الرحلة';

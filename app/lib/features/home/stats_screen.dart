@@ -10,9 +10,13 @@ import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import 'analytics_section.dart';
 import 'habit_switcher.dart';
+import 'history_screen.dart' show HistoryList;
 import 'journey_cards.dart';
 import 'home_shell.dart' show homeTabProvider;
 import 'month_heatmap.dart';
+
+/// Internal Stats sub-tab: 0 = analytics, 1 = history (السجل merged in).
+final statsSubTabProvider = StateProvider<int>((ref) => 0);
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -47,7 +51,14 @@ class StatsScreen extends ConsumerWidget {
                   fontSize: 22, fontWeight: FontWeight.w900)),
           const SizedBox(height: 12),
           const HabitSwitcher(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+          // Sub-tabs: analytics vs history (السجل, merged here per the nav
+          // redesign that replaced the History tab with «هُدنة»).
+          _subTabs(context, ref, locale),
+          const SizedBox(height: 14),
+          if (ref.watch(statsSubTabProvider) == 1) ...[
+            const HistoryList(),
+          ] else ...[
           Row(
             children: [
               Expanded(
@@ -170,8 +181,47 @@ class StatsScreen extends ConsumerWidget {
                       color: AppColors.success)),
             ],
           ),
+          ], // end analytics sub-tab
         ],
       ),
     );
+  }
+
+  Widget _subTabs(BuildContext context, WidgetRef ref, String locale) {
+    final sel = ref.watch(statsSubTabProvider);
+    final labels = const {
+      'ar': ['الإحصائيات', 'السجل'],
+      'en': ['Analytics', 'History'],
+      'fr': ['Stats', 'Historique'],
+    };
+    final l = labels[locale] ?? labels['en']!;
+    Widget seg(int i, String text) => Expanded(
+          child: GestureDetector(
+            onTap: () => ref.read(statsSubTabProvider.notifier).state = i,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 9),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: sel == i
+                    ? AppColors.accent.withValues(alpha: 0.16)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(9),
+                border: Border.all(
+                    color: sel == i ? AppColors.accent : AppColors.border),
+              ),
+              child: Text(text,
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight:
+                          sel == i ? FontWeight.w700 : FontWeight.w500,
+                      color: sel == i ? AppColors.heading : AppColors.muted)),
+            ),
+          ),
+        );
+    return Row(children: [
+      seg(0, l[0]),
+      const SizedBox(width: 8),
+      seg(1, l[1]),
+    ]);
   }
 }

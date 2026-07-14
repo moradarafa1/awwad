@@ -149,7 +149,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Write your reason, it will remind you in weak moments';
 
   @override
-  String get reminderTime => 'Daily reminder time';
+  String get reminderTime => 'Daily progress reminder time';
 
   @override
   String get startJourney => 'Start the journey';

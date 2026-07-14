@@ -187,6 +187,33 @@ void main() {
       expect(c.longestStreak, 2);
     });
 
+    test('skip quota: 2/week and 4/month, from first skip', () {
+      String k(int daysAgo) =>
+          dayKey(DateTime.now().subtract(Duration(days: daysAgo)));
+      DailyEntry skip(String date) => DailyEntry(
+          id: 's$date', habitId: 'h', date: date, urge: 0, resistance: 0,
+          didSlip: false, entryType: 'skip', createdAt: DateTime(2026, 1, 1));
+      AppState st(List<DailyEntry> e) => AppState(
+            settings: const AppSettings(activeHabitId: 'h'),
+            habits: [
+              Habit(id: 'h', track: 'break', title: 'x', createdAt: DateTime(2026, 1, 1)),
+            ],
+            entries: e,
+          );
+      // No skips -> allowed.
+      expect(st([]).skipBlockedBy(), isNull);
+      // 1 skip this week -> still allowed.
+      expect(st([skip(k(0))]).skipBlockedBy(), isNull);
+      // 2 skips within the current week window -> weekly quota hit.
+      expect(st([skip(k(1)), skip(k(0))]).skipBlockedBy(), 'week');
+      // Old skips outside the rolling week don't count against the week, but
+      // 4 within the month exhaust the monthly quota.
+      final monthly = st([skip(k(20)), skip(k(15)), skip(k(9)), skip(k(0))]);
+      expect(monthly.weeklySkipUsage.used, 1); // only k(0) is in this week
+      expect(monthly.monthlySkipUsage.used, 4);
+      expect(monthly.skipBlockedBy(), 'month');
+    });
+
     test('ranks resolve from streak with correct next rank', () {
       expect(rankForStreak(0).name['ar'], 'بذرة العزم');
       expect(rankForStreak(8).name['ar'], 'راسخ الأسبوع');

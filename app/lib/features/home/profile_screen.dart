@@ -190,25 +190,39 @@ class ProfileScreen extends ConsumerWidget {
 
   Future<void> _changePassword(BuildContext context, String loc) async {
     final ctrl = TextEditingController();
+    var obscure = true;
     final newPass = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text(_s(_kAcc['changePw']!, loc),
-            style: TextStyle(color: AppColors.heading)),
-        content: TextField(
-          controller: ctrl,
-          obscureText: true,
-          decoration: InputDecoration(labelText: _s(_kAcc['newPw']!, loc)),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(_s(_kAcc['changePw']!, loc),
+              style: TextStyle(color: AppColors.heading)),
+          content: TextField(
+            controller: ctrl,
+            obscureText: obscure,
+            decoration: InputDecoration(
+              labelText: _s(_kAcc['newPw']!, loc),
+              suffixIcon: IconButton(
+                onPressed: () => setLocal(() => obscure = !obscure),
+                icon: Icon(
+                    obscure
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    size: 20,
+                    color: AppColors.muted),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(_s(_kAcc['cancel']!, loc))),
+            FilledButton(
+                onPressed: () => Navigator.pop(ctx, ctrl.text),
+                child: Text(_s(_kAcc['save']!, loc))),
+          ],
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(_s(_kAcc['cancel']!, loc))),
-          FilledButton(
-              onPressed: () => Navigator.pop(ctx, ctrl.text),
-              child: Text(_s(_kAcc['save']!, loc))),
-        ],
       ),
     );
     ctrl.dispose();

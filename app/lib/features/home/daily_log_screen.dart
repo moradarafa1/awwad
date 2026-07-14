@@ -132,6 +132,33 @@ const Map<String, Map<String, String>> _kSkip = {
   },
   'cancel': {'ar': 'إلغاء', 'en': 'Cancel', 'fr': 'Annuler'},
   'ok': {'ar': 'إعفاء اليوم', 'en': 'Excuse it', 'fr': 'Exempter'},
+  'remaining': {
+    'ar': 'المتبقي لك: {w} هذا الأسبوع · {m} هذا الشهر',
+    'en': 'Remaining: {w} this week · {m} this month',
+    'fr': 'Restant : {w} cette semaine · {m} ce mois',
+  },
+  'quotaTitle': {
+    'ar': 'انتهت فرص الإعفاء',
+    'en': 'No excuse days left',
+    'fr': "Plus de jours d'exemption",
+  },
+  'quotaWeek': {
+    'ar':
+        'استنفدت فرص الإعفاء لهذا الأسبوع (٢ أسبوعياً). تتجدد فرصك في بداية أسبوعك القادم. الثبات الحقيقي يُبنى بالاستمرار.',
+    'en':
+        'You have used all your excuse days this week (2 per week). They renew at the start of your next week.',
+    'fr':
+        "Vous avez épuisé vos exemptions cette semaine (2 par semaine). Elles se renouvellent la semaine prochaine.",
+  },
+  'quotaMonth': {
+    'ar':
+        'استنفدت فرص الإعفاء لهذا الشهر (٤ شهرياً). تتجدد فرصك في بداية شهرك القادم. واصل، أنت أقوى مما تظن.',
+    'en':
+        'You have used all your excuse days this month (4 per month). They renew at the start of your next month.',
+    'fr':
+        "Vous avez épuisé vos exemptions ce mois (4 par mois). Elles se renouvellent le mois prochain.",
+  },
+  'quotaOk': {'ar': 'حسناً', 'en': 'OK', 'fr': 'OK'},
 };
 
 const Map<String, Map<String, String>> _kRepair = {
@@ -459,13 +486,54 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
   }
 
   Future<void> _confirmSkipToday(String locale) async {
+    // Enforce the per-habit excused-day quota (2/week, 4/month).
+    final blocked = ref.read(appControllerProvider).skipBlockedBy();
+    if (blocked != null) {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(_dl(_kSkip, 'quotaTitle', locale),
+              style: TextStyle(color: AppColors.heading)),
+          content: Text(
+              _dl(_kSkip, blocked == 'week' ? 'quotaWeek' : 'quotaMonth',
+                  locale),
+              style: TextStyle(color: AppColors.text, height: 1.6)),
+          actions: [
+            FilledButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(_dl(_kSkip, 'quotaOk', locale))),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final w = ref.read(appControllerProvider).weeklySkipUsage;
+    final m = ref.read(appControllerProvider).monthlySkipUsage;
+    final remainInfo = _dl(_kSkip, 'remaining', locale)
+        .replaceFirst('{w}', '${w.limit - w.used}')
+        .replaceFirst('{m}', '${m.limit - m.used}');
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(_dl(_kSkip, 'title', locale)),
-        content: Text(_dl(_kSkip, 'body', locale),
-            style: TextStyle(color: AppColors.text, height: 1.6)),
+        title: Text(_dl(_kSkip, 'title', locale),
+            style: TextStyle(color: AppColors.heading)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(_dl(_kSkip, 'body', locale),
+                style: TextStyle(color: AppColors.text, height: 1.6)),
+            const SizedBox(height: 10),
+            Text(remainInfo,
+                style: TextStyle(
+                    color: AppColors.accent2,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700)),
+          ],
+        ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),

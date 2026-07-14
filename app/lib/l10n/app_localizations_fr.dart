@@ -150,7 +150,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Écrivez votre raison, elle vous rappellera dans les moments difficiles';
 
   @override
-  String get reminderTime => 'Heure du rappel quotidien';
+  String get reminderTime => 'Heure du rappel de progrès';
 
   @override
   String get startJourney => 'Commencer le parcours';

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
 import '../../core/catalog/habit_content.dart';
+import '../../core/models.dart';
 import '../../core/state/app_state.dart';
 import '../shield/dns_shield_screen.dart';
 
@@ -19,7 +20,13 @@ import '../shield/dns_shield_screen.dart';
 ///   5. short adhkar (respects the religious-content toggle).
 /// Pure Flutter: works on Android, iOS and web with zero permissions.
 class SosScreen extends ConsumerStatefulWidget {
-  const SosScreen({super.key});
+  const SosScreen({super.key, this.habitId});
+
+  /// When set (from the «هُدنة» nav flow), the screen targets THIS habit
+  /// instead of the active one, so the user can get help for any break habit
+  /// without switching their active tab context.
+  final String? habitId;
+
   @override
   ConsumerState<SosScreen> createState() => _SosScreenState();
 }
@@ -74,7 +81,15 @@ class _SosScreenState extends ConsumerState<SosScreen>
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context).languageCode;
     final s = ref.watch(appControllerProvider);
-    final habit = s.activeHabit;
+    Habit? habit = s.activeHabit;
+    if (widget.habitId != null) {
+      for (final h in s.habits) {
+        if (h.id == widget.habitId) {
+          habit = h;
+          break;
+        }
+      }
+    }
     final actions =
         habitChecklistLabels(habit?.catalogKey, 'competing_response', locale)
             .take(4)

@@ -210,6 +210,58 @@ class AppState {
     }
     return null;
   }
+
+  // ----- excused-day (skip) quotas: 2 per rolling week, 4 per rolling month,
+  // counted PER HABIT from that habit's FIRST skip, renewing every 7 / ~30 days.
+  static const int kSkipsPerWeek = 2;
+  static const int kSkipsPerMonth = 4;
+
+  /// The active habit's skip entries, oldest first.
+  List<DailyEntry> get _activeSkips {
+    final id = activeHabitId;
+    if (id == null) return const [];
+    final list = entries
+        .where((e) => e.habitId == id && e.isSkip)
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+    return list;
+  }
+
+  /// Skips used in the current rolling window since the FIRST-ever skip.
+  /// [periodDays] = 7 (week) or 30 (month). Returns (used, limit).
+  ({int used, int limit}) _skipUsage(int periodDays, int limit) {
+    final skips = _activeSkips;
+    if (skips.isEmpty) return (used: 0, limit: limit);
+    final firstParts = skips.first.date.split('-').map(int.parse).toList();
+    final anchor = DateTime(firstParts[0], firstParts[1], firstParts[2]);
+    final today = DateTime.now();
+    // How many whole periods have elapsed since the anchor; the current
+    // window starts at anchor + periodsElapsed*period.
+    final daysSince = today.difference(anchor).inDays;
+    final periodsElapsed = daysSince < 0 ? 0 : daysSince ~/ periodDays;
+    final windowStart = anchor.add(Duration(days: periodsElapsed * periodDays));
+    final startKey = dayKey(windowStart);
+    var used = 0;
+    for (final e in skips) {
+      if (e.date.compareTo(startKey) >= 0) used++;
+    }
+    return (used: used, limit: limit);
+  }
+
+  ({int used, int limit}) get weeklySkipUsage =>
+      _skipUsage(7, kSkipsPerWeek);
+  ({int used, int limit}) get monthlySkipUsage =>
+      _skipUsage(30, kSkipsPerMonth);
+
+  /// null = a skip is allowed now; otherwise 'week' or 'month' = the exhausted
+  /// quota, so the UI can show the right message.
+  String? skipBlockedBy() {
+    final w = weeklySkipUsage;
+    if (w.used >= w.limit) return 'week';
+    final m = monthlySkipUsage;
+    if (m.used >= m.limit) return 'month';
+    return null;
+  }
 }
 
 class AppController extends Notifier<AppState> {

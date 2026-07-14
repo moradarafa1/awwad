@@ -5,8 +5,46 @@ import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
 import '../../core/catalog/habit_daily_content.dart';
+import '../../core/models.dart';
 import '../../core/state/app_state.dart';
 import 'habit_switcher.dart';
+
+/// Embeddable history list for the ACTIVE habit (no header/switcher), so it
+/// can be shown inside the Stats screen's «السجل» tab. The standalone
+/// HistoryScreen below wraps it with a title + habit switcher.
+class HistoryList extends ConsumerWidget {
+  const HistoryList({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).languageCode;
+    final s = ref.watch(appControllerProvider);
+    final entries = s.activeEntries;
+    final habit = s.activeHabit;
+    final metrics = resolveMetrics(
+      catalogKey: habit?.catalogKey,
+      track: habit?.track ?? 'break',
+      customPrimary: habit?.customMetricPrimary,
+      customSecondary: habit?.customMetricSecondary,
+      generatedOverride: kHabitMetricsOverrides[habit?.catalogKey],
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (entries.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(40),
+            child: Text(l10n.noHistory,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.muted)),
+          )
+        else
+          ...entries.map((e) => _historyCard(context, e, l10n, locale, metrics)),
+      ],
+    );
+  }
+}
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
@@ -47,86 +85,96 @@ class HistoryScreen extends ConsumerWidget {
                   style: TextStyle(color: AppColors.muted)),
             )
           else
-            ...entries.map((e) {
-              final clean = !e.didSlip;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text('📅 ${e.date}',
-                            style: TextStyle(
-                                color: AppColors.accent,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12)),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: (clean
-                                    ? AppColors.success
-                                    : AppColors.danger)
-                                .withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                                color: clean
-                                    ? AppColors.success
-                                    : AppColors.danger),
-                          ),
-                          child: Text(
-                              clean
-                                  ? '✅ ${l10n.badgeClean}'
-                                  : '⚠️ ${l10n.badgeSlip}',
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: clean
-                                      ? AppColors.success
-                                      : AppColors.danger)),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    _row(metrics.primary.l(locale), '${e.urge}/10'),
-                    _row(metrics.secondary.l(locale), '${e.resistance}/10'),
-                    if (e.moodEmoji != null)
-                      _row(l10n.moodLabel, '${e.moodEmoji} ${e.moodLabel ?? ''}'),
-                    if (e.note != null && e.note!.isNotEmpty)
-                      _row(l10n.noteLabel, e.note!),
-                  ],
-                ),
-              );
-            }),
+            ...entries.map(
+                (e) => _historyCard(context, e, l10n, locale, metrics)),
         ],
       ),
     );
   }
+}
 
-  Widget _row(String k, String v) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Row(
+Widget _historyCard(BuildContext context, DailyEntry e, AppLocalizations l10n,
+    String locale, HabitMetrics metrics) {
+  final clean = !e.didSlip;
+  final skip = e.isSkip;
+  return Container(
+    margin: const EdgeInsets.only(bottom: 10),
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: AppColors.border),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Text(k,
-                style: TextStyle(color: AppColors.muted, fontSize: 12)),
+            Text('📅 ${e.date}',
+                style: TextStyle(
+                    color: AppColors.accent,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12)),
             const Spacer(),
-            Flexible(
-              child: Text(v,
-                  textAlign: TextAlign.end,
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: (skip
+                        ? AppColors.muted
+                        : (clean ? AppColors.success : AppColors.danger))
+                    .withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                    color: skip
+                        ? AppColors.muted
+                        : (clean ? AppColors.success : AppColors.danger)),
+              ),
+              child: Text(
+                  skip
+                      ? '➖'
+                      : (clean
+                          ? '✅ ${l10n.badgeClean}'
+                          : '⚠️ ${l10n.badgeSlip}'),
                   style: TextStyle(
-                      color: AppColors.text,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600)),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: skip
+                          ? AppColors.muted
+                          : (clean
+                              ? AppColors.success
+                              : AppColors.danger))),
             ),
           ],
         ),
-      );
+        if (!skip) ...[
+          const SizedBox(height: 8),
+          _row(metrics.primary.l(locale), '${e.urge}/10'),
+          _row(metrics.secondary.l(locale), '${e.resistance}/10'),
+          if (e.moodEmoji != null)
+            _row(l10n.moodLabel, '${e.moodEmoji} ${e.moodLabel ?? ''}'),
+          if (e.note != null && e.note!.isNotEmpty)
+            _row(l10n.noteLabel, e.note!),
+        ],
+      ],
+    ),
+  );
 }
+
+Widget _row(String k, String v) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Text(k, style: TextStyle(color: AppColors.muted, fontSize: 12)),
+          const Spacer(),
+          Flexible(
+            child: Text(v,
+                textAlign: TextAlign.end,
+                style: TextStyle(
+                    color: AppColors.text,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );

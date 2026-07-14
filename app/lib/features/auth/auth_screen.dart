@@ -36,6 +36,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       widget.startInSignUp ? _AuthMode.signUp : _AuthMode.signIn;
   bool _codeStep = false; // signUp: verify code; reset: code + new password
   bool _busy = false;
+  // Eye toggle: show/hide the password (visible text is also copyable).
+  bool _obscurePassword = true;
   // The recovery code is ONE-TIME: verifyOTP consumes it and signs the user
   // in even if the subsequent updateUser fails (e.g. same_password). Track
   // that so a retry goes straight to changePassword instead of re-consuming
@@ -84,6 +86,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   String _tr(String k) =>
       (_regStrings[Localizations.localeOf(context).languageCode] ??
           _regStrings['en']!)[k]!;
+
+  Widget _eyeToggle() => IconButton(
+        onPressed: () =>
+            setState(() => _obscurePassword = !_obscurePassword),
+        icon: Icon(
+            _obscurePassword
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+            size: 20,
+            color: AppColors.muted),
+      );
 
   Widget _genderChip(String value, String label) {
     final sel = _gender == value;
@@ -209,13 +222,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   // ---- flow steps ----
 
+  static final _emailRe = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$');
+
   Future<void> _submitSignUpForm() async {
-    if (_gender == null) {
-      _toast(_tr('chooseGender'));
+    // Required-field checks, in visual order, each with the conventional
+    // toast (fields are starred; the toast fires only when one is missed).
+    if (_name.text.trim().isEmpty) {
+      _toast(_tr('nameRequired'));
+      return;
+    }
+    final emailText = _email.text.trim();
+    if (emailText.isEmpty) {
+      _toast(_tr('emailRequired'));
+      return;
+    }
+    if (!_emailRe.hasMatch(emailText)) {
+      _toast(_tr('errBadEmail'));
       return;
     }
     if (_password.text.length < 6) {
       _toast(_tr('errWeakPassword'));
+      return;
+    }
+    if (_gender == null) {
+      _toast(_tr('chooseGender'));
       return;
     }
     await _run(() async {
@@ -285,6 +315,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   Future<void> _submitSignIn() async {
+    if (_email.text.trim().isEmpty) {
+      _toast(_tr('emailRequired'));
+      return;
+    }
+    if (_password.text.isEmpty) {
+      _toast(_tr('passwordRequired'));
+      return;
+    }
     await _run(() async {
       try {
         await SupabaseService.signInWithPassword(
@@ -315,6 +353,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   Future<void> _submitResetEmail() async {
+    final emailText = _email.text.trim();
+    if (emailText.isEmpty) {
+      _toast(_tr('emailRequired'));
+      return;
+    }
+    if (!_emailRe.hasMatch(emailText)) {
+      _toast(_tr('errBadEmail'));
+      return;
+    }
     await _run(() async {
       await SupabaseService.sendPasswordResetCode(_email.text.trim());
       AnalyticsService.instance.track('otp_sent');
@@ -327,25 +374,37 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     });
   }
 
+  // Reset is TWO screens: (1) enter the code only -> verify; (2) once the
+  // code is verified, enter the new password only. Splitting keeps each step
+  // focused and matches conventional reset UX.
   Future<void> _submitResetCode() async {
-    final code = _normDigits(_otp.text.trim());
-    if (!_recoveryVerified && code.isEmpty) {
-      _toast(_tr('errBadOtp'));
+    // Step 1: verify the emailed code (OTP field only on screen).
+    if (!_recoveryVerified) {
+      final code = _normDigits(_otp.text.trim());
+      if (code.isEmpty) {
+        _toast(_tr('errBadOtp'));
+        return;
+      }
+      await _run(() async {
+        await SupabaseService.verifyRecoveryCode(_email.text.trim(), code);
+        AnalyticsService.instance.track('otp_verified', {'success': true});
+        if (!mounted) return;
+        setState(() {
+          _recoveryVerified = true; // reveal the new-password field
+          _obscurePassword = true;
+          _password.clear();
+        });
+        _toast(_tr('resetEnterNewPw'));
+      });
       return;
     }
+    // Step 2: set the new password. The code was already consumed, so a
+    // failed updateUser retry must NOT re-verify (we stay signed in).
     if (_password.text.length < 6) {
       _toast(_tr('errWeakPassword'));
       return;
     }
     await _run(() async {
-      // The code is one-time: once verified we are signed in, so a RETRY
-      // after a failed updateUser (same_password / network blip) must go
-      // straight to changePassword instead of re-consuming the burned code.
-      if (!_recoveryVerified) {
-        await SupabaseService.verifyRecoveryCode(_email.text.trim(), code);
-        _recoveryVerified = true;
-        AnalyticsService.instance.track('otp_verified', {'success': true});
-      }
       await SupabaseService.changePassword(_password.text);
       AnalyticsService.instance.track(
           'login_succeeded', {'otp_required': true, 'trusted_device': false});
@@ -383,7 +442,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       case _AuthMode.signIn:
         return l10n.signIn;
       case _AuthMode.reset:
-        return _codeStep ? _tr('resetApply') : l10n.sendCode;
+        if (!_codeStep) return l10n.sendCode;
+        return _recoveryVerified ? _tr('resetApply') : _tr('verifyCode');
     }
   }
 
@@ -406,7 +466,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             Text(
                 _mode == _AuthMode.signUp
                     ? _tr('codeSentInfo')
-                    : _tr('resetCodeInfo'),
+                    : (_recoveryVerified
+                        ? _tr('resetNewPwInfo')
+                        : _tr('resetCodeInfo')),
                 style: TextStyle(color: AppColors.muted, height: 1.6)),
             const SizedBox(height: 8),
             Text(_email.text.trim(),
@@ -416,10 +478,36 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     color: AppColors.heading, fontWeight: FontWeight.w700)),
           ],
           const SizedBox(height: 20),
+          // Sign-up form, CONVENTIONAL order: required identity+credentials
+          // first (all starred), the optional extras collapsed at the END so
+          // nothing required ever renders under an "optional" header.
           if (_mode == _AuthMode.signUp && !inCode) ...[
             TextField(
                 controller: _name,
-                decoration: InputDecoration(labelText: l10n.nameLabel)),
+                decoration:
+                    InputDecoration(labelText: '${l10n.nameLabel} *')),
+            const SizedBox(height: 12),
+          ],
+          if (!inCode) ...[
+            TextField(
+                controller: _email,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                    labelText: _mode == _AuthMode.signUp
+                        ? '${l10n.emailLabel} *'
+                        : l10n.emailLabel)),
+            const SizedBox(height: 12),
+          ],
+          if (_mode != _AuthMode.reset && !inCode)
+            TextField(
+                controller: _password,
+                obscureText: _obscurePassword,
+                decoration: InputDecoration(
+                    labelText: _mode == _AuthMode.signUp
+                        ? '${l10n.passwordLabel} *'
+                        : l10n.passwordLabel,
+                    suffixIcon: _eyeToggle())),
+          if (_mode == _AuthMode.signUp && !inCode) ...[
             const SizedBox(height: 16),
             Text('${_tr('gender')} *',
                 style: TextStyle(
@@ -482,33 +570,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       labelText: _tr('whatsapp'),
                       hintText: '+20 / +966 ...')),
             ],
-            const SizedBox(height: 14),
           ],
-          if (!inCode) ...[
-            TextField(
-                controller: _email,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(labelText: l10n.emailLabel)),
-            const SizedBox(height: 12),
-          ],
-          if (_mode != _AuthMode.reset && !inCode)
-            TextField(
-                controller: _password,
-                obscureText: true,
-                decoration: InputDecoration(labelText: l10n.passwordLabel)),
           if (inCode) ...[
-            TextField(
-                controller: _otp,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: l10n.otpHint)),
-            if (_mode == _AuthMode.reset) ...[
-              const SizedBox(height: 12),
+            // Reset step 2 = new-password ONLY; otherwise (signup code, reset
+            // step 1) = OTP field ONLY.
+            if (_mode == _AuthMode.reset && _recoveryVerified)
               TextField(
                   controller: _password,
-                  obscureText: true,
-                  decoration:
-                      InputDecoration(labelText: _tr('newPassword'))),
-            ],
+                  obscureText: _obscurePassword,
+                  decoration: InputDecoration(
+                      labelText: _tr('newPassword'),
+                      suffixIcon: _eyeToggle()))
+            else
+              TextField(
+                  controller: _otp,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(labelText: l10n.otpHint)),
           ],
           const SizedBox(height: 20),
           FilledButton(
@@ -522,18 +599,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           ),
           const SizedBox(height: 12),
           if (inCode) ...[
+            // "Resend" only makes sense while still awaiting/entering a code
+            // (not on reset step 2 where the code was already consumed).
+            if (!(_mode == _AuthMode.reset && _recoveryVerified))
+              TextButton(
+                onPressed: _busy
+                    ? null
+                    : (_mode == _AuthMode.signUp
+                        ? _resendSignUpCode
+                        : _submitResetEmail),
+                child: Text(_tr('resendCode')),
+              ),
             TextButton(
               onPressed: _busy
                   ? null
-                  : (_mode == _AuthMode.signUp
-                      ? _resendSignUpCode
-                      : _submitResetEmail),
-              child: Text(_tr('resendCode')),
-            ),
-            TextButton(
-              onPressed: _busy
-                  ? null
-                  : () => setState(() => _codeStep = false),
+                  : () => setState(() {
+                        _codeStep = false;
+                        _recoveryVerified = false;
+                      }),
               child: Text(_tr('back')),
             ),
           ] else ...[
@@ -577,6 +660,9 @@ const Map<String, Map<String, String>> _regStrings = {
     'male': 'ذكر',
     'female': 'أنثى',
     'chooseGender': 'من فضلك اختر النوع',
+    'nameRequired': 'من فضلك اكتب اسمك.',
+    'emailRequired': 'البريد الإلكتروني مطلوب.',
+    'passwordRequired': 'أدخل كلمة المرور.',
     'optional': 'معلومات إضافية (اختيارية)',
     'country': 'الدولة',
     'birthDate': 'تاريخ الميلاد',
@@ -593,8 +679,10 @@ const Map<String, Map<String, String>> _regStrings = {
         'أدخل بريدك الإلكتروني وسنرسل إليك رمزاً لتعيين كلمة مرور جديدة.',
     'resetSentNote':
         'إن كان البريد مسجّلاً لدينا فستصلك رسالة بالرمز خلال لحظات. تحقق أيضاً من مجلد الرسائل غير المرغوبة.',
-    'resetCodeInfo':
-        'أدخل الرمز المرسل إلى بريدك، ثم اكتب كلمة المرور الجديدة.',
+    'resetCodeInfo': 'أدخل الرمز المرسل إلى بريدك الإلكتروني.',
+    'resetNewPwInfo': 'تم التحقق من الرمز. اكتب الآن كلمة المرور الجديدة.',
+    'resetEnterNewPw': 'تم التحقق من الرمز. اكتب كلمة المرور الجديدة.',
+    'verifyCode': 'تأكيد الرمز',
     'newPassword': 'كلمة المرور الجديدة',
     'resetApply': 'تعيين كلمة المرور والدخول',
     'resetDone': 'تم تغيير كلمة المرور وتسجيل دخولك بنجاح.',
@@ -623,6 +711,9 @@ const Map<String, Map<String, String>> _regStrings = {
     'male': 'Male',
     'female': 'Female',
     'chooseGender': 'Please choose your gender',
+    'nameRequired': 'Please enter your name.',
+    'emailRequired': 'Email is required.',
+    'passwordRequired': 'Enter your password.',
     'optional': 'Additional info (optional)',
     'country': 'Country',
     'birthDate': 'Date of birth',
@@ -639,8 +730,10 @@ const Map<String, Map<String, String>> _regStrings = {
         "Enter your email and we'll send you a code to set a new password.",
     'resetSentNote':
         'If this email is registered, a code is on its way. Check your spam folder too.',
-    'resetCodeInfo':
-        'Enter the code we sent to your email, then type your new password.',
+    'resetCodeInfo': 'Enter the code we sent to your email.',
+    'resetNewPwInfo': 'Code verified. Now type your new password.',
+    'resetEnterNewPw': 'Code verified. Type your new password.',
+    'verifyCode': 'Verify code',
     'newPassword': 'New password',
     'resetApply': 'Set password & sign in',
     'resetDone': 'Password changed and you are signed in.',
@@ -668,6 +761,9 @@ const Map<String, Map<String, String>> _regStrings = {
     'male': 'Homme',
     'female': 'Femme',
     'chooseGender': 'Veuillez choisir votre sexe',
+    'nameRequired': 'Veuillez saisir votre nom.',
+    'emailRequired': "L'email est requis.",
+    'passwordRequired': 'Saisissez votre mot de passe.',
     'optional': 'Informations supplémentaires (facultatif)',
     'country': 'Pays',
     'birthDate': 'Date de naissance',
@@ -684,8 +780,10 @@ const Map<String, Map<String, String>> _regStrings = {
         'Saisissez votre email et nous vous enverrons un code pour définir un nouveau mot de passe.',
     'resetSentNote':
         'Si cet email est enregistré, un code est en route. Vérifiez aussi vos spams.',
-    'resetCodeInfo':
-        'Saisissez le code envoyé à votre email, puis votre nouveau mot de passe.',
+    'resetCodeInfo': 'Saisissez le code envoyé à votre email.',
+    'resetNewPwInfo': 'Code vérifié. Saisissez votre nouveau mot de passe.',
+    'resetEnterNewPw': 'Code vérifié. Saisissez votre nouveau mot de passe.',
+    'verifyCode': 'Vérifier le code',
     'newPassword': 'Nouveau mot de passe',
     'resetApply': 'Définir le mot de passe et se connecter',
     'resetDone': 'Mot de passe changé, vous êtes connecté.',

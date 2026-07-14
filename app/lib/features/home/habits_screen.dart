@@ -257,7 +257,7 @@ const Map<String, Map<String, String>> _kStr = {
   'cancel': {'ar': 'إلغاء', 'en': 'Cancel', 'fr': 'Annuler'},
   'delete': {'ar': 'حذف', 'en': 'Delete', 'fr': 'Supprimer'},
   'save': {'ar': 'حفظ', 'en': 'Save', 'fr': 'Enregistrer'},
-  'reminders': {'ar': 'أوقات التذكير', 'en': 'Reminder times', 'fr': 'Heures de rappel'},
+  'reminders': {'ar': 'أوقات تذكيرك بتسجيل التقدم', 'en': 'Progress reminder times', 'fr': 'Heures de rappel de progrès'},
   'lastOne': {
     'ar': 'لا يمكن حذف آخر عادة. أضِف عادة أخرى أولاً.',
     'en': "Can't delete your last habit. Add another first.",

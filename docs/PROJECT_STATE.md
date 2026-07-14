@@ -42,6 +42,20 @@ context or dropping anything:
 
 ---
 
+## 0.5 HANDOFF 2026-07-16 (context overflow — RESUME HERE, execute in order)
+
+**State committed in this very commit (built earlier but NOT yet deployed to Pages):**
+seedling logo rolled out everywhere (masters assets/icons/*.svg + all derived/launcher/splash/site/store assets); signup form reworked (order: name* -> email* -> password* -> gender* -> optional extras LAST; starred labels; missing-field toasts + email regex on signup/sign-in/reset); password EYE toggles (auth screen ×2 + profile change-password via StatefulBuilder); Settings ACCOUNT CARD moved under Language, reactive via `SupabaseService.authRevision` (ValueNotifier bumped on init + onAuthStateChange) — signed-in shows «حسابك» + email -> ProfileScreen, signed-out shows create/sign-in (fixes "asks to sign in although logged in"); RESET flow split into TWO steps (code-only -> verify -> new-password-only; `_recoveryVerified` gates fields/labels/resend); savings calculator = cost field ONLY (minutes removed everywhere); reminder labels renamed «وقت التذكير بتسجيل تقدمك اليومي» (arb ×3 + add_habit + habits_screen); BOTTOM NAV: History tab REPLACED by «هُدنة» ACTION (danger shield icon; index 3 intercepted in home_shell -> if 0 break habits: hint toast; if 1: straight to SOS; if >1: bottom-sheet picker «أي عادة تحتاج هُدنة الآن؟» -> `SosScreen(habitId:)` (new param resolves habit over active)); HISTORY merged into Stats as sub-tab (`statsSubTabProvider`, segmented toggle الإحصائيات|السجل, embeddable `HistoryList` in history_screen.dart, skip days render with ➖ chip); AppState SKIP QUOTAS added — LOGIC ONLY, **NOT WIRED TO UI YET**: kSkipsPerWeek=2 (rolling 7d), kSkipsPerMonth=4 (rolling 30d), anchored at the habit's FIRST-ever skip, renewing per whole period (`weeklySkipUsage`/`monthlySkipUsage`/`skipBlockedBy()` -> null|'week'|'month').
+
+**EXECUTE NEXT, in order:**
+1. **Wire skip quotas**: in daily_log_screen, `_confirmSkipToday` AND the skip option in `_repairSheet` must first check `skipBlockedBy()`; if 'week' -> AlertDialog «استنفدت فرص الإعفاء لهذا الأسبوع (المسموح ٢ أسبوعياً و٤ شهرياً). عُد بعد تجدد الفرص.» / 'month' variant; ar/en/fr, MSA, no em-dash. Also show remaining counts inside the skip confirm dialog body. Add unit tests for the rolling-window math (anchor renewal, week exhausted, month exhausted). analyze + test.
+2. **Button/label overflow audit**: resume workflow `C:\Users\morad\.claude\projects\D--Claude\7ca5cbb3-5954-42b6-ba7c-4e02b2400a7d\workflows\scripts\awwad-button-text-audit-wf_18312458-072.js` (resumeFromRunId wf_18312458-072; it died on session limit) or re-launch equivalent (audit every FilledButton/TextButton/chip/nav label for overflow at ar/en/fr + big font scale; fix with maxLines/ellipsis/size tweaks). Apply confirmed fixes. The new long reminder label + «تأكيد الرمز وإنشاء الحساب» + هُدنة nav labels are prime suspects.
+3. **TRACKING DATA LAYER (owner request)**: (a) APP: AnalyticsService only buffers locally — implement flush to Supabase `analytics_events` (schema from migration 0004; anon INSERT policy — VERIFY policy exists via get_advisors/execute_sql first) batching on app open + after save, fail-open; enrich every event with standard params {platform, app_version:'1.0.0', locale, and habit_track/catalog_key where relevant}; extend the allow-list accordingly + update docs/tracking-plan.md with a GA4/MMP-compatible name mapping table. (b) WEB: GTM scaffold in web/src/layouts/Base.astro gated by a `GTM_ID` const in site.js (empty string = render nothing) + dataLayer.push custom events on the download/web-app CTA clicks (event:'cta_click', cta:'download|webapp|store', locale) — the CTA code lives in [...path].astro/Base scripts; keep 0 em-dashes; note in docs that GA/GTM cookies apply once owner sets GTM_ID. (c) MMP (AppsFlyer/Adjust) needs an owner account + SDK — document as owner-gated P-item, do NOT add SDK now.
+4. **Religious data assets**: app/assets/data/{cities,reciters,scholar_videos}.json exist (306/50/25) but are NOT registered in pubspec `assets:` — register when starting TODO 0d Phase A (prayer engine), not before (unused-asset bloat otherwise is fine either way).
+5. **Finish**: ONE full build (flutter web --base-href /app/ + apk + aab with the standard --dart-defines from §6) + `npm run build` in web/ + deploy Pages (site dist at root KEEPING app/ dir + new app build at /app/ + 404.html copy; repo clone lives at the OLD session scratchpad — re-clone if gone: github.com/moradarafa1/moradarafa1.github.io) + byte-match verify + push source + changelog entry. NOTE: last DEPLOYED Pages commit is the tab-titles round — the logo and everything above is NOT live yet.
+
+Machine quirk: OS clock shows EDT but the owner is in Cairo (UTC+3). Old background-build IDs from the previous session are dead.
+
 ## Table of contents
 1. [Snapshot](#1-snapshot)
 2. [Hard constraints & conventions](#2-hard-constraints--conventions)
@@ -442,6 +456,57 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
    ML + overlay; battery/latency/accuracy prohibitive, Play-rejection risk for the whole app,
    impossible on iOS. Network-level blocking (the shield) + SOS is the practical substitute.
 
+0d. **RELIGIOUS-HABITS ENGINE + AUDIO WIRD (owner mega-spec, 2026-07-14).** Full owner spec;
+   execute in phases. FEASIBILITY CALLS included - do not silently change them.
+   **PHASE A - prayer-times engine (all feasible, offline):**
+   - `adhan` Dart package (offline astronomical calc, zero cost). Location via geolocator
+     (GPS, ACCESS_COARSE_LOCATION + iOS plist) with REQUIRED manual fallback: country ->
+     nearest-city picker (bundle ~300-city JSON: ar/en names, lat/lng, tz - data being
+     generated by workflow) and full manual editing of each time.
+   - pray_on_time: 5 auto reminders at the 5 prayer times of the user's location, EDITABLE;
+     optional toggle «ذكّرني قبل الصلاة بـ5 دقائق» applying to all five. Push (local) notifs.
+   - adhkar: fajr+30min (morning) + asr+30min (evening), auto from same engine.
+   - NEW catalog habit «سورة الكهف» (build, weekly): reminder Friday at jumu'ah+1h
+     (jumu'ah ~= dhuhr on Friday). NOTE: needs weekly-day scheduling support in
+     notif_scheduler (currently daily-hour only).
+   - gratitude: user-set time (exists); its dua content MUST be authentic-hadith duas
+     sourced via islamweb (generate + adversarially verify like dhikr.dart precedent).
+   - GENERAL RULE (owner): ALL religious texts/duas in the app source from islamweb.net.
+   - Dynamic rescheduling: prayer times shift daily -> reschedule the next N days' notifs
+     on every app open (pattern: _autoSync-like hook in home_shell).
+   - Adhan SOUND on prayer notifications: technically fine (custom notification channel
+     sound, raw resource). LICENSING CAVEAT flagged to owner: use a short permissible
+     adhan clip or an owner-provided licensed file (Makkah/Qatami recordings rights unclear).
+   **PHASE A2 - porn-break habit:**
+   - NEW catalog habit «كسر الإباحية» (break; distinct from secret_habit) synced
+     catalog+seed+live DB. On selection: IMMEDIATELY open the DNS-shield guided screen
+     (auto-set Private DNS is IMPOSSIBLE on Android by policy - apps cannot write that
+     setting; the guided 2-tap flow + live verification is the honest maximum). Daily log
+     reminder at a user-chosen hour (existing per-habit reminders cover this).
+   - Scholar-video suggestions for RELIGIOUS habits only, <15 min, from: الحويني، وحيد
+     عبدالسلام بالي، محمد الغليظ؟ (verify name), مصطفى العدوي + islamweb fatwa links.
+     Direct YouTube links (in-app playback later). Extend kHabitVideos via the verified
+     curation workflow pattern (find + adversarial re-verify duration/author).
+   **PHASE B - Quran audio wird (feasible via free APIs):**
+   - NEW habit «ورد الاستماع» with in-app AUDIO player (just_audio): mp3quran.net public
+     API (api/v3/reciters?language=ar) for ~50 reciters (قدامى: المنشاوي، الحصري، عبد
+     الباسط...؛ معاصرون: القطامي، ياسر الدوسري، بندر بليلة...). User picks reciter +
+     surah/juz + daily pages OR monthly/yearly goal; progress tracked as the habit metric.
+   - Reminder scheduling per owner: specific hour(s) OR hourly range (e.g. every hour
+     10:00->23:00) - needs multi/interval scheduling in notif_scheduler.
+   **PHASE B2 - hadith audio: PARTIALLY INFEASIBLE (documented honestly):** no free API
+     exists for Bukhari/Muslim audio BY CHAPTER (قناة الحرم النبوي style). Available
+     alternatives: (a) live-stream player of قناة السنة النبوية السعودية (play-only, no
+     chapter choice), (b) hadith TEXT by book/chapter via sunnah.com API (no audio).
+     DEFERRED until owner picks an alternative or a source appears.
+   **PHASE C - monthly report:**
+   - End-of-month local push -> beautiful report screen: per-habit monthly progress,
+     encouragement, and PER-HABIT relapse solutions (scientific/HRT for behavioral,
+     islamweb-sourced for religious; sensible generic template for CUSTOM habits).
+     Content generated + adversarially verified per the established workflow pattern.
+   DATA PREP (workflow launched 2026-07-14): cities JSON, reciters JSON w/ mp3quran ids,
+   verified scholar videos per religious habit.
+
 0b. **Phone-usage control for `phone_addiction` (owner-requested).** Goal: Awwad lets the user
    pick apps and limits/monitors time on them. **Feasibility & plan:**
    - **Android (doable):** read per-app usage via `UsageStatsManager` (needs the special
@@ -502,6 +567,29 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-14 (SEEDLING LOGO REDESIGN + tab titles + signup-form rework + marketing PDF)** -
+  **(1) Marketing kit PDF** (owner request): docs/marketing/Awwad_Marketing_Kit.pdf (also
+  copied to the owner's OneDrive Desktop) - cover + trilingual-sourced Arabic explainer
+  (idea/14 features/9 steps/7 FAQ) + 100 ad posts in 5 angle families, written by a 6-agent
+  workflow, assembled via Node -> RTL HTML (Cairo font) -> Chrome headless print (the
+  reliable Arabic-PDF path on this machine; reportlab/python absent). **(2) Tab titles**:
+  site home (ar/en/fr) + app web index.html + Flutter onGenerateTitle now show
+  «عوّاد | رفيقٌ مَن زانَ عُمرَه، وحُسُنُ عملَه» (en: Always for the better; fr: Toujours
+  pour le meilleur); other site pages keep SEO titles. VERIFIED live. **(3) LOGO REDESIGN**
+  (owner request): the mark is now an emoji-style SEEDLING (curved stem + two upward leaves
+  in a V, matching the in-app build-track icon) in the same brand greens; masters
+  assets/icons/icon-full.svg + icon-foreground.svg rewritten; ops/icongen/gen.mjs re-run;
+  flutter_launcher_icons + flutter_native_splash regenerated; derived assets regenerated at
+  original sizes (site favicon/192/512/apple-touch/logo-mark, app sprout.png, play-icon-512)
+  + og-image 1200x630 and play-feature 1024x500 recomposed via Chrome-screenshot HTML
+  (seedling + Reem-Kufi عوّاد + slogan) - visually verified. **(4) SIGNUP FORM REWORK**
+  (owner request): field order is now conventional (name* -> email* -> password* -> gender*
+  -> collapsed optional extras LAST, so required fields never sit under the "optional"
+  header); required fields are starred; missing-field toasts added (name/email/password +
+  email-format regex) on signup, sign-in and reset flows. Verified: analyze clean, 20/20
+  tests. ALSO: owner mega-spec for the religious-habits engine + Quran audio wird recorded
+  as TODO item 0d (phased, with honest feasibility calls); data-prep workflow launched
+  (cities/reciters/videos JSONs).
 - **2026-07-12 round 6 (COMPETITOR FEATURES BATCH: 6 new features + CRITICAL streak fix)** -
   Owner approved implementing the competitor-research table («اعمل كله واختبر»). SHIPPED:
   **(1) Streak protection**: DailyEntry.entryType 'log'|'skip' - excused days (سفر/مرض) via a

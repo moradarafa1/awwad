@@ -51,7 +51,7 @@
   "habitNameLabel": "Nom de l'habitude",
   "habitWhyLabel": "Pourquoi le voulez-vous ? (votre motivation)",
   "habitWhyHint": "Écrivez votre raison, elle vous rappellera dans les moments difficiles",
-  "reminderTime": "Heure du rappel quotidien",
+  "reminderTime": "Heure du rappel de progrès",
   "startJourney": "Commencer le parcours",
 
   "navToday": "Aujourd'hui",

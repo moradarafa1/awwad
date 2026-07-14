@@ -51,7 +51,7 @@
   "habitNameLabel": "اسم العادة",
   "habitWhyLabel": "لماذا تريد القيام بها؟ (دافعك)",
   "habitWhyHint": "اكتب سببك، فهو يُذكّرك في أوقات الضعف",
-  "reminderTime": "وقت التذكير اليومي",
+  "reminderTime": "وقت التذكير بتسجيل تقدمك اليومي",
   "startJourney": "ابدأ الرحلة",
 
   "navToday": "اليوم",

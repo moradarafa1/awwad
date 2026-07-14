@@ -18,6 +18,7 @@
 //     retired from the client but stays deployed as an emergency fallback for
 //     times when email delivery is down.
 
+import 'package:flutter/foundation.dart' show ValueNotifier;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseService {
@@ -30,6 +31,12 @@ class SupabaseService {
 
   static bool _inited = false;
 
+  /// Bumps whenever cloud init finishes OR the auth state changes (sign-in /
+  /// sign-out / session restored from storage on app open). UI that shows
+  /// account state listens to this so it reflects the real session even when
+  /// the session is restored asynchronously after the first frame.
+  static final ValueNotifier<int> authRevision = ValueNotifier<int>(0);
+
   static Future<void> init() async {
     if (!configured || _inited) return;
     // _anon holds the legacy public anon JWT (passed via --dart-define).
@@ -39,6 +46,10 @@ class SupabaseService {
       // ignore: deprecated_member_use
       await Supabase.initialize(url: _url, anonKey: _anon);
       _inited = true;
+      // Restoring a persisted session (app reopened while logged in) and every
+      // later sign-in/out must refresh the account UI.
+      client.auth.onAuthStateChange.listen((_) => authRevision.value++);
+      authRevision.value++;
     } catch (_) {
       // Leave _inited=false → app stays offline; retried lazily on sign-in.
     }

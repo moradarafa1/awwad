@@ -51,7 +51,7 @@
   "habitNameLabel": "Habit name",
   "habitWhyLabel": "Why do you want this? (your motivation)",
   "habitWhyHint": "Write your reason, it will remind you in weak moments",
-  "reminderTime": "Daily reminder time",
+  "reminderTime": "Daily progress reminder time",
   "startJourney": "Start the journey",
 
   "navToday": "Today",

@@ -102,6 +102,21 @@ const Map<String, Map<String, String>> _kSet = {
     'en': 'Version',
     'fr': 'Version'
   },
+  'yourAccount': {
+    'ar': 'حسابك',
+    'en': 'Your account',
+    'fr': 'Votre compte'
+  },
+  'createOrSignIn': {
+    'ar': 'إنشاء حساب / تسجيل الدخول',
+    'en': 'Create account / Sign in',
+    'fr': 'Créer un compte / Se connecter'
+  },
+  'accountSub': {
+    'ar': 'سجّل الدخول كي تتزامن بياناتك على جميع أجهزتك.',
+    'en': 'Sign in so your data syncs across all your devices.',
+    'fr': 'Connectez-vous pour synchroniser vos données sur tous vos appareils.'
+  },
 };
 
 class SettingsScreen extends ConsumerWidget {
@@ -146,6 +161,16 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
+
+          // account (right after language): reactive to auth state so it
+          // shows the real session even when it is restored asynchronously.
+          if (SupabaseService.configured) ...[
+            ValueListenableBuilder<int>(
+              valueListenable: SupabaseService.authRevision,
+              builder: (context, _, child) => _accountCard(context, loc),
+            ),
+            const SizedBox(height: 12),
+          ],
 
           // appearance: dark / light mode
           SectionCard(
@@ -230,13 +255,13 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
 
-          // profile + habits management
+          // badges + habits management (account moved up under language)
           SectionCard(
             child: Column(
               children: [
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: Icon(Icons.person_outline,
+                  leading: Icon(Icons.workspace_premium_outlined,
                       color: AppColors.accent),
                   title: Text(_set('profile', loc),
                       style: const TextStyle(fontSize: 13)),
@@ -261,39 +286,6 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-
-          // cloud account & sync (only when the build was given Supabase keys)
-          if (SupabaseService.configured) ...[
-            SectionCard(
-              // Signed in: just "sign out" (the conventional item). Sync is
-              // now fully AUTOMATIC (on app open + after every saved entry),
-              // so the old manual "sync now" button was removed.
-              child: SupabaseService.signedIn
-                  ? ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(Icons.logout, color: AppColors.muted),
-                      title: Text(l10n.signOut,
-                          style: const TextStyle(fontSize: 13)),
-                      onTap: () => SupabaseService.signOut(),
-                    )
-                  : ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(Icons.cloud_outlined,
-                          color: AppColors.accent),
-                      title: Text('${l10n.signUp} / ${l10n.signIn}',
-                          style: const TextStyle(fontSize: 13)),
-                      subtitle: Text(l10n.syncDesc,
-                          style: TextStyle(
-                              fontSize: 11, color: AppColors.muted)),
-                      trailing: Icon(Icons.chevron_right,
-                          color: AppColors.muted),
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) =>
-                              const AuthScreen(startInSignUp: true))),
-                    ),
-            ),
-            const SizedBox(height: 12),
-          ],
 
           // content shield + phone usage (protection tools)
           SectionCard(
@@ -480,6 +472,47 @@ class SettingsScreen extends ConsumerWidget {
 
   String _set(String key, String loc) =>
       _kSet[key]?[loc] ?? _kSet[key]?['ar'] ?? key;
+
+  /// Account card, reactive to auth state (built inside a ValueListenableBuilder
+  /// on SupabaseService.authRevision). Signed in -> «حسابك» opening the account
+  /// screen; signed out -> create-account / sign-in entry.
+  Widget _accountCard(BuildContext context, String loc) {
+    final signedIn = SupabaseService.signedIn;
+    final email = signedIn ? (SupabaseService.currentUser?.email ?? '') : '';
+    return SectionCard(
+      child: signedIn
+          ? ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.account_circle_outlined,
+                  color: AppColors.accent2),
+              title: Text(_set('yourAccount', loc),
+                  style: const TextStyle(fontSize: 13)),
+              subtitle: email.isEmpty
+                  ? null
+                  : Text(email,
+                      textDirection: TextDirection.ltr,
+                      style:
+                          TextStyle(fontSize: 11, color: AppColors.muted)),
+              trailing:
+                  Icon(Icons.chevron_right, color: AppColors.muted),
+              onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ProfileScreen())),
+            )
+          : ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading:
+                  Icon(Icons.cloud_outlined, color: AppColors.accent),
+              title: Text(_set('createOrSignIn', loc),
+                  style: const TextStyle(fontSize: 13)),
+              subtitle: Text(_set('accountSub', loc),
+                  style: TextStyle(fontSize: 11, color: AppColors.muted)),
+              trailing:
+                  Icon(Icons.chevron_right, color: AppColors.muted),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => const AuthScreen(startInSignUp: true))),
+            ),
+    );
+  }
 
   Future<void> _applySchedule(WidgetRef ref, String loc) async {
     final state = ref.read(appControllerProvider);

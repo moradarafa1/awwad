@@ -29,7 +29,6 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
   final _metricSecondaryCtrl = TextEditingController();
   // Money/time-saved calculator inputs (break habits, optional).
   final _costCtrl = TextEditingController();
-  final _minutesCtrl = TextEditingController();
   List<int> _reminderHours = [20];
   String _query = '';
   bool _advisoryShown = false;
@@ -54,7 +53,6 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
     _metricPrimaryCtrl.dispose();
     _metricSecondaryCtrl.dispose();
     _costCtrl.dispose();
-    _minutesCtrl.dispose();
     super.dispose();
   }
 
@@ -102,9 +100,6 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
               : null,
       costPerDay: _track == 'break'
           ? double.tryParse(_costCtrl.text.trim())
-          : null,
-      minutesPerDay: _track == 'break'
-          ? int.tryParse(_minutesCtrl.text.trim())
           : null,
       createdAt: DateTime.now(),
     );
@@ -239,26 +234,11 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                           color: AppColors.muted,
                           height: 1.6)),
                   const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _costCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                              labelText: _s(_kStr['costLabel']!)),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          controller: _minutesCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                              labelText: _s(_kStr['minutesLabel']!)),
-                        ),
-                      ),
-                    ],
+                  TextField(
+                    controller: _costCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        labelText: _s(_kStr['costLabel']!)),
                   ),
                 ],
                 const SizedBox(height: 14),
@@ -536,23 +516,18 @@ const Map<String, Map<String, String>> _kStr = {
   },
   'savingsHint': {
     'ar':
-        'كم كانت تكلفك هذه العادة يومياً؟ سنريك كم وفّرت من مال ووقت مع كل يوم نظيف.',
+        'كم كانت تكلفك هذه العادة يومياً؟ سنريك كم وفّرت من مال مع كل يوم نظيف.',
     'en':
-        'What did this habit cost you daily? We will show money and time saved with every clean day.',
+        'What did this habit cost you daily? We will show the money saved with every clean day.',
     'fr':
-        "Combien cette habitude vous coûtait-elle par jour ? Nous afficherons vos économies."
+        "Combien cette habitude vous coûtait-elle par jour ? Nous afficherons l'argent économisé."
   },
   'costLabel': {
     'ar': 'التكلفة اليومية',
     'en': 'Daily cost',
     'fr': 'Coût quotidien'
   },
-  'minutesLabel': {
-    'ar': 'دقائق مستهلكة يومياً',
-    'en': 'Minutes lost daily',
-    'fr': 'Minutes perdues par jour'
-  },
-  'reminder': {'ar': 'وقت التذكير', 'en': 'Reminder time', 'fr': 'Heure du rappel'},
+  'reminder': {'ar': 'وقت التذكير بتسجيل تقدمك اليومي', 'en': 'Daily progress reminder time', 'fr': 'Heure du rappel de progrès'},
   'capReached': {
     'ar': 'وصلت للحد الأقصى (٣) لهذا النوع',
     'en': 'You reached the limit (3) for this type',

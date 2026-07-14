@@ -16,9 +16,9 @@ import '../../core/widgets/ambient_background.dart';
 import 'daily_log_screen.dart';
 import 'stats_screen.dart';
 import 'badges_screen.dart';
-import 'history_screen.dart';
 import 'settings_screen.dart';
 import '../pomodoro/pomodoro_screen.dart';
+import '../sos/sos_screen.dart';
 
 /// Selected bottom-nav tab index, shared so any screen can switch tabs
 /// (e.g. the daily log jumps to Stats after saving).
@@ -34,11 +34,13 @@ class HomeShell extends ConsumerStatefulWidget {
 class _HomeShellState extends ConsumerState<HomeShell> {
   bool _nudged = false;
 
+  // Nav index 3 is the «هُدنة» ACTION (opens the truce flow), not a screen,
+  // so its stack slot is an unused placeholder that is never displayed.
   static const _screens = [
     DailyLogScreen(),
-    StatsScreen(),
+    StatsScreen(), // history now lives inside Stats as an internal tab
     BadgesScreen(),
-    HistoryScreen(),
+    SizedBox.shrink(), // index 3 = هُدنة action (intercepted, never shown)
     PomodoroScreen(),
     SettingsScreen(),
   ];
@@ -167,6 +169,81 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     );
   }
 
+  String _truceLabel() {
+    final loc = Localizations.localeOf(context).languageCode;
+    return const {'ar': 'هُدنة', 'en': 'Truce', 'fr': 'Trêve'}[loc] ?? 'Truce';
+  }
+
+  // «هُدنة» flow: pick which break habit needs help right now, then open the
+  // SOS screen tailored to that habit. If there is exactly one break habit,
+  // skip the picker. If none, gently point to adding one.
+  Future<void> _openTruce() async {
+    final s = ref.read(appControllerProvider);
+    final loc = Localizations.localeOf(context).languageCode;
+    final breakHabits =
+        s.habits.where((h) => h.track == 'break').toList();
+
+    if (breakHabits.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(const {
+                'ar': 'أضف عادة تريد الإقلاع عنها أولاً لتستفيد من الهُدنة.',
+                'en': 'Add a break habit first to use Truce.',
+                'fr': "Ajoutez d'abord une habitude à arrêter pour utiliser la Trêve.",
+              }[loc] ??
+              'Add a break habit first.')));
+      return;
+    }
+
+    String targetId = breakHabits.first.id;
+    if (breakHabits.length > 1) {
+      final picked = await showModalBottomSheet<String>(
+        context: context,
+        backgroundColor: AppColors.surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (ctx) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 6),
+                child: Text(
+                    const {
+                          'ar': 'أي عادة تحتاج هُدنة الآن؟',
+                          'en': 'Which habit needs a truce now?',
+                          'fr': 'Quelle habitude a besoin d\'une trêve ?',
+                        }[loc] ??
+                        'Which habit?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        color: AppColors.heading)),
+              ),
+              for (final h in breakHabits)
+                ListTile(
+                  leading: Icon(Icons.health_and_safety_outlined,
+                      color: AppColors.danger),
+                  title: Text(h.title,
+                      style: TextStyle(color: AppColors.text)),
+                  onTap: () => Navigator.pop(ctx, h.id),
+                ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      );
+      if (picked == null) return; // dismissed
+      targetId = picked;
+    }
+
+    if (!mounted) return;
+    await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => SosScreen(habitId: targetId)));
+  }
+
   Widget _buildNavBar(
       AppLocalizations l10n, int index, String pomodoroLabel) {
     return NavigationBarTheme(
@@ -187,8 +264,15 @@ class _HomeShellState extends ConsumerState<HomeShell> {
         ),
         child: NavigationBar(
           selectedIndex: index,
-          onDestinationSelected: (i) =>
-              ref.read(homeTabProvider.notifier).state = i,
+          // Index 3 = «هُدنة»: an action, not a tab. Intercept it (open the
+          // truce flow) and leave the selected tab unchanged.
+          onDestinationSelected: (i) {
+            if (i == 3) {
+              _openTruce();
+              return;
+            }
+            ref.read(homeTabProvider.notifier).state = i;
+          },
           destinations: [
             NavigationDestination(
                 icon: const Icon(Icons.today_outlined),
@@ -203,9 +287,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 selectedIcon: const Icon(Icons.emoji_events),
                 label: l10n.navBadges),
             NavigationDestination(
-                icon: const Icon(Icons.history_outlined),
-                selectedIcon: const Icon(Icons.history),
-                label: l10n.navHistory),
+                icon: Icon(Icons.health_and_safety_outlined,
+                    color: AppColors.danger),
+                selectedIcon: Icon(Icons.health_and_safety,
+                    color: AppColors.danger),
+                label: _truceLabel()),
             NavigationDestination(
                 icon: const Icon(Icons.timer_outlined),
                 selectedIcon: const Icon(Icons.timer),

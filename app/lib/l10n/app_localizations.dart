@@ -373,7 +373,7 @@ abstract class AppLocalizations {
   /// No description provided for @reminderTime.
   ///
   /// In ar, this message translates to:
-  /// **'وقت التذكير اليومي'**
+  /// **'وقت التذكير بتسجيل تقدمك اليومي'**
   String get reminderTime;
 
   /// No description provided for @startJourney.

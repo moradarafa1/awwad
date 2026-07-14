@@ -1,11 +1,29 @@
 <svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-  <!-- Awwad app icon (from the "تصميم لوجو عواد" handoff, assets/brand/). -->
+  <!-- Awwad app icon: emoji-style seedling on the dark brand tile
+       (owner-requested redesign 2026-07-14). -->
   <rect width="1024" height="1024" rx="230" fill="#12161F"/>
-  <g transform="translate(212,200) scale(6)">
-    <path d="M47 60 C45 72 39 79 38 89 C37 94 43 96 46 91 C50 84 53 72 55 61 Z" fill="#5E8A31"/>
-    <path d="M50 59 C36 57 20 49 13 33 C12 30 14 26 18 26 C34 28 46 43 52 58 Z" fill="#8FBF44"/>
-    <path d="M52 57 C60 51 74 45 81 31 C83 28 81 24 78 25 C64 29 55 43 53 56 Z" fill="#9FCE57"/>
-    <path d="M49 57 C39 49 29 42 20 32" stroke="#C6E58C" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-    <path d="M52 55 C61 47 69 41 77 33" stroke="#CBE892" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <g transform="translate(512 512) scale(1.12) translate(-512 -512)">
+    <!-- stem -->
+    <path d="M 548 872 C 536 792 508 690 501 606"
+          fill="none" stroke="#5E8A31" stroke-width="58" stroke-linecap="round"/>
+    <!-- left (smaller, darker) leaf -->
+    <path d="M 494 602
+             C 480 480 424 348 312 284
+             C 272 380 308 512 446 588
+             C 464 597 482 602 494 602 Z"
+          fill="#8FBF44"/>
+    <!-- right (larger, lighter) leaf -->
+    <path d="M 506 598
+             C 518 440 592 268 726 196
+             C 772 312 726 486 566 586
+             C 544 596 522 601 506 598 Z"
+          fill="#9FCE57"/>
+    <!-- veins -->
+    <path d="M 352 330 C 420 420 466 510 488 578" fill="none"
+          stroke="#C6E58C" stroke-width="15" stroke-linecap="round" opacity="0.9"/>
+    <path d="M 688 244 C 606 356 540 480 514 574" fill="none"
+          stroke="#CBE892" stroke-width="17" stroke-linecap="round" opacity="0.9"/>
+    <!-- crown joint -->
+    <circle cx="500" cy="596" r="28" fill="#6FA232"/>
   </g>
 </svg>
