@@ -44,7 +44,7 @@ context or dropping anything:
 
 ## 0.5 HANDOFF 2026-07-14 round 2 (RESUME HERE)
 
-**Done this round (committed, NOT yet deployed):** skip quotas wired to the UI (both entry
+**Done this round (committed AND deployed):** skip quotas wired to the UI (both entry
 points) + rolling-window tests; TRACKING data layer live (app flushes `analytics_events` on
 open + after save, standard params, allow-list completed, anon INSERT verified against the
 live DB; site GTM scaffold behind `GTM_ID` in site.js, empty = no third-party, + `cta_click`
@@ -54,15 +54,17 @@ crash on the Pomodoro screen in EVERY locale) with `test/layout_overflow_test.da
 them down (pumps screens at 320dp + 1.3x text scale in ar/en/fr); LOGO fixed to be the
 owner's plant image itself (see §11 - never redraw it again).
 
+**DEPLOYED 2026-07-14 (Pages commit `8ab5244`, source `4561c9b`).** Site + app are LIVE at
+https://moradarafa1.github.io and /app/ with the plant logo, reworked signup, truce nav,
+history-in-stats, tracking and every layout fix. Verified live: favicon byte-matches the local
+build, `cta_click` is wired, GTM is absent (no cookies, as designed), the app boots and the
+analytics flush REACHED the live DB (`app_opened` rows with platform/app_version/locale; test
+rows deleted afterwards). Browser walkthrough passed: language -> guest -> onboarding -> habit
+pick -> Today; signup form order/asterisks/toasts/email-regex/eye-toggle all behave; the truce
+tab opens SOS directly with a single habit.
+
 **EXECUTE NEXT, in order:**
-1. Full build (web `--base-href /app/` + apk + aab with the §6 dart-defines) + `npm run build`
-   in web/ + deploy GitHub Pages (site dist at root KEEPING app/, new app build at /app/,
-   404.html copy) + byte-match verify + push. Pages clone lives in this session's scratchpad;
-   re-clone github.com/moradarafa1/moradarafa1.github.io if gone. Last DEPLOYED commit is the
-   tab-titles round: the logo, signup rework, truce nav, tracking and all layout fixes are
-   NOT live yet. OWNER GATE: ask before deploying (owner chose "finish the remaining screens
-   first" on 2026-07-14; the screens are now done, so the next ask should be the deploy).
-2. Then TODO 0d Phase A (religious-habits engine) - the owner re-confirmed the full spec
+1. TODO 0d Phase A (religious-habits engine) - the owner re-confirmed the full spec
    (prayer-times by GPS + city fallback + editable times + 5-min-before toggle + adhan sound,
    adhkar at fajr+30/asr+30, Kahf on Friday, islamweb-sourced duas, scholar videos <15min for
    religious habits only, monthly report push). Start by registering
@@ -603,6 +605,23 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-14 round 3 (LIVE TIMER ANIMATIONS + 0d groundwork)** - Owner: «خلي البومودورو
+  ومؤقت الهدنة يكون فيهم انيميشن اثناء الاستخدام». **POMODORO** (`pomodoro_screen.dart`): the
+  dial is now driven by two controllers (a 1s repeating frame clock + a 2.6s breathing pulse)
+  that run ONLY while the timer runs. The ring sweeps CONTINUOUSLY off a `_deadline` DateTime
+  (sub-second, and correct after a throttled/background tab) instead of jumping once per second;
+  a phase-coloured glow breathes behind it (scale + blur + alpha); a luminous head dot rides the
+  arc. Pausing/resetting/switching phase stops every controller (an idle screen schedules ZERO
+  frames). **SOS «هُدنة»** (`sos_screen.dart`): two staggered rings now expand and fade outward
+  (the urge "wave"), a circular progress ring around the breathing circle fills as the 5 minutes
+  pass (also off a `_waveEnd` DateTime, so it creeps instead of ticking), the breathing circle
+  gained a soft glow, and the instruction text cross-fades between inhale/hold/exhale; the
+  "still fighting" button reuses the new `_startWave()`. New `test/timer_animation_test.dart`
+  (4 cases) PROVES it: the ring advances within a single second, the movement is a creep not a
+  jump, the idle dial schedules no frames, and SOS animates from the moment it opens.
+  **0d groundwork**: `adhan` + `geolocator` added to pubspec and the religious data assets
+  (cities/reciters/scholar_videos JSON) registered under `flutter: assets:`. Verified: analyze
+  clean, 54/54 tests.
 - **2026-07-14 round 2 (skip quotas wired + TRACKING layer + LAYOUT-OVERFLOW round + logo
   corrected)** - **(1) SKIP QUOTAS UI**: `skipBlockedBy()` now gates BOTH skip entry points
   (`_confirmSkipToday` and the skip option in the yesterday-repair sheet) via a shared

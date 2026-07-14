@@ -32,11 +32,14 @@ class SosScreen extends ConsumerStatefulWidget {
 }
 
 class _SosScreenState extends ConsumerState<SosScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   static const _waveSeconds = 5 * 60;
-  late final AnimationController _breath; // one full 12s cycle
+  late final AnimationController _breath; // one full 12s breathing cycle
+  late final AnimationController _ripple; // urge "wave" rings, 3.4s
   Timer? _tick;
   int _left = _waveSeconds;
+  // Sub-second precision for the wave ring (a 1s timer alone makes it step).
+  DateTime _waveEnd = DateTime.now().add(const Duration(seconds: _waveSeconds));
 
   @override
   void initState() {
@@ -45,6 +48,16 @@ class _SosScreenState extends ConsumerState<SosScreen>
     _breath = AnimationController(
         vsync: this, duration: const Duration(seconds: 12))
       ..repeat();
+    _ripple = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 3400))
+      ..repeat();
+    _startWave();
+  }
+
+  void _startWave() {
+    _tick?.cancel();
+    _left = _waveSeconds;
+    _waveEnd = DateTime.now().add(const Duration(seconds: _waveSeconds));
     _tick = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_left > 0) {
         setState(() => _left--);
@@ -54,9 +67,17 @@ class _SosScreenState extends ConsumerState<SosScreen>
     });
   }
 
+  /// Seconds left, fractional, so the ring sweeps instead of stepping.
+  double get _leftExact {
+    if (_left <= 0) return 0;
+    final ms = _waveEnd.difference(DateTime.now()).inMilliseconds;
+    return (ms / 1000).clamp(0, _waveSeconds.toDouble()).toDouble();
+  }
+
   @override
   void dispose() {
     _breath.dispose();
+    _ripple.dispose();
     _tick?.cancel();
     super.dispose();
   }
@@ -109,31 +130,82 @@ class _SosScreenState extends ConsumerState<SosScreen>
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppColors.muted, height: 1.7)),
             const SizedBox(height: 18),
-            // Breathing circle.
+            // Breathing circle: the urge rides out as rings that expand and
+            // fade (the "wave"), the circle breathes 4s in / 2s hold / 6s out,
+            // and the ring around it fills as the 5 minutes pass.
             SizedBox(
-              height: 190,
+              height: 210,
               child: AnimatedBuilder(
-                animation: _breath,
+                animation: Listenable.merge([_breath, _ripple]),
                 builder: (context, child) {
                   final (scale, phaseKey) = _breathState(_breath.value);
+                  final waveP =
+                      (1 - _leftExact / _waveSeconds).clamp(0.0, 1.0);
                   return Stack(
                     alignment: Alignment.center,
                     children: [
+                      // Two staggered rings expanding outward and fading.
+                      for (final offset in const [0.0, 0.5])
+                        Builder(builder: (context) {
+                          final t = (_ripple.value + offset) % 1.0;
+                          final eased = Curves.easeOut.transform(t);
+                          return Opacity(
+                            opacity: (1 - t) * 0.35,
+                            child: Container(
+                              width: 120 + 90 * eased,
+                              height: 120 + 90 * eased,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: AppColors.accent2, width: 1.5),
+                              ),
+                            ),
+                          );
+                        }),
+                      // Wave progress ring (how much of the 5 minutes passed).
+                      SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: CircularProgressIndicator(
+                          value: waveDone ? 1.0 : waveP,
+                          strokeWidth: 5,
+                          strokeCap: StrokeCap.round,
+                          backgroundColor:
+                              AppColors.accent2.withValues(alpha: 0.12),
+                          valueColor: AlwaysStoppedAnimation(
+                              AppColors.accent2.withValues(alpha: 0.75)),
+                        ),
+                      ),
+                      // The breathing circle itself.
                       Container(
-                        width: 170 * scale,
-                        height: 170 * scale,
+                        width: 160 * scale,
+                        height: 160 * scale,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: AppColors.accent2.withValues(alpha: 0.18),
-                          border: Border.all(
-                              color: AppColors.accent2, width: 2),
+                          border:
+                              Border.all(color: AppColors.accent2, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.accent2
+                                  .withValues(alpha: 0.10 + 0.16 * (scale - 0.55)),
+                              blurRadius: 24,
+                              spreadRadius: 2,
+                            ),
+                          ],
                         ),
                       ),
-                      Text(_tr(phaseKey),
-                          style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 16,
-                              color: AppColors.heading)),
+                      // Cross-fade the breathing instruction as it changes.
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 450),
+                        child: Text(_tr(phaseKey),
+                            key: ValueKey(phaseKey),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 16,
+                                color: AppColors.heading)),
+                      ),
                     ],
                   );
                 },
@@ -166,12 +238,18 @@ class _SosScreenState extends ConsumerState<SosScreen>
                     const SizedBox(height: 8),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: 1 - _left / _waveSeconds,
-                        minHeight: 6,
-                        backgroundColor:
-                            AppColors.accent2.withValues(alpha: 0.15),
-                        color: AppColors.accent2,
+                      // Rebuilt every frame with the breath clock, so the bar
+                      // creeps forward smoothly instead of ticking.
+                      child: AnimatedBuilder(
+                        animation: _breath,
+                        builder: (context, _) => LinearProgressIndicator(
+                          value: (1 - _leftExact / _waveSeconds)
+                              .clamp(0.0, 1.0),
+                          minHeight: 6,
+                          backgroundColor:
+                              AppColors.accent2.withValues(alpha: 0.15),
+                          color: AppColors.accent2,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -295,17 +373,7 @@ class _SosScreenState extends ConsumerState<SosScreen>
             ),
             const SizedBox(height: 8),
             TextButton(
-              onPressed: () => setState(() {
-                _left = _waveSeconds;
-                _tick?.cancel();
-                _tick = Timer.periodic(const Duration(seconds: 1), (_) {
-                  if (_left > 0) {
-                    setState(() => _left--);
-                  } else {
-                    _tick?.cancel();
-                  }
-                });
-              }),
+              onPressed: () => setState(_startWave),
               child: Text(_tr('stillBtn')),
             ),
           ],

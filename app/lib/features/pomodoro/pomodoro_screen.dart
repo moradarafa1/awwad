@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,8 @@ class PomodoroScreen extends ConsumerStatefulWidget {
 
 enum _Phase { focus, shortBreak, longBreak }
 
-class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
+class _PomodoroScreenState extends ConsumerState<PomodoroScreen>
+    with TickerProviderStateMixin {
   // Durations in minutes (the focus length is user-selectable).
   int _focusMin = 25;
   static const int _shortMin = 5;
@@ -31,9 +33,48 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
   bool _running = false;
   int _completedFocus = 0;
 
+  // ----- animation (only while the timer is RUNNING; idle = a still dial) ---
+  // _frame is a 1s repeating clock that rebuilds the dial every frame, so the
+  // ring sweeps CONTINUOUSLY instead of jumping once per second. _pulse drives
+  // the breathing glow behind it. _deadline gives sub-second precision (and
+  // survives a backgrounded tab, where 1s timers get throttled).
+  late final AnimationController _frame;
+  late final AnimationController _pulse;
+  DateTime? _deadline;
+
+  @override
+  void initState() {
+    super.initState();
+    _frame = AnimationController(
+        vsync: this, duration: const Duration(seconds: 1));
+    _pulse = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2600));
+  }
+
+  void _startAnim() {
+    _frame.repeat();
+    _pulse.repeat(reverse: true);
+  }
+
+  void _stopAnim() {
+    _frame.stop();
+    _pulse.stop();
+    _pulse.value = 0;
+  }
+
+  /// Seconds left with sub-second precision while running (for a smooth ring).
+  double get _remainingExact {
+    final d = _deadline;
+    if (!_running || d == null) return _remaining.toDouble();
+    final ms = d.difference(DateTime.now()).inMilliseconds;
+    return (ms / 1000).clamp(0, _total.toDouble()).toDouble();
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
+    _frame.dispose();
+    _pulse.dispose();
     super.dispose();
   }
 
@@ -52,7 +93,11 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
 
   void _start() {
     if (_running) return;
-    setState(() => _running = true);
+    setState(() {
+      _running = true;
+      _deadline = DateTime.now().add(Duration(seconds: _remaining));
+    });
+    _startAnim();
     AnalyticsService.instance.track('pomodoro_start', {'phase': _phase.name});
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_remaining > 1) {
@@ -65,43 +110,55 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
 
   void _pause() {
     _timer?.cancel();
-    setState(() => _running = false);
+    _stopAnim();
+    setState(() {
+      _running = false;
+      _deadline = null;
+    });
   }
 
   void _reset() {
     _timer?.cancel();
+    _stopAnim();
     setState(() {
       _running = false;
+      _deadline = null;
       _remaining = _total;
     });
   }
 
   void _switchPhase(_Phase p) {
     _timer?.cancel();
+    _stopAnim();
     setState(() {
       _phase = p;
       _running = false;
+      _deadline = null;
       _remaining = _total;
     });
   }
 
   void _setFocusLength(int min) {
     _timer?.cancel();
+    _stopAnim();
     setState(() {
       _focusMin = min;
       _running = false;
+      _deadline = null;
       if (_phase == _Phase.focus) _remaining = min * 60;
     });
   }
 
   void _completePhase() {
     _timer?.cancel();
+    _stopAnim();
     final lang = Localizations.localeOf(context).languageCode;
     final s = _strings[lang] ?? _strings['en']!;
     final wasFocus = _phase == _Phase.focus;
     AnalyticsService.instance.track('pomodoro_complete', {'phase': _phase.name});
     setState(() {
       _running = false;
+      _deadline = null;
       if (wasFocus) {
         _completedFocus++;
         _phase = (_completedFocus % _roundsBeforeLong == 0)
@@ -131,7 +188,6 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
   Widget build(BuildContext context) {
     final lang = Localizations.localeOf(context).languageCode;
     final t = _strings[lang] ?? _strings['en']!;
-    final progress = _total == 0 ? 0.0 : 1 - (_remaining / _total);
     final phaseLabel = switch (_phase) {
       _Phase.focus => t['focus']!,
       _Phase.shortBreak => t['short']!,
@@ -159,7 +215,10 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
               ],
             ),
             const SizedBox(height: 28),
-            // Timer dial (tap anywhere on it to start / pause)
+            // Timer dial (tap anywhere on it to start / pause). While the timer
+            // RUNS it is alive: a breathing glow behind the ring, a ring that
+            // sweeps continuously (not a once-per-second jump) and a bright
+            // head dot riding the arc. Idle, everything is still.
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: _running ? _pause : _start,
@@ -167,49 +226,104 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
                 child: SizedBox(
                   width: 240,
                   height: 240,
-                  child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 240,
-                      height: 240,
-                      child: CircularProgressIndicator(
-                        value: progress.clamp(0.0, 1.0),
-                        strokeWidth: 12,
-                        backgroundColor: AppColors.border,
-                        valueColor: AlwaysStoppedAnimation(_phaseColor),
-                        strokeCap: StrokeCap.round,
-                      ),
-                    ),
-                    // The dial is a fixed 240x240 circle: at a large OS font
-                    // scale the 56px digits alone overflow it, so scale the
-                    // whole stack down to fit instead of clipping it.
-                    Padding(
-                      padding: const EdgeInsets.all(28),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(_fmt(_remaining),
-                                style: TextStyle(
-                                    fontSize: 56,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.heading)),
-                            const SizedBox(height: 4),
-                            Text(phaseLabel,
-                                maxLines: 1,
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: _phaseColor)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                  child: AnimatedBuilder(
+                    animation: Listenable.merge([_frame, _pulse]),
+                    builder: (context, _) {
+                      final exact = _remainingExact;
+                      final p = _total == 0
+                          ? 0.0
+                          : (1 - exact / _total).clamp(0.0, 1.0);
+                      final beat = _running ? _pulse.value : 0.0;
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Breathing glow.
+                          Transform.scale(
+                            scale: 1 + 0.05 * beat,
+                            child: Container(
+                              width: 216,
+                              height: 216,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _phaseColor
+                                    .withValues(alpha: 0.05 + 0.09 * beat),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _phaseColor.withValues(
+                                        alpha: 0.10 + 0.16 * beat),
+                                    blurRadius: 26 + 18 * beat,
+                                    spreadRadius: 2 + 6 * beat,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 240,
+                            height: 240,
+                            child: CircularProgressIndicator(
+                              value: p,
+                              strokeWidth: 12,
+                              backgroundColor: AppColors.border,
+                              valueColor: AlwaysStoppedAnimation(_phaseColor),
+                              strokeCap: StrokeCap.round,
+                            ),
+                          ),
+                          // Head dot riding the arc (starts at 12 o'clock).
+                          if (_running)
+                            Transform.rotate(
+                              angle: p * 2 * math.pi,
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: Container(
+                                  width: 14,
+                                  height: 14,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.heading,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _phaseColor.withValues(
+                                            alpha: 0.6 + 0.4 * beat),
+                                        blurRadius: 10 + 6 * beat,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          // The dial is a fixed 240x240 circle: at a large OS
+                          // font scale the 56px digits alone overflow it, so
+                          // scale the stack down to fit instead of clipping it.
+                          Padding(
+                            padding: const EdgeInsets.all(28),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(_fmt(exact.ceil()),
+                                      style: TextStyle(
+                                          fontSize: 56,
+                                          fontWeight: FontWeight.w800,
+                                          color: AppColors.heading)),
+                                  const SizedBox(height: 4),
+                                  Text(phaseLabel,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          color: _phaseColor)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ),
               ),
             ),
             const SizedBox(height: 28),
