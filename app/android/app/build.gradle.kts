@@ -55,6 +55,11 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+            // APPEND (proguardFile, not proguardFiles: that would replace
+            // Flutter's own defaults) the keep rules that stop R8 from
+            // breaking flutter_local_notifications' GSON serialization in
+            // release builds. Without this, reminders never fire on devices.
+            proguardFile("proguard-rules.pro")
         }
     }
 }

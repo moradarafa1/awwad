@@ -44,6 +44,25 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- flutter_local_notifications: v18 does NOT merge these receivers from
+             its own library manifest, they MUST be declared here (per the plugin
+             README). Without the first one, every scheduled reminder's alarm
+             broadcasts to a non-existent component and is silently dropped: no
+             reminder can EVER fire. The second reschedules everything after a
+             reboot or an app update (it is what consumes RECEIVE_BOOT_COMPLETED
+             above); without it reminders die on every restart. -->
+        <receiver android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

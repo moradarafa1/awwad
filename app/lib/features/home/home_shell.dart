@@ -79,8 +79,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
     // First open: request the OS notification permission directly (no extra
     // in-app dialog). Covers users who skipped the first-open auth screen.
+    // A DENIAL flips the in-app toggle off, so Settings tells the truth and
+    // switching it back ON re-requests the permission.
     if (!s.settings.notifPromptShown) {
-      await ensureNotificationPermission();
+      final granted = await ensureNotificationPermission();
+      if (!granted) await ctrl.setNotificationsEnabled(false);
       await ctrl.markNotifPromptShown();
       if (!mounted) return;
       s = ref.read(appControllerProvider);

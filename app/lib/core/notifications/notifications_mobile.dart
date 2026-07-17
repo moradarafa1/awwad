@@ -7,6 +7,7 @@
 //   1003  one-off 3-day sign-up nudge  (fires once)
 //   2000+ badge/shield congratulations (immediate, one per badge)
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
@@ -86,6 +87,36 @@ tz.TZDateTime _nextInstanceOfHour(int hour) {
   return scheduled;
 }
 
+/// zonedSchedule with a per-call guard: ONE failing schedule must not abort
+/// the whole reschedule loop (it used to kill every later reminder AND the
+/// dhikr), and the failure is printed so a broken release pipeline (like the
+/// pre-proguard R8/GSON breakage) is visible in `adb logcat` instead of
+/// silently eating every reminder.
+Future<void> _safeZoned(
+  int id,
+  String title,
+  String body,
+  tz.TZDateTime when,
+  NotificationDetails details, {
+  DateTimeComponents? match,
+}) async {
+  try {
+    await _plugin.zonedSchedule(
+      id,
+      title,
+      body,
+      when,
+      details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: match,
+    );
+  } catch (e) {
+    debugPrint('awwad notif: schedule #$id failed: $e');
+  }
+}
+
 Future<void> scheduleDailyReminder(int hour, String title, String body) async {
   await initNotifications();
   const details = NotificationDetails(
@@ -98,17 +129,8 @@ Future<void> scheduleDailyReminder(int hour, String title, String body) async {
     ),
     iOS: DarwinNotificationDetails(),
   );
-  await _plugin.zonedSchedule(
-    _reminderId,
-    title,
-    body,
-    _nextInstanceOfHour(hour),
-    details,
-    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-    uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
-    matchDateTimeComponents: DateTimeComponents.time, // repeat daily
-  );
+  await _safeZoned(_reminderId, title, body, _nextInstanceOfHour(hour), details,
+      match: DateTimeComponents.time); // repeat daily
 }
 
 /// Daily Ibrahimic-prayer dhikr. The [body] is the Arabic dhikr; a BigText
@@ -126,17 +148,8 @@ Future<void> scheduleDhikrReminder(int hour, String title, String body) async {
     ),
     iOS: const DarwinNotificationDetails(),
   );
-  await _plugin.zonedSchedule(
-    _dhikrId,
-    title,
-    body,
-    _nextInstanceOfHour(hour),
-    details,
-    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-    uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
-    matchDateTimeComponents: DateTimeComponents.time, // repeat daily
-  );
+  await _safeZoned(_dhikrId, title, body, _nextInstanceOfHour(hour), details,
+      match: DateTimeComponents.time); // repeat daily
 }
 
 /// One-off sign-up re-engagement nudge (no matchDateTimeComponents => fires once).
@@ -152,16 +165,8 @@ Future<void> scheduleReengageNudge(Duration delay, String title, String body) as
     ),
     iOS: DarwinNotificationDetails(),
   );
-  await _plugin.zonedSchedule(
-    _reengageId,
-    title,
-    body,
-    tz.TZDateTime.now(tz.local).add(delay),
-    details,
-    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-    uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
-  );
+  await _safeZoned(_reengageId, title, body,
+      tz.TZDateTime.now(tz.local).add(delay), details);
 }
 
 /// Immediate congratulation when a shield/badge is earned.
@@ -196,17 +201,9 @@ Future<void> scheduleHabitReminder(
     ),
     iOS: DarwinNotificationDetails(),
   );
-  await _plugin.zonedSchedule(
-    _habitReminderBase + slot,
-    title,
-    body,
-    _nextInstanceOfHour(hour),
-    details,
-    androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-    uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
-    matchDateTimeComponents: DateTimeComponents.time, // repeat daily
-  );
+  await _safeZoned(_habitReminderBase + slot, title, body,
+      _nextInstanceOfHour(hour), details,
+      match: DateTimeComponents.time); // repeat daily
 }
 
 /// Clears all per-habit reminders (and the legacy single one) before a reschedule.

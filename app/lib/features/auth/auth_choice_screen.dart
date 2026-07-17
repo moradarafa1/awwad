@@ -33,8 +33,14 @@ class _AuthChoiceScreenState extends ConsumerState<AuthChoiceScreen> {
   Future<void> _requestPermissions() async {
     final s = ref.read(appControllerProvider);
     if (s.settings.notifPromptShown) return;
-    await ensureNotificationPermission(); // OS prompt directly, no extra dialog
-    await ref.read(appControllerProvider.notifier).markNotifPromptShown();
+    // OS prompt directly, no extra dialog. If the user DENIES, flip the
+    // in-app toggle off too: otherwise Settings shows notifications as ON
+    // while the OS silently blocks them, and the permission is never asked
+    // again (turning the toggle back ON re-requests it).
+    final granted = await ensureNotificationPermission();
+    final ctrl = ref.read(appControllerProvider.notifier);
+    if (!granted) await ctrl.setNotificationsEnabled(false);
+    await ctrl.markNotifPromptShown();
   }
 
   String _s(Map<String, String> m, String loc) => m[loc] ?? m['ar'] ?? '';

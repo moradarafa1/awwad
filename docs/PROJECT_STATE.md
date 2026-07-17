@@ -439,6 +439,26 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
    ar/en/fr messages (`_friendlyError` in `auth_screen.dart`; similar mapping in
    `profile_screen.dart` change-password and `settings_screen.dart` sync). Keep this pattern
    for any new network-touching UI.
+10. **Scheduled notifications on Android need BOTH manifest receivers AND proguard keep rules
+   (CRITICAL, hit 2026-07-14 on the owner's phone: zero reminders ever fired).** TWO stacked
+   causes, fix both or reminders stay dead:
+   (a) PRIMARY - flutter_local_notifications v18 does NOT merge its broadcast receivers from
+   the library manifest (verified by reading the pub-cache AAR manifest: it ships only
+   permissions). `ScheduledNotificationReceiver` + `ScheduledNotificationBootReceiver` MUST be
+   declared in app/android/app/src/main/AndroidManifest.xml (now done). Without the first,
+   every zonedSchedule alarm broadcasts to a non-existent component and Android silently drops
+   it - debug AND release, no exception raised anywhere. Without the second, a reboot or app
+   update wipes all alarms and nothing reschedules until the next app open.
+   (b) SECONDARY - R8 minification (ON by default in release) strips GSON generic signatures
+   the plugin needs, so zonedSchedule THROWS in release only and the runZonedGuarded zone
+   swallowed it. Fix: `android/app/proguard-rules.pro` (keep `com.dexterous.**` + gson +
+   Signature/annotations) appended via `proguardFile("proguard-rules.pro")` in build.gradle.kts
+   (proguardFile APPENDS; `proguardFiles(...)` would REPLACE Flutter's defaults - never switch).
+   Also: `_safeZoned` in notifications_mobile.dart guards each schedule call (one failure no
+   longer aborts the rest) and prints to logcat; a DENIED first-open permission prompt now
+   flips the in-app notifications toggle OFF (auth_choice_screen + home_shell) so Settings
+   tells the truth and re-enabling re-requests the OS permission. Debugging on-device starts
+   with: `adb logcat | grep "awwad notif"`.
 
 ---
 
@@ -605,6 +625,24 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-14 round 4 (NOTIFICATIONS/REMINDERS FIXED - the owner's phone bug)** - Owner
+  tested the release APK on a real Android device: no notifications, no reminders. TWO stacked
+  root causes found (self-diagnosis + adversarial audit workflow that read the plugin's
+  pub-cache AAR manifest and Java source; see gotcha #10): (1) PRIMARY BLOCKER: the
+  flutter_local_notifications v18 broadcast receivers were never declared in the app manifest
+  and v18 does not merge them from the library, so every scheduled alarm broadcast was
+  silently dropped by Android - no reminder could EVER fire, debug or release, since the
+  feature shipped; both receivers now declared (Scheduled + Boot, the latter also fixes
+  reminders dying on reboot/app-update). (2) R8 minification without proguard keep rules broke
+  the plugin's GSON serialization in release; new android/app/proguard-rules.pro appended via
+  proguardFile. Plus: `_safeZoned` per-call guard (one failed schedule no longer kills the
+  rest; failures print «awwad notif:» to logcat), and a DENIED first-open permission prompt
+  now flips the in-app toggle OFF so Settings reflects reality and re-enabling re-requests.
+  ICON: confirmed every surface already composites the owner's exact plant (sprout.png, no
+  redraw) - his phone had a pre-fix APK; uninstall old app before installing so the launcher
+  icon cache refreshes. Fresh release APK+AAB rebuilt with receivers verified INSIDE the
+  packaged manifest via aapt; APK copied to the owner's OneDrive Desktop. Verified: analyze
+  clean, 54/54 tests.
 - **2026-07-14 round 3 (LIVE TIMER ANIMATIONS + 0d groundwork)** - Owner: «خلي البومودورو
   ومؤقت الهدنة يكون فيهم انيميشن اثناء الاستخدام». **POMODORO** (`pomodoro_screen.dart`): the
   dial is now driven by two controllers (a 1s repeating frame clock + a 2.6s breathing pulse)
