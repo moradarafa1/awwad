@@ -283,13 +283,26 @@ class _UsageScreenState extends State<UsageScreen>
             Row(
               children: [
                 Expanded(
-                  child: Text(u.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13.5,
-                          color: AppColors.heading)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(u.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13.5,
+                              color: AppColors.heading)),
+                      if (u.opens > 0)
+                        Text(
+                          usageOpensLabel(
+                              Localizations.localeOf(context).languageCode,
+                              u.opens),
+                          style: TextStyle(
+                              fontSize: 10.5, color: AppColors.muted),
+                        ),
+                    ],
+                  ),
                 ),
                 Text(_fmt(u.minutes),
                     style: TextStyle(
@@ -333,6 +346,22 @@ class _UsageScreenState extends State<UsageScreen>
 /// Localized entry-point title for Settings / daily log cards.
 String usageScreenTitle(String locale) =>
     (_usageStrings[locale] ?? _usageStrings['en']!)['title']!;
+
+/// "Opened N times" line for a per-app usage row. Pure so the Arabic
+/// number agreement (مرة واحدة / مرتين / N مرات / N مرة) is unit-testable.
+String usageOpensLabel(String locale, int n) {
+  switch (locale) {
+    case 'ar':
+      if (n == 1) return 'فُتح مرة واحدة اليوم';
+      if (n == 2) return 'فُتح مرتين اليوم';
+      if (n <= 10) return 'فُتح $n مرات اليوم';
+      return 'فُتح $n مرة اليوم';
+    case 'fr':
+      return n == 1 ? "Ouvert 1 fois aujourd'hui" : "Ouvert $n fois aujourd'hui";
+    default:
+      return n == 1 ? 'Opened once today' : 'Opened $n times today';
+  }
+}
 
 /// Prominent entry card on the Today tab for the phone-addiction habit.
 class UsageEntryButton extends StatelessWidget {

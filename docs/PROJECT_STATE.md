@@ -42,10 +42,38 @@ context or dropping anything:
 
 ---
 
-## 0.5 HANDOFF 2026-07-18 (context full - RESUME HERE, execute in order)
+## 0.5 HANDOFF 2026-07-18 round 2 (RESUME HERE)
+
+**STATE: everything delivered and verified; nothing half-done.** The adhan + radio + autolog
+round IS LIVE: Pages commit `324b61d` was pushed by the previous session before it died and a
+fresh rebuild from committed source is hash-identical to the live main.dart.js + every asset
+(byte-verified 2026-07-18; the size mismatch you may see in a Windows clone is only git
+autocrlf inflating text checkouts - compare git blob hashes, not working-tree bytes).
+NEW this round: **PER-APP OPEN COUNTS** in «استخدام الهاتف» (the owner's screenshot request) -
+MainActivity.kt `todayUsage` also walks `queryEvents` counting ACTIVITY_RESUMED
+(MOVE_TO_FOREGROUND < API 29), deduping consecutive same-package resumes; AppUsage gains
+`opens` (default 0, old payloads fine); row subtitle shows `usageOpensLabel` (pure, tested,
+MSA number agreement: فُتح مرة واحدة/مرتين/N مرات/N مرة اليوم) only when opens>0. Reviewed by a
+3-lens adversarial workflow (Android API / Arabic copy / Flutter UI): 10 raw findings, 0
+confirmed. analyze clean, 79/79 tests. APK+AAB rebuilt + aapt-verified (gotcha #11 checks),
+APK on the Desktop as `Awwad-1.0.0-final.apk`. The web bundle is BYTE-UNCHANGED by this
+feature (Android-only code, tree-shaken from web) so no Pages push was needed.
+
+**EXECUTE NEXT, in order:**
+1. §12 backlog 0c item (4): HOME-SCREEN WIDGET (streak + quick log; `home_widget` package;
+   needs native receiver + layout; verify like UsageLimitWorker - aapt + tests, owner tests
+   on device).
+2. Then 0c (7) shareable monthly report image (pure Flutter: render-to-image + share_plus),
+   and 0c (6) late-night usage detection for `late_nights`.
+3. OWNER-GATED (ask before starting): 0a deep per-habit appropriateness review, 0c phase C
+   hard app-blocking, §12 item 8 «غض البصر» habit. Store submission = owner action.
+
+## 0.5-OLD HANDOFF 2026-07-18 (superseded - kept for the round's technical details)
 
 **STATE: all code below is COMMITTED in this commit, verified (analyze clean, 75/75 tests),
 but the FINAL build/deploy round was still running when the session ended.**
+(Resolution 2026-07-18 round 2: the deploy HAD completed - Pages 324b61d live + byte-verified;
+APK/AAB + Desktop copy done; the per-app open-count request below is now SHIPPED.)
 
 Done since the last deploy (Pages commit a437ac6): (1) ADHAN SOUND on the 5 prayer
 notifications - channel `awwad_adhan_v1`, sound `android/app/src/main/res/raw/adhan.mp3`
@@ -397,6 +425,10 @@ cd /d/Claude/awwad/web && npm install && npm run build   # -> web/dist (111 page
 - **Notifications (local, mobile only; web no-op):** per-habit per-time reminders (ids 3000+),
   daily Ibrahimic-prayer **dhikr** (verified Sahih Muslim 405, `core/content/dhikr.dart`),
   badge-earned congrats, one-off 3-day sign-up re-engage. Toggles in Settings.
+- **Phone-usage toolkit (Android only, fail-open elsewhere):** «استخدام الهاتف» screen shows
+  per-app screen time + per-app OPEN COUNTS (queryEvents ACTIVITY_RESUMED, consecutive-dedup;
+  since 2026-07-18) + per-app daily limits; background `UsageLimitWorker` warns over-budget
+  apps every 15 min even with Awwad closed. Hard blocking = owner-gated (§12 0c phase C).
 - **Registration:** name/email/password, gender MANDATORY, optional country/birth_date/WhatsApp
   (Arabic/Persian digits normalized) + research-only notice. Writes to Supabase profiles.
 - **UI:** dark theme, **iOS "liquid glass" translucent buttons** (`theme.dart`). Verified:
@@ -524,6 +556,13 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
    flips the in-app notifications toggle OFF (auth_choice_screen + home_shell) so Settings
    tells the truth and re-enabling re-requests the OS permission. Debugging on-device starts
    with: `adb logcat | grep "awwad notif"`.
+11. **Release resource shrinking strips runtime-only res/raw sounds (hit 2026-07-18).** The
+   adhan silently vanished from the release APK because nothing references `@raw/adhan` from
+   code the shrinker can see (the channel sound is looked up by NAME at runtime). Fix:
+   `android/app/src/main/res/raw/keep.xml` with `tools:keep="@raw/adhan"`. Verify after EVERY
+   release build: `aapt2 dump resources app-release.apk | grep raw/adhan` (must be 1) and
+   `unzip -l` shows a ~2.24MB `res/*.mp3`. ALSO: never run two gradle builds concurrently on
+   one build dir - concurrent builds corrupt resource merging.
 
 ---
 
@@ -652,7 +691,9 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
      mirroring the `notifications` conditional-import pattern.
    - **Build it in a dedicated mobile session** (needs an APK + a real device to test); it
      cannot be verified in the web preview. Add UI under the `phone_addiction` habit's daily
-     log / a new tab. NOT started.
+     log / a new tab. STATUS: superseded by 0c item (3) - phases A+B SHIPPED (monitoring,
+     limits, background alarms) + per-app open counts (2026-07-18). Only hard blocking
+     (phase C) remains, owner-gated.
 
 1. **Language tap on onboarding does nothing** (reported 2026-06-27) - investigate
    `onboarding_flow.dart` language selection handler. (Open bug; may already be moot.)
@@ -698,6 +739,22 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-18 round 2 (PER-APP OPEN COUNTS in the usage screen)** - Owner request (screenshot):
+  every app row in «استخدام الهاتف» now shows how many times that app was opened today under its
+  name, next to the screen time. Native: `todayUsage` in MainActivity.kt additionally iterates
+  `usm.queryEvents(start, end)` counting ACTIVITY_RESUMED (MOVE_TO_FOREGROUND fallback < API
+  29) and dedupes consecutive same-package resumes so in-app screen changes do not inflate the
+  count; adds `opens` per row; fail-open (an event-query error just leaves opens = 0). Dart:
+  `AppUsage` gains positional-optional `opens = 0` (payloads from an older native side keep
+  working); the row renders the new pure `usageOpensLabel` - correct MSA number agreement
+  (فُتح مرة واحدة / مرتين / N مرات / N مرة اليوم) + en/fr - only when opens > 0. New
+  test/usage_opens_test.dart (4 tests). A 3-lens adversarial review workflow (Android API,
+  Arabic copy, Flutter UI) produced 10 raw findings, 0 confirmed real. Verified: analyze clean,
+  79/79 tests, web+APK+AAB rebuilt, gotcha #11 aapt checks pass, APK re-copied to the Desktop.
+  Web bundle byte-UNCHANGED (Android-only code is tree-shaken from the web build; fresh build
+  hash-identical to live Pages) so no Pages push. Also this session: confirmed the previous
+  session's deploy DID complete (Pages 324b61d live + byte-verified) and moved gotcha #11 into
+  §10 permanently.
 - **2026-07-18 (ADHAN SOUND + hadith/Sunnah live radio + auto-log-after-listening)** - Owner
   approved. (1) ADHAN on the five prayer notifications: dedicated Android notification channel
   `awwad_adhan_v1` with a raw sound (`android/app/src/main/res/raw/adhan.mp3`), alarm audio

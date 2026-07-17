@@ -1,6 +1,7 @@
 package com.awwad.awwad
 
 import android.app.AppOpsManager
+import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
@@ -77,6 +78,33 @@ class MainActivity : FlutterActivity() {
                         val start = cal.timeInMillis
                         val end = System.currentTimeMillis()
                         val agg = usm.queryAndAggregateUsageStats(start, end)
+                        // Per-app open counts from the raw event stream.
+                        // Consecutive resumes of the same package are one
+                        // "open" (in-app screen changes fire ACTIVITY_RESUMED
+                        // too); only a switch from another app counts.
+                        val opens = HashMap<String, Int>()
+                        try {
+                            val resumed =
+                                if (android.os.Build.VERSION.SDK_INT >= 29)
+                                    UsageEvents.Event.ACTIVITY_RESUMED
+                                else
+                                    @Suppress("DEPRECATION")
+                                    UsageEvents.Event.MOVE_TO_FOREGROUND
+                            val events = usm.queryEvents(start, end)
+                            val ev = UsageEvents.Event()
+                            var lastPkg: String? = null
+                            while (events.hasNextEvent()) {
+                                events.getNextEvent(ev)
+                                if (ev.eventType != resumed) continue
+                                val p = ev.packageName ?: continue
+                                if (p != lastPkg) {
+                                    opens[p] = (opens[p] ?: 0) + 1
+                                    lastPkg = p
+                                }
+                            }
+                        } catch (e: Exception) {
+                            // Fail-open: rows simply carry opens = 0.
+                        }
                         val pm = packageManager
                         val rows = mutableListOf<Map<String, Any>>()
                         for ((pkg, stats) in agg) {
@@ -97,6 +125,7 @@ class MainActivity : FlutterActivity() {
                                 "package" to pkg,
                                 "label" to label,
                                 "minutes" to minutes,
+                                "opens" to (opens[pkg] ?: 0),
                             ))
                         }
                         rows.sortByDescending { it["minutes"] as Int }

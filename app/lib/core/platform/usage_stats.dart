@@ -17,7 +17,11 @@ class AppUsage {
   final String package;
   final String label;
   final int minutes;
-  const AppUsage(this.package, this.label, this.minutes);
+
+  /// How many times the app was brought to the foreground today.
+  /// 0 when the platform side predates the field or events are unavailable.
+  final int opens;
+  const AppUsage(this.package, this.label, this.minutes, [this.opens = 0]);
 }
 
 /// "1h 25m" style split, kept pure for unit tests.
@@ -59,6 +63,7 @@ class UsageStatsPlatform {
             (r['package'] as String?) ?? '',
             (r['label'] as String?) ?? '',
             (r['minutes'] as num?)?.toInt() ?? 0,
+            (r['opens'] as num?)?.toInt() ?? 0,
           )
       ];
     } catch (_) {
