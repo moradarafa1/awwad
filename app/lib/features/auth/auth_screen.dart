@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
 
 import 'package:awwad/l10n/app_localizations.dart';
@@ -201,16 +202,38 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     var syncOk = true;
     try {
       final ctrl = ref.read(appControllerProvider.notifier);
+
+      // Shared-device fence: if the data on this device was produced under a
+      // DIFFERENT account, wipe it before touching the new user's cloud, so
+      // one person's relapse history can never leak into another's account.
+      final uid = SupabaseService.currentUser?.id;
+      final owner = await SyncService.ownerUid();
+      if (uid != null && owner != null && owner != uid) {
+        await ctrl.resetAll();
+        await SyncService.clearOwner();
+        await ctrl.setAuthChoice(guest: false); // stay past the auth gate
+      }
+
       final snap = await SyncService.pullAll();
       final local = ref.read(appControllerProvider);
       if (local.habits.isEmpty && snap.habits.isNotEmpty) {
         await ctrl.importSnapshot(snap.habits, snap.entries, snap.survey);
+      } else if (snap.habits.isNotEmpty) {
+        // Device already has data (guest onboarding on a new phone): MERGE
+        // instead of ignoring the cloud, or years of history stay invisible.
+        await ctrl.mergeSnapshot(snap.habits, snap.entries, snap.survey);
       }
       final cur = ref.read(appControllerProvider);
       await SyncService.pushAll(
           habits: cur.habits, entries: cur.entries, survey: cur.survey);
+      (await SharedPreferences.getInstance()).remove('awwad_pull_pending');
     } catch (_) {
-      syncOk = false; // Signed in fine; sync can be re-run from Settings.
+      syncOk = false; // Signed in fine; the next app open retries (see
+      // home_shell._autoSync, keyed off awwad_pull_pending).
+      try {
+        (await SharedPreferences.getInstance())
+            .setBool('awwad_pull_pending', true);
+      } catch (_) {}
     }
     try {
       // The user now has an account, so cancel any pending sign-up nudge.
@@ -708,7 +731,7 @@ const Map<String, Map<String, String>> _regStrings = {
         'البريد الإلكتروني لم يُؤكَّد بعد. أدخل الرمز المرسل إلى بريدك.',
     'errGeneric': 'حدث خطأ غير متوقّع. أعد المحاولة لاحقاً.',
     'syncLater':
-        'تم تسجيل الدخول بنجاح. تعذّرت مزامنة بياناتك الآن؛ يمكنك تشغيلها لاحقاً من الإعدادات.',
+        'تم تسجيل الدخول بنجاح. تعذّرت المزامنة الآن وستُعاد تلقائياً عند فتح التطبيق القادم.',
   },
   'en': {
     'gender': 'Gender',

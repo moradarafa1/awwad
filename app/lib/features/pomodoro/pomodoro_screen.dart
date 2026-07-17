@@ -6,6 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
+import '../../core/data/local_store.dart';
+import '../../core/notifications/notifications.dart';
+import '../../core/state/app_state.dart';
 
 /// Pomodoro focus timer. A productivity tool that complements habit building:
 /// focus in short, repeatable sprints (25m focus / 5m short break / 15m long
@@ -49,6 +52,68 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen>
         vsync: this, duration: const Duration(seconds: 1));
     _pulse = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 2600));
+    _restoreSession();
+  }
+
+  // ---- session persistence: a running timer survives app restarts ---------
+  void _persist() {
+    final LocalStore store;
+    try {
+      store = ref.read(localStoreProvider);
+    } catch (_) {
+      return; // store not wired (bare widget tests): timer still works
+    }
+    store.savePomodoro({
+      'phase': _phase.name,
+      'focusMin': _focusMin,
+      'completedFocus': _completedFocus,
+      'running': _running,
+      'remaining': _remaining,
+      'deadlineMs': _deadline?.millisecondsSinceEpoch,
+    });
+  }
+
+  void _restoreSession() {
+    final Map<String, dynamic>? saved;
+    try {
+      saved = ref.read(localStoreProvider).loadPomodoro();
+    } catch (_) {
+      return; // store not wired (bare widget tests)
+    }
+    if (saved == null) return;
+    _phase = _Phase.values.asNameMap()[saved['phase']] ?? _Phase.focus;
+    _focusMin = (saved['focusMin'] as num?)?.toInt() ?? 25;
+    _completedFocus = (saved['completedFocus'] as num?)?.toInt() ?? 0;
+    final wasRunning = saved['running'] == true;
+    final deadlineMs = (saved['deadlineMs'] as num?)?.toInt();
+    if (wasRunning && deadlineMs != null) {
+      final deadline = DateTime.fromMillisecondsSinceEpoch(deadlineMs);
+      final left = deadline.difference(DateTime.now()).inSeconds;
+      if (left > 1) {
+        // Resume mid-phase: the end notification from the original _start()
+        // is still armed with the OS, so only the in-app timer restarts.
+        _remaining = left;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && !_running) _start(resume: true);
+        });
+        return;
+      }
+      // The phase finished while the app was closed (the OS notification
+      // already fired). Land on the NEXT phase, idle.
+      if (_phase == _Phase.focus) {
+        _completedFocus++;
+        _phase = (_completedFocus % _roundsBeforeLong == 0)
+            ? _Phase.longBreak
+            : _Phase.shortBreak;
+      } else {
+        _phase = _Phase.focus;
+      }
+      _remaining = _total;
+      _persist();
+      return;
+    }
+    _remaining =
+        ((saved['remaining'] as num?)?.toInt() ?? _total).clamp(1, _total);
   }
 
   void _startAnim() {
@@ -91,14 +156,26 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen>
         _Phase.longBreak => AppColors.accent3,
       };
 
-  void _start() {
+  void _start({bool resume = false}) {
     if (_running) return;
     setState(() {
       _running = true;
       _deadline = DateTime.now().add(Duration(seconds: _remaining));
     });
     _startAnim();
-    AnalyticsService.instance.track('pomodoro_start', {'phase': _phase.name});
+    if (!resume) {
+      AnalyticsService.instance
+          .track('pomodoro_start', {'phase': _phase.name});
+      // OS alarm at phase end: the chime arrives on time even if the app is
+      // killed mid-session. (On resume the original alarm is still armed.)
+      final lang = Localizations.localeOf(context).languageCode;
+      final s = _strings[lang] ?? _strings['en']!;
+      schedulePomodoroDone(
+          Duration(seconds: _remaining),
+          s['title']!,
+          _phase == _Phase.focus ? s['doneFocus']! : s['doneBreak']!);
+    }
+    _persist();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_remaining > 1) {
         setState(() => _remaining--);
@@ -111,42 +188,50 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen>
   void _pause() {
     _timer?.cancel();
     _stopAnim();
+    cancelPomodoroDone();
     setState(() {
       _running = false;
       _deadline = null;
     });
+    _persist();
   }
 
   void _reset() {
     _timer?.cancel();
     _stopAnim();
+    cancelPomodoroDone();
     setState(() {
       _running = false;
       _deadline = null;
       _remaining = _total;
     });
+    _persist();
   }
 
   void _switchPhase(_Phase p) {
     _timer?.cancel();
     _stopAnim();
+    cancelPomodoroDone();
     setState(() {
       _phase = p;
       _running = false;
       _deadline = null;
       _remaining = _total;
     });
+    _persist();
   }
 
   void _setFocusLength(int min) {
     _timer?.cancel();
     _stopAnim();
+    cancelPomodoroDone();
     setState(() {
       _focusMin = min;
       _running = false;
       _deadline = null;
       if (_phase == _Phase.focus) _remaining = min * 60;
     });
+    _persist();
   }
 
   void _completePhase() {
@@ -169,6 +254,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen>
       }
       _remaining = _total;
     });
+    _persist();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,

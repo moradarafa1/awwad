@@ -11,9 +11,11 @@ import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
 import '../../core/cloud/supabase_service.dart';
+import '../../core/cloud/sync_service.dart';
 import '../../core/content/dhikr.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/notifications/notif_scheduler.dart';
+import '../../core/platform/reliability.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import '../auth/auth_screen.dart';
@@ -71,6 +73,54 @@ const Map<String, Map<String, String>> _kSet = {
     'ar': 'الإشعارات غير مسموح بها. فعّلها لعوّاد من إعدادات النظام.',
     'en': 'Notifications are blocked. Enable them for Awwad in system settings.',
     'fr': "Les notifications sont bloquées. Activez-les pour Awwad dans les réglages système."
+  },
+  'testNotif': {
+    'ar': 'اختبار الإشعارات',
+    'en': 'Test notifications',
+    'fr': 'Tester les notifications'
+  },
+  'testNotifSub': {
+    'ar': 'إشعار فوري وآخر بعد دقيقة للتأكد من وصول التذكيرات',
+    'en': 'One now and one in a minute, to confirm reminders arrive',
+    'fr': "Un maintenant et un dans une minute, pour vérifier"
+  },
+  'testSent': {
+    'ar': 'أُرسل إشعار الآن، وسيصلك آخر بعد دقيقة واحدة. إن لم يصل، افتح «التذكيرات لا تصل؟» بالأسفل.',
+    'en': 'A notification was sent now; another arrives in one minute. If it does not, open "Reminders not arriving?" below.',
+    'fr': "Une notification envoyée; une autre dans une minute. Sinon, ouvrez « Rappels absents ? »"
+  },
+  'testNow': {
+    'ar': 'الإشعارات تعمل. هذا هو الإشعار الفوري.',
+    'en': 'Notifications work. This is the instant one.',
+    'fr': "Les notifications fonctionnent. Voici l'instantanée."
+  },
+  'testLater': {
+    'ar': 'ممتاز! التذكيرات المجدولة تصل أيضاً. أنت جاهز.',
+    'en': 'Great! Scheduled reminders arrive too. You are all set.',
+    'fr': 'Parfait ! Les rappels programmés arrivent aussi.'
+  },
+  'battery': {
+    'ar': 'التذكيرات لا تصل؟',
+    'en': 'Reminders not arriving?',
+    'fr': 'Rappels absents ?'
+  },
+  'batterySub': {
+    'ar': 'بعض الهواتف توقف التنبيهات لتوفير البطارية. أعفِ عوّاد من ذلك.',
+    'en': 'Some phones kill alarms to save battery. Exempt Awwad.',
+    'fr': "Certains téléphones coupent les alarmes. Exemptez Awwad."
+  },
+  'batteryBody': {
+    'ar':
+        'شركات مثل شاومي وأوبو وفيفو وهواوي وسامسونج توقف تنبيهات التطبيقات في الخلفية لتوفير البطارية، فتتأخر التذكيرات أو لا تصل.\n\nالحل في خطوتين:\n1. اضغط «افتح الإعدادات» ثم اختر عوّاد واجعله «غير مقيد / بدون قيود».\n2. في إعدادات البطارية بالهاتف، أضف عوّاد إلى التطبيقات المستثناة من التوفير.',
+    'en':
+        'Makers like Xiaomi, Oppo, Vivo, Huawei and Samsung throttle background alarms to save battery, delaying or dropping reminders.\n\nTwo steps:\n1. Tap "Open settings", choose Awwad, set it to Unrestricted.\n2. In your phone battery settings, add Awwad to the exempt apps.',
+    'fr':
+        "Xiaomi, Oppo, Vivo, Huawei et Samsung limitent les alarmes en arrière-plan.\n\n1. Ouvrez les réglages et passez Awwad en « Sans restriction ».\n2. Ajoutez Awwad aux applications exemptées d'économie de batterie."
+  },
+  'batteryOpen': {
+    'ar': 'افتح الإعدادات',
+    'en': 'Open settings',
+    'fr': 'Ouvrir les réglages'
   },
   'share': {
     'ar': 'شارك عوّاد مع من تحب',
@@ -254,6 +304,74 @@ class SettingsScreen extends ConsumerWidget {
                     await _applySchedule(ref, loc);
                   },
                 ),
+                if (!kIsWeb) ...[
+                  const Divider(),
+                  // Instant self-check: one notification now + one in 60s.
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.notification_add_outlined,
+                        color: AppColors.accent, size: 20),
+                    title: Text(_set('testNotif', loc),
+                        style: const TextStyle(fontSize: 13)),
+                    subtitle: Text(_set('testNotifSub', loc),
+                        style:
+                            TextStyle(fontSize: 11, color: AppColors.muted)),
+                    onTap: () async {
+                      final granted = await ensureNotificationPermission();
+                      if (!context.mounted) return;
+                      if (!granted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(_set('permDenied', loc))));
+                        return;
+                      }
+                      await sendTestNotifications(
+                          l10n.appName,
+                          _set('testNow', loc),
+                          _set('testLater', loc));
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          duration: const Duration(seconds: 6),
+                          content: Text(_set('testSent', loc))));
+                    },
+                  ),
+                  const Divider(),
+                  // OEM battery-manager guidance (the #1 reminder killer).
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.battery_saver_outlined,
+                        color: AppColors.accent3, size: 20),
+                    title: Text(_set('battery', loc),
+                        style: const TextStyle(fontSize: 13)),
+                    subtitle: Text(_set('batterySub', loc),
+                        style:
+                            TextStyle(fontSize: 11, color: AppColors.muted)),
+                    onTap: () => showDialog<void>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        backgroundColor: AppColors.surface,
+                        title: Text(_set('battery', loc),
+                            style: TextStyle(color: AppColors.heading)),
+                        content: SingleChildScrollView(
+                          child: Text(_set('batteryBody', loc),
+                              style: TextStyle(
+                                  color: AppColors.text, height: 1.7)),
+                        ),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: Text(l10n.cancel)),
+                          FilledButton(
+                            onPressed: () {
+                              Navigator.pop(ctx);
+                              openBatterySettings();
+                            },
+                            child: Text(_set('batteryOpen', loc)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -596,6 +714,18 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
     if (ok == true) {
+      // "Erase my data" must not quietly leave the full history in the
+      // cloud: tombstone the user's rows first, then wipe the device and the
+      // owner tag.
+      if (SupabaseService.signedIn) {
+        try {
+          await SyncService.deleteAllCloud();
+        } catch (_) {
+          // Offline: local wipe still proceeds; cloud rows remain until a
+          // future erase (documented limitation).
+        }
+      }
+      await SyncService.clearOwner();
       await ref.read(appControllerProvider.notifier).resetAll();
     }
   }

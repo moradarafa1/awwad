@@ -6,6 +6,8 @@
 // for end-to-end testing (P2). Covers habit + daily entries + survey. Per-event
 // checklist selections (entry_selections) and custom fields sync land next.
 
+import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models.dart';
 import 'supabase_service.dart';
@@ -23,6 +25,21 @@ class SyncService {
   static SupabaseClient get _c => SupabaseService.client;
   static String? get _uid => SupabaseService.currentUser?.id;
 
+  // The account that OWNS the data on this device. Set after any successful
+  // push/pull; checked before every push so one person's private relapse
+  // history can never be uploaded into somebody else's account on a shared
+  // device (they sign out, a relative signs in...).
+  static const _kOwnerUid = 'awwad_owner_uid';
+
+  static Future<String?> ownerUid() async =>
+      (await SharedPreferences.getInstance()).getString(_kOwnerUid);
+
+  static Future<void> _markOwner(String uid) async =>
+      (await SharedPreferences.getInstance()).setString(_kOwnerUid, uid);
+
+  static Future<void> clearOwner() async =>
+      (await SharedPreferences.getInstance()).remove(_kOwnerUid);
+
   /// Push the local snapshot up. Safe to call repeatedly (idempotent upserts).
   static Future<void> pushAll({
     required List<Habit> habits,
@@ -31,6 +48,12 @@ class SyncService {
   }) async {
     final uid = _uid;
     if (uid == null || habits.isEmpty) return;
+    final owner = await ownerUid();
+    if (owner != null && owner != uid) {
+      // Data on this device belongs to another account; never cross-upload.
+      debugPrint('awwad sync: push blocked (device data owned by $owner)');
+      return;
+    }
 
     await _c.from('habits').upsert([
       for (final habit in habits)
@@ -44,9 +67,13 @@ class SyncService {
           'template_key': habit.templateKey,
           'total_weeks': habit.totalWeeks,
           'reminder_hour': habit.reminderHour,
+          // Client creation time: without it a restore misdates every habit
+          // to the first push, which corrupts streak/anniversary math.
+          'created_at': habit.createdAt.toUtc().toIso8601String(),
           'config': {
             'catalog_key': habit.catalogKey,
             'origin': 'offline',
+            'reminder_hours': habit.reminderHours,
             if ((habit.customMetricPrimary ?? '').isNotEmpty)
               'metric_p': habit.customMetricPrimary,
             if ((habit.customMetricSecondary ?? '').isNotEmpty)
@@ -66,14 +93,19 @@ class SyncService {
                   'user_id': uid,
                   'habit_id': e.habitId,
                   'entry_date': e.date,
-                  'urge_level': e.urge,
-                  'resistance_level': e.resistance,
+                  // Skip (excused) days carry 0/0 locally, but the DB checks
+                  // demand 1..10: nulls pass the checks and mean "no rating".
+                  // Without this, ONE skip entry poisoned the whole atomic
+                  // upsert and silently killed entry backup forever.
+                  'urge_level': e.isSkip ? null : e.urge,
+                  'resistance_level': e.isSkip ? null : e.resistance,
                   'did_slip': e.didSlip,
                   'mood_label': e.moodLabel,
                   'mood_emoji': e.moodEmoji,
                   'note': e.note,
                   'entry_type': e.entryType,
                   'trigger_key': e.trigger,
+                  'created_at': e.createdAt.toUtc().toIso8601String(),
                 })
             .toList(),
         onConflict: 'habit_id,entry_date',
@@ -90,6 +122,28 @@ class SyncService {
         'referral_source': survey.referralSource,
       }, onConflict: 'user_id');
     }
+
+    await _markOwner(uid);
+  }
+
+  /// Tombstone one habit (and its entries) in the cloud so it cannot
+  /// resurrect on the next pull after the user deleted it locally.
+  static Future<void> deleteHabitCloud(String habitId) async {
+    final uid = _uid;
+    if (uid == null) return;
+    await _c
+        .from('daily_entries')
+        .update({'is_deleted': true}).eq('habit_id', habitId);
+    await _c.from('habits').update({'is_deleted': true}).eq('id', habitId);
+  }
+
+  /// Tombstone EVERYTHING for the signed-in user ("erase my data"): the local
+  /// wipe must not quietly leave a full relapse history in the cloud.
+  static Future<void> deleteAllCloud() async {
+    final uid = _uid;
+    if (uid == null) return;
+    await _c.from('daily_entries').update({'is_deleted': true}).eq('user_id', uid);
+    await _c.from('habits').update({'is_deleted': true}).eq('user_id', uid);
   }
 
   /// Pull the user's snapshot from the cloud (used on first login on a device).
@@ -121,6 +175,11 @@ class SyncService {
               templateKey: h['template_key'] as String? ?? 'generic',
               totalWeeks: h['total_weeks'] as int? ?? 8,
               reminderHour: h['reminder_hour'] as int? ?? 20,
+              reminderHours: ((h['config'] as Map?)?['reminder_hours'] as List?)
+                      ?.whereType<num>()
+                      .map((n) => n.toInt())
+                      .toList() ??
+                  const [],
               createdAt: DateTime.tryParse(h['created_at'] as String? ?? '') ??
                   DateTime.now(),
             ))
@@ -136,8 +195,12 @@ class SyncService {
               id: e['id'] as String,
               habitId: e['habit_id'] as String? ?? '',
               date: e['entry_date'] as String,
-              urge: e['urge_level'] as int? ?? 5,
-              resistance: e['resistance_level'] as int? ?? 5,
+              // Skip entries store NULL ratings in the cloud (see pushAll);
+              // locally they are 0/0.
+              urge: e['urge_level'] as int? ??
+                  ((e['entry_type'] as String?) == 'skip' ? 0 : 5),
+              resistance: e['resistance_level'] as int? ??
+                  ((e['entry_type'] as String?) == 'skip' ? 0 : 5),
               didSlip: e['did_slip'] as bool? ?? false,
               moodEmoji: e['mood_emoji'] as String?,
               moodLabel: e['mood_label'] as String?,
@@ -162,6 +225,7 @@ class SyncService {
       );
     }
 
+    await _markOwner(uid);
     return CloudSnapshot(habits: habits, entries: entries, survey: survey);
   }
 }

@@ -464,14 +464,16 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 11. Brand & content rules
 
-- **LOGO (owner ruling 2026-07-14): the mark IS `app/assets/logo/sprout.png`, the plant shown
-  next to «أبني عادة جديدة» in the app. NEVER re-draw it in SVG.** Every icon is COMPOSITED
-  from that PNG by `ops/icongen/gen.mjs` (app icon = plant on the #12161F rounded tile),
-  `ops/icongen/site-icons.mjs` (favicon/192/512/apple-touch/logo-mark/play-icon) and
-  `ops/icongen/banners.mjs` (og-image 1200x630 + play-feature 1024x500). A previous round
-  shipped a hand-drawn "emoji-style seedling" instead; the owner rejected it («هي هي دي، مش
-  تصنعها من جديد»). To change any icon: edit sprout.png, re-run the three scripts, then
-  `flutter pub run flutter_launcher_icons` + `flutter_native_splash:create`.
+- **LOGO (owner ruling 2026-07-17, FINAL): the mark IS the official Noto emoji seedling
+  (U+1F331) artwork - the exact plant the app renders next to «أول خطوة» - stored at
+  `app/assets/logo/sprout.png` (rasterized unmodified from googlefonts/noto-emoji
+  svg/emoji_u1f331.svg, Apache-2.0). NEVER redraw it, NEVER substitute a hand-made lookalike
+  (two earlier lookalikes were both rejected: «عايزها هي هي... مش تعمل فيها اي تعديل»).**
+  Every icon is COMPOSITED from that PNG by `ops/icongen/gen.mjs` (app icon = plant on the
+  #12161F rounded tile), `ops/icongen/site-icons.mjs` (favicon/192/512/apple-touch/logo-mark/
+  play-icon) and `ops/icongen/banners.mjs` (og-image + play-feature). To change any icon:
+  replace sprout.png, re-run the three scripts, then `flutter pub run flutter_launcher_icons`
+  + `flutter_native_splash:create`.
 - **Name:** عوّاد / Awwad. **Slogan:** «رفيقٌ مَن زانَ عُمرَه، وحُسُنُ عملَه» (note the
   tashkeel on حُسُنُ: ح, س, ن all carry damma). Set in `app_ar.arb` `slogan` + `site.js` ar `slogan`.
 - **Colors:** dark theme. App accents: blue `#4f8ef7`, teal `#2dd4bf`, amber `#f59e0b`.
@@ -498,9 +500,15 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
    practicality).** DONE: (1) SOS «لحظة ضعف» screen; (2) DNS content shield (Private DNS guided
    setup + live verification). NEXT (in order):
    (3) DONE phase A (2026-07-12 round 2): app-usage monitoring + per-app daily limits +
-       on-open warnings (see changelog). Remaining phases: periodic BACKGROUND overrun
-       warnings, then optional hard-blocking overlay (Play-policy-sensitive). Native code
-       pending owner device validation.
+       on-open warnings. DONE phase B (2026-07-17): background overrun ALARMS via native
+       UsageLimitWorker (15-min WorkManager periodic, notification the moment a limited app
+       crosses its budget, once/app/day, works with Awwad closed). REMAINING phase C
+       (OWNER-GATED, do not build without explicit approval): hard BLOCKING/password-locking
+       other apps requires an AccessibilityService or overlay - real Google Play rejection
+       risk for the whole app, extra review process, and it is fragile across OEMs. The
+       honest alternatives if wanted: (a) keep strong warnings (shipped), (b) Digital
+       Wellbeing-style repeated nag notifications, (c) accept the Play risk and build the
+       AccessibilityService blocker. Owner must choose before C starts.
    (4) Home-screen widget (streak + quick log; home_widget package).
    (5) Auto prayer-times reminders for prayer habits (offline adhan calculation by location).
    (6) Late-night usage detection for `late_nights` (depends on (3)'s usage plumbing).
@@ -625,6 +633,37 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-17 (FULL AUDIT FIXES + competitor round: real emoji logo, test notifications,
+  usage-limit background alarms, sync integrity)** - Owner ran «التدقيق الشامل + كل التحسينات».
+  **(1) LOGO, FINAL:** the mark is now the OFFICIAL Noto emoji seedling artwork (U+1F331,
+  fetched from googlefonts/noto-emoji, Apache-2.0), i.e. the exact plant rendered next to
+  «أول خطوة» inside the app - sprout.png replaced, every asset regenerated (launcher/splash/
+  site/store/og/banners). §11 updated: the master IS the official emoji artwork, never redraw.
+  **(2) TEST NOTIFICATIONS (Settings):** «اختبار الإشعارات» sends one instant + one 60s-scheduled
+  notification (ids 1998/1999) so the owner can verify the fixed pipeline on-device in a minute.
+  **(3) BATTERY GUIDANCE (Settings):** «التذكيرات لا تصل؟» dialog + `awwad/reliability` channel
+  (manufacturer + openBatterySettings intents) for the OEM alarm-killers (Xiaomi/Oppo/Samsung...).
+  **(4) USAGE-LIMIT BACKGROUND ALARMS:** native `UsageLimitWorker` (androidx.work 2.9.1, 15-min
+  periodic, registered in MainActivity, KEEP policy) reads the Flutter-saved limits + today's
+  UsageStats and posts a HIGH-priority warning the moment a limited app crosses its budget,
+  once per app per day, trilingual, fail-open - works with Awwad closed. App LOCKING (password/
+  hard-block) deliberately NOT shipped: needs an AccessibilityService with real Play-rejection
+  risk; documented as an owner-gated option in §12 0c. **(5) POMODORO:** end-of-phase OS alarm
+  (id 1004; arrives even if the app is killed) + full session persistence (LocalStore
+  awwad_pomodoro_v1; a running timer resumes after restart, a phase that ended while closed
+  lands on the next phase). **(6) SYNC INTEGRITY (audit workflow, 6 confirmed findings, all
+  fixed):** skip entries now push NULL ratings (a single excused day used to poison the atomic
+  upsert and silently kill ALL entry backup forever) + live DB checks relaxed to 0..10/null
+  (migration 0009); owner-uid fence (`awwad_owner_uid`) stops one account's relapse history
+  from being pushed into another account on a shared device, and sign-in over another user's
+  data wipes-then-imports; habit deletion + «امسح كل بياناتي» now TOMBSTONE cloud rows
+  (deleteHabitCloud/deleteAllCloud - no more resurrection on the next pull); sign-in with
+  existing guest data MERGES cloud+local (union by id / habit+date, newer createdAt wins)
+  instead of ignoring the cloud; failed first pull sets `awwad_pull_pending` and
+  home_shell._autoSync retries pull+merge on every open (syncLater copy fixed to match);
+  habits now sync created_at + reminder_hours (multi-time reminders used to be lost on
+  restore). Advisors after 0009: only the known by-design warnings. Verified: analyze clean,
+  full suite green, web+APK+AAB rebuilt, Pages redeployed, APK on the owner's Desktop.
 - **2026-07-14 round 4 (NOTIFICATIONS/REMINDERS FIXED - the owner's phone bug)** - Owner
   tested the release APK on a real Android device: no notifications, no reminders. TWO stacked
   root causes found (self-diagnosis + adversarial audit workflow that read the plugin's

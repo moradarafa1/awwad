@@ -15,6 +15,21 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
+        // Usage-limit guard: a 15-minute periodic check that posts a warning
+        // the moment a limited app crosses its daily screen-time budget, even
+        // if Awwad itself is closed. KEEP = never duplicated across launches.
+        try {
+            androidx.work.WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "awwad_usage_guard",
+                androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+                androidx.work.PeriodicWorkRequestBuilder<UsageLimitWorker>(
+                    java.time.Duration.ofMinutes(15)
+                ).build()
+            )
+        } catch (e: Exception) {
+            // WorkManager unavailable: the in-app checks still work.
+        }
+
         // App-usage monitoring (phone-addiction habit, phase A: read-only).
         // Uses the special PACKAGE_USAGE_STATS permission the user grants in
         // system settings. Everything is fail-open: errors return safe values.
@@ -131,6 +146,43 @@ class MainActivity : FlutterActivity() {
                     for (action in actions) {
                         try {
                             startActivity(Intent(action))
+                            opened = true
+                            break
+                        } catch (e: Exception) {
+                            // try the next fallback
+                        }
+                    }
+                    result.success(opened)
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        // Reminder reliability helpers: aggressive OEM battery managers
+        // (Xiaomi/Oppo/Vivo/Huawei...) kill scheduled alarms. These open the
+        // relevant system screens so the user can exempt Awwad. Fail-open.
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            "awwad/reliability"
+        ).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "manufacturer" -> result.success(android.os.Build.MANUFACTURER)
+                "openBatterySettings" -> {
+                    // The per-OEM "app auto-start / battery saver" screens are
+                    // non-public; the stock exemption list + app details are
+                    // reliable everywhere.
+                    val intents = listOf(
+                        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),
+                        Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            android.net.Uri.parse("package:$packageName")
+                        ),
+                        Intent(Settings.ACTION_SETTINGS),
+                    )
+                    var opened = false
+                    for (intent in intents) {
+                        try {
+                            startActivity(intent)
                             opened = true
                             break
                         } catch (e: Exception) {

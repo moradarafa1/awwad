@@ -636,6 +636,51 @@ class AppController extends Notifier<AppState> {
     if (survey != null) await _store.saveSurvey(survey);
   }
 
+  /// Union-merge a cloud snapshot into EXISTING local data (sign-in on a
+  /// device that already has habits, e.g. new phone onboarded as guest first).
+  /// Habits union by id; entries union by (habit, date) with the newer
+  /// createdAt winning. Nothing is dropped from either side.
+  Future<void> mergeSnapshot(List<Habit> cloudHabits,
+      List<DailyEntry> cloudEntries, SurveyData? cloudSurvey) async {
+    final habitsById = {for (final h in state.habits) h.id: h};
+    for (final h in cloudHabits) {
+      habitsById.putIfAbsent(h.id, () => h);
+    }
+    final habits = habitsById.values.toList();
+
+    final byKey = <String, DailyEntry>{};
+    for (final e in [...cloudEntries, ...state.entries]) {
+      final k = '${e.habitId}|${e.date}';
+      final prev = byKey[k];
+      if (prev == null || e.createdAt.isAfter(prev.createdAt)) byKey[k] = e;
+    }
+    final entries = _sorted(byKey.values.toList());
+
+    var s = state.settings;
+    if (habits.isNotEmpty) {
+      s = s.copyWith(
+        onboardingDone: true,
+        activeHabitId: s.activeHabitId ?? habits.first.id,
+      );
+    }
+    final survey = state.survey ?? cloudSurvey;
+    final fields = state.fields.isEmpty
+        ? seedFields(s.locale ?? 'ar',
+            habits.isNotEmpty ? habits.first.track : 'break')
+        : state.fields;
+    state = state.copyWith(
+        settings: s,
+        habits: habits,
+        entries: entries,
+        survey: survey,
+        fields: fields);
+    await _store.saveSettings(s);
+    await _store.saveHabits(habits);
+    await _store.saveEntries(entries);
+    await _store.saveFields(fields);
+    if (survey != null) await _store.saveSurvey(survey);
+  }
+
   // ---------- reset ----------
   Future<void> resetAll() async {
     await _store.clearAll();

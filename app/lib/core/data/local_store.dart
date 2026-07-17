@@ -94,6 +94,25 @@ class LocalStore {
   Future<void> saveFields(List<CustomField> fields) => _prefs.setString(
       _kFields, jsonEncode(fields.map((e) => e.toJson()).toList()));
 
+  // ---- Pomodoro session (survives app restarts) ----
+  static const _kPomodoro = 'awwad_pomodoro_v1';
+  Map<String, dynamic>? loadPomodoro() {
+    final raw = _prefs.getString(_kPomodoro);
+    if (raw == null) return null;
+    try {
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> savePomodoro(Map<String, dynamic> state) =>
+      _prefs.setString(_kPomodoro, jsonEncode(state));
+
+  Future<void> clearPomodoro() async {
+    await _prefs.remove(_kPomodoro);
+  }
+
   Future<void> clearAll() async {
     await _prefs.remove(_kHabit);
     await _prefs.remove(_kHabits);

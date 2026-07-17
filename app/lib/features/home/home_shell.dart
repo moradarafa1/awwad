@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
@@ -56,10 +57,27 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   }
 
   // Auto-sync on app open: replaces the removed manual "sync now" button.
-  // Push-only upserts (idempotent), silent fail-open, never blocks startup.
+  // Idempotent, silent fail-open, never blocks startup. Also the RECOVERY
+  // path: if the first-login pull failed (awwad_pull_pending) or the device
+  // has no habits yet, pull + merge before pushing.
   Future<void> _autoSync() async {
     if (!SupabaseService.signedIn) return;
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final pending = prefs.getBool('awwad_pull_pending') ?? false;
+      final before = ref.read(appControllerProvider);
+      if (pending || before.habits.isEmpty) {
+        final snap = await SyncService.pullAll();
+        final ctrl = ref.read(appControllerProvider.notifier);
+        if (snap.habits.isNotEmpty) {
+          if (before.habits.isEmpty) {
+            await ctrl.importSnapshot(snap.habits, snap.entries, snap.survey);
+          } else {
+            await ctrl.mergeSnapshot(snap.habits, snap.entries, snap.survey);
+          }
+        }
+        await prefs.remove('awwad_pull_pending');
+      }
       final s = ref.read(appControllerProvider);
       await SyncService.pushAll(
           habits: s.habits, entries: s.entries, survey: s.survey);

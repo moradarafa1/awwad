@@ -1,8 +1,12 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/cloud/supabase_service.dart';
+import '../../core/cloud/sync_service.dart';
 import '../../core/content/dhikr.dart';
 import '../../core/models.dart';
 import '../../core/notifications/notif_scheduler.dart';
@@ -252,6 +256,11 @@ class HabitsScreen extends ConsumerWidget {
     );
     if (ok == true) {
       await ref.read(appControllerProvider.notifier).removeHabit(h.id);
+      // Tombstone the cloud copy too, or the habit resurrects on the next
+      // pull (fire-and-forget; a miss self-heals on a later delete/push).
+      if (SupabaseService.signedIn) {
+        unawaited(SyncService.deleteHabitCloud(h.id).catchError((_) {}));
+      }
     }
   }
 }

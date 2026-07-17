@@ -19,6 +19,14 @@ Future<void> scheduleReengageNudge(
 
 Future<void> showBadgeNotification(int slot, String title, String body) async {}
 
+Future<void> schedulePomodoroDone(
+    Duration after, String title, String body) async {}
+
+Future<void> sendTestNotifications(
+    String title, String nowBody, String laterBody) async {}
+
+Future<void> cancelPomodoroDone() async {}
+
 Future<void> cancelReminders() async {}
 
 Future<void> cancelDhikr() async {}

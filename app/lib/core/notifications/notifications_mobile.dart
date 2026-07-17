@@ -28,6 +28,7 @@ const _badgeChannelName = 'Achievements';
 const _reminderId = 1001; // legacy single habit reminder
 const _dhikrId = 1002;
 const _reengageId = 1003;
+const _pomodoroId = 1004; // one-off end-of-phase chime
 const _badgeIdBase = 2000;
 const _habitReminderBase = 3000; // per-habit, per-time reminders (3000..3059)
 const _habitReminderMax = 60;
@@ -52,10 +53,15 @@ Future<void> initNotifications() async {
     requestBadgePermission: false,
     requestSoundPermission: false,
   );
-  await _plugin.initialize(
-    const InitializationSettings(android: android, iOS: ios),
-  );
-  _ready = true;
+  try {
+    await _plugin.initialize(
+      const InitializationSettings(android: android, iOS: ios),
+    );
+    _ready = true;
+  } catch (e) {
+    // e.g. MissingPluginException under `flutter test`; callers stay no-op.
+    debugPrint('awwad notif: init failed: $e');
+  }
 }
 
 /// Explicitly request OS notification permission and return whether granted.
@@ -204,6 +210,61 @@ Future<void> scheduleHabitReminder(
   await _safeZoned(_habitReminderBase + slot, title, body,
       _nextInstanceOfHour(hour), details,
       match: DateTimeComponents.time); // repeat daily
+}
+
+const _testNowId = 1998;
+const _testLaterId = 1999;
+
+/// Owner-facing sanity check: one notification NOW plus one scheduled in 60s.
+/// The immediate one proves the permission/channel path; the delayed one
+/// proves the AlarmManager + receiver path (the part that used to be broken).
+Future<void> sendTestNotifications(
+    String title, String nowBody, String laterBody) async {
+  await initNotifications();
+  const details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _habitChannelId,
+      _habitChannelName,
+      channelDescription: 'Daily habit reminder',
+      importance: Importance.high,
+      priority: Priority.high,
+    ),
+    iOS: DarwinNotificationDetails(),
+  );
+  try {
+    await _plugin.show(_testNowId, title, nowBody, details);
+  } catch (e) {
+    debugPrint('awwad notif: test show failed: $e');
+  }
+  await _safeZoned(_testLaterId, title, laterBody,
+      tz.TZDateTime.now(tz.local).add(const Duration(seconds: 60)), details);
+}
+
+/// One-off notification when the running Pomodoro phase ends. Because this is
+/// an OS alarm, it fires ON TIME even if the app is killed mid-session, which
+/// is what makes the timer trustworthy on mobile.
+Future<void> schedulePomodoroDone(Duration after, String title, String body) async {
+  await initNotifications();
+  const details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _habitChannelId,
+      _habitChannelName,
+      channelDescription: 'Daily habit reminder',
+      importance: Importance.high,
+      priority: Priority.high,
+    ),
+    iOS: DarwinNotificationDetails(),
+  );
+  await _safeZoned(
+      _pomodoroId, title, body, tz.TZDateTime.now(tz.local).add(after), details);
+}
+
+Future<void> cancelPomodoroDone() async {
+  try {
+    await _plugin.cancel(_pomodoroId);
+  } catch (_) {
+    // plugin unavailable (tests) - nothing scheduled anyway
+  }
 }
 
 /// Clears all per-habit reminders (and the legacy single one) before a reschedule.
