@@ -121,12 +121,16 @@ Future<void> applyPrayerSchedule({
             a.id, a.when, _t(_kAdhkarPm, locale), _t(_kAdhkarBody, locale));
       default:
         final p = prayerName(a.prayer, locale);
-        await scheduleAt(
-          a.id,
-          a.when,
-          _t(a.pre ? _kPre : _kMain, locale).replaceFirst('{p}', p),
-          _t(a.pre ? _kPreBody : _kMainBody, locale),
-        );
+        final title =
+            _t(a.pre ? _kPre : _kMain, locale).replaceFirst('{p}', p);
+        final body = _t(a.pre ? _kPreBody : _kMainBody, locale);
+        // The adhan SOUND plays only on the actual prayer-time notification,
+        // never on the 5-minute pre-alert.
+        if (cfg.adhanSound && !a.pre) {
+          await scheduleAdhan(a.id, a.when, title, body);
+        } else {
+          await scheduleAt(a.id, a.when, title, body);
+        }
     }
   }
 }

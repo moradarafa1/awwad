@@ -297,19 +297,38 @@ class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen> {
             ),
             const SizedBox(height: 12),
             SectionCard(
-              child: SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                value: _cfg.preAlert,
-                activeThumbColor: AppColors.accent,
-                title: Text(_s('preAlert'),
-                    style: const TextStyle(fontSize: 13)),
-                subtitle: Text(_s('preAlertSub'),
-                    style: TextStyle(fontSize: 11, color: AppColors.muted)),
-                onChanged: (v) async {
-                  setState(() => _cfg = _cfg.copyWith(preAlert: v));
-                  await _save();
-                },
-              ),
+              child: Column(children: [
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: _cfg.preAlert,
+                  activeThumbColor: AppColors.accent,
+                  title: Text(_s('preAlert'),
+                      style: const TextStyle(fontSize: 13)),
+                  subtitle: Text(_s('preAlertSub'),
+                      style: TextStyle(fontSize: 11, color: AppColors.muted)),
+                  onChanged: (v) async {
+                    setState(() => _cfg = _cfg.copyWith(preAlert: v));
+                    await _save();
+                  },
+                ),
+                if (!kIsWeb) ...[
+                  const Divider(),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: _cfg.adhanSound,
+                    activeThumbColor: AppColors.accent,
+                    title: Text(_s('adhanSound'),
+                        style: const TextStyle(fontSize: 13)),
+                    subtitle: Text(_s('adhanSoundSub'),
+                        style:
+                            TextStyle(fontSize: 11, color: AppColors.muted)),
+                    onChanged: (v) async {
+                      setState(() => _cfg = _cfg.copyWith(adhanSound: v));
+                      await _save();
+                    },
+                  ),
+                ],
+              ]),
             ),
             const SizedBox(height: 12),
             Text(_s('note'),
@@ -389,6 +408,16 @@ const Map<String, Map<String, String>> _kStr = {
     'ar': 'تنبيه إضافي قبل كل صلاة من الصلوات الخمس',
     'en': 'An extra alert before each of the five prayers',
     'fr': 'Une alerte avant chacune des cinq prieres'
+  },
+  'adhanSound': {
+    'ar': 'صوت الأذان مع التنبيه',
+    'en': 'Play the adhan with the alert',
+    'fr': "Jouer l'adhan avec l'alerte"
+  },
+  'adhanSoundSub': {
+    'ar': 'يُشغّل الأذان عند دخول وقت كل صلاة (أندرويد).',
+    'en': 'Plays the call to prayer when each prayer time enters (Android).',
+    'fr': "Joue l'appel a la priere a l'entree de chaque priere (Android)."
   },
   'note': {
     'ar':

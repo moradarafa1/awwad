@@ -24,6 +24,11 @@ const _nudgeChannelId = 'awwad_account';
 const _nudgeChannelName = 'Account';
 const _badgeChannelId = 'awwad_badges';
 const _badgeChannelName = 'Achievements';
+// Prayer notifications with the adhan sound. A dedicated channel because an
+// Android channel's sound is fixed at creation; the app switches between this
+// channel and the silent prayer channel via the user's adhan-sound toggle.
+const _adhanChannelId = 'awwad_adhan_v1';
+const _adhanChannelName = 'Adhan (prayer call)';
 
 const _reminderId = 1001; // legacy single habit reminder
 const _dhikrId = 1002;
@@ -317,6 +322,32 @@ Future<void> scheduleAt(
       styleInformation: BigTextStyleInformation(body),
     ),
     iOS: const DarwinNotificationDetails(),
+  );
+  await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details);
+}
+
+/// A prayer notification that plays the ADHAN sound (Android). The sound is the
+/// raw resource `android/app/src/main/res/raw/adhan` (ships CC0 by default;
+/// the owner can drop in a licensed Makkah/Qatami file of the same name).
+/// iOS keeps its default sound until a bundled .caf is provided (documented).
+Future<void> scheduleAdhan(
+    int id, DateTime when, String title, String body) async {
+  await initNotifications();
+  final details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _adhanChannelId,
+      _adhanChannelName,
+      channelDescription: 'The call to prayer at prayer time',
+      importance: Importance.max,
+      priority: Priority.max,
+      sound: const RawResourceAndroidNotificationSound('adhan'),
+      audioAttributesUsage: AudioAttributesUsage.alarm,
+      styleInformation: BigTextStyleInformation(body),
+    ),
+    iOS: const DarwinNotificationDetails(
+      // A licensed short adhan .caf can be bundled and named here later.
+      presentSound: true,
+    ),
   );
   await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details);
 }

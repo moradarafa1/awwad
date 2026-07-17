@@ -2,6 +2,8 @@
 // free mp3quran.net servers via just_audio. The user picks a reciter and a
 // surah; the choice persists so the wird resumes where they left off.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
@@ -11,7 +13,11 @@ import '../../core/quran/quran_data.dart';
 import '../../core/state/app_state.dart';
 
 class QuranPlayerScreen extends ConsumerStatefulWidget {
-  const QuranPlayerScreen({super.key});
+  const QuranPlayerScreen({super.key, this.habitId});
+
+  /// When set, listening for a couple of minutes auto-logs this habit's day.
+  final String? habitId;
+
   @override
   ConsumerState<QuranPlayerScreen> createState() => _QuranPlayerScreenState();
 }
@@ -23,11 +29,34 @@ class _QuranPlayerScreenState extends ConsumerState<QuranPlayerScreen> {
   int _surah = 18; // default to Al-Kahf
   bool _loading = true;
   String? _error;
+  StreamSubscription<Duration>? _posSub;
+  int _listenedSeconds = 0;
+  bool _autoLogged = false;
+  static const _autoLogAfter = 120; // seconds of real listening
 
   @override
   void initState() {
     super.initState();
     _init();
+    _posSub = _player.positionStream.listen((_) {
+      if (_player.playing && !_autoLogged) {
+        _listenedSeconds++;
+        if (_listenedSeconds >= _autoLogAfter) _autoLog();
+      }
+    });
+  }
+
+  Future<void> _autoLog() async {
+    if (_autoLogged || widget.habitId == null) return;
+    _autoLogged = true;
+    final created = await ref
+        .read(appControllerProvider.notifier)
+        .quickLogHabit(widget.habitId!, note: _s('autoNote'));
+    if (created && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.success,
+          content: Text(_s('autoLogged'))));
+    }
   }
 
   Future<void> _init() async {
@@ -50,6 +79,7 @@ class _QuranPlayerScreenState extends ConsumerState<QuranPlayerScreen> {
 
   @override
   void dispose() {
+    _posSub?.cancel();
     _player.dispose();
     super.dispose();
   }
@@ -328,5 +358,15 @@ const Map<String, Map<String, String>> _kStr = {
     'ar': 'التلاوات تُبَثّ من خوادم mp3quran.net المجانية وتحتاج اتصالاً بالإنترنت. اختيارك يُحفظ ليستأنف وردك.',
     'en': 'Recitations stream from the free mp3quran.net servers and need an internet connection. Your choice is saved to resume your wird.',
     'fr': "Les récitations proviennent des serveurs gratuits mp3quran.net et nécessitent une connexion. Votre choix est enregistré."
+  },
+  'autoNote': {
+    'ar': 'سُجِّل تلقائياً بعد الاستماع',
+    'en': 'Auto-logged after listening',
+    'fr': "Enregistré après l'écoute"
+  },
+  'autoLogged': {
+    'ar': 'أحسنت! سُجِّل وردك لليوم تلقائياً ✅',
+    'en': "Well done! Today's wird was logged automatically ✅",
+    'fr': "Bravo ! Votre wird du jour a été enregistré ✅"
   },
 };

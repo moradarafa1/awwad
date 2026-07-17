@@ -28,6 +28,9 @@ Future<void> sendTestNotifications(
 Future<void> scheduleAt(
     int id, DateTime when, String title, String body) async {}
 
+Future<void> scheduleAdhan(
+    int id, DateTime when, String title, String body) async {}
+
 Future<void> cancelIdRange(int from, int to) async {}
 
 Future<void> scheduleWeekly(int id, int weekday, int hour, int minute,

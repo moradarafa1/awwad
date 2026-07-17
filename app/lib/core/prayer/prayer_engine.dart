@@ -26,6 +26,9 @@ class PrayerConfig {
   /// Notify 5 minutes before each prayer too (owner-spec toggle).
   final bool preAlert;
 
+  /// Play the adhan SOUND on the five prayer notifications (Android).
+  final bool adhanSound;
+
   /// Per-prayer manual adjustment in minutes (e.g. {'fajr': -3}).
   final Map<String, int> offsets;
 
@@ -37,6 +40,7 @@ class PrayerConfig {
     this.countryAr,
     this.countryEn,
     this.preAlert = false,
+    this.adhanSound = false,
     this.offsets = const {},
   });
 
@@ -50,6 +54,7 @@ class PrayerConfig {
     String? countryAr,
     String? countryEn,
     bool? preAlert,
+    bool? adhanSound,
     Map<String, int>? offsets,
   }) =>
       PrayerConfig(
@@ -60,6 +65,7 @@ class PrayerConfig {
         countryAr: countryAr ?? this.countryAr,
         countryEn: countryEn ?? this.countryEn,
         preAlert: preAlert ?? this.preAlert,
+        adhanSound: adhanSound ?? this.adhanSound,
         offsets: offsets ?? this.offsets,
       );
 
@@ -71,6 +77,7 @@ class PrayerConfig {
         'country_ar': countryAr,
         'country_en': countryEn,
         'pre_alert': preAlert,
+        'adhan_sound': adhanSound,
         'offsets': offsets,
       };
 
@@ -82,6 +89,7 @@ class PrayerConfig {
         countryAr: j['country_ar'] as String?,
         countryEn: j['country_en'] as String?,
         preAlert: j['pre_alert'] == true,
+        adhanSound: j['adhan_sound'] == true,
         offsets: (j['offsets'] as Map?)
                 ?.map((k, v) => MapEntry(k.toString(), (v as num).toInt())) ??
             const {},

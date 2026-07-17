@@ -95,6 +95,7 @@ const Map<String, Map<String, String>> kHabitQuestions = {
   'break_porn': {'ar': 'هل شاهدت محتوى محرّماً اليوم؟', 'en': 'Did you view forbidden content today?', 'fr': 'Avez-vous regardé du contenu interdit aujourd\'hui ?'},
   'surah_kahf': {'ar': 'هل قرأت سورة الكهف هذا الأسبوع؟', 'en': 'Did you read Surah Al-Kahf this week?', 'fr': 'Avez-vous lu la sourate Al-Kahf cette semaine ?'},
   'listening_wird': {'ar': 'هل استمعت إلى وِردك من القرآن اليوم؟', 'en': 'Did you listen to your Quran wird today?', 'fr': 'Avez-vous écouté votre wird du Coran aujourd\'hui ?'},
+  'hadith_wird': {'ar': 'هل استمعت إلى وِردك من السنة اليوم؟', 'en': 'Did you listen to your Sunnah wird today?', 'fr': 'Avez-vous écouté votre wird de la Sunna aujourd\'hui ?'},
   'phone_addiction': {'ar': 'هل ضاع وقتك في التصفح اليوم؟', 'en': 'Did you waste your time scrolling today?', 'fr': 'Avez-vous perdu votre temps à naviguer sans but aujourd\'hui ?'},
   'excessive_gaming': {'ar': 'هل تجاوزت وقت اللعب المسموح اليوم؟', 'en': 'Did you exceed your gaming limit today?', 'fr': 'Avez-vous dépassé votre limite de jeu aujourd\'hui ?'},
   'procrastination': {'ar': 'هل سوّفت مهامك اليوم؟', 'en': 'Did you procrastinate on your tasks today?', 'fr': 'Avez-vous procrastiné sur vos tâches aujourd\'hui ?'},

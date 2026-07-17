@@ -42,7 +42,45 @@ context or dropping anything:
 
 ---
 
-## 0.5 HANDOFF 2026-07-14 round 2 (RESUME HERE)
+## 0.5 HANDOFF 2026-07-18 (context full - RESUME HERE, execute in order)
+
+**STATE: all code below is COMMITTED in this commit, verified (analyze clean, 75/75 tests),
+but the FINAL build/deploy round was still running when the session ended.**
+
+Done since the last deploy (Pages commit a437ac6): (1) ADHAN SOUND on the 5 prayer
+notifications - channel `awwad_adhan_v1`, sound `android/app/src/main/res/raw/adhan.mp3`
+which IS THE OWNER'S OWN FILE (317311.mp3, his explicit instruction «لا تستخدم غيره مطلقاً» -
+NEVER replace it); toggle = PrayerConfig.adhanSound + switch in prayer settings; adhan plays
+only on the actual prayer time, never the 5-min pre-alert (prayer_scheduler branches to
+scheduleAdhan). (2) HADITH/SUNNAH LIVE RADIO: habit `hadith_wird` (synced catalog + seed +
+LIVE DB = 40 rows) + features/radio/radio_player_screen.dart, stations in
+core/radio/radio_stations.dart (verified https: saheh-bokharee, saheh-muslim, riyad,
+fi_zilal_alsiyra + quran: radiojar 0tpy1h0kxtzuv, salma, tafseer). (3) AUTO-LOG AFTER
+LISTENING: AppController.quickLogHabit(habitId) (idempotent, keeps active habit) fired after
+120s of real listening by BOTH the radio player and the Quran player (QuranPlayerScreen now
+takes habitId; daily_log resource cards pass habit?.id). Tests: radio_autolog_test.dart.
+
+**EXECUTE NEXT, in order:**
+1. FINISH THE DELIVERY: run the §6 builds (web --base-href /app/ + apk + aab, standard
+   dart-defines), verify `aapt dump` shows the receivers + POST_NOTIFICATIONS, copy APK to
+   C:/Users/morad/OneDrive/Desktop/Awwad-1.0.0-final.apk, refresh the Pages clone (in THIS
+   session's scratchpad or re-clone moradarafa1.github.io) with web/dist at root + app build
+   at /app/ + 404.html copy, commit+push Pages, byte-verify live main.dart.js, push source.
+2. OWNER REQUEST IN FLIGHT (screenshot provided, NOT yet implemented): show PER-APP OPEN
+   COUNT next to the usage time in the usage screen. Plan: in MainActivity.kt `todayUsage`
+   (lines ~67-105, currently queryAndAggregateUsageStats) ALSO iterate
+   `usm.queryEvents(start, end)` counting Event.ACTIVITY_RESUMED (fallback
+   MOVE_TO_FOREGROUND < API 29) per package into an `opens` map; add `'opens': n` to each
+   row map. Dart: core/platform/usage_stats.dart AppUsage gains `opens` (default 0).
+   UI: features/phone/usage_screen.dart per-app row subtitle appends «N مرة فتح» trilingual;
+   keep fail-open. Consider counting opens in UsageLimitWorker too (not required).
+3. Then continue §12 backlog (0c phase C app-blocking is OWNER-GATED; home widget; share
+   image; store submission is owner action).
+
+Machine quirk: OS clock EDT, owner is Cairo (UTC+3). qurango saheh-muslim stream returned
+intermittent 500s when probed - the player already shows a friendly error; consider a retry.
+
+## 0.5-OLD HANDOFF 2026-07-14 round 2 (superseded)
 
 **Done this round (committed AND deployed):** skip quotas wired to the UI (both entry
 points) + rolling-window tests; TRACKING data layer live (app flushes `analytics_events` on
@@ -658,6 +696,27 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-18 (ADHAN SOUND + hadith/Sunnah live radio + auto-log-after-listening)** - Owner
+  approved. (1) ADHAN on the five prayer notifications: dedicated Android notification channel
+  `awwad_adhan_v1` with a raw sound (`android/app/src/main/res/raw/adhan.mp3`), alarm audio
+  usage, max importance; toggled by `adhanSound` in PrayerConfig + a switch in prayer settings;
+  plays only on the actual prayer time, never the pre-alert. ADHAN FILE: owner-PROVIDED
+  recording (317311.mp3), placed 2026-07-18 at the owner's explicit instruction; owner holds
+  distribution rights. docs/ADHAN_SOUND.md covers replacing it (keep the name `adhan`). iOS
+  keeps its default sound until a licensed .caf is bundled (needs a Mac).
+  (2) HADITH/SUNNAH LIVE RADIO: new «ورد الاستماع للسنة» build habit + features/radio/
+  radio_player_screen.dart - a play-only live tuner (no download/redistribution) over the
+  SBA/qurango public streams (Sahih Bukhari, Sahih Muslim, Riyad as-Salihin, Seerah) + a Quran
+  radio category (KSA Quran radio, tafsir...). core/radio/radio_stations.dart holds the https
+  stream list (verified live). (3) AUTO-LOG AFTER LISTENING (owner request): both the Quran
+  wird and the hadith radio auto-create today's entry after 2 minutes of real listening via the
+  new `AppController.quickLogHabit(habitId)` (idempotent, never overwrites a manual log, does
+  not touch the active habit). hadith_wird synced to catalog + seed + LIVE DB (now 40 rows).
+  New tests: radio_autolog_test (4: station data, catalog, idempotent auto-log, adhan-flag
+  roundtrip). Verified: analyze clean, 75 tests. NOTE: قناة السنة official SBA video stream
+  (m.live.net.sa/live/sunnah) works but is http+video; used the https audio hadith channels
+  instead (cleaner + legal). Hadith-audio-by-specific-chapter still has no free API (live tuner
+  is the honest maximum).
 - **2026-07-17 round 4 (0d PHASE B + C SHIPPED: Quran audio wird + monthly report)** -
   PHASE B: «ورد الاستماع للقرآن» catalog habit (build) + in-app audio player
   (features/quran/quran_player_screen.dart, just_audio + audio_session) streaming surah mp3s

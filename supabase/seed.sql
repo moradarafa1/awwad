@@ -211,5 +211,9 @@ insert into public.habit_catalog (key, track, category, title, description, icon
 ('listening_wird','build','worship',
   '{"ar":"ورد الاستماع للقرآن","en":"Quran listening wird","fr":"Wird d''écoute du Coran"}',
   '{"ar":"اجعل لك وِرداً يومياً تستمع فيه إلى القرآن بصوت قارئك المفضّل، فللاستماع للقرآن سكينةٌ للقلب ورحمة. اختر السورة وعدد ما تسمع.","en":"Set a daily wird of listening to the Quran in your favourite reciter''s voice; listening brings calm and mercy to the heart.","fr":"Fixez un wird quotidien d''écoute du Coran par votre récitateur préféré; l''écoute apporte sérénité et miséricorde au cœur."}',
-  '🎧','generic',true,'https://www.islamweb.net/ar/fatwa/13782/', 50, 58)
+  '🎧','generic',true,'https://www.islamweb.net/ar/fatwa/13782/', 50, 58),
+('hadith_wird','build','worship',
+  '{"ar":"ورد الاستماع للسنة","en":"Sunnah listening wird","fr":"Wird d''écoute de la Sunna"}',
+  '{"ar":"استمع يومياً إلى أحاديث النبي صلى الله عليه وسلم من صحيح البخاري ومسلم ورياض الصالحين، بثاً مباشراً. يُسجَّل وردك تلقائياً بعد الاستماع.","en":"Listen daily to the Prophet''s hadith from Sahih al-Bukhari, Muslim and Riyad as-Salihin via live radio. Auto-logged after listening.","fr":"Écoutez chaque jour les hadiths du Prophète depuis Sahih al-Bukhari, Muslim et Riyad as-Salihin en direct."}',
+  '📻','generic',true,'https://www.islamweb.net/ar/fatwa/10054/', 50, 59)
 on conflict (key) do nothing;

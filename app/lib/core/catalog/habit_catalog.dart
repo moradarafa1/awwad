@@ -354,6 +354,12 @@ const List<CatalogHabit> kHabitCatalog = [
     islamwebRef: 'https://www.islamweb.net/ar/fatwa/13782/',
     title: {'ar': "ورد الاستماع للقرآن", 'en': "Quran listening wird", 'fr': "Wird d'écoute du Coran"},
     description: {'ar': "اجعل لك وِرداً يومياً تستمع فيه إلى القرآن بصوت قارئك المفضّل، فللاستماع للقرآن سكينةٌ للقلب ورحمة. اختر السورة وعدد ما تسمع.", 'en': "Set a daily wird of listening to the Quran in your favourite reciter's voice; listening brings calm and mercy to the heart. Pick a surah and how much to hear.", 'fr': "Fixez un wird quotidien d'écoute du Coran par votre récitateur préféré; l'écoute apporte sérénité et miséricorde au cœur."}),
+  // Live hadith radio (Sahih Bukhari/Muslim/Riyad as-Salihin): opens the
+  // in-app radio player; listening auto-logs the day.
+  CatalogHabit(key: 'hadith_wird', track: 'build', category: 'worship', icon: '📻', templateKey: 'generic', isIslamic: true,
+    islamwebRef: 'https://www.islamweb.net/ar/fatwa/10054/',
+    title: {'ar': "ورد الاستماع للسنة", 'en': "Sunnah listening wird", 'fr': "Wird d'écoute de la Sunna"},
+    description: {'ar': "استمع يومياً إلى أحاديث النبي صلى الله عليه وسلم من صحيح البخاري ومسلم ورياض الصالحين، بثاً مباشراً. يُسجَّل وردك تلقائياً بعد الاستماع.", 'en': "Listen daily to the Prophet's hadith from Sahih al-Bukhari, Muslim and Riyad as-Salihin via live radio. Your wird is logged automatically after listening.", 'fr': "Écoutez chaque jour les hadiths du Prophète depuis Sahih al-Bukhari, Muslim et Riyad as-Salihin en direct. Votre wird est enregistré automatiquement."}),
 ];
 
 List<CatalogHabit> catalogForTrack(String track) =>

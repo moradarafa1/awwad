@@ -571,6 +571,55 @@ class AppController extends Notifier<AppState> {
     return _evaluateAndAwardBadges();
   }
 
+  /// Auto-logs a SPECIFIC habit as done for today WITHOUT changing the active
+  /// habit. Used by the listening players (Quran wird, hadith radio): after the
+  /// user has listened enough, today's entry is created automatically. Idempotent
+  /// (does nothing if today is already logged for that habit). Returns true if a
+  /// new entry was created.
+  Future<bool> quickLogHabit(String habitId, {String? note}) async {
+    Habit? habit;
+    for (final h in state.habits) {
+      if (h.id == habitId) {
+        habit = h;
+        break;
+      }
+    }
+    if (habit == null) return false;
+    final today = dayKey(DateTime.now());
+    final already = state.entries
+        .any((e) => e.date == today && e.habitId == habitId && !e.isSkip);
+    if (already) return false; // never overwrite a manual log
+
+    final rating = habit.track == 'build' ? 8 : 2; // neutral positive rating
+    final entry = DailyEntry(
+      id: _uuid.v4(),
+      habitId: habitId,
+      date: today,
+      urge: rating,
+      resistance: rating,
+      didSlip: false, // build habit done / break habit clean
+      note: note,
+      createdAt: DateTime.now(),
+    );
+    final list = [
+      ...state.entries.where((e) => !(e.date == today && e.habitId == habitId)),
+      entry,
+    ];
+    final sorted = _sorted(list);
+    state = state.copyWith(entries: sorted);
+    await _store.saveEntries(sorted);
+    AnalyticsService.instance.track('entry_saved', {
+      'did_slip': false,
+      'urge': rating,
+      'resistance': rating,
+      'habit_track': habit.track,
+      'catalog_key': habit.catalogKey,
+      'auto': true,
+    });
+    // The signed-in cloud push happens on the next app open / save (auto-sync).
+    return true;
+  }
+
   Future<List<EarnedBadge>> _evaluateAndAwardBadges() async {
     final habitId = state.activeHabitId;
     if (habitId == null) return const [];
