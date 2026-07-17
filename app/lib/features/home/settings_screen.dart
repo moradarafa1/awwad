@@ -20,6 +20,7 @@ import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import '../auth/auth_screen.dart';
 import '../phone/usage_screen.dart';
+import '../prayer/prayer_settings_screen.dart';
 import '../shield/dns_shield_screen.dart';
 import 'fields_manager_screen.dart';
 import 'habits_screen.dart';
@@ -121,6 +122,11 @@ const Map<String, Map<String, String>> _kSet = {
     'ar': 'افتح الإعدادات',
     'en': 'Open settings',
     'fr': 'Ouvrir les réglages'
+  },
+  'prayerTimes': {
+    'ar': 'مواقيت الصلاة والتذكير',
+    'en': 'Prayer times and reminders',
+    'fr': 'Horaires de prière et rappels'
   },
   'share': {
     'ar': 'شارك عوّاد مع من تحب',
@@ -413,6 +419,20 @@ class SettingsScreen extends ConsumerWidget {
           SectionCard(
             child: Column(
               children: [
+                if (s.settings.showReligiousContent) ...[
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.mosque_outlined,
+                        color: AppColors.accent2),
+                    title: Text(_set('prayerTimes', loc),
+                        style: const TextStyle(fontSize: 13)),
+                    trailing:
+                        Icon(Icons.chevron_right, color: AppColors.muted),
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => const PrayerSettingsScreen())),
+                  ),
+                  const Divider(),
+                ],
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(Icons.shield_outlined,

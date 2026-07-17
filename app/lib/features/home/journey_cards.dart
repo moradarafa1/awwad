@@ -74,7 +74,7 @@ class RecoveryTimelineCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                      '${_jc('after', locale)} ${next.day - streak} ${_jc('days', locale)}: ${next.t(locale)}',
+                      '${_jc('after', locale)} ${next.day - streak} ${_jc('days', locale)} ${next.t(locale)}',
                       style: TextStyle(
                           color: AppColors.muted,
                           fontSize: 12,
@@ -250,7 +250,7 @@ const Map<String, Map<String, String>> _jcStrings = {
     'timelineTitle': 'رحلة تعافيك',
     'timelineStart': 'ابدأ أول يوم نظيف لتتحرك في خط التعافي.',
     'after': 'بعد',
-    'days': 'يوماً:',
+    'days': 'من الأيام:',
     'savedTitle': 'وفّرت منذ البداية 💰',
     'money': 'وحدة نقدية موفرة',
     'hours': 'ساعة مستعادة',

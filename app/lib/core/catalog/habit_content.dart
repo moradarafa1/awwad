@@ -268,7 +268,7 @@ const Map<String, HabitChecklists> kHabitChecklists = {
     environment: [
       {'ar': "اضبط منبّهاً لموعد النوم قبله بنصف ساعة", 'en': "Set an alarm half an hour before bedtime", 'fr': "Régler une alarme une demi-heure avant le coucher"},
       {'ar': "اشحن الهاتف خارج غرفة النوم", 'en': "Charge your phone outside the bedroom", 'fr': "Charger le téléphone hors de la chambre"},
-      {'ar': "خفّت الإضاءة وأطفئ الشاشات مساءً", 'en': "Dim the lights and switch off screens in the evening", 'fr': "Tamiser les lumières et éteindre les écrans le soir"},
+      {'ar': "خفِّف الإضاءة وأطفئ الشاشات مساءً", 'en': "Dim the lights and switch off screens in the evening", 'fr': "Tamiser les lumières et éteindre les écrans le soir"},
       {'ar': "تجنّب القهوة والمنبّهات بعد العصر", 'en': "Avoid coffee and stimulants after afternoon", 'fr': "Éviter le café et les stimulants après l'après-midi"},
     ],
   ),

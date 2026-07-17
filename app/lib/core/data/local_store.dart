@@ -113,6 +113,21 @@ class LocalStore {
     await _prefs.remove(_kPomodoro);
   }
 
+  // ---- Prayer-times config (location + offsets + pre-alert toggle) ----
+  static const _kPrayer = 'awwad_prayer_v1';
+  Map<String, dynamic>? loadPrayer() {
+    final raw = _prefs.getString(_kPrayer);
+    if (raw == null) return null;
+    try {
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> savePrayer(Map<String, dynamic> cfg) =>
+      _prefs.setString(_kPrayer, jsonEncode(cfg));
+
   Future<void> clearAll() async {
     await _prefs.remove(_kHabit);
     await _prefs.remove(_kHabits);

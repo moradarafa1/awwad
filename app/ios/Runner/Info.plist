@@ -76,5 +76,7 @@
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>يُستخدم موقعك مرة واحدة لحساب مواقيت الصلاة لمدينتك. Your location is used once to compute prayer times for your city.</string>
 	</dict>
 </plist>

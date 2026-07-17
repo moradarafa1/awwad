@@ -76,8 +76,13 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       reminderHours: _reminderHours,
       createdAt: DateTime.now(),
     );
+    // Consent is TRUE only because the survey step now displays the research
+    // notice (surveyConsent) above these optional fields; an untouched survey
+    // stays consent-free.
+    final answered =
+        _ageRange != null || _gender != null || _country != null;
     final survey = SurveyData(
-      consent: true,
+      consent: answered,
       ageRange: _ageRange,
       gender: _gender,
       country: _country,
@@ -202,6 +207,13 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
             ),
           ),
         ),
+        const SizedBox(height: 18),
+        // The research notice MUST be visible here: answering these optional
+        // fields is what constitutes consent (see _finish), so recording
+        // consent without rendering this text would be dishonest.
+        Text(l10n.surveyConsent,
+            style: TextStyle(
+                color: AppColors.muted, fontSize: 11.5, height: 1.6)),
       ],
     );
   }

@@ -267,6 +267,71 @@ Future<void> cancelPomodoroDone() async {
   }
 }
 
+/// Exact-moment one-off (prayer times shift daily, so these are scheduled as
+/// absolute datetimes for the next ~2 days and rebuilt on every app open).
+Future<void> scheduleAt(
+    int id, DateTime when, String title, String body) async {
+  await initNotifications();
+  final details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _habitChannelId,
+      _habitChannelName,
+      channelDescription: 'Daily habit reminder',
+      importance: Importance.high,
+      priority: Priority.high,
+      styleInformation: BigTextStyleInformation(body),
+    ),
+    iOS: const DarwinNotificationDetails(),
+  );
+  await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details);
+}
+
+/// Cancels an inclusive id range (used for the 4000-4299 prayer window).
+Future<void> cancelIdRange(int from, int to) async {
+  for (var i = from; i <= to; i++) {
+    try {
+      await _plugin.cancel(i);
+    } catch (_) {
+      return; // plugin unavailable (tests): nothing scheduled anyway
+    }
+  }
+}
+
+/// Weekly repeating reminder (e.g. surah Al-Kahf on Friday). [weekday] uses
+/// DateTime constants (DateTime.friday = 5).
+Future<void> scheduleWeekly(
+    int id, int weekday, int hour, int minute, String title, String body) async {
+  await initNotifications();
+  final details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _habitChannelId,
+      _habitChannelName,
+      channelDescription: 'Daily habit reminder',
+      importance: Importance.high,
+      priority: Priority.high,
+      styleInformation: BigTextStyleInformation(body),
+    ),
+    iOS: const DarwinNotificationDetails(),
+  );
+  var when = tz.TZDateTime.now(tz.local);
+  when = tz.TZDateTime(
+      tz.local, when.year, when.month, when.day, hour, minute);
+  while (when.weekday != weekday || when.isBefore(tz.TZDateTime.now(tz.local))) {
+    when = when.add(const Duration(days: 1));
+  }
+  try {
+    await _plugin.zonedSchedule(
+      id, title, body, when, details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+    );
+  } catch (e) {
+    debugPrint('awwad notif: weekly #$id failed: $e');
+  }
+}
+
 /// Clears all per-habit reminders (and the legacy single one) before a reschedule.
 Future<void> cancelHabitReminders() async {
   for (var i = 0; i < _habitReminderMax; i++) {

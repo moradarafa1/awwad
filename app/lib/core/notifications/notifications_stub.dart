@@ -25,6 +25,14 @@ Future<void> schedulePomodoroDone(
 Future<void> sendTestNotifications(
     String title, String nowBody, String laterBody) async {}
 
+Future<void> scheduleAt(
+    int id, DateTime when, String title, String body) async {}
+
+Future<void> cancelIdRange(int from, int to) async {}
+
+Future<void> scheduleWeekly(int id, int weekday, int hour, int minute,
+    String title, String body) async {}
+
 Future<void> cancelPomodoroDone() async {}
 
 Future<void> cancelReminders() async {}

@@ -12,6 +12,7 @@ import '../../core/cloud/sync_service.dart';
 import '../../core/content/dhikr.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/notifications/notif_scheduler.dart';
+import '../../core/prayer/prayer_scheduler.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/ambient_background.dart';
 import 'daily_log_screen.dart';
@@ -115,6 +116,15 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       showReligious: s.settings.showReligiousContent,
       dhikrHour: s.settings.dhikrHour,
       dhikrTitle: kDhikrTitle[loc] ?? kDhikrTitle['ar']!,
+    );
+    // Prayer times shift every day: rebuild the 2-day prayer/adhkar window on
+    // each open (no-op until the user configures a location).
+    await applyPrayerSchedule(
+      store: ref.read(localStoreProvider),
+      habits: s.habits,
+      notificationsEnabled: s.settings.notificationsEnabled,
+      showReligious: s.settings.showReligiousContent,
+      locale: loc,
     );
   }
 

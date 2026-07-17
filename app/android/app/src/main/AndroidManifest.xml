@@ -12,6 +12,10 @@
          requested at runtime. tools:ignore silences the lint for declaring it. -->
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions"/>
+    <!-- Prayer-times engine: one coarse fix to pick the nearest city; the
+         astronomical calculation itself is fully offline. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:label="عوّاد"

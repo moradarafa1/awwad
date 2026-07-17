@@ -781,7 +781,7 @@ const Map<String, Map<String, String>> _regStrings = {
         'Email not confirmed yet. Enter the code we sent to your inbox.',
     'errGeneric': 'Something went wrong. Please try again later.',
     'syncLater':
-        'Signed in successfully. Sync failed for now; you can run it later from Settings.',
+        'Signed in successfully. Sync failed for now and retries automatically next time you open the app.',
   },
   'fr': {
     'gender': 'Sexe',
@@ -835,6 +835,6 @@ const Map<String, Map<String, String>> _regStrings = {
         'Email non confirmé. Saisissez le code envoyé à votre boîte.',
     'errGeneric': "Une erreur s'est produite. Réessayez plus tard.",
     'syncLater':
-        'Connexion réussie. La synchronisation a échoué pour le moment ; relancez-la plus tard depuis les réglages.',
+        "Connexion réussie. La synchronisation reprendra automatiquement à la prochaine ouverture de l'application.",
   },
 };

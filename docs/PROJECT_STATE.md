@@ -63,12 +63,37 @@ rows deleted afterwards). Browser walkthrough passed: language -> guest -> onboa
 pick -> Today; signup form order/asterisks/toasts/email-regex/eye-toggle all behave; the truce
 tab opens SOS directly with a single habit.
 
+**DONE 2026-07-17 round 2: 0d PHASE A (prayer-times engine) SHIPPED.** core/prayer/
+prayer_engine.dart (pure, tested: adhan offline calc, regional method by country, per-prayer
+manual offsets, cities.json nearest-city + country/city picker data) + prayer_scheduler.dart
+(2-day window ids 4000-4299, mains + optional 5-min pre-alerts + adhkar fajr+30/asr+30,
+trilingual MSA copy, rebuilt on every app open from home_shell) + features/prayer/
+prayer_settings_screen.dart (GPS via geolocator with graceful fallback, searchable country ->
+city sheets, tap-to-edit each prayer time, pre-alert toggle; Settings tile gated on religious
+content) + location permissions (Android manifest + iOS plist). notifications layer gained
+scheduleAt/cancelIdRange/scheduleWeekly (weekly = ready for Kahf in A2). 5 engine tests.
+
+**DONE same round: Arabic-ux lens (wf_e166f7a7-0eb) fixed.** MAJOR consent-integrity defect:
+the app recorded and SYNCED survey consent=true while the research notice (l10n surveyConsent)
+was never rendered anywhere - now the notice renders in the survey step and consent is true
+only when the user actually answered an optional field. Also fixed: journey-cards double colon
++ Arabic number grammar («بعد N من الأيام»), EN/FR syncLater promised a Settings sync button
+that does not exist (aligned with the auto-retry truth), «خفّت الإضاءة» -> «خفِّف», catalog
+wording («إدمان الموبايل» -> «إدمان الهاتف», «بدل ما تأجّل» -> «بدلاً من التأجيل», «الإثنين» ->
+«الاثنين») synced in catalog + seed.sql + LIVE DB. LOGGED, NOT YET FIXED (minors):
+(a) habit_content.dart FR strings stripped of accents across ~8 break habits (quit_smoking,
+nail_biting, hair_pulling, skin_picking, excessive_gaming, procrastination, oversleeping,
+caffeine_excess) - restore accents in one sweep; (b) history cards use break vocabulary
+(نظيف/تعثّر) for BUILD habits - branch on track like month_heatmap does.
+
 **EXECUTE NEXT, in order:**
-1. TODO 0d Phase A (religious-habits engine) - the owner re-confirmed the full spec
-   (prayer-times by GPS + city fallback + editable times + 5-min-before toggle + adhan sound,
-   adhkar at fajr+30/asr+30, Kahf on Friday, islamweb-sourced duas, scholar videos <15min for
-   religious habits only, monthly report push). Start by registering
-   app/assets/data/{cities,reciters,scholar_videos}.json in pubspec.
+1. The two logged Arabic minors above (FR accents sweep + history build-track wording).
+2. TODO 0d Phase A2: Kahf habit (weekly Friday dhuhr+1h via the new scheduleWeekly) +
+   «كسر الإباحية» habit (opens DNS shield on selection) + wire scholar_videos.json into the
+   suggestions card for religious habits. Sync catalog + seed + live DB together.
+3. 0d Phase B (Quran audio wird, just_audio + reciters.json) then Phase C (monthly report).
+4. Adhan SOUND on prayer notifications still pending an owner-provided/licensed clip (see 0d
+   spec; custom notification channel sound once the file exists).
 
 ## 0.5-OLD HANDOFF 2026-07-16 (context overflow — superseded, kept for the file map)
 
@@ -633,6 +658,17 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-17 round 2 (PRAYER-TIMES ENGINE SHIPPED + Arabic lens fixes)** - 0d Phase A live in
+  code: offline adhan calc with regional methods (Egypt/Gulf authorities, MWL default),
+  PrayerConfig (location + per-prayer manual offsets + 5-min pre-alert toggle) persisted in
+  LocalStore, GPS via geolocator with bundled 306-city country/city picker fallback, 2-day
+  notification window (ids 4000-4299: mains + pre-alerts + adhkar fajr+30/asr+30) rebuilt on
+  every app open, Settings tile gated on religious content, location permissions added
+  (manifest + iOS plist), notifications layer gained scheduleAt/cancelIdRange/scheduleWeekly
+  (Kahf-ready), 5 engine unit tests (Cairo sanity, offsets, id windows). Arabic lens rerun:
+  MAJOR consent fix (notice now rendered; consent only on real answers) + wording fixes synced
+  to live DB (details in HANDOFF above). Verified: analyze clean, 59/59 tests, full builds,
+  Pages redeployed, APK to Desktop.
 - **2026-07-17 (FULL AUDIT FIXES + competitor round: real emoji logo, test notifications,
   usage-limit background alarms, sync integrity)** - Owner ran «التدقيق الشامل + كل التحسينات».
   **(1) LOGO, FINAL:** the mark is now the OFFICIAL Noto emoji seedling artwork (U+1F331,
