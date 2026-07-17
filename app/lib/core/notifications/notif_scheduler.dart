@@ -57,3 +57,19 @@ const Map<String, String> _kReminderBody = {
   'en': 'Time to log this habit. One small step today 🌿',
   'fr': "C'est l'heure d'enregistrer cette habitude. Un petit pas aujourd'hui 🌿",
 };
+
+/// End-of-month report notification copy (fired on the last day at 20:00).
+const Map<String, Map<String, String>> kMonthlyReportNotif = {
+  'ar': {
+    'title': 'تقرير شهرك جاهز 📊',
+    'body': 'اطّلع على تقدّمك هذا الشهر في عاداتك، ومعه كلمة تشجيع لكل عادة.'
+  },
+  'en': {
+    'title': 'Your monthly report is ready 📊',
+    'body': "See this month's progress across your habits, with a word of encouragement."
+  },
+  'fr': {
+    'title': 'Votre rapport mensuel est prêt 📊',
+    'body': "Découvrez vos progrès du mois, avec un mot d'encouragement par habitude."
+  },
+};

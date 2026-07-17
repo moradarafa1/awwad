@@ -15,7 +15,10 @@ class HabitChecklists {
 List<String> habitChecklistLabels(
     String? catalogKey, String group, String locale) {
   if (catalogKey == null) return const [];
-  final c = kHabitChecklists[catalogKey];
+  // The porn-break habit shares the secret-habit HRT content (same recovery
+  // toolkit: wudu + leave the room + filter + accountability + fasting).
+  final key = catalogKey == 'break_porn' ? 'secret_habit' : catalogKey;
+  final c = kHabitChecklists[key];
   if (c == null) return const [];
   final list =
       group == 'competing_response' ? c.competingResponses : c.environment;
@@ -33,17 +36,17 @@ String? habitVideoSearchUrl(String? catalogKey) {
 const Map<String, HabitChecklists> kHabitChecklists = {
   'quit_smoking': HabitChecklists(
     competingResponses: [
-      {'ar': "اشرب كوب ماء بارد ببطء عند اشتداد الرغبة في التدخين", 'en': "Slowly sip a glass of cold water when the craving hits", 'fr': "Bois lentement un verre d'eau fraiche quand l'envie surgit"},
-      {'ar': "امضغ علكة خالية من السكر أو عودا من القرفة بدل السيجارة", 'en': "Chew sugar-free gum or a cinnamon stick instead of a cigarette", 'fr': "Mache un chewing-gum sans sucre ou un baton de cannelle"},
-      {'ar': "تنفس بعمق عشر مرات مع ترديد الاستغفار حتى تمر الرغبة", 'en': "Take ten deep breaths while repeating istighfar until the urge passes", 'fr': "Respire profondement dix fois en repetant l'istighfar jusqu'a ce que l'envie passe"},
-      {'ar': "شغل يديك بمسبحة أو بكتابة سبب إقلاعك على ورقة", 'en': "Keep your hands busy with prayer beads or write down your reason for quitting", 'fr': "Occupe tes mains avec un chapelet ou ecris ta raison d'arreter"},
-      {'ar': "اخرج لمشي سريع خمس دقائق فور الإحساس بالرغبة", 'en': "Go for a brisk five-minute walk the moment a craving starts", 'fr': "Fais une marche rapide de cinq minutes des qu'une envie commence"},
+      {'ar': "اشرب كوب ماء بارد ببطء عند اشتداد الرغبة في التدخين", 'en': "Slowly sip a glass of cold water when the craving hits", 'fr': "Bois lentement un verre d'eau fraîche quand l'envie surgit"},
+      {'ar': "امضغ علكة خالية من السكر أو عودا من القرفة بدل السيجارة", 'en': "Chew sugar-free gum or a cinnamon stick instead of a cigarette", 'fr': "Mâche un chewing-gum sans sucre ou un bâton de cannelle"},
+      {'ar': "تنفس بعمق عشر مرات مع ترديد الاستغفار حتى تمر الرغبة", 'en': "Take ten deep breaths while repeating istighfar until the urge passes", 'fr': "Respire profondément dix fois en répétant l'istighfar jusqu'à ce que l'envie passe"},
+      {'ar': "شغل يديك بمسبحة أو بكتابة سبب إقلاعك على ورقة", 'en': "Keep your hands busy with prayer beads or write down your reason for quitting", 'fr': "Occupe tes mains avec un chapelet ou écris ta raison d'arrêter"},
+      {'ar': "اخرج لمشي سريع خمس دقائق فور الإحساس بالرغبة", 'en': "Go for a brisk five-minute walk the moment a craving starts", 'fr': "Fais une marche rapide de cinq minutes dès qu'une envie commence"},
     ],
     environment: [
       {'ar': "تخلص من جميع علب السجائر والولاعات والمنافض من البيت والسيارة", 'en': "Throw out all cigarette packs, lighters, and ashtrays from home and car", 'fr': "Jette tous les paquets de cigarettes, briquets et cendriers de la maison et la voiture"},
-      {'ar': "تجنب أماكن التدخين كالمقاهي والجلسات التي يكثر فيها الدخان", 'en': "Avoid smoking spots like cafes and gatherings where smoking is common", 'fr': "Evite les lieux de tabac comme les cafes et les rassemblements de fumeurs"},
-      {'ar': "اطلب من المحيطين بك عدم التدخين أمامك ولا إهداؤك سيجارة", 'en': "Ask those around you not to smoke near you or offer you a cigarette", 'fr': "Demande a ton entourage de ne pas fumer pres de toi ni t'offrir de cigarette"},
-      {'ar': "ضع المال المخصص للسجائر في مكان ظاهر كهدف ادخار", 'en': "Put your cigarette money in a visible jar as a savings goal", 'fr': "Mets l'argent des cigarettes dans un bocal visible comme objectif d'epargne"},
+      {'ar': "تجنب أماكن التدخين كالمقاهي والجلسات التي يكثر فيها الدخان", 'en': "Avoid smoking spots like cafes and gatherings where smoking is common", 'fr': "Évite les lieux de tabac comme les cafés et les rassemblements de fumeurs"},
+      {'ar': "اطلب من المحيطين بك عدم التدخين أمامك ولا إهداؤك سيجارة", 'en': "Ask those around you not to smoke near you or offer you a cigarette", 'fr': "Demande à ton entourage de ne pas fumer près de toi ni t'offrir de cigarette"},
+      {'ar': "ضع المال المخصص للسجائر في مكان ظاهر كهدف ادخار", 'en': "Put your cigarette money in a visible jar as a savings goal", 'fr': "Mets l'argent des cigarettes dans un bocal visible comme objectif d'épargne"},
     ],
   ),
   'quit_vaping': HabitChecklists(
@@ -63,22 +66,22 @@ const Map<String, HabitChecklists> kHabitChecklists = {
   ),
   'nail_biting': HabitChecklists(
     competingResponses: [
-      {'ar': "اقبض يدك بإحكام لعشر ثوانٍ كلما اشتقت إلى القضم", 'en': "Clench your fist tightly for ten seconds whenever the urge hits", 'fr': "Serre le poing pendant dix secondes des que l'envie surgit"},
+      {'ar': "اقبض يدك بإحكام لعشر ثوانٍ كلما اشتقت إلى القضم", 'en': "Clench your fist tightly for ten seconds whenever the urge hits", 'fr': "Serre le poing pendant dix secondes dès que l'envie surgit"},
       {'ar': "امسك بكرة ضغط صغيرة أو سبحة بين أصابعك", 'en': "Hold a small stress ball or prayer beads between your fingers", 'fr': "Tiens une balle anti-stress ou un chapelet entre tes doigts"},
-      {'ar': "اجلس وضع يديك تحت فخذيك حتى تزول الرغبة", 'en': "Sit and tuck both hands under your thighs until the urge passes", 'fr': "Assieds-toi et glisse tes mains sous tes cuisses jusqu'a ce que l'envie passe"},
+      {'ar': "اجلس وضع يديك تحت فخذيك حتى تزول الرغبة", 'en': "Sit and tuck both hands under your thighs until the urge passes", 'fr': "Assieds-toi et glisse tes mains sous tes cuisses jusqu'à ce que l'envie passe"},
       {'ar': "اشغل يديك بالوضوء أو بترتيب ما حولك", 'en': "Keep your hands busy with wudu or tidying your space", 'fr': "Occupe tes mains par les ablutions ou en rangeant autour de toi"},
-      {'ar': "دلّك أطراف أصابعك بزيت وردّد ذكرًا قصيرًا", 'en': "Massage your fingertips with oil while repeating a short dhikr", 'fr': "Masse le bout de tes doigts avec de l'huile en repetant un court dhikr"},
+      {'ar': "دلّك أطراف أصابعك بزيت وردّد ذكرًا قصيرًا", 'en': "Massage your fingertips with oil while repeating a short dhikr", 'fr': "Masse le bout de tes doigts avec de l'huile en répétant un court dhikr"},
     ],
     environment: [
-      {'ar': "قصّ أظافرك قصيرة باستمرار حتى لا يبقى ما تقضمه", 'en': "Keep your nails trimmed short so there is nothing to bite", 'fr': "Garde tes ongles coupes courts pour qu'il n'y ait rien a ronger"},
-      {'ar': "ضع لاصقًا أو طلاءً مرّ المذاق على الأظافر", 'en': "Apply a bandage or bitter-tasting polish on your nails", 'fr': "Mets un pansement ou un vernis au gout amer sur tes ongles"},
-      {'ar': "احتفظ بمشغل لليدين قريبًا منك في كل مكان", 'en': "Keep a hand-fidget tool within reach everywhere you go", 'fr': "Garde un objet a manipuler a portee de main partout"},
-      {'ar': "ضع تذكيرًا مرئيًا على مكتبك وهاتفك يوقفك عند القضم", 'en': "Place a visible reminder on your desk and phone to stop you", 'fr': "Place un rappel visible sur ton bureau et ton telephone pour t'arreter"},
+      {'ar': "قصّ أظافرك قصيرة باستمرار حتى لا يبقى ما تقضمه", 'en': "Keep your nails trimmed short so there is nothing to bite", 'fr': "Garde tes ongles coupés courts pour qu'il n'y ait rien à ronger"},
+      {'ar': "ضع لاصقًا أو طلاءً مرّ المذاق على الأظافر", 'en': "Apply a bandage or bitter-tasting polish on your nails", 'fr': "Mets un pansement ou un vernis au goût amer sur tes ongles"},
+      {'ar': "احتفظ بمشغل لليدين قريبًا منك في كل مكان", 'en': "Keep a hand-fidget tool within reach everywhere you go", 'fr': "Garde un objet à manipuler à portée de main partout"},
+      {'ar': "ضع تذكيرًا مرئيًا على مكتبك وهاتفك يوقفك عند القضم", 'en': "Place a visible reminder on your desk and phone to stop you", 'fr': "Place un rappel visible sur ton bureau et ton téléphone pour t'arrêter"},
     ],
   ),
   'hair_pulling': HabitChecklists(
     competingResponses: [
-      {'ar': "أقبض كفي بقوة وأعد إلى العشرة حتى تزول الرغبة", 'en': "Clench my fist tightly and count to ten until the urge passes", 'fr': "Je serre fortement le poing et compte jusqu'a dix jusqu'a ce que l'envie passe"},
+      {'ar': "أقبض كفي بقوة وأعد إلى العشرة حتى تزول الرغبة", 'en': "Clench my fist tightly and count to ten until the urge passes", 'fr': "Je serre fortement le poing et compte jusqu'à dix jusqu'à ce que l'envie passe"},
       {'ar': "أمسك بكرة ضغط أو مسبحة لأشغل يدي عن الشعر", 'en': "Hold a stress ball or prayer beads to keep my hands away from my hair", 'fr': "Je tiens une balle anti-stress ou un chapelet pour occuper mes mains loin des cheveux"},
       {'ar': "أضع يدي تحت فخذي أو أجلس عليهما لدقيقتين", 'en': "Place my hands under my thighs or sit on them for two minutes", 'fr': "Je place mes mains sous mes cuisses ou m'assois dessus pendant deux minutes"},
       {'ar': "أتوضأ وأصلي ركعتين عندما تشتد الرغبة", 'en': "Make wudu and pray two rakaat when the urge intensifies", 'fr': "Je fais les ablutions et prie deux rakaat quand l'envie s'intensifie"},
@@ -87,39 +90,39 @@ const Map<String, HabitChecklists> kHabitChecklists = {
     environment: [
       {'ar': "أرتدي قبعة خفيفة أو غطاء رأس في أوقات الرغبة الشديدة", 'en': "Wear a light cap or head covering during high-urge times", 'fr': "Je porte une casquette legere ou un couvre-chef pendant les moments de forte envie"},
       {'ar': "أقص أظافري وألبس قفازين عند الجلوس وحدي", 'en': "Trim my nails and wear gloves when sitting alone", 'fr': "Je coupe mes ongles et porte des gants quand je suis assis seul"},
-      {'ar': "أبعد المرايا الصغيرة والملاقط التي تشجع على الفحص والنتف", 'en': "Remove small mirrors and tweezers that encourage inspecting and pulling", 'fr': "J'eloigne les petits miroirs et les pinces qui incitent a inspecter et arracher"},
-      {'ar': "أضيء الغرفة جيدا وأبقى قرب الناس بدلا من العزلة", 'en': "Keep the room well lit and stay near people instead of isolating", 'fr': "Je garde la piece bien eclairee et reste pres des gens au lieu de m'isoler"},
+      {'ar': "أبعد المرايا الصغيرة والملاقط التي تشجع على الفحص والنتف", 'en': "Remove small mirrors and tweezers that encourage inspecting and pulling", 'fr': "J'éloigne les petits miroirs et les pinces qui incitent à inspecter et arracher"},
+      {'ar': "أضيء الغرفة جيدا وأبقى قرب الناس بدلا من العزلة", 'en': "Keep the room well lit and stay near people instead of isolating", 'fr': "Je garde la pièce bien éclairée et reste près des gens au lieu de m'isoler"},
     ],
   ),
   'skin_picking': HabitChecklists(
     competingResponses: [
-      {'ar': "أضع يديّ تحت فخذيّ أو أطبق راحتيّ معا حتى تزول الرغبة.", 'en': "I sit on my hands or clasp my palms together until the urge passes.", 'fr': "Je m'assois sur mes mains ou je serre mes paumes jusqu'a ce que l'envie passe."},
+      {'ar': "أضع يديّ تحت فخذيّ أو أطبق راحتيّ معا حتى تزول الرغبة.", 'en': "I sit on my hands or clasp my palms together until the urge passes.", 'fr': "Je m'assois sur mes mains ou je serre mes paumes jusqu'à ce que l'envie passe."},
       {'ar': "أمسك كرة ضغط أو خرز التسبيح وأشغل أصابعي بها بدلا من نتش الجلد.", 'en': "I squeeze a stress ball or worry beads to keep my fingers busy instead of picking.", 'fr': "Je presse une balle anti-stress ou un chapelet pour occuper mes doigts au lieu de gratter."},
-      {'ar': "أدهن يديّ بمرطب لزج يجعل الجلد أملس ويصعب الإمساك به.", 'en': "I rub on a thick moisturizer that makes my skin smooth and hard to grip.", 'fr': "J'applique une creme epaisse qui rend ma peau lisse et difficile a saisir."},
-      {'ar': "أتوضأ وأصلي ركعتين أو أردد ذكرا حتى ينصرف انشغالي عن الجلد.", 'en': "I make wudu and pray two rak'ahs or recite dhikr until my focus leaves my skin.", 'fr': "Je fais les ablutions et prie deux rak'ahs ou recite un dhikr jusqu'a detourner mon attention."},
-      {'ar': "أنهض وأغسل يديّ بماء بارد وأشد قبضتي عشر ثوان حتى تهدأ الرغبة.", 'en': "I stand up, rinse my hands in cold water, and clench my fists for ten seconds until the urge calms.", 'fr': "Je me leve, rince mes mains a l'eau froide et serre les poings dix secondes jusqu'au calme."},
+      {'ar': "أدهن يديّ بمرطب لزج يجعل الجلد أملس ويصعب الإمساك به.", 'en': "I rub on a thick moisturizer that makes my skin smooth and hard to grip.", 'fr': "J'applique une crème épaisse qui rend ma peau lisse et difficile à saisir."},
+      {'ar': "أتوضأ وأصلي ركعتين أو أردد ذكرا حتى ينصرف انشغالي عن الجلد.", 'en': "I make wudu and pray two rak'ahs or recite dhikr until my focus leaves my skin.", 'fr': "Je fais les ablutions et prie deux rak'ahs ou récite un dhikr jusqu'à détourner mon attention."},
+      {'ar': "أنهض وأغسل يديّ بماء بارد وأشد قبضتي عشر ثوان حتى تهدأ الرغبة.", 'en': "I stand up, rinse my hands in cold water, and clench my fists for ten seconds until the urge calms.", 'fr': "Je me lève, rince mes mains à l'eau froide et serre les poings dix secondes jusqu'au calme."},
     ],
     environment: [
       {'ar': "أقص أظافري قصيرة وأبقيها ناعمة حتى يصعب نتش الجلد.", 'en': "I keep my nails trimmed short and smooth so picking is harder.", 'fr': "Je garde mes ongles courts et lisses pour rendre le grattage difficile."},
       {'ar': "أغطي المناطق التي أنتشها بضمادة أو ملابس بأكمام طويلة.", 'en': "I cover the spots I pick with a bandage or long sleeves.", 'fr': "Je couvre les zones que je gratte avec un pansement ou des manches longues."},
       {'ar': "أبعد المرآة المكبرة والملاقط من متناول يدي.", 'en': "I keep magnifying mirrors and tweezers out of reach.", 'fr': "Je range les miroirs grossissants et les pinces hors de portee."},
-      {'ar': "أضيء غرفتي إضاءة خافتة عند الأماكن التي أجلس فيها طويلا حتى لا تظهر تفاصيل الجلد.", 'en': "I dim the lighting where I sit for long periods so skin details are less visible.", 'fr': "Je tamise l'eclairage la ou je reste longtemps pour moins voir les details de la peau."},
+      {'ar': "أضيء غرفتي إضاءة خافتة عند الأماكن التي أجلس فيها طويلا حتى لا تظهر تفاصيل الجلد.", 'en': "I dim the lighting where I sit for long periods so skin details are less visible.", 'fr': "Je tamise l'éclairage là où je reste longtemps pour moins voir les détails de la peau."},
     ],
   ),
   'secret_habit': HabitChecklists(
     competingResponses: [
-      {'ar': "أتوضأ فورا وأصلي ركعتين عند هجوم الرغبة", 'en': "Make wudu at once and pray two rak'ahs when the urge hits", 'fr': "Faire les ablutions aussitot et prier deux rak'ahs des que l'envie surgit"},
+      {'ar': "أتوضأ فورا وأصلي ركعتين عند هجوم الرغبة", 'en': "Make wudu at once and pray two rak'ahs when the urge hits", 'fr': "Faire les ablutions aussitôt et prier deux rak'ahs dès que l'envie surgit"},
       {'ar': "أغادر السرير والغرفة المغلقة وأخرج إلى مكان مفتوح", 'en': "Leave the bed and the closed room and go to an open space", 'fr': "Quitter le lit et la piece fermee et sortir dans un espace ouvert"},
-      {'ar': "أترك الهاتف بعيداً وأشغل يديّ بوضوء بارد أو تمرين سريع", 'en': "Keep both hands busy with cold wudu or quick exercise instead of the phone", 'fr': "Occuper les deux mains avec des ablutions froides ou un exercice rapide au lieu du telephone"},
-      {'ar': "أتصل بصديق صالح أو أقرأ ورد القرآن حتى تهدأ الرغبة", 'en': "Call a righteous friend or read a portion of Quran until the urge passes", 'fr': "Appeler un ami pieux ou lire une portion du Coran jusqu'a ce que l'envie passe"},
+      {'ar': "أترك الهاتف بعيداً وأشغل يديّ بوضوء بارد أو تمرين سريع", 'en': "Keep both hands busy with cold wudu or quick exercise instead of the phone", 'fr': "Occuper les deux mains avec des ablutions froides ou un exercice rapide au lieu du téléphone"},
+      {'ar': "أتصل بصديق صالح أو أقرأ ورد القرآن حتى تهدأ الرغبة", 'en': "Call a righteous friend or read a portion of Quran until the urge passes", 'fr': "Appeler un ami pieux ou lire une portion du Coran jusqu'à ce que l'envie passe"},
       {'ar': "أستحضر مراقبة الله وأستغفر عشر مرات وأشرب ماء باردا", 'en': "Recall that Allah sees me, seek forgiveness ten times, and drink cold water", 'fr': "Me rappeler qu'Allah me voit, demander pardon dix fois et boire de l'eau froide"},
       {'ar': "أصوم تطوعاً ما استطعت، فالصيام يكسر حدة الشهوة كما أوصى النبي صلى الله عليه وسلم", 'en': "Fast voluntarily when you can; fasting weakens desire, as the Prophet, peace be upon him, advised", 'fr': "Jeûner volontairement quand possible : le jeûne apaise le désir, comme l'a conseillé le Prophète, paix sur lui"},
     ],
     environment: [
-      {'ar': "أخرج الهاتف من غرفة النوم وأشحنه في مكان بعيد ليلا", 'en': "Keep the phone out of the bedroom and charge it far away at night", 'fr': "Garder le telephone hors de la chambre et le charger loin la nuit"},
+      {'ar': "أخرج الهاتف من غرفة النوم وأشحنه في مكان بعيد ليلا", 'en': "Keep the phone out of the bedroom and charge it far away at night", 'fr': "Garder le téléphone hors de la chambre et le charger loin la nuit"},
       {'ar': "أفعّل فلترا يحجب المواقع الإباحية على كل الأجهزة", 'en': "Install a filter that blocks pornographic sites on all devices", 'fr': "Installer un filtre qui bloque les sites pornographiques sur tous les appareils"},
-      {'ar': "أتجنب الخلوة الطويلة وأبقي باب الغرفة مفتوحا", 'en': "Avoid long isolation and keep the room door open", 'fr': "Eviter l'isolement prolonge et garder la porte de la chambre ouverte"},
-      {'ar': "أنام مبكرا ولا آخذ الهاتف إلى الفراش", 'en': "Sleep early and do not take the phone to bed", 'fr': "Se coucher tot et ne pas emporter le telephone au lit"},
+      {'ar': "أتجنب الخلوة الطويلة وأبقي باب الغرفة مفتوحا", 'en': "Avoid long isolation and keep the room door open", 'fr': "Éviter l'isolement prolongé et garder la porte de la chambre ouverte"},
+      {'ar': "أنام مبكرا ولا آخذ الهاتف إلى الفراش", 'en': "Sleep early and do not take the phone to bed", 'fr': "Se coucher tôt et ne pas emporter le téléphone au lit"},
     ],
   ),
   'phone_addiction': HabitChecklists(
@@ -142,29 +145,29 @@ const Map<String, HabitChecklists> kHabitChecklists = {
       {'ar': "عندما أشتهي تشغيل اللعبة، أتوضأ وأصلي ركعتين أو أقرأ صفحة من المصحف.", 'en': "When I crave starting the game, I make wudu and pray two rakat or read a page of Quran.", 'fr': "Quand l'envie de lancer le jeu surgit, je fais mes ablutions et prie deux rakat ou lis une page du Coran."},
       {'ar': "أضبط مؤقتا لخمس عشرة دقيقة من رياضة أو مشي بدل فتح اللعبة.", 'en': "I set a fifteen-minute timer for exercise or a walk instead of opening the game.", 'fr': "Je règle une minuterie de quinze minutes pour faire du sport ou marcher au lieu d'ouvrir le jeu."},
       {'ar': "أمسك بكتاب أو مهارة جديدة فأشغل عقلي ويدي بشيء نافع.", 'en': "I pick up a book or a new skill, keeping my mind and hands busy with something useful.", 'fr': "Je prends un livre ou une nouvelle compétence pour occuper mon esprit et mes mains utilement."},
-      {'ar': "أتصل بأحد الأهل أو الأصدقاء أو أزورهم بدل الجلوس وحيدا أمام الشاشة.", 'en': "I call or visit family or a friend instead of sitting alone in front of the screen.", 'fr': "J'appelle ou rends visite a un proche ou un ami au lieu de rester seul devant l'ecran."},
-      {'ar': "أنجز مهمة مؤجلة لخمس دقائق فأحول طاقة اللعب إلى عمل حقيقي.", 'en': "I tackle a postponed task for five minutes, turning the gaming urge into real work.", 'fr': "Je m'attaque a une tache reportee pendant cinq minutes, transformant l'envie de jouer en travail reel."},
+      {'ar': "أتصل بأحد الأهل أو الأصدقاء أو أزورهم بدل الجلوس وحيدا أمام الشاشة.", 'en': "I call or visit family or a friend instead of sitting alone in front of the screen.", 'fr': "J'appelle ou rends visite à un proche ou un ami au lieu de rester seul devant l'écran."},
+      {'ar': "أنجز مهمة مؤجلة لخمس دقائق فأحول طاقة اللعب إلى عمل حقيقي.", 'en': "I tackle a postponed task for five minutes, turning the gaming urge into real work.", 'fr': "Je m'attaque à une tâche reportée pendant cinq minutes, transformant l'envie de jouer en travail réel."},
     ],
     environment: [
-      {'ar': "أحذف الألعاب المسببة للإدمان من الهاتف وأسجل خروجي من حساباتها.", 'en': "I delete the addictive games from my phone and log out of their accounts.", 'fr': "Je supprime les jeux addictifs de mon telephone et me deconnecte de leurs comptes."},
+      {'ar': "أحذف الألعاب المسببة للإدمان من الهاتف وأسجل خروجي من حساباتها.", 'en': "I delete the addictive games from my phone and log out of their accounts.", 'fr': "Je supprime les jeux addictifs de mon téléphone et me déconnecte de leurs comptes."},
       {'ar': "أنقل جهاز اللعب إلى غرفة مشتركة وأبعده عن غرفة النوم.", 'en': "I move the gaming device to a shared room and keep it out of the bedroom.", 'fr': "Je deplace la console dans une piece commune et la garde hors de la chambre."},
-      {'ar': "أضع حدا زمنيا يوميا عبر أدوات التحكم الأبوي ومؤقت الاستخدام.", 'en': "I set a daily time limit using parental-control tools and a usage timer.", 'fr': "Je fixe une limite de temps quotidienne avec le controle parental et un minuteur d'usage."},
-      {'ar': "ألغي إشعارات الألعاب وأزيل اختصاراتها من الشاشة الرئيسية.", 'en': "I turn off game notifications and remove their shortcuts from the home screen.", 'fr': "Je desactive les notifications des jeux et retire leurs raccourcis de l'ecran d'accueil."},
+      {'ar': "أضع حدا زمنيا يوميا عبر أدوات التحكم الأبوي ومؤقت الاستخدام.", 'en': "I set a daily time limit using parental-control tools and a usage timer.", 'fr': "Je fixe une limite de temps quotidienne avec le contrôle parental et un minuteur d'usage."},
+      {'ar': "ألغي إشعارات الألعاب وأزيل اختصاراتها من الشاشة الرئيسية.", 'en': "I turn off game notifications and remove their shortcuts from the home screen.", 'fr': "Je désactive les notifications des jeux et retire leurs raccourcis de l'écran d'accueil."},
     ],
   ),
   'procrastination': HabitChecklists(
     competingResponses: [
       {'ar': "ابدأ بأصغر خطوة لمدة دقيقتين فقط ثم أكمل", 'en': "Start the smallest step for just two minutes, then continue", 'fr': "Commence la plus petite etape pendant deux minutes, puis continue"},
-      {'ar': "اكتب المهمة الواحدة الواجبة الآن وأنجزها قبل غيرها", 'en': "Write the single required task now and finish it before anything else", 'fr': "Note la seule tache requise maintenant et termine-la avant tout"},
-      {'ar': "قسم العمل الكبير إلى مهمات صغيرة محددة المدة", 'en': "Split the big task into small time-boxed chunks", 'fr': "Decoupe la grande tache en petits blocs limites dans le temps"},
-      {'ar': "توضأ وصل ركعتين ثم اشرع في العمل مباشرة", 'en': "Make wudu, pray two rakaat, then start the work immediately", 'fr': "Fais les ablutions, prie deux rakaat, puis commence le travail aussitot"},
+      {'ar': "اكتب المهمة الواحدة الواجبة الآن وأنجزها قبل غيرها", 'en': "Write the single required task now and finish it before anything else", 'fr': "Note la seule tâche requise maintenant et termine-la avant tout"},
+      {'ar': "قسم العمل الكبير إلى مهمات صغيرة محددة المدة", 'en': "Split the big task into small time-boxed chunks", 'fr': "Decoupe la grande tâche en petits blocs limites dans le temps"},
+      {'ar': "توضأ وصل ركعتين ثم اشرع في العمل مباشرة", 'en': "Make wudu, pray two rakaat, then start the work immediately", 'fr': "Fais les ablutions, prie deux rakaat, puis commence le travail aussitôt"},
       {'ar': "أغلق المشتتات وشغل مؤقتا لمدة خمس وعشرين دقيقة للتركيز", 'en': "Close distractions and run a twenty-five minute focus timer", 'fr': "Ferme les distractions et lance un minuteur de concentration de vingt-cinq minutes"},
     ],
     environment: [
       {'ar': "أعد قائمة مهام اليوم مكتوبة وضعها أمام عينيك", 'en': "Prepare a written to-do list for today and keep it in sight", 'fr': "Prepare une liste de taches ecrite pour aujourdhui et garde-la en vue"},
-      {'ar': "أبعد الهاتف ووسائل التواصل عن مكان العمل أثناء الإنجاز", 'en': "Keep the phone and social media away from your workspace while working", 'fr': "Eloigne le telephone et les reseaux sociaux du lieu de travail pendant la tache"},
+      {'ar': "أبعد الهاتف ووسائل التواصل عن مكان العمل أثناء الإنجاز", 'en': "Keep the phone and social media away from your workspace while working", 'fr': "Éloigne le téléphone et les réseaux sociaux du lieu de travail pendant la tâche"},
       {'ar': "هيئ مكانا مرتبا ومخصصا للعمل خاليا من الفوضى", 'en': "Set up a tidy, dedicated work spot free of clutter", 'fr': "Amenage un espace de travail range et dedie, sans desordre"},
-      {'ar': "حدد موعدا نهائيا واضحا لكل مهمة وأخبر به من يحاسبك", 'en': "Set a clear deadline for each task and tell an accountability partner", 'fr': "Fixe une echeance claire pour chaque tache et informe un partenaire de responsabilite"},
+      {'ar': "حدد موعدا نهائيا واضحا لكل مهمة وأخبر به من يحاسبك", 'en': "Set a clear deadline for each task and tell an accountability partner", 'fr': "Fixe une échéance claire pour chaque tâche et informe un partenaire de responsabilite"},
     ],
   ),
   'junk_food': HabitChecklists(
@@ -184,29 +187,29 @@ const Map<String, HabitChecklists> kHabitChecklists = {
   ),
   'oversleeping': HabitChecklists(
     competingResponses: [
-      {'ar': "أصلي الفجر في وقته ثم أمشي عشر دقائق بدلا من العودة إلى النوم", 'en': "Pray Fajr on time, then walk for ten minutes instead of going back to sleep", 'fr': "Prier le Fajr a l'heure, puis marcher dix minutes au lieu de me rendormir"},
-      {'ar': "أنزل من السرير فورا عند الاستيقاظ وأغسل وجهي بماء بارد", 'en': "Get out of bed immediately on waking and wash my face with cold water", 'fr': "Sortir du lit des le reveil et me laver le visage a l'eau froide"},
-      {'ar': "أبدأ يومي بأذكار الصباح وقراءة صفحة من القرآن فور النهوض", 'en': "Start my day with morning remembrance and one page of Quran right after rising", 'fr': "Commencer ma journee par les invocations du matin et une page de Coran des le lever"},
-      {'ar': "أؤدي مهمة نافعة في أول عشرين دقيقة من الصباح قبل أي راحة", 'en': "Do one useful task in the first twenty minutes of the morning before any rest", 'fr': "Accomplir une tache utile dans les vingt premieres minutes du matin avant tout repos"},
-      {'ar': "عند الرغبة في قيلولة طويلة أكتفي بعشرين دقيقة وأضبط منبها", 'en': "When tempted by a long nap, limit it to twenty minutes and set an alarm", 'fr': "Quand je suis tente par une longue sieste, la limiter a vingt minutes et regler une alarme"},
+      {'ar': "أصلي الفجر في وقته ثم أمشي عشر دقائق بدلا من العودة إلى النوم", 'en': "Pray Fajr on time, then walk for ten minutes instead of going back to sleep", 'fr': "Prier le Fajr à l'heure, puis marcher dix minutes au lieu de me rendormir"},
+      {'ar': "أنزل من السرير فورا عند الاستيقاظ وأغسل وجهي بماء بارد", 'en': "Get out of bed immediately on waking and wash my face with cold water", 'fr': "Sortir du lit dès le réveil et me laver le visage à l'eau froide"},
+      {'ar': "أبدأ يومي بأذكار الصباح وقراءة صفحة من القرآن فور النهوض", 'en': "Start my day with morning remembrance and one page of Quran right after rising", 'fr': "Commencer ma journée par les invocations du matin et une page de Coran dès le lever"},
+      {'ar': "أؤدي مهمة نافعة في أول عشرين دقيقة من الصباح قبل أي راحة", 'en': "Do one useful task in the first twenty minutes of the morning before any rest", 'fr': "Accomplir une tâche utile dans les vingt premieres minutes du matin avant tout repos"},
+      {'ar': "عند الرغبة في قيلولة طويلة أكتفي بعشرين دقيقة وأضبط منبها", 'en': "When tempted by a long nap, limit it to twenty minutes and set an alarm", 'fr': "Quand je suis tenté par une longue sieste, la limiter à vingt minutes et régler une alarme"},
     ],
     environment: [
-      {'ar': "أضبط منبها واحدا بعيدا عن السرير يجبرني على القيام لإيقافه", 'en': "Set a single alarm far from the bed that forces me to stand up to turn it off", 'fr': "Regler une seule alarme loin du lit qui m'oblige a me lever pour l'eteindre"},
-      {'ar': "أنام مبكرا وأحدد وقتا ثابتا للنوم لأكفي حاجتي دون إفراط", 'en': "Sleep early and fix a consistent bedtime to get enough rest without excess", 'fr': "Me coucher tot et fixer une heure de sommeil reguliere pour un repos suffisant sans exces"},
-      {'ar': "أفتح الستائر وأدخل ضوء النهار إلى الغرفة فور الاستيقاظ", 'en': "Open the curtains and let daylight into the room as soon as I wake", 'fr': "Ouvrir les rideaux et laisser entrer la lumiere du jour des le reveil"},
-      {'ar': "أبعد الهاتف عن السرير ليلا حتى لا يؤخر نومي ولا يطيل بقائي فيه", 'en': "Keep the phone away from the bed at night so it neither delays sleep nor keeps me in bed", 'fr': "Eloigner le telephone du lit la nuit pour qu'il ne retarde pas mon sommeil ni ne me retienne au lit"},
+      {'ar': "أضبط منبها واحدا بعيدا عن السرير يجبرني على القيام لإيقافه", 'en': "Set a single alarm far from the bed that forces me to stand up to turn it off", 'fr': "Régler une seule alarme loin du lit qui m'oblige à me lever pour l'éteindre"},
+      {'ar': "أنام مبكرا وأحدد وقتا ثابتا للنوم لأكفي حاجتي دون إفراط", 'en': "Sleep early and fix a consistent bedtime to get enough rest without excess", 'fr': "Me coucher tôt et fixer une heure de sommeil régulière pour un repos suffisant sans excès"},
+      {'ar': "أفتح الستائر وأدخل ضوء النهار إلى الغرفة فور الاستيقاظ", 'en': "Open the curtains and let daylight into the room as soon as I wake", 'fr': "Ouvrir les rideaux et laisser entrer la lumière du jour dès le réveil"},
+      {'ar': "أبعد الهاتف عن السرير ليلا حتى لا يؤخر نومي ولا يطيل بقائي فيه", 'en': "Keep the phone away from the bed at night so it neither delays sleep nor keeps me in bed", 'fr': "Éloigner le téléphone du lit la nuit pour qu'il ne retarde pas mon sommeil ni ne me retienne au lit"},
     ],
   ),
   'gossip': HabitChecklists(
     competingResponses: [
-      {'ar': "أغلقت فمي وقلت في نفسي ذكرا قصيرا حتى يزول الدافع", 'en': "I close my mouth and silently repeat a short dhikr until the urge passes", 'fr': "Je ferme la bouche et repete un court dhikr en silence jusqu'a ce que l'envie passe"},
+      {'ar': "أغلقت فمي وقلت في نفسي ذكرا قصيرا حتى يزول الدافع", 'en': "I close my mouth and silently repeat a short dhikr until the urge passes", 'fr': "Je ferme la bouche et répète un court dhikr en silence jusqu'à ce que l'envie passe"},
       {'ar': "حولت الكلام نحو ذكر حسنة في الشخص بدل عيبه", 'en': "I steer the conversation toward something good about the person instead of their fault", 'fr': "Je dirige la conversation vers une qualite de la personne au lieu de son defaut"},
       {'ar': "غيرت موضوع الحديث فورا الى أمر نافع أو سؤال", 'en': "I immediately change the subject to something useful or ask a question", 'fr': "Je change immediatement de sujet vers quelque chose d'utile ou une question"},
-      {'ar': "انسحبت من المجلس بأدب أو صمت حتى ينتهي الكلام", 'en': "I politely leave the gathering or stay silent until the talk ends", 'fr': "Je quitte poliment le rassemblement ou je me tais jusqu'a la fin de la discussion"},
-      {'ar': "دافعت عن الغائب بكلمة طيبة بدل المشاركة في عيبه", 'en': "I defend the absent person with a kind word instead of joining the criticism", 'fr': "Je defends la personne absente par une parole bienveillante au lieu de participer a la critique"},
+      {'ar': "انسحبت من المجلس بأدب أو صمت حتى ينتهي الكلام", 'en': "I politely leave the gathering or stay silent until the talk ends", 'fr': "Je quitte poliment le rassemblement ou je me tais jusqu'à la fin de la discussion"},
+      {'ar': "دافعت عن الغائب بكلمة طيبة بدل المشاركة في عيبه", 'en': "I defend the absent person with a kind word instead of joining the criticism", 'fr': "Je défends la personne absente par une parole bienveillante au lieu de participer à la critique"},
     ],
     environment: [
-      {'ar': "أبتعد عن المجالس والمجموعات التي يكثر فيها الكلام في الناس", 'en': "I avoid gatherings and group chats where people are often discussed", 'fr': "J'evite les rassemblements et les groupes ou l'on parle souvent des gens"},
+      {'ar': "أبتعد عن المجالس والمجموعات التي يكثر فيها الكلام في الناس", 'en': "I avoid gatherings and group chats where people are often discussed", 'fr': "J'évite les rassemblements et les groupes où l'on parle souvent des gens"},
       {'ar': "أكتم الإشعارات وأخرج من المحادثات التي تشعل الغيبة", 'en': "I mute notifications and leave chats that spark gossip", 'fr': "Je coupe les notifications et je quitte les conversations qui declenchent les commerages"},
       {'ar': "أرافق أصدقاء يحفظون ألسنتهم ويذكرونني عند الزلل", 'en': "I keep company with friends who guard their tongues and remind me when I slip", 'fr': "Je m'entoure d'amis qui maitrisent leur langue et me reprennent quand je derape"},
       {'ar': "أضع تذكيرا مرئيا بآية أو حديث عن حفظ اللسان أمامي", 'en': "I place a visible reminder of a verse or hadith about guarding the tongue in front of me", 'fr': "Je place devant moi un rappel visible d'un verset ou hadith sur la maitrise de la langue"},
@@ -244,17 +247,17 @@ const Map<String, HabitChecklists> kHabitChecklists = {
   ),
   'caffeine_excess': HabitChecklists(
     competingResponses: [
-      {'ar': "اشرب كوب ماء أو شاي أعشاب خالٍ من الكافيين عند اشتداد الرغبة.", 'en': "Drink a glass of water or caffeine-free herbal tea when the craving hits.", 'fr': "Bois un verre d'eau ou une tisane sans cafeine des que l'envie surgit."},
-      {'ar': "امش دقيقتين أو افعل تمارين تنفس عميق بدل احتساء فنجان جديد.", 'en': "Take a two-minute walk or do deep breathing instead of brewing another cup.", 'fr': "Fais une marche de deux minutes ou respire profondement au lieu de preparer une autre tasse."},
-      {'ar': "تناول وجبة خفيفة فيها بروتين لرفع طاقتك بدل الاعتماد على الكافيين.", 'en': "Eat a protein-rich snack to lift your energy instead of relying on caffeine.", 'fr': "Mange une collation riche en proteines pour remonter ton energie au lieu de la cafeine."},
-      {'ar': "استبدل القهوة بمشروب دافئ منزوع الكافيين واحتفظ بطقس الفنجان نفسه.", 'en': "Swap the coffee for a warm decaf drink and keep the same cup ritual.", 'fr': "Remplace le cafe par une boisson chaude decafeinee en gardant le meme rituel de la tasse."},
+      {'ar': "اشرب كوب ماء أو شاي أعشاب خالٍ من الكافيين عند اشتداد الرغبة.", 'en': "Drink a glass of water or caffeine-free herbal tea when the craving hits.", 'fr': "Bois un verre d'eau ou une tisane sans caféine dès que l'envie surgit."},
+      {'ar': "امش دقيقتين أو افعل تمارين تنفس عميق بدل احتساء فنجان جديد.", 'en': "Take a two-minute walk or do deep breathing instead of brewing another cup.", 'fr': "Fais une marche de deux minutes ou respire profondément au lieu de préparer une autre tasse."},
+      {'ar': "تناول وجبة خفيفة فيها بروتين لرفع طاقتك بدل الاعتماد على الكافيين.", 'en': "Eat a protein-rich snack to lift your energy instead of relying on caffeine.", 'fr': "Mange une collation riche en protéines pour remonter ton énergie au lieu de la caféine."},
+      {'ar': "استبدل القهوة بمشروب دافئ منزوع الكافيين واحتفظ بطقس الفنجان نفسه.", 'en': "Swap the coffee for a warm decaf drink and keep the same cup ritual.", 'fr': "Remplace le café par une boisson chaude décaféinée en gardant le même rituel de la tasse."},
       {'ar': "اذكر الله بتسبيحة قصيرة وانتظر عشر دقائق فقد تزول الرغبة.", 'en': "Say a brief dhikr and wait ten minutes; the urge often passes.", 'fr': "Fais un court dhikr et attends dix minutes; l'envie passe souvent."},
     ],
     environment: [
-      {'ar': "احتفظ بزجاجة ماء بارد في متناول يدك على المكتب طوال اليوم.", 'en': "Keep a bottle of cold water within reach on your desk all day.", 'fr': "Garde une bouteille d'eau fraiche a portee de main sur ton bureau toute la journee."},
-      {'ar': "لا تحتفظ بحبوب القهوة وكبسولات الكافيين إلا بكمية قليلة في البيت.", 'en': "Keep only a small amount of coffee beans and caffeine pods at home.", 'fr': "Ne garde qu'une petite quantite de grains de cafe et de capsules a la maison."},
-      {'ar': "لا تشرب أي كافيين بعد العصر لحماية نومك وتقليل الحاجة إليه.", 'en': "Avoid all caffeine after mid-afternoon to protect your sleep and lower your need for it.", 'fr': "Evite toute cafeine apres le milieu de l'apres-midi pour proteger ton sommeil."},
-      {'ar': "تجنّب الطريق المار بالمقهى وأبعد آلة القهوة عن مجال نظرك.", 'en': "Avoid the route that passes the cafe and move the coffee machine out of sight.", 'fr': "Evite le chemin qui passe devant le cafe et range la machine a cafe hors de vue."},
+      {'ar': "احتفظ بزجاجة ماء بارد في متناول يدك على المكتب طوال اليوم.", 'en': "Keep a bottle of cold water within reach on your desk all day.", 'fr': "Garde une bouteille d'eau fraîche à portée de main sur ton bureau toute la journée."},
+      {'ar': "لا تحتفظ بحبوب القهوة وكبسولات الكافيين إلا بكمية قليلة في البيت.", 'en': "Keep only a small amount of coffee beans and caffeine pods at home.", 'fr': "Ne garde qu'une petite quantite de grains de café et de capsules a la maison."},
+      {'ar': "لا تشرب أي كافيين بعد العصر لحماية نومك وتقليل الحاجة إليه.", 'en': "Avoid all caffeine after mid-afternoon to protect your sleep and lower your need for it.", 'fr': "Évite toute caféine après le milieu de l'après-midi pour protéger ton sommeil."},
+      {'ar': "تجنّب الطريق المار بالمقهى وأبعد آلة القهوة عن مجال نظرك.", 'en': "Avoid the route that passes the cafe and move the coffee machine out of sight.", 'fr': "Évite le chemin qui passe devant le café et range la machine a café hors de vue."},
     ],
   ),
   'late_nights': HabitChecklists(

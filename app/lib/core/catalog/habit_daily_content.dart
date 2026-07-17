@@ -40,16 +40,15 @@ const Map<String, List<ScholarVideo>> kHabitVideos = {
     ScholarVideo(id: 'kFn_3_aMOnc', title: 'كتاب ووقت أذكار الصباح والمساء ؟ للشيخ مصطفي العدوي', scholar: 'الشيخ مصطفى العدوي', seconds: 62),
   ],
   'keeping_ties': [
-    ScholarVideo(id: '6M4-mzXHz8M', title: 'صلة الأرحام - معراج الروح - الشيخ مصطفى العدوي', scholar: 'الشيخ مصطفى العدوي', seconds: 1184),
-    ScholarVideo(id: 'EsgRroD5eI0', title: 'الرحم معلقة بالعرش: من وصلني وصله الله ومن قطعني قطعه الله - الشيخ مصطفى العدوي', scholar: 'الشيخ مصطفى العدوي', seconds: 313),
+    ScholarVideo(id: '52MWXPZvLts', title: 'أفضل البر الصدقة على الأرحام', scholar: 'الشيخ أبو إسحاق الحويني', seconds: 360),
+    ScholarVideo(id: 'EsgRroD5eI0', title: 'الرحم معلقة بالعرش: من وصلني وصله الله ومن قطعني قطعه الله', scholar: 'الشيخ مصطفى العدوي', seconds: 313),
   ],
   'daily_charity': [
     ScholarVideo(id: 'WGo79srmiQo', title: 'ما نقصت صدقة من مال - الشيخ مصطفى العدوي', scholar: 'الشيخ مصطفى العدوي', seconds: 442),
     ScholarVideo(id: '0mQf3K9ayY8', title: 'أفضل الصدقة صدقة الصحيح الشحيح - الشيخ مصطفى العدوي', scholar: 'الشيخ مصطفى العدوي', seconds: 459),
   ],
   'istighfar': [
-    ScholarVideo(id: 'r21k3cL69gU', title: 'الاستغفار والمداومة عليه - معراج الروح - الشيخ مصطفى العدوي', scholar: 'الشيخ مصطفى العدوي', seconds: 1232),
-    ScholarVideo(id: '49aKz8DBms0', title: 'الاستغفار والحث عليه - الشيخ مصطفى العدوي', scholar: 'الشيخ مصطفى العدوي', seconds: 999),
+    ScholarVideo(id: 'e3UjZiXXZ9Y', title: 'هو ده استغفار بجد', scholar: 'محمد الغليظ', seconds: 240),
   ],
   'gratitude': [
     ScholarVideo(id: 'P5_WFOIOKcU', title: 'نعمة الظل | الشيخ مصطفى العدوي', scholar: 'الشيخ مصطفى العدوي', seconds: 92),
@@ -60,6 +59,30 @@ const Map<String, List<ScholarVideo>> kHabitVideos = {
   'dua': [
     ScholarVideo(id: 'MCf-VVnkKxQ', title: 'فقه الدعاء (1) للشيخ مصطفى العدوي', scholar: 'الشيخ مصطفى العدوي', seconds: 640),
   ],
+  // Added 2026-07-17 from assets/data/scholar_videos.json (verified <15 min).
+  'break_porn': [
+    ScholarVideo(id: 'y3rb67qqDSg', title: 'أقوى 8 خطوات تخليك تبطّل الإباحية نهائيًا', scholar: 'قناة واعي', seconds: 780),
+    ScholarVideo(id: '2FIYJTafJqU', title: 'خطة عملية لترك العادة السرية', scholar: 'محمد الغليظ', seconds: 480),
+  ],
+  'wake_fajr': [
+    ScholarVideo(id: '4WlxjbO2D3A', title: 'أثقل الصلاة على المنافقين صلاة العشاء وصلاة الفجر', scholar: 'الشيخ أبو إسحاق الحويني', seconds: 420),
+    ScholarVideo(id: 'QCMSHn_Jc70', title: 'قصة رجل نجا من بطش الحجاج لصلاته صلاة الصبح', scholar: 'الشيخ أبو إسحاق الحويني', seconds: 120),
+  ],
+  'daily_quran': [
+    ScholarVideo(id: '2n4F418AGmg', title: 'ما هو أقل ورد يومي يستطيع القارئ أن يقرأه؟', scholar: 'الشيخ مصطفى العدوي', seconds: 60),
+    ScholarVideo(id: '06cnq1DSmg0', title: 'الشيخ الحويني يبكي عند تلاوته القرآن: يا ليتني أعطيت القرآن عمري', scholar: 'الشيخ أبو إسحاق الحويني', seconds: 240),
+  ],
+  'qiyam': [
+    ScholarVideo(id: 'VV8dyky1zho', title: 'أفضل طريقة للحفاظ على قيام الليل', scholar: 'الشيخ أبو إسحاق الحويني', seconds: 60),
+    ScholarVideo(id: 'spK08YeQQYo', title: 'قيام الليل والأنس بالله', scholar: 'الشيخ أبو إسحاق الحويني', seconds: 180),
+  ],
+  'voluntary_fasting': [
+    ScholarVideo(id: 'K858u38xZF8', title: 'فضل صيام ثلاثة أيام من كل شهر', scholar: 'الشيخ أبو إسحاق الحويني', seconds: 180),
+    ScholarVideo(id: 'lcChbY-HMfc', title: 'أيهما أفضل صيام الاثنين والخميس أم صيام داود؟', scholar: 'الشيخ مصطفى العدوي', seconds: 120),
+  ],
+  'salawat': [
+    ScholarVideo(id: 'Rt-1W3LFxOk', title: 'واجب الصلاة على النبي والدعوة', scholar: 'محمد الغليظ', seconds: 780),
+  ],
 };
 
 const Map<String, Map<String, String>> kHabitQuestions = {
@@ -69,6 +92,9 @@ const Map<String, Map<String, String>> kHabitQuestions = {
   'hair_pulling': {'ar': 'هل نتفت شعرك اليوم؟', 'en': 'Did you pull your hair today?', 'fr': 'Vous êtes-vous arraché les cheveux aujourd\'hui ?'},
   'skin_picking': {'ar': 'هل نتشت جلدك اليوم؟', 'en': 'Did you pick at your skin today?', 'fr': 'Vous êtes-vous gratté la peau aujourd\'hui ?'},
   'secret_habit': {'ar': 'هل وقعت في العادة اليوم؟', 'en': 'Did you fall into the habit today?', 'fr': 'Êtes-vous retombé dans l\'habitude aujourd\'hui ?'},
+  'break_porn': {'ar': 'هل شاهدت محتوى محرّماً اليوم؟', 'en': 'Did you view forbidden content today?', 'fr': 'Avez-vous regardé du contenu interdit aujourd\'hui ?'},
+  'surah_kahf': {'ar': 'هل قرأت سورة الكهف هذا الأسبوع؟', 'en': 'Did you read Surah Al-Kahf this week?', 'fr': 'Avez-vous lu la sourate Al-Kahf cette semaine ?'},
+  'listening_wird': {'ar': 'هل استمعت إلى وِردك من القرآن اليوم؟', 'en': 'Did you listen to your Quran wird today?', 'fr': 'Avez-vous écouté votre wird du Coran aujourd\'hui ?'},
   'phone_addiction': {'ar': 'هل ضاع وقتك في التصفح اليوم؟', 'en': 'Did you waste your time scrolling today?', 'fr': 'Avez-vous perdu votre temps à naviguer sans but aujourd\'hui ?'},
   'excessive_gaming': {'ar': 'هل تجاوزت وقت اللعب المسموح اليوم؟', 'en': 'Did you exceed your gaming limit today?', 'fr': 'Avez-vous dépassé votre limite de jeu aujourd\'hui ?'},
   'procrastination': {'ar': 'هل سوّفت مهامك اليوم؟', 'en': 'Did you procrastinate on your tasks today?', 'fr': 'Avez-vous procrastiné sur vos tâches aujourd\'hui ?'},

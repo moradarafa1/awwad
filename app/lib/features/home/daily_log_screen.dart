@@ -19,6 +19,7 @@ import '../../core/models.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
+import '../quran/quran_player_screen.dart';
 import 'badge_celebration.dart';
 import 'habit_switcher.dart';
 import 'home_shell.dart';
@@ -990,6 +991,33 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     if (!online) return const SizedBox.shrink();
     final key = habit?.catalogKey;
     if (key == null) return const SizedBox.shrink();
+
+    // The listening wird opens the in-app Quran audio player instead of a link.
+    if (key == 'listening_wird') {
+      final w = const {
+        'ar': {
+          'title': 'ورد الاستماع',
+          'body': 'استمع إلى القرآن بصوت قارئك المفضّل من ٥٠ قارئاً.',
+          'button': 'افتح المشغّل'
+        },
+        'en': {
+          'title': 'Listening wird',
+          'body': 'Listen to the Quran in your favourite voice from 50 reciters.',
+          'button': 'Open the player'
+        },
+        'fr': {
+          'title': "Wird d'écoute",
+          'body': 'Écoutez le Coran par votre récitateur préféré parmi 50.',
+          'button': 'Ouvrir le lecteur'
+        },
+      }[locale] ?? const {'title': '', 'body': '', 'button': ''};
+      return _solutionCard(
+          title: w['title']!,
+          body: w['body']!,
+          buttonLabel: w['button']!,
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => const QuranPlayerScreen())));
+    }
 
     // A curated channel (the secret-habit واعي recommendation) takes precedence.
     final res = catalogByKey(key)?.resource;

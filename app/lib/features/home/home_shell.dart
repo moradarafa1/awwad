@@ -126,6 +126,13 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       showReligious: s.settings.showReligiousContent,
       locale: loc,
     );
+    // End-of-month report notification (re-armed each open).
+    if (s.settings.notificationsEnabled) {
+      final r = kMonthlyReportNotif[loc] ?? kMonthlyReportNotif['ar']!;
+      await scheduleMonthlyReport(r['title']!, r['body']!);
+    } else {
+      await cancelMonthlyReport();
+    }
   }
 
 

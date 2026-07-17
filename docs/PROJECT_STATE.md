@@ -658,6 +658,35 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-17 round 4 (0d PHASE B + C SHIPPED: Quran audio wird + monthly report)** -
+  PHASE B: «ورد الاستماع للقرآن» catalog habit (build) + in-app audio player
+  (features/quran/quran_player_screen.dart, just_audio + audio_session) streaming surah mp3s
+  from the free mp3quran.net servers; core/quran/quran_data.dart is pure + tested (50 reciters
+  from reciters.json, 114 surah names, 3-digit URL builder); reciter+surah choice persists
+  (LocalStore quran wird) and the daily-log resource card opens the player. iOS audio
+  background mode added. PHASE C: end-of-month report - core/report/monthly_report.dart (pure,
+  tested: per-habit logged/clean/skip/slip counts, success rate, in-month best streak, and a
+  per-habit relapse tip that is repentance-framed for religious habits, HRT/scientific for
+  behavioural, generic for custom) + features/report/monthly_report_screen.dart (per-habit
+  cards + tips) reachable from a Stats card and from the new end-of-month notification (id
+  1005, last day 20:00, re-armed each open via home_shell). Both synced: listening_wird added
+  to catalog + seed.sql + LIVE DB (now 39 catalog rows). New tests: quran_data_test (3) +
+  monthly_report_test (4). Verified: analyze clean, 71 tests, web+APK+AAB built. NOTE: the
+  adhan SOUND on prayer notifications is still owner-gated (needs a licensed clip); hadith
+  audio-by-chapter remains infeasible (no free API) - both documented in 0d.
+- **2026-07-17 round 3 (Arabic minors cleared + 0d PHASE A2 SHIPPED)** - Cleared the two logged
+  Arabic minors: restored FR accents across ~30 checklist strings in habit_content.dart (café,
+  téléphone, écran, à/dès/où, etc.) and made history cards use build-track vocabulary
+  (أُنجزت/لم تُنجَز vs نظيف/تعثّر) by branching on the habit track like the heatmap. PHASE A2:
+  two new catalog habits - «قراءة سورة الكهف» (build, weekly: scheduled Friday at dhuhr+1h via
+  the new scheduleWeekly / prayer_scheduler, id 4300, independent of prayer-location config,
+  falls back to 13:30) and «كسر إدمان الإباحية» (break; opens the DNS content shield immediately
+  on add; reuses secret_habit's HRT checklists) - synced catalog + seed.sql + LIVE DB. Scholar
+  videos wired from assets/data/scholar_videos.json for break_porn + 5 previously-uncovered
+  religious habits (wake_fajr, daily_quran, qiyam, voluntary_fasting, salawat); a new regression
+  test (catalog_a2_test.dart) enforces the owner's <15-min rule and CAUGHT 3 legacy videos over
+  15 min (keeping_ties/istighfar), now replaced with shorter verified clips. Daily questions
+  added for both new habits. Verified: analyze clean, 64/64 tests.
 - **2026-07-17 round 2 (PRAYER-TIMES ENGINE SHIPPED + Arabic lens fixes)** - 0d Phase A live in
   code: offline adhan calc with regional methods (Egypt/Gulf authorities, MWL default),
   PrayerConfig (location + per-prayer manual offsets + 5-min pre-alert toggle) persisted in

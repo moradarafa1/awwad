@@ -214,6 +214,41 @@ Future<void> scheduleHabitReminder(
 
 const _testNowId = 1998;
 const _testLaterId = 1999;
+const _monthlyId = 1005; // end-of-month report reminder
+
+/// Schedules the end-of-month report notification at 20:00 on the last day of
+/// the current month (re-armed on each app open; a no-op if already past).
+Future<void> scheduleMonthlyReport(String title, String body) async {
+  await initNotifications();
+  final now = tz.TZDateTime.now(tz.local);
+  final lastDay = DateTime(now.year, now.month + 1, 0).day;
+  var when = tz.TZDateTime(tz.local, now.year, now.month, lastDay, 20);
+  if (when.isBefore(now)) {
+    // This month's slot passed: aim at next month's last day.
+    final ny = now.month == 12 ? now.year + 1 : now.year;
+    final nm = now.month == 12 ? 1 : now.month + 1;
+    final nLast = DateTime(ny, nm + 1, 0).day;
+    when = tz.TZDateTime(tz.local, ny, nm, nLast, 20);
+  }
+  final details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _badgeChannelId,
+      _badgeChannelName,
+      channelDescription: 'Monthly report',
+      importance: Importance.high,
+      priority: Priority.high,
+      styleInformation: BigTextStyleInformation(body),
+    ),
+    iOS: const DarwinNotificationDetails(),
+  );
+  await _safeZoned(_monthlyId, title, body, when, details);
+}
+
+Future<void> cancelMonthlyReport() async {
+  try {
+    await _plugin.cancel(_monthlyId);
+  } catch (_) {}
+}
 
 /// Owner-facing sanity check: one notification NOW plus one scheduled in 60s.
 /// The immediate one proves the permission/channel path; the delayed one

@@ -8,6 +8,7 @@ import '../../core/catalog/habit_catalog.dart';
 import '../../core/catalog/habit_daily_content.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
+import '../report/monthly_report_screen.dart';
 import 'analytics_section.dart';
 import 'habit_switcher.dart';
 import 'history_screen.dart' show HistoryList;
@@ -59,6 +60,37 @@ class StatsScreen extends ConsumerWidget {
           if (ref.watch(statsSubTabProvider) == 1) ...[
             const HistoryList(),
           ] else ...[
+          // Monthly report entry.
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => const MonthlyReportScreen())),
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                      colors: [Color(0x222DD4BF), Color(0x114F8EF7)]),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                      color: AppColors.accent2.withValues(alpha: 0.4)),
+                ),
+                child: Row(children: [
+                  const Text('📊', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(_kReport[locale] ?? _kReport['ar']!,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: AppColors.heading)),
+                  ),
+                  Icon(Icons.chevron_left, color: AppColors.muted),
+                ]),
+              ),
+            ),
+          ),
           Row(
             children: [
               Expanded(
@@ -225,3 +257,9 @@ class StatsScreen extends ConsumerWidget {
     ]);
   }
 }
+
+const Map<String, String> _kReport = {
+  'ar': 'تقرير الشهر: تقدّمك وكلمة تشجيع لكل عادة',
+  'en': 'Monthly report: your progress and a word of encouragement',
+  'fr': 'Rapport du mois : vos progrès et un mot d\'encouragement',
+};

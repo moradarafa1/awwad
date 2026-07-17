@@ -40,7 +40,8 @@ class HistoryList extends ConsumerWidget {
                 style: TextStyle(color: AppColors.muted)),
           )
         else
-          ...entries.map((e) => _historyCard(context, e, l10n, locale, metrics)),
+          ...entries.map((e) =>
+              _historyCard(context, e, l10n, locale, metrics, habit?.track)),
       ],
     );
   }
@@ -85,18 +86,28 @@ class HistoryScreen extends ConsumerWidget {
                   style: TextStyle(color: AppColors.muted)),
             )
           else
-            ...entries.map(
-                (e) => _historyCard(context, e, l10n, locale, metrics)),
+            ...entries.map((e) =>
+                _historyCard(context, e, l10n, locale, metrics, habit?.track)),
         ],
       ),
     );
   }
 }
 
+// Build habits are "done / missed", not "clean / slipped": matches the heatmap.
+const _kBuildDone = {'ar': 'أُنجزت', 'en': 'Done', 'fr': 'Accomplie'};
+const _kBuildMissed = {'ar': 'لم تُنجَز', 'en': 'Missed', 'fr': 'Manquée'};
+
 Widget _historyCard(BuildContext context, DailyEntry e, AppLocalizations l10n,
-    String locale, HabitMetrics metrics) {
+    String locale, HabitMetrics metrics, String? track) {
   final clean = !e.didSlip;
   final skip = e.isSkip;
+  final isBuild = track == 'build';
+  final goodLabel =
+      isBuild ? (_kBuildDone[locale] ?? _kBuildDone['ar']!) : l10n.badgeClean;
+  final badLabel = isBuild
+      ? (_kBuildMissed[locale] ?? _kBuildMissed['ar']!)
+      : l10n.badgeSlip;
   return Container(
     margin: const EdgeInsets.only(bottom: 10),
     padding: const EdgeInsets.all(14),
@@ -138,9 +149,7 @@ Widget _historyCard(BuildContext context, DailyEntry e, AppLocalizations l10n,
               child: Text(
                   skip
                       ? '➖'
-                      : (clean
-                          ? '✅ ${l10n.badgeClean}'
-                          : '⚠️ ${l10n.badgeSlip}'),
+                      : (clean ? '✅ $goodLabel' : '⚠️ $badLabel'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

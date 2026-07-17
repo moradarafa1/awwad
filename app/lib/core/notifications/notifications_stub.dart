@@ -33,6 +33,10 @@ Future<void> cancelIdRange(int from, int to) async {}
 Future<void> scheduleWeekly(int id, int weekday, int hour, int minute,
     String title, String body) async {}
 
+Future<void> scheduleMonthlyReport(String title, String body) async {}
+
+Future<void> cancelMonthlyReport() async {}
+
 Future<void> cancelPomodoroDone() async {}
 
 Future<void> cancelReminders() async {}

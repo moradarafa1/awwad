@@ -336,6 +336,24 @@ const List<CatalogHabit> kHabitCatalog = [
   CatalogHabit(key: 'dua', track: 'build', category: 'worship', icon: '🤍', templateKey: 'generic', isIslamic: true,
     title: {'ar': "الدعاء اليومي", 'en': "Daily supplication", 'fr': "Invocation quotidienne"},
     description: {'ar': "اجعل لك نصيباً ثابتاً من الدعاء كل يوم، وارفع حاجاتك إلى الله بقلب موقن بالإجابة، فالدعاء مفتاح كل خير.", 'en': "Set aside a steady portion of supplication each day, raising your needs to God with a heart certain of an answer. Supplication is the key to every good.", 'fr': "Réservez chaque jour un moment d'invocation, en présentant vos besoins à Dieu avec un cœur convaincu de la réponse. L'invocation est la clé de tout bien."}),
+  // Weekly build habit: reminder is scheduled Friday at dhuhr+1h by the prayer
+  // engine, not the daily reminder path (see notif scheduleWeekly / kahf wiring).
+  CatalogHabit(key: 'surah_kahf', track: 'build', category: 'worship', icon: '📖', templateKey: 'generic', isIslamic: true,
+    islamwebRef: 'https://www.islamweb.net/ar/fatwa/21395/',
+    title: {'ar': "قراءة سورة الكهف", 'en': "Reading Surah Al-Kahf", 'fr': "Lecture de sourate Al-Kahf"},
+    description: {'ar': "اقرأ سورة الكهف كل جمعة، فمن قرأها أضاء له من النور ما بين الجمعتين. اجعلها موعداً ثابتاً بعد صلاة الجمعة.", 'en': "Read Surah Al-Kahf every Friday; whoever reads it is granted light between the two Fridays. Make it a fixed appointment after Jumu'ah.", 'fr': "Lisez la sourate Al-Kahf chaque vendredi; celui qui la lit reçoit une lumière entre les deux vendredis. Fixez ce rendez-vous après la prière du vendredi."}),
+  // Distinct from secret_habit: opens the DNS content shield immediately on
+  // selection (see add_habit / onboarding _onPick hook).
+  CatalogHabit(key: 'break_porn', track: 'break', category: 'mind', icon: '🛡️', templateKey: 'hrt_8week', isIslamic: true, resource: _waaiResource,
+    islamwebRef: 'https://www.islamweb.net/ar/fatwa/125402/',
+    title: {'ar': "كسر إدمان الإباحية", 'en': "Break porn addiction", 'fr': "Briser l'addiction au porno"},
+    description: {'ar': "طريق التعافي يبدأ بصدق التوبة وقطع الطريق على المحرَّم. فعّل حاجب المحتوى، واملأ فراغك بالخير، واستعن بالله ثم بمن تثق به.", 'en': "Recovery starts with sincere repentance and cutting off access. Turn on the content shield, fill your time with good, and lean on God then a trusted companion.", 'fr': "La guérison commence par un repentir sincère et la coupure de l'accès. Activez le filtre de contenu, occupez votre temps par le bien, et appuyez-vous sur Dieu puis sur une personne de confiance."}),
+  // Quran listening wird: opens an in-app audio player (50 reciters) from the
+  // daily log resource card. Build habit (a daily good deed).
+  CatalogHabit(key: 'listening_wird', track: 'build', category: 'worship', icon: '🎧', templateKey: 'generic', isIslamic: true,
+    islamwebRef: 'https://www.islamweb.net/ar/fatwa/13782/',
+    title: {'ar': "ورد الاستماع للقرآن", 'en': "Quran listening wird", 'fr': "Wird d'écoute du Coran"},
+    description: {'ar': "اجعل لك وِرداً يومياً تستمع فيه إلى القرآن بصوت قارئك المفضّل، فللاستماع للقرآن سكينةٌ للقلب ورحمة. اختر السورة وعدد ما تسمع.", 'en': "Set a daily wird of listening to the Quran in your favourite reciter's voice; listening brings calm and mercy to the heart. Pick a surah and how much to hear.", 'fr': "Fixez un wird quotidien d'écoute du Coran par votre récitateur préféré; l'écoute apporte sérénité et miséricorde au cœur."}),
 ];
 
 List<CatalogHabit> catalogForTrack(String track) =>

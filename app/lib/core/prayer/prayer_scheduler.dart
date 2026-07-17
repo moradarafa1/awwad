@@ -52,8 +52,22 @@ const _kAdhkarPm = {
 const _kAdhkarBody = {
   'ar': 'حصّن يومك بذكر الله. دقائق قليلة تكفي.',
   'en': 'Guard your day with remembrance. A few minutes suffice.',
-  'fr': 'Protegez votre journee par le dhikr. Quelques minutes suffisent.',
+  'fr': 'Protégez votre journée par le dhikr. Quelques minutes suffisent.',
 };
+const _kKahfTitle = {
+  'ar': 'سورة الكهف',
+  'en': 'Surah Al-Kahf',
+  'fr': 'Sourate Al-Kahf',
+};
+const _kKahfBody = {
+  'ar': 'اليوم الجمعة: اقرأ سورة الكهف يُضِئ لك من النور ما بين الجمعتين.',
+  'en': 'It is Friday: read Surah Al-Kahf for light between the two Fridays.',
+  'fr': "C'est vendredi : lisez la sourate Al-Kahf pour une lumière entre les deux vendredis.",
+};
+
+/// Fixed notification id for the weekly Kahf reminder (outside the 4000-4299
+/// prayer window so the daily reschedule never cancels it).
+const _kKahfId = 4300;
 
 String _t(Map<String, String> m, String loc) => m[loc] ?? m['ar']!;
 
@@ -67,13 +81,30 @@ Future<void> applyPrayerSchedule({
   required String locale,
 }) async {
   await cancelIdRange(4000, 4299);
+  await cancelIdRange(_kKahfId, _kKahfId);
   if (!notificationsEnabled || !showReligious) return;
-  final raw = store.loadPrayer();
-  if (raw == null) return;
-  final cfg = PrayerConfig.fromJson(raw);
-  if (!cfg.configured) return;
 
   final keys = habits.map((h) => h.catalogKey).whereType<String>().toSet();
+  final raw = store.loadPrayer();
+  final cfg = raw != null ? PrayerConfig.fromJson(raw) : const PrayerConfig();
+
+  // Surah Al-Kahf is INDEPENDENT of the prayer location: weekly on Friday, at
+  // the computed dhuhr+1h when a location exists, else a sensible 13:30.
+  if (keys.contains('surah_kahf')) {
+    var h = 13, m = 30;
+    if (cfg.configured) {
+      final dhuhr = timesFor(cfg, DateTime.now())['dhuhr'];
+      if (dhuhr != null) {
+        h = (dhuhr.hour + 1).clamp(0, 23);
+        m = dhuhr.minute;
+      }
+    }
+    await scheduleWeekly(_kKahfId, DateTime.friday, h, m,
+        _t(_kKahfTitle, locale), _t(_kKahfBody, locale));
+  }
+
+  // Everything below needs a real location (astronomical times).
+  if (!cfg.configured) return;
   final wantPrayers =
       keys.contains('pray_on_time') || keys.contains('wake_fajr');
   final wantAdhkar = keys.contains('adhkar');

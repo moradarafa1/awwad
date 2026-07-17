@@ -198,5 +198,18 @@ insert into public.habit_catalog (key, track, category, title, description, icon
 ('anger','break','mind',
   '{"ar":"الغضب وسرعة الانفعال","en":"Anger & quick temper","fr":"Colère et emportement"}',
   '{"ar":"تعلّم ضبط غضبك وكظم غيظك في المواقف الصعبة، فالقوي من يملك نفسه عند الغضب، واحفظ علاقاتك وصحتك.","en":"Learn to control your anger and restrain it in difficult moments. The strong one is who masters himself when angry, protecting your relationships and health.","fr":"Apprenez à maîtriser votre colère et à la contenir dans les moments difficiles. Le fort est celui qui se domine quand il est en colère, préservant ses relations et sa santé."}',
-  '😤','hrt_8week',true,null, 50, 55)
+  '😤','hrt_8week',true,null, 50, 55),
+-- New religious habits (2026-07-17): Surah Al-Kahf (weekly) + porn-break.
+('surah_kahf','build','worship',
+  '{"ar":"قراءة سورة الكهف","en":"Reading Surah Al-Kahf","fr":"Lecture de sourate Al-Kahf"}',
+  '{"ar":"اقرأ سورة الكهف كل جمعة، فمن قرأها أضاء له من النور ما بين الجمعتين. اجعلها موعداً ثابتاً بعد صلاة الجمعة.","en":"Read Surah Al-Kahf every Friday; whoever reads it is granted light between the two Fridays. Make it a fixed appointment after Jumu''ah.","fr":"Lisez la sourate Al-Kahf chaque vendredi; celui qui la lit reçoit une lumière entre les deux vendredis. Fixez ce rendez-vous après la prière du vendredi."}',
+  '📖','generic',true,'https://www.islamweb.net/ar/fatwa/21395/', 50, 56),
+('break_porn','break','mind',
+  '{"ar":"كسر إدمان الإباحية","en":"Break porn addiction","fr":"Briser l''addiction au porno"}',
+  '{"ar":"طريق التعافي يبدأ بصدق التوبة وقطع الطريق على المحرَّم. فعّل حاجب المحتوى، واملأ فراغك بالخير، واستعن بالله ثم بمن تثق به.","en":"Recovery starts with sincere repentance and cutting off access. Turn on the content shield, fill your time with good, and lean on God then a trusted companion.","fr":"La guérison commence par un repentir sincère et la coupure de l''accès. Activez le filtre de contenu, occupez votre temps par le bien, et appuyez-vous sur Dieu puis sur une personne de confiance."}',
+  '🛡️','hrt_8week',true,'https://www.islamweb.net/ar/fatwa/125402/', 50, 57),
+('listening_wird','build','worship',
+  '{"ar":"ورد الاستماع للقرآن","en":"Quran listening wird","fr":"Wird d''écoute du Coran"}',
+  '{"ar":"اجعل لك وِرداً يومياً تستمع فيه إلى القرآن بصوت قارئك المفضّل، فللاستماع للقرآن سكينةٌ للقلب ورحمة. اختر السورة وعدد ما تسمع.","en":"Set a daily wird of listening to the Quran in your favourite reciter''s voice; listening brings calm and mercy to the heart.","fr":"Fixez un wird quotidien d''écoute du Coran par votre récitateur préféré; l''écoute apporte sérénité et miséricorde au cœur."}',
+  '🎧','generic',true,'https://www.islamweb.net/ar/fatwa/13782/', 50, 58)
 on conflict (key) do nothing;

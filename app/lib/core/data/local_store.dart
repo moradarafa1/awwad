@@ -128,6 +128,21 @@ class LocalStore {
   Future<void> savePrayer(Map<String, dynamic> cfg) =>
       _prefs.setString(_kPrayer, jsonEncode(cfg));
 
+  // ---- Quran listening wird (reciter + surah, to resume) ----
+  static const _kQuranWird = 'awwad_quran_wird_v1';
+  Map<String, dynamic>? loadQuranWird() {
+    final raw = _prefs.getString(_kQuranWird);
+    if (raw == null) return null;
+    try {
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveQuranWird(Map<String, dynamic> w) =>
+      _prefs.setString(_kQuranWird, jsonEncode(w));
+
   Future<void> clearAll() async {
     await _prefs.remove(_kHabit);
     await _prefs.remove(_kHabits);

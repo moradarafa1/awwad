@@ -54,6 +54,10 @@ dependencies:
   adhan: ^2.0.0+1
   geolocator: ^13.0.2
 
+  # Quran audio wird: streams surah mp3s from the free mp3quran.net servers.
+  just_audio: ^0.9.42
+  audio_session: ^0.1.25
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

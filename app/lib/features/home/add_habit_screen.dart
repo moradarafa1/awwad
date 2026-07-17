@@ -7,6 +7,7 @@ import '../../core/analytics/analytics.dart';
 import '../../core/catalog/habit_catalog.dart';
 import '../../core/models.dart';
 import '../../core/state/app_state.dart';
+import '../shield/dns_shield_screen.dart';
 import '../../core/widgets/reminder_times_picker.dart';
 
 /// Flow for adding an extra habit after onboarding. Reachable from the habit
@@ -112,6 +113,12 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
       return;
     }
     Navigator.of(context).pop();
+    // The porn-break habit opens the DNS content shield immediately, since
+    // cutting off access is step one of recovery.
+    if (habit.catalogKey == 'break_porn' && mounted) {
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const DnsShieldScreen()));
+    }
   }
 
   @override
