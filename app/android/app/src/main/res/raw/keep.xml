@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Release resource shrinking strips resources that are only referenced BY
+     NAME at runtime. The adhan notification sound is resolved via
+     RawResourceAndroidNotificationSound('adhan') (getIdentifier), so without
+     this keep rule the shrinker silently removes it and prayer notifications
+     fall back to the default sound. Do not delete. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/adhan" />

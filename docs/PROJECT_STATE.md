@@ -77,6 +77,8 @@ takes habitId; daily_log resource cards pass habit?.id). Tests: radio_autolog_te
 3. Then continue §12 backlog (0c phase C app-blocking is OWNER-GATED; home widget; share
    image; store submission is owner action).
 
+NEW GOTCHA #11 (hit 2026-07-18): release resource SHRINKING strips res/raw sounds that are only referenced by name at runtime - the adhan silently vanished from the APK (and concurrent gradle builds on one build dir corrupt resource merging; never run two). Fix: android/app/src/main/res/raw/keep.xml with tools:keep="@raw/adhan" - verify after EVERY release build: aapt2 dump resources app-release.apk | grep raw/adhan (must be 1) + unzip -l shows a ~2.24MB res/*.mp3. APK/AAB rebuilt WITH the owner adhan verified inside; APK copied to Desktop.
+
 Machine quirk: OS clock EDT, owner is Cairo (UTC+3). qurango saheh-muslim stream returned
 intermittent 500s when probed - the player already shows a friendly error; consider a retry.
 
