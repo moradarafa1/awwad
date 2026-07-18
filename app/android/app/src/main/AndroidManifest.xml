@@ -7,11 +7,14 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <!-- Minute-accurate PRAYER/adhan notifications (core feature). Auto-granted
-         on Android 12; on 13+ the user grants «Alarms and reminders» via the
-         prayer-settings tile (requestExactAlarmsPermission). Everything else
-         stays inexact by design. Play policy: exact alarms are justified here
-         as user-visible, time-critical religious reminders. -->
+    <!-- Minute-accurate PRAYER/adhan notifications (core feature). Granted by
+         default on Android 12-13; DENIED BY DEFAULT for new installs on
+         Android 14+, where the user grants «Alarms and reminders» via the
+         prayer-settings tile (requestExactAlarmsPermission). Scheduling
+         degrades to inexact whenever the grant is absent. Everything except
+         the prayer family stays inexact by design. Play policy: justified as
+         user-visible, time-critical religious reminders. NEVER swap this for
+         USE_EXACT_ALARM (Play restricts that to alarm-clock/calendar apps). -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <!-- App-usage monitoring for the phone-addiction habit: a SPECIAL permission
          the user grants manually in system settings (Usage access); it cannot be

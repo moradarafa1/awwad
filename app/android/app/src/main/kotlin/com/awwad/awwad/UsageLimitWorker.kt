@@ -106,7 +106,8 @@ class UsageLimitWorker(ctx: Context, params: WorkerParameters) :
             else -> "$app: استخدمته $used دقيقة اليوم (حددت $limit). حان وقت التوقف، أنت أقوى من العادة."
         }
         val n = NotificationCompat.Builder(ctx, "awwad_usage_guard")
-            .setSmallIcon(ctx.applicationInfo.icon)
+            .setSmallIcon(R.drawable.ic_stat_awwad)
+            .setColor(0xFF4F8EF7.toInt())
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))

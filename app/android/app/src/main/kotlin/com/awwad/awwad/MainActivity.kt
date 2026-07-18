@@ -19,14 +19,26 @@ class MainActivity : FlutterActivity() {
         // Usage-limit guard: a 15-minute periodic check that posts a warning
         // the moment a limited app crosses its daily screen-time budget, even
         // if Awwad itself is closed. KEEP = never duplicated across launches.
+        // Only runs while the user actually HAS limits: with none set the
+        // periodic work is cancelled instead of waking every 15 minutes for
+        // nothing (it re-enqueues on the next launch after a limit is saved).
         try {
-            androidx.work.WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "awwad_usage_guard",
-                androidx.work.ExistingPeriodicWorkPolicy.KEEP,
-                androidx.work.PeriodicWorkRequestBuilder<UsageLimitWorker>(
-                    java.time.Duration.ofMinutes(15)
-                ).build()
-            )
+            val wm = androidx.work.WorkManager.getInstance(this)
+            val hasLimits = getSharedPreferences(
+                "FlutterSharedPreferences", Context.MODE_PRIVATE
+            ).getString("flutter.app_usage_limits_v1", null)
+                ?.let { it.trim() != "{}" && it.isNotEmpty() } ?: false
+            if (hasLimits) {
+                wm.enqueueUniquePeriodicWork(
+                    "awwad_usage_guard",
+                    androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+                    androidx.work.PeriodicWorkRequestBuilder<UsageLimitWorker>(
+                        java.time.Duration.ofMinutes(15)
+                    ).build()
+                )
+            } else {
+                wm.cancelUniqueWork("awwad_usage_guard")
+            }
         } catch (e: Exception) {
             // WorkManager unavailable: the in-app checks still work.
         }
@@ -63,6 +75,32 @@ class MainActivity : FlutterActivity() {
                         } catch (e2: Exception) {
                             result.success(false)
                         }
+                    }
+                }
+                // Called by the Dart side right after limits are saved so the
+                // background guard starts/stops without waiting for the next
+                // app launch (mirrors the enqueue gating in configureFlutterEngine).
+                "syncGuard" -> {
+                    try {
+                        val wm = androidx.work.WorkManager.getInstance(this)
+                        val hasLimits = getSharedPreferences(
+                            "FlutterSharedPreferences", Context.MODE_PRIVATE
+                        ).getString("flutter.app_usage_limits_v1", null)
+                            ?.let { it.trim() != "{}" && it.isNotEmpty() } ?: false
+                        if (hasLimits) {
+                            wm.enqueueUniquePeriodicWork(
+                                "awwad_usage_guard",
+                                androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+                                androidx.work.PeriodicWorkRequestBuilder<UsageLimitWorker>(
+                                    java.time.Duration.ofMinutes(15)
+                                ).build()
+                            )
+                        } else {
+                            wm.cancelUniqueWork("awwad_usage_guard")
+                        }
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.success(false)
                     }
                 }
                 "todayUsage" -> {

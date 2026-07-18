@@ -786,6 +786,19 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-18 round 7 (MANDATE_PLAN Round 1 batch A: notification reliability)** -
+  (1) STATUS-BAR ICON: white-on-transparent ic_stat_awwad generated from the official sprout
+  into drawable-{m..xxx}dpi (sharp mask script), wired in AndroidInitializationSettings and
+  UsageLimitWorker (with brand setColor), added to keep.xml (name-referenced = shrinker bait,
+  gotcha #11 pattern); every Android notification also carries color _kBrandColor (11 sites).
+  (2) PRAYER WINDOW: 6 days on Android (id scheme fits), 2 on iOS (64-cap); prayers now
+  survive a long weekend of the app staying closed. (3) TZ FALLBACK: timezone-lookup failure
+  now falls back to a fixed-offset zone from the device offset instead of UTC (reminders no
+  longer shift by hours). (4) USAGE GUARD gating: the 15-min worker only runs while limits
+  exist (cancelUniqueWork otherwise) + new syncGuard channel call from saveLimits so the
+  first limit starts it instantly. (5) Manifest exact-alarm comment corrected (14+ default
+  denied; never USE_EXACT_ALARM). analyze clean, 83/83. MANDATE_PLAN Round 1 marked
+  (N3/N9 done, N1/N2/N10 partial - re-arm worker + state receiver + housekeeping pending).
 - **2026-07-18 round 6 (REVIEW FIXES + iOS-lens fixes)** - The 6-lens adversarial review
   (partial: 3 lenses re-running after a second limit hit) CONFIRMED 2 copy defects, both
   fixed: (1) Arabic streak label now keys on n % 100 (exact hundreds bare يوم, 103-110 أيام,

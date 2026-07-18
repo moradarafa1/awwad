@@ -3,6 +3,9 @@
 // user edits the prayer settings. All no-ops on web via the notifications
 // facade. Trilingual MSA copy lives here; prayer NAMES come from one map.
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
+
 import '../data/local_store.dart';
 import '../models.dart';
 import '../notifications/notifications.dart';
@@ -110,8 +113,14 @@ Future<void> applyPrayerSchedule({
   final wantAdhkar = keys.contains('adhkar');
   if (!wantPrayers && !wantAdhkar) return;
 
-  for (final a
-      in buildAlarms(cfg, wantPrayers: wantPrayers, wantAdhkar: wantAdhkar)) {
+  // 6 days on Android so prayers keep firing when the app stays closed for a
+  // long weekend (id scheme d*10+i fits: 60 slots per 100-id base). iOS keeps
+  // 2 days: it caps pending requests at 64 and 6 days of prayers alone would
+  // eat 72 slots.
+  final windowDays =
+      (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) ? 2 : 6;
+  for (final a in buildAlarms(cfg,
+      wantPrayers: wantPrayers, wantAdhkar: wantAdhkar, days: windowDays)) {
     switch (a.prayer) {
       case 'adhkar_am':
         await scheduleAt(

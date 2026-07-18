@@ -7,6 +7,8 @@
 //   1003  one-off 3-day sign-up nudge  (fires once)
 //   2000+ badge/shield congratulations (immediate, one per badge)
 
+import 'dart:ui' show Color;
+
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -40,6 +42,9 @@ const _habitReminderMax = 60;
 
 bool _ready = false;
 
+/// Brand accent applied to every Android notification (icon tint).
+const Color _kBrandColor = Color(0xFF4F8EF7);
+
 /// Initialize the plugin + timezone DB. Does NOT request permission (call
 /// [ensureNotificationPermission] explicitly, after showing a rationale).
 Future<void> initNotifications() async {
@@ -49,10 +54,26 @@ Future<void> initNotifications() async {
     final name = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(name));
   } catch (_) {
-    // fall back to UTC if the local zone can't be resolved
+    // A UTC fallback would shift every reminder by hours. Use the device's
+    // CURRENT offset as a fixed-offset zone instead: DST-naive (rebuilt on
+    // the next app open anyway) but on-the-hour correct today.
+    try {
+      final off = DateTime.now().timeZoneOffset;
+      tz.setLocalLocation(tz.Location(
+        'AWWAD_FIXED',
+        [tz.minTime],
+        [0],
+        [tz.TimeZone(off.inMilliseconds, isDst: false, abbreviation: 'FIX')],
+      ));
+    } catch (_) {
+      // keep the package default (UTC) as the last resort
+    }
   }
 
-  const android = AndroidInitializationSettings('@mipmap/ic_launcher');
+  // White-on-transparent silhouette (drawable-*dpi/ic_stat_awwad, generated
+  // from the official sprout): colored launcher icons render as a grey blob
+  // in the status bar. Kept by keep.xml against the release shrinker.
+  const android = AndroidInitializationSettings('ic_stat_awwad');
   const ios = DarwinInitializationSettings(
     requestAlertPermission: false,
     requestBadgePermission: false,
@@ -178,6 +199,7 @@ Future<void> scheduleDailyReminder(int hour, String title, String body) async {
   await initNotifications();
   const details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _habitChannelId,
       _habitChannelName,
       channelDescription: 'Daily habit reminder',
@@ -196,6 +218,7 @@ Future<void> scheduleDhikrReminder(int hour, String title, String body) async {
   await initNotifications();
   final details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _dhikrChannelId,
       _dhikrChannelName,
       channelDescription: 'Daily morning dhikr',
@@ -214,6 +237,7 @@ Future<void> scheduleReengageNudge(Duration delay, String title, String body) as
   await initNotifications();
   const details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _nudgeChannelId,
       _nudgeChannelName,
       channelDescription: 'Account and sync',
@@ -231,6 +255,7 @@ Future<void> showBadgeNotification(int slot, String title, String body) async {
   await initNotifications();
   final details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _badgeChannelId,
       _badgeChannelName,
       channelDescription: 'Badges and shields',
@@ -250,6 +275,7 @@ Future<void> scheduleHabitReminder(
   await initNotifications();
   const details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _habitChannelId,
       _habitChannelName,
       channelDescription: 'Daily habit reminder',
@@ -283,6 +309,7 @@ Future<void> scheduleMonthlyReport(String title, String body) async {
   }
   final details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _badgeChannelId,
       _badgeChannelName,
       channelDescription: 'Monthly report',
@@ -309,6 +336,7 @@ Future<void> sendTestNotifications(
   await initNotifications();
   const details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _habitChannelId,
       _habitChannelName,
       channelDescription: 'Daily habit reminder',
@@ -333,6 +361,7 @@ Future<void> schedulePomodoroDone(Duration after, String title, String body) asy
   await initNotifications();
   const details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _habitChannelId,
       _habitChannelName,
       channelDescription: 'Daily habit reminder',
@@ -360,6 +389,7 @@ Future<void> scheduleAt(
   await initNotifications();
   final details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _habitChannelId,
       _habitChannelName,
       channelDescription: 'Daily habit reminder',
@@ -394,6 +424,7 @@ Future<void> scheduleAdhan(
   await initNotifications();
   final details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _adhanChannelId,
       _adhanChannelName,
       channelDescription: 'The call to prayer at prayer time',
@@ -431,6 +462,7 @@ Future<void> scheduleWeekly(
   await initNotifications();
   final details = NotificationDetails(
     android: AndroidNotificationDetails(
+      color: _kBrandColor,
       _habitChannelId,
       _habitChannelName,
       channelDescription: 'Daily habit reminder',

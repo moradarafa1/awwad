@@ -5,4 +5,4 @@
      this keep rule the shrinker silently removes it and prayer notifications
      fall back to the default sound. Do not delete. -->
 <resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@raw/adhan" />
+    tools:keep="@raw/adhan,@drawable/ic_stat_awwad" />

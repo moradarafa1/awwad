@@ -98,6 +98,13 @@ class UsageStatsPlatform {
     try {
       final sp = await SharedPreferences.getInstance();
       await sp.setString(_limitsKey, jsonEncode(limits));
+      // Start/stop the 15-min background guard immediately (it is otherwise
+      // reconciled only on the next app launch). Fail-open.
+      if (supported) {
+        try {
+          await _ch.invokeMethod<bool>('syncGuard');
+        } catch (_) {}
+      }
     } catch (_) {}
   }
 }
