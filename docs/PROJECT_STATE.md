@@ -104,11 +104,14 @@ wf_93a19fab-46a (4 areas) both RUNNING after the limit renewed.**
    permissions, APK -> Desktop, Pages /app/ redeploy (the widget round DID change
    main.dart.js - hash 4697f911... vs live 78d8e801..., so Pages MUST be pushed this time),
    push source.
-2. Rerun the mandate research workflow (4 areas: competitive-ux, seo-aso, notifications,
-   store-policy; script owner-mandate-research-wf_5ba32da8-047.js) and execute its merged
-   plan in rounds: notifications/permissions fixes -> competitive features + 0a per-habit
-   content -> SEO/ASO -> store-policy compliance. Each round: implement + analyze/tests +
-   adversarial review + build + deploy + docs + push, per this file's methodology.
+2. THE MANDATE RESEARCH IS DONE and its merged 10-round execution plan is persisted at
+   **docs/MANDATE_PLAN.md** (rounds: notification-reliability core -> per-habit content 0a +
+   retention wins -> site technical SEO -> notification architecture + iOS notif parity ->
+   flagship competitive features (tasbih counter, SOS loop, habit strength, weekly insight)
+   -> scholar-video curation -> store-compliance code (IN-APP ACCOUNT DELETION is a hard
+   store blocker; owner's web-only decision must be reversed - see the owner-gated list) ->
+   store metadata/submission docs -> screenshots + PWA -> 8-9 new blog articles). Execute
+   IN ORDER from that file, marking items done there + changelog here per round.
 3. Still later: 0c (7) share-image, 0c (6) late-night detection. OWNER-GATED: 0c phase C
    hard app-blocking, «غض البصر» habit, store submission (owner action).
 
