@@ -57,6 +57,7 @@ dependencies:
   # Quran audio wird: streams surah mp3s from the free mp3quran.net servers.
   just_audio: ^0.9.42
   audio_session: ^0.1.25
+  home_widget: ^0.9.3
 
 dev_dependencies:
   flutter_test:

@@ -13,6 +13,11 @@ class LocalStore {
   LocalStore(this._prefs);
   final SharedPreferences _prefs;
 
+  /// Refreshes this isolate's SharedPreferences cache from disk. Needed after
+  /// an EXTERNAL writer changed the data - the home-screen widget's quick-log
+  /// runs in a background isolate with its own copy of the cache.
+  Future<void> reload() => _prefs.reload();
+
   static const _kSettings = 'awwad_settings';
   static const _kHabit = 'awwad_habit'; // legacy single-habit (migration source)
   static const _kHabits = 'awwad_habits'; // multi-habit list

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget card: the app's dark surface with a subtle border. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#F212161F" />
+    <corners android:radius="16dp" />
+    <stroke android:width="1dp" android:color="#2A3140" />
+</shape>

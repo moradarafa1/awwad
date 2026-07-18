@@ -10,6 +10,7 @@ import 'core/analytics/analytics.dart';
 import 'core/cloud/supabase_service.dart';
 import 'core/data/local_store.dart';
 import 'core/state/app_state.dart';
+import 'core/widget/widget_sync.dart';
 import 'features/onboarding/onboarding_flow.dart';
 import 'features/onboarding/language_screen.dart';
 import 'features/home/home_shell.dart';
@@ -42,6 +43,9 @@ void main() {
       unawaited(SupabaseService.init()
           .then((_) => AnalyticsService.instance.flush())
           .catchError((_) {}));
+      // Home-screen widget: (re)register the background quick-log callback
+      // (Android no-op elsewhere, fail-open).
+      unawaited(HomeWidgetSync.registerCallback());
     });
   }, (error, stack) {
     // Cloud/async errors must not crash the app. (Logged in debug only.)

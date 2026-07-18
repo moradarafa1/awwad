@@ -14,6 +14,23 @@ const _uuid = Uuid();
 String dayKey(DateTime d) =>
     '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
+/// The auto-log entry shared by AppController.quickLogHabit and the
+/// home-screen widget's background quick-log: neutral positive ratings,
+/// no slip (build habit done / break habit clean). Pure for tests.
+DailyEntry buildQuickEntry(Habit habit, String today, {String? note}) {
+  final rating = habit.track == 'build' ? 8 : 2;
+  return DailyEntry(
+    id: _uuid.v4(),
+    habitId: habit.id,
+    date: today,
+    urge: rating,
+    resistance: rating,
+    didSlip: false,
+    note: note,
+    createdAt: DateTime.now(),
+  );
+}
+
 /// Provided via override in main() once SharedPreferences is ready.
 final localStoreProvider = Provider<LocalStore>((ref) {
   throw UnimplementedError('localStoreProvider must be overridden in main()');
@@ -314,6 +331,25 @@ class AppController extends Notifier<AppState> {
     return copy;
   }
 
+  /// Re-reads the persisted state after an EXTERNAL writer may have changed
+  /// it - the home-screen widget's background quick-log writes entries from
+  /// its own isolate while this isolate's SharedPreferences cache is stale.
+  /// Called on app resume. Safe to replace wholesale because every in-app
+  /// mutation persists immediately, so disk is always authoritative.
+  Future<void> refreshFromStore() async {
+    try {
+      await _store.reload();
+      state = state.copyWith(
+        settings: _store.loadSettings(),
+        habits: _store.loadHabits(),
+        entries: _sorted(_store.loadEntries()),
+        badges: _store.loadBadges(),
+      );
+    } catch (_) {
+      // Fail-open: keep the in-memory state.
+    }
+  }
+
   // ---------- settings ----------
   Future<void> setLocale(String locale) async {
     final s = state.settings.copyWith(locale: locale);
@@ -590,17 +626,8 @@ class AppController extends Notifier<AppState> {
         .any((e) => e.date == today && e.habitId == habitId && !e.isSkip);
     if (already) return false; // never overwrite a manual log
 
-    final rating = habit.track == 'build' ? 8 : 2; // neutral positive rating
-    final entry = DailyEntry(
-      id: _uuid.v4(),
-      habitId: habitId,
-      date: today,
-      urge: rating,
-      resistance: rating,
-      didSlip: false, // build habit done / break habit clean
-      note: note,
-      createdAt: DateTime.now(),
-    );
+    final rating = habit.track == 'build' ? 8 : 2; // mirrors buildQuickEntry
+    final entry = buildQuickEntry(habit, today, note: note);
     final list = [
       ...state.entries.where((e) => !(e.date == today && e.habitId == habitId)),
       entry,

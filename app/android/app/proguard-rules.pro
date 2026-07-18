@@ -17,3 +17,8 @@
 }
 -dontwarn com.google.errorprone.annotations.**
 -dontwarn sun.misc.**
+
+# home_widget: the background quick-log path resolves the app's widget
+# provider and callback plumbing at runtime; keep the plugin classes intact
+# in release (same defensive pattern as the notifications rules above).
+-keep class es.antonborri.home_widget.** { *; }

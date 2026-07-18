@@ -59,14 +59,39 @@ confirmed. analyze clean, 79/79 tests. APK+AAB rebuilt + aapt-verified (gotcha #
 APK on the Desktop as `Awwad-1.0.0-final.apk`. The web bundle is BYTE-UNCHANGED by this
 feature (Android-only code, tree-shaken from web) so no Pages push was needed.
 
+**OWNER MANDATE (2026-07-18 ~03:30, supersedes the old next-steps order):** (a) competitive
+features/UX polish on the EXISTING habits; (b) organic-search domination: site SEO + app-store
+ASO; (c) perfect ALL notifications/alarms/reminders/permissions; (d) Google Play + App Store
+policy compliance; (e) if the 5h usage limit pauses work, RESUME after it renews (it did:
+limit hit ~03:40, resets 05:20 Cairo). NOTE: mandate (a) UNGATES the 0a deep per-habit
+appropriateness review.
+
+**STATE AT THE PAUSE: HOME-SCREEN WIDGET (0c item 4) fully IMPLEMENTED + COMMITTED in this
+commit, analyze clean, 83/83 tests, manually self-reviewed; the 4-lens adversarial review
+workflow + the 4-area mandate research workflow both DIED on the session limit BEFORE
+producing anything - RERUN BOTH after 05:20.** Widget pieces: AwwadWidgetProvider.kt +
+res/{layout,xml,drawable} + manifest receivers (.AwwadWidgetProvider + home_widget
+HomeWidgetBackgroundReceiver + LAUNCH filter) + proguard keep; Dart core/widget/widget_sync.dart
+(pure trilingual labels + HomeWidgetSync.push/registerCallback + @pragma vm:entry-point
+homeWidgetBackgroundCallback quick-log, idempotent via shared buildQuickEntry extracted in
+app_state.dart); LocalStore.reload() + AppController.refreshFromStore() reconcile the
+foreground cache after a background widget log (called from home_shell on resume;
+WidgetsBindingObserver added there + ref.listen pushes on every state change);
+main.dart registers the callback post-frame. home_widget 0.9.3 added to pubspec.
+
 **EXECUTE NEXT, in order:**
-1. §12 backlog 0c item (4): HOME-SCREEN WIDGET (streak + quick log; `home_widget` package;
-   needs native receiver + layout; verify like UsageLimitWorker - aapt + tests, owner tests
-   on device).
-2. Then 0c (7) shareable monthly report image (pure Flutter: render-to-image + share_plus),
-   and 0c (6) late-night usage detection for `late_nights`.
-3. OWNER-GATED (ask before starting): 0a deep per-habit appropriateness review, 0c phase C
-   hard app-blocking, §12 item 8 «غض البصر» habit. Store submission = owner action.
+1. AFTER 05:20: rerun the widget adversarial review workflow (4 lenses: widget-native,
+   bg-integrity, arabic-copy, flutter-integration; script in this session's workflows dir);
+   apply confirmed fixes; then deliver the widget round: §6 builds (web+apk+aab, sequential),
+   gotcha #11 aapt checks, APK -> Desktop, Pages /app/ redeploy IF the web bundle changed
+   (the opens round showed Android-only code tree-shakes out of web - verify by hash), push.
+2. Rerun the mandate research workflow (4 areas: competitive-ux, seo-aso, notifications,
+   store-policy; script owner-mandate-research-wf_5ba32da8-047.js) and execute its merged
+   plan in rounds: notifications/permissions fixes -> competitive features + 0a per-habit
+   content -> SEO/ASO -> store-policy compliance. Each round: implement + analyze/tests +
+   adversarial review + build + deploy + docs + push, per this file's methodology.
+3. Still later: 0c (7) share-image, 0c (6) late-night detection. OWNER-GATED: 0c phase C
+   hard app-blocking, «غض البصر» habit, store submission (owner action).
 
 ## 0.5-OLD HANDOFF 2026-07-18 (superseded - kept for the round's technical details)
 
@@ -739,6 +764,16 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-18 round 3 (HOME-SCREEN WIDGET code complete; paused on session limit)** - 0c item
+  (4) implemented end to end (see HANDOFF 0.5 for the piece list): native RemoteViews card
+  (habit name + streak + quick-log button, midnight rollover check in the provider), Dart sync
+  layer with pure trilingual labels (MSA agreement: يوم واحد/يومان/N أيام/N يوماً), background
+  quick-log callback (idempotent, shared buildQuickEntry now also used by quickLogHabit), and
+  the stale-cache reconciliation path (LocalStore.reload + refreshFromStore on resume).
+  home_widget 0.9.3. analyze clean, 83/83 tests (4 new in home_widget_test.dart). Adversarial
+  review + the owner-mandate research workflows both hit the 5h session limit before running -
+  rerun after 05:20 Cairo, then build/deploy. Release builds started locally meanwhile. Owner
+  mandate received (competitive UX, SEO/ASO, notifications, store policies) - plan in §0.5.
 - **2026-07-18 round 2 (PER-APP OPEN COUNTS in the usage screen)** - Owner request (screenshot):
   every app row in «استخدام الهاتف» now shows how many times that app was opened today under its
   name, next to the screen time. Native: `todayUsage` in MainActivity.kt additionally iterates

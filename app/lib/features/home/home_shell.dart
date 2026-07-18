@@ -14,6 +14,7 @@ import '../../core/notifications/notifications.dart';
 import '../../core/notifications/notif_scheduler.dart';
 import '../../core/prayer/prayer_scheduler.dart';
 import '../../core/state/app_state.dart';
+import '../../core/widget/widget_sync.dart';
 import '../../core/widgets/ambient_background.dart';
 import 'daily_log_screen.dart';
 import 'stats_screen.dart';
@@ -33,7 +34,8 @@ class HomeShell extends ConsumerStatefulWidget {
   ConsumerState<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends ConsumerState<HomeShell> {
+class _HomeShellState extends ConsumerState<HomeShell>
+    with WidgetsBindingObserver {
   bool _nudged = false;
 
   // Nav index 3 is the «هُدنة» ACTION (opens the truce flow), not a screen,
@@ -50,10 +52,32 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _maybeNudge();
       _setupNotifications();
       _autoSync();
+      // Seed the home-screen widget with the current state on every open.
+      HomeWidgetSync.push(ref.read(appControllerProvider));
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // The home-screen widget's quick-log runs in a background isolate and
+  // writes entries while this isolate's SharedPreferences cache is stale;
+  // reconcile from disk whenever the app comes back to the foreground
+  // (in-app mutations always persist immediately, so disk wins safely).
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    Future(() async {
+      await ref.read(appControllerProvider.notifier).refreshFromStore();
+      if (mounted) HomeWidgetSync.push(ref.read(appControllerProvider));
     });
   }
 
@@ -169,6 +193,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Mirror every state change (save, habit switch, locale...) to the
+    // home-screen widget. Cheap and fail-open; no-op off Android.
+    ref.listen<AppState>(
+        appControllerProvider, (_, next) => HomeWidgetSync.push(next));
     final l10n = AppLocalizations.of(context);
     final index = ref.watch(homeTabProvider);
     final pomodoroLabel = const {

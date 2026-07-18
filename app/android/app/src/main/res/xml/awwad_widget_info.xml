@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 3x1-ish resizable card. updatePeriodMillis (30 min, the OS minimum) only
+     re-renders from the saved data; its job is the midnight rollover check in
+     AwwadWidgetProvider (a new day un-does the "logged" button state). -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="180dp"
+    android:minHeight="60dp"
+    android:targetCellWidth="3"
+    android:targetCellHeight="1"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/awwad_widget"
+    android:previewLayout="@layout/awwad_widget"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen" />
