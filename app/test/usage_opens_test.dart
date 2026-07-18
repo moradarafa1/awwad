@@ -22,6 +22,10 @@ void main() {
     expect(usageOpensLabel('ar', 10), 'فُتح 10 مرات اليوم');
     expect(usageOpensLabel('ar', 11), 'فُتح 11 مرة اليوم');
     expect(usageOpensLabel('ar', 47), 'فُتح 47 مرة اليوم');
+    // n % 100 buckets for three-digit heavy-usage days.
+    expect(usageOpensLabel('ar', 100), 'فُتح 100 مرة اليوم');
+    expect(usageOpensLabel('ar', 105), 'فُتح 105 مرات اليوم');
+    expect(usageOpensLabel('ar', 120), 'فُتح 120 مرة اليوم');
   });
 
   test('English and French opens labels handle singular and plural', () {

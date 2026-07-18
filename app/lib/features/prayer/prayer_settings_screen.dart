@@ -462,7 +462,7 @@ const Map<String, Map<String, String>> _kStr = {
     'en':
         'Grant the "Alarms and reminders" permission so prayer alerts arrive exactly on time.',
     'fr':
-        "Accordez l'autorisation « Alarmes et rappels » pour des alertes a l'heure exacte."
+        "Accordez l'autorisation « Alarmes et rappels » pour des alertes à l'heure exacte."
   },
   'note': {
     'ar':

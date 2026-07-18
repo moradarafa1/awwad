@@ -24,6 +24,16 @@ void main() {
     expect(widgetStreakLabel('ar', 10), 'سلسلتك: 10 أيام');
     expect(widgetStreakLabel('ar', 11), 'سلسلتك: 11 يوماً');
     expect(widgetStreakLabel('ar', 30), 'سلسلتك: 30 يوماً');
+    // n % 100 buckets: exact hundreds bare singular, 103-110 plural,
+    // 111-199 singular accusative (the 100-day milestone is celebrated
+    // by the badges, so the widget must be grammatical there).
+    expect(widgetStreakLabel('ar', 100), 'سلسلتك: 100 يوم');
+    expect(widgetStreakLabel('ar', 101), 'سلسلتك: 101 يوم');
+    expect(widgetStreakLabel('ar', 103), 'سلسلتك: 103 أيام');
+    expect(widgetStreakLabel('ar', 110), 'سلسلتك: 110 أيام');
+    expect(widgetStreakLabel('ar', 111), 'سلسلتك: 111 يوماً');
+    expect(widgetStreakLabel('ar', 180), 'سلسلتك: 180 يوماً');
+    expect(widgetStreakLabel('ar', 200), 'سلسلتك: 200 يوم');
   });
 
   test('English and French streak labels', () {

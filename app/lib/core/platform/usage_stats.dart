@@ -9,7 +9,8 @@
 
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,7 +34,11 @@ class UsageStatsPlatform {
   static const _ch = MethodChannel('awwad/usage_stats');
   static const _limitsKey = 'app_usage_limits_v1';
 
-  static bool get supported => !kIsWeb;
+  // Android only: UsageStatsManager has no iOS counterpart (Screen Time
+  // needs a special Apple entitlement), so iOS must see the honest
+  // "Android only" message instead of a grant flow that cannot succeed.
+  static bool get supported =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
   static Future<bool> hasPermission() async {
     if (kIsWeb) return false;

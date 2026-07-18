@@ -2,6 +2,9 @@
 // Shared by HomeShell (on launch) and Settings (on toggle change) so the two
 // never drift. All underlying calls are no-ops on web.
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
+
 import '../content/dhikr.dart';
 import '../models.dart';
 import 'notifications.dart';
@@ -40,9 +43,15 @@ Future<void> applyNotificationSchedule({
     await cancelReengageNudge(); // honor a global opt-out for the pending nudge
     return;
   }
+  // iOS keeps only the 64 SOONEST pending requests and silently drops the
+  // rest; the prayer window alone can hold ~24. Capping habit slots at 30
+  // there keeps prayers + habits + singletons safely under 64. Android has
+  // no such limit and keeps the full 60.
+  final maxSlots =
+      (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) ? 30 : 60;
   var slot = 0;
   for (final r in habitReminders) {
-    if (slot >= 60) break;
+    if (slot >= maxSlots) break;
     await scheduleHabitReminder(slot++, r.hour, r.title, r.body);
   }
   if (dhikrEnabled && showReligious) {

@@ -354,7 +354,10 @@ String usageOpensLabel(String locale, int n) {
     case 'ar':
       if (n == 1) return 'فُتح مرة واحدة اليوم';
       if (n == 2) return 'فُتح مرتين اليوم';
-      if (n <= 10) return 'فُتح $n مرات اليوم';
+      // Same n % 100 MSA agreement rule as widgetStreakLabel: 103-110 opens
+      // take the plural تمييز (heavy phone days do reach three digits).
+      final r = n % 100;
+      if (r >= 3 && r <= 10) return 'فُتح $n مرات اليوم';
       return 'فُتح $n مرة اليوم';
     case 'fr':
       return n == 1 ? "Ouvert 1 fois aujourd'hui" : "Ouvert $n fois aujourd'hui";

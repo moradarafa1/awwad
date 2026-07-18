@@ -1,8 +1,16 @@
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 
 import '../../app/theme.dart';
 import '../../core/platform/dns_shield.dart';
+
+/// The same Cloudflare family service as [kFamilyDnsHost], as plain IPv4
+/// resolvers: iOS has no Private DNS hostname field, but its per-WiFi
+/// «Configure DNS - Manual» accepts these directly.
+const String kFamilyDnsIpA = '1.1.1.3';
+const String kFamilyDnsIpB = '1.0.0.3';
 
 /// «درع المحتوى» - guided setup + live verification of Android Private DNS
 /// with a family-filtering resolver. Blocks pornography phone-wide (every
@@ -128,29 +136,49 @@ class _DnsShieldScreenState extends State<DnsShieldScreen>
                     fontSize: 14,
                     color: AppColors.heading)),
             const SizedBox(height: 10),
-            _step('1', _tr('step1'),
-                trailing: OutlinedButton.icon(
-                  onPressed: () async {
-                    await Clipboard.setData(
-                        const ClipboardData(text: kFamilyDnsHost));
-                    _toast(_tr('copied'));
-                  },
-                  icon: const Icon(Icons.copy, size: 16),
-                  label: const Text(kFamilyDnsHost,
-                      textDirection: TextDirection.ltr,
-                      style: TextStyle(fontSize: 12)),
-                )),
-            _step('2', _tr('step2'),
-                trailing: FilledButton.icon(
-                  onPressed: () async {
-                    final ok = await DnsShield.openSettings();
-                    if (!ok && mounted) _toast(_tr('openManually'));
-                  },
-                  icon: const Icon(Icons.settings, size: 16),
-                  label: Text(_tr('openSettings')),
-                )),
-            _step('3', _tr('step3')),
-            _step('4', _tr('step4')),
+            if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) ...[
+              // iOS has no Private DNS setting: guide through the per-WiFi
+              // manual DNS using the same family service's IPv4 resolvers.
+              _step('1', _tr('stepIos1'),
+                  trailing: OutlinedButton.icon(
+                    onPressed: () async {
+                      await Clipboard.setData(const ClipboardData(
+                          text: '$kFamilyDnsIpA, $kFamilyDnsIpB'));
+                      _toast(_tr('copied'));
+                    },
+                    icon: const Icon(Icons.copy, size: 16),
+                    label: const Text('$kFamilyDnsIpA · $kFamilyDnsIpB',
+                        textDirection: TextDirection.ltr,
+                        style: TextStyle(fontSize: 12)),
+                  )),
+              _step('2', _tr('stepIos2')),
+              _step('3', _tr('stepIos3')),
+              _step('4', _tr('stepIos4')),
+            ] else ...[
+              _step('1', _tr('step1'),
+                  trailing: OutlinedButton.icon(
+                    onPressed: () async {
+                      await Clipboard.setData(
+                          const ClipboardData(text: kFamilyDnsHost));
+                      _toast(_tr('copied'));
+                    },
+                    icon: const Icon(Icons.copy, size: 16),
+                    label: const Text(kFamilyDnsHost,
+                        textDirection: TextDirection.ltr,
+                        style: TextStyle(fontSize: 12)),
+                  )),
+              _step('2', _tr('step2'),
+                  trailing: FilledButton.icon(
+                    onPressed: () async {
+                      final ok = await DnsShield.openSettings();
+                      if (!ok && mounted) _toast(_tr('openManually'));
+                    },
+                    icon: const Icon(Icons.settings, size: 16),
+                    label: Text(_tr('openSettings')),
+                  )),
+              _step('3', _tr('step3')),
+              _step('4', _tr('step4')),
+            ],
             const SizedBox(height: 14),
             // What it does / honesty notes.
             Container(
@@ -246,6 +274,12 @@ const Map<String, Map<String, String>> _shieldStrings = {
     'step2': 'افتح إعدادات الهاتف، ثم ابحث عن «DNS الخاص» (Private DNS).',
     'step3': 'اختر «اسم مضيف مزوّد DNS الخاص» والصق العنوان ثم احفظ.',
     'step4': 'ارجع إلى هنا واضغط زر التحديث للتأكد من تفعيل الدرع.',
+    'stepIos1': 'انسخ عنواني الخادم العائلي:',
+    'stepIos2': 'افتح الإعدادات ثم Wi-Fi، واضغط علامة (i) بجوار شبكتك.',
+    'stepIos3':
+        'اختر «تكوين DNS» ثم «يدوي»، احذف الخوادم الموجودة وأضف العنوانين، ثم احفظ.',
+    'stepIos4':
+        'كرر الخطوات لكل شبكة تستخدمها. التحقق التلقائي غير متاح على آيفون، فجرّب فتح موقع محجوب للتأكد.',
     'openSettings': 'افتح الإعدادات',
     'openManually':
         'افتح الإعدادات يدوياً وابحث عن «Private DNS» أو «DNS الخاص».',
@@ -270,6 +304,12 @@ const Map<String, Map<String, String>> _shieldStrings = {
     'step3':
         'Choose "Private DNS provider hostname", paste the address, and save.',
     'step4': 'Come back here and tap refresh to confirm the shield is on.',
+    'stepIos1': 'Copy the two family resolver addresses:',
+    'stepIos2': 'Open Settings, tap Wi-Fi, then tap the (i) next to your network.',
+    'stepIos3':
+        'Choose "Configure DNS" then "Manual", remove the existing servers, add both addresses, and save.',
+    'stepIos4':
+        'Repeat for every Wi-Fi you use. Auto-check is not available on iPhone; test by opening a blocked site.',
     'openSettings': 'Open Settings',
     'openManually': 'Open Settings manually and search for "Private DNS".',
     'copied': 'Address copied. Paste it into the Private DNS field.',
@@ -296,6 +336,13 @@ const Map<String, Map<String, String>> _shieldStrings = {
         "Choisissez « Nom d'hôte du fournisseur DNS privé », collez l'adresse et enregistrez.",
     'step4':
         'Revenez ici et appuyez sur actualiser pour confirmer le bouclier.',
+    'stepIos1': 'Copiez les deux adresses du résolveur familial :',
+    'stepIos2':
+        'Ouvrez Réglages, touchez Wi-Fi, puis le (i) à côté de votre réseau.',
+    'stepIos3':
+        'Choisissez « Configurer le DNS » puis « Manuel », retirez les serveurs existants, ajoutez les deux adresses et enregistrez.',
+    'stepIos4':
+        'Répétez pour chaque réseau Wi-Fi. La vérification automatique est indisponible sur iPhone ; testez en ouvrant un site bloqué.',
     'openSettings': 'Ouvrir les réglages',
     'openManually':
         'Ouvrez les réglages manuellement et cherchez « DNS privé ».',

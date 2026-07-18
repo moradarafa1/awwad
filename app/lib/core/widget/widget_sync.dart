@@ -22,8 +22,12 @@ String widgetStreakLabel(String locale, int n) {
       if (n <= 0) return 'ابدأ سلسلتك اليوم';
       if (n == 1) return 'سلسلتك: يوم واحد';
       if (n == 2) return 'سلسلتك: يومان';
-      if (n <= 10) return 'سلسلتك: $n أيام';
-      return 'سلسلتك: $n يوماً';
+      // MSA agreement keys on n % 100: 3-10 plural تمييز (أيام), 11-99
+      // singular accusative (يوماً), exact hundreds bare singular (يوم).
+      final r = n % 100;
+      if (r >= 3 && r <= 10) return 'سلسلتك: $n أيام';
+      if (r >= 11) return 'سلسلتك: $n يوماً';
+      return 'سلسلتك: $n يوم';
     case 'fr':
       if (n <= 0) return "Commencez votre série aujourd'hui";
       return n == 1 ? 'Série : 1 jour' : 'Série : $n jours';

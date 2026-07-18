@@ -783,6 +783,19 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-18 round 6 (REVIEW FIXES + iOS-lens fixes)** - The 6-lens adversarial review
+  (partial: 3 lenses re-running after a second limit hit) CONFIRMED 2 copy defects, both
+  fixed: (1) Arabic streak label now keys on n % 100 (exact hundreds bare يوم, 103-110 أيام,
+  11-99 يوماً) - the 100-day milestone the badges celebrate was rendering wrong MSA; same
+  bucketing applied to usageOpensLabel; tests extended (100/101/103/110/111/180/200 + opens
+  100/105/120). (2) French exact-alarm subtitle a -> à. PLUS 4 iOS-parity lens findings
+  implemented: usage screen no longer shows the dead Android grant flow on iOS
+  (UsageStatsPlatform.supported now Android-only -> honest «أندرويد فقط» message);
+  prayer/adhan Darwin details gained interruptionLevel timeSensitive (the iOS twin of exact
+  alarms; Xcode capability step added to IOS_PARITY_SETUP.md 2.5); habit-reminder slots
+  capped at 30 on iOS (64-pending-request silent-drop guard, Android keeps 60); DNS-shield
+  screen now shows real iOS steps (per-WiFi Configure DNS Manual with 1.1.1.3/1.0.0.3 +
+  copy button) instead of Android Private DNS instructions, trilingual. analyze clean, 83/83.
 - **2026-07-18 round 5 (iOS PARITY - owner rule: Android features must reach iPhone)** -
   (1) WIDGET: full WidgetKit twin prepared in-repo - ios/AwwadWidget/{AwwadWidgetBundle,
   AwwadWidget}.swift (TimelineProvider over the group.com.awwad.awwad UserDefaults aw_* keys,

@@ -367,7 +367,12 @@ Future<void> scheduleAt(
       priority: Priority.high,
       styleInformation: BigTextStyleInformation(body),
     ),
-    iOS: const DarwinNotificationDetails(),
+    // timeSensitive = the iOS twin of Android exactness: without it Focus
+    // modes / Scheduled Summary may defer the prayer alert. Needs the Time
+    // Sensitive capability once in Xcode (docs/IOS_PARITY_SETUP.md);
+    // until then iOS silently treats it as a normal alert.
+    iOS: const DarwinNotificationDetails(
+        interruptionLevel: InterruptionLevel.timeSensitive),
   );
   await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details,
       exact: true); // prayer-family timing must be minute-accurate
@@ -401,6 +406,7 @@ Future<void> scheduleAdhan(
     iOS: DarwinNotificationDetails(
       presentSound: true,
       sound: kIOSAdhanSoundBundled ? 'adhan30.caf' : null,
+      interruptionLevel: InterruptionLevel.timeSensitive,
     ),
   );
   await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details,
