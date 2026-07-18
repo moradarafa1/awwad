@@ -79,12 +79,25 @@ foreground cache after a background widget log (called from home_shell on resume
 WidgetsBindingObserver added there + ref.listen pushes on every state change);
 main.dart registers the callback post-frame. home_widget 0.9.3 added to pubspec.
 
+**ALSO DONE DURING THE PAUSE (main loop kept working): EXACT PRAYER ALARMS.** All scheduling
+used inexactAllowWhileIdle - Android batching could delay the ADHAN 10-15 min past prayer
+time. Fixed: SCHEDULE_EXACT_ALARM declared in the manifest (Play-justifiable: time-critical
+religious reminders are core functionality); _safeZoned gained `exact:` (used ONLY by
+scheduleAt + scheduleAdhan = the prayer family; habit/dhikr reminders stay inexact by design)
+with silent degrade-to-inexact when the grant is missing/revoked; new canUseExactAlarms() +
+requestExactAlarmsPermission() (facade + web stub); prayer-settings gained a «فعّل دقة
+المواعيد» tile (Android-only, shown while the grant is missing; granting re-runs _save so
+queued prayer notifs upgrade). analyze clean, 83/83. NOT yet in the built APK (build predates
+this) - the next build after the review picks it up.
+
 **EXECUTE NEXT, in order:**
 1. AFTER 05:20: rerun the widget adversarial review workflow (4 lenses: widget-native,
-   bg-integrity, arabic-copy, flutter-integration; script in this session's workflows dir);
-   apply confirmed fixes; then deliver the widget round: §6 builds (web+apk+aab, sequential),
-   gotcha #11 aapt checks, APK -> Desktop, Pages /app/ redeploy IF the web bundle changed
-   (the opens round showed Android-only code tree-shakes out of web - verify by hash), push.
+   bg-integrity, arabic-copy, flutter-integration; script in this session's workflows dir) -
+   ALSO have it (or a 5th lens) review the exact-alarm diff above; apply confirmed fixes;
+   then deliver ONE round: §6 builds (web+apk+aab, sequential), gotcha #11 aapt checks +
+   SCHEDULE_EXACT_ALARM present in aapt permissions, APK -> Desktop, Pages /app/ redeploy
+   (the widget round DID change main.dart.js - hash 4697f911... vs live 78d8e801..., so
+   Pages MUST be pushed this time), push source.
 2. Rerun the mandate research workflow (4 areas: competitive-ux, seo-aso, notifications,
    store-policy; script owner-mandate-research-wf_5ba32da8-047.js) and execute its merged
    plan in rounds: notifications/permissions fixes -> competitive features + 0a per-habit
@@ -764,6 +777,14 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-18 round 4 (EXACT PRAYER ALARMS - notifications mandate, part 1)** - Every
+  scheduled notification used inexactAllowWhileIdle, so Android alarm batching could delay
+  prayer/adhan alerts 10-15 minutes. Now: SCHEDULE_EXACT_ALARM in the manifest, _safeZoned
+  takes `exact:` (prayer family only: scheduleAt + scheduleAdhan; habit/dhikr stay inexact
+  for battery), silent fallback to inexact if the Android 12+ grant is missing or revoked
+  mid-flight, new canUseExactAlarms/requestExactAlarmsPermission through the web-safe facade,
+  and a prayer-settings tile «فعّل دقة المواعيد» that opens the system grant and reschedules.
+  analyze clean, 83/83 tests. Ships with the widget round's next build.
 - **2026-07-18 round 3 (HOME-SCREEN WIDGET code complete; paused on session limit)** - 0c item
   (4) implemented end to end (see HANDOFF 0.5 for the piece list): native RemoteViews card
   (habit name + streak + quick-log button, midnight rollover check in the provider), Dart sync

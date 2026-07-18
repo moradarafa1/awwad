@@ -3,12 +3,14 @@
 // and the «remind me 5 minutes before» toggle. Times are recomputed offline
 // every day; the notification window is rebuilt on every save and app open.
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../app/theme.dart';
+import '../../core/notifications/notifications.dart';
 import '../../core/prayer/prayer_engine.dart';
 import '../../core/prayer/prayer_scheduler.dart';
 import '../../core/state/app_state.dart';
@@ -24,12 +26,22 @@ class PrayerSettingsScreen extends ConsumerStatefulWidget {
 class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen> {
   PrayerConfig _cfg = const PrayerConfig();
   bool _locating = false;
+  // Android 12+ «Alarms and reminders» grant missing: the adhan/prayer
+  // notifications would be delayed by inexact batching until it is given.
+  bool _exactMissing = false;
 
   @override
   void initState() {
     super.initState();
     final raw = ref.read(localStoreProvider).loadPrayer();
     if (raw != null) _cfg = PrayerConfig.fromJson(raw);
+    _checkExact();
+  }
+
+  Future<void> _checkExact() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+    final ok = await canUseExactAlarms();
+    if (mounted) setState(() => _exactMissing = !ok);
   }
 
   String get _loc => Localizations.localeOf(context).languageCode;
@@ -328,6 +340,26 @@ class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen> {
                     },
                   ),
                 ],
+                if (_exactMissing) ...[
+                  const Divider(),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.alarm_on, color: AppColors.accent2),
+                    title: Text(_s('exactAlarm'),
+                        style: const TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w700)),
+                    subtitle: Text(_s('exactAlarmSub'),
+                        style:
+                            TextStyle(fontSize: 11, color: AppColors.muted)),
+                    onTap: () async {
+                      await requestExactAlarmsPermission();
+                      await _checkExact();
+                      // Re-run scheduling so the already-queued prayer
+                      // notifications upgrade to exact delivery.
+                      await _save();
+                    },
+                  ),
+                ],
               ]),
             ),
             const SizedBox(height: 12),
@@ -418,6 +450,19 @@ const Map<String, Map<String, String>> _kStr = {
     'ar': 'يُشغّل الأذان عند دخول وقت كل صلاة (أندرويد).',
     'en': 'Plays the call to prayer when each prayer time enters (Android).',
     'fr': "Joue l'appel a la priere a l'entree de chaque priere (Android)."
+  },
+  'exactAlarm': {
+    'ar': 'فعّل دقة المواعيد',
+    'en': 'Enable exact timing',
+    'fr': "Activer l'heure exacte"
+  },
+  'exactAlarmSub': {
+    'ar':
+        'امنح إذن «المنبهات والتذكيرات» ليصل تنبيه الأذان في وقته تماماً دون تأخير من النظام.',
+    'en':
+        'Grant the "Alarms and reminders" permission so prayer alerts arrive exactly on time.',
+    'fr':
+        "Accordez l'autorisation « Alarmes et rappels » pour des alertes a l'heure exacte."
   },
   'note': {
     'ar':

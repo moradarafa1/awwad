@@ -47,3 +47,7 @@ Future<void> cancelReminders() async {}
 Future<void> cancelDhikr() async {}
 
 Future<void> cancelReengageNudge() async {}
+
+Future<bool> canUseExactAlarms() async => false;
+
+Future<bool> requestExactAlarmsPermission() async => false;

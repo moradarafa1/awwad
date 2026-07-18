@@ -7,6 +7,12 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- Minute-accurate PRAYER/adhan notifications (core feature). Auto-granted
+         on Android 12; on 13+ the user grants «Alarms and reminders» via the
+         prayer-settings tile (requestExactAlarmsPermission). Everything else
+         stays inexact by design. Play policy: exact alarms are justified here
+         as user-visible, time-critical religious reminders. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <!-- App-usage monitoring for the phone-addiction habit: a SPECIAL permission
          the user grants manually in system settings (Usage access); it cannot be
          requested at runtime. tools:ignore silences the lint for declaring it. -->

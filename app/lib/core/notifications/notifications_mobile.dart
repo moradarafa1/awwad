@@ -98,11 +98,40 @@ tz.TZDateTime _nextInstanceOfHour(int hour) {
   return scheduled;
 }
 
+/// True when Android will honor EXACT alarms for us (always below Android 12;
+/// 12+ only while the user grant «المنبهات والتذكيرات» is active). Exactness
+/// is reserved for the PRAYER family (mains + pre-alerts + adhkar + adhan),
+/// where a 10-15 min inexact batching delay would be a real correctness bug;
+/// habit reminders and dhikr stay inexact by design (battery-friendly).
+Future<bool> canUseExactAlarms() async {
+  try {
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android == null) return false; // iOS delivers on time by itself
+    return await android.canScheduleExactNotifications() ?? false;
+  } catch (_) {
+    return false;
+  }
+}
+
+/// Opens the Android 12+ «Alarms and reminders» grant screen for this app.
+Future<bool> requestExactAlarmsPermission() async {
+  try {
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android == null) return false;
+    return await android.requestExactAlarmsPermission() ?? false;
+  } catch (_) {
+    return false;
+  }
+}
+
 /// zonedSchedule with a per-call guard: ONE failing schedule must not abort
 /// the whole reschedule loop (it used to kill every later reminder AND the
 /// dhikr), and the failure is printed so a broken release pipeline (like the
 /// pre-proguard R8/GSON breakage) is visible in `adb logcat` instead of
-/// silently eating every reminder.
+/// silently eating every reminder. [exact] asks for minute accuracy and
+/// SILENTLY degrades to inexact when the grant is missing or revoked.
 Future<void> _safeZoned(
   int id,
   String title,
@@ -110,20 +139,37 @@ Future<void> _safeZoned(
   tz.TZDateTime when,
   NotificationDetails details, {
   DateTimeComponents? match,
+  bool exact = false,
 }) async {
+  var mode = AndroidScheduleMode.inexactAllowWhileIdle;
+  if (exact && await canUseExactAlarms()) {
+    mode = AndroidScheduleMode.exactAllowWhileIdle;
+  }
+  Future<void> attempt(AndroidScheduleMode m) => _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        when,
+        details,
+        androidScheduleMode: m,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: match,
+      );
   try {
-    await _plugin.zonedSchedule(
-      id,
-      title,
-      body,
-      when,
-      details,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: match,
-    );
+    await attempt(mode);
   } catch (e) {
+    // The exact grant can be revoked between the check and the call: never
+    // lose the notification, deliver it inexactly instead.
+    if (mode == AndroidScheduleMode.exactAllowWhileIdle) {
+      try {
+        await attempt(AndroidScheduleMode.inexactAllowWhileIdle);
+        return;
+      } catch (e2) {
+        debugPrint('awwad notif: schedule #$id failed: $e2');
+        return;
+      }
+    }
     debugPrint('awwad notif: schedule #$id failed: $e');
   }
 }
@@ -323,7 +369,8 @@ Future<void> scheduleAt(
     ),
     iOS: const DarwinNotificationDetails(),
   );
-  await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details);
+  await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details,
+      exact: true); // prayer-family timing must be minute-accurate
 }
 
 /// A prayer notification that plays the ADHAN sound (Android). The sound is the
@@ -349,7 +396,8 @@ Future<void> scheduleAdhan(
       presentSound: true,
     ),
   );
-  await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details);
+  await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details,
+      exact: true); // the adhan must play AT prayer time, not minutes later
 }
 
 /// Cancels an inclusive id range (used for the 4000-4299 prayer window).
