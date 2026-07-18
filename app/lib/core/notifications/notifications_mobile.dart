@@ -377,6 +377,13 @@ Future<void> scheduleAt(
 /// raw resource `android/app/src/main/res/raw/adhan` (ships CC0 by default;
 /// the owner can drop in a licensed Makkah/Qatami file of the same name).
 /// iOS keeps its default sound until a bundled .caf is provided (documented).
+/// iOS notification sounds must be a bundled caf/aiff/wav of 30 seconds or
+/// less. Flip to true ONLY after `ios/Runner/adhan30.caf` is added to the
+/// Runner target on a Mac (docs/IOS_PARITY_SETUP.md has the afconvert
+/// one-liner); naming a missing file would MUTE the alert, so the flag stays
+/// false until the file ships and iOS keeps its default sound meanwhile.
+const bool kIOSAdhanSoundBundled = false;
+
 Future<void> scheduleAdhan(
     int id, DateTime when, String title, String body) async {
   await initNotifications();
@@ -391,9 +398,9 @@ Future<void> scheduleAdhan(
       audioAttributesUsage: AudioAttributesUsage.alarm,
       styleInformation: BigTextStyleInformation(body),
     ),
-    iOS: const DarwinNotificationDetails(
-      // A licensed short adhan .caf can be bundled and named here later.
+    iOS: DarwinNotificationDetails(
       presentSound: true,
+      sound: kIOSAdhanSoundBundled ? 'adhan30.caf' : null,
     ),
   );
   await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details,

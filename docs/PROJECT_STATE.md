@@ -90,14 +90,20 @@ requestExactAlarmsPermission() (facade + web stub); prayer-settings gained a «�
 queued prayer notifs upgrade). analyze clean, 83/83. NOT yet in the built APK (build predates
 this) - the next build after the review picks it up.
 
+**OWNER RULE ADDED (05:30): whatever ships on Android must ship on iPhone wherever iOS
+allows.** iOS parity round done in-repo (see changelog round 5); the ONLY Mac-gated steps
+are documented in docs/IOS_PARITY_SETUP.md (Xcode widget target + app group + adhan30.caf).
+
+**IN FLIGHT (05:30+): review workflow wf_ed42c57d-d79 (6 lenses: widget-native, bg-integrity,
+exact-alarms, arabic-copy, flutter-integration, ios-parity) + mandate research workflow
+wf_93a19fab-46a (4 areas) both RUNNING after the limit renewed.**
+
 **EXECUTE NEXT, in order:**
-1. AFTER 05:20: rerun the widget adversarial review workflow (4 lenses: widget-native,
-   bg-integrity, arabic-copy, flutter-integration; script in this session's workflows dir) -
-   ALSO have it (or a 5th lens) review the exact-alarm diff above; apply confirmed fixes;
-   then deliver ONE round: §6 builds (web+apk+aab, sequential), gotcha #11 aapt checks +
-   SCHEDULE_EXACT_ALARM present in aapt permissions, APK -> Desktop, Pages /app/ redeploy
-   (the widget round DID change main.dart.js - hash 4697f911... vs live 78d8e801..., so
-   Pages MUST be pushed this time), push source.
+1. When the review returns: apply confirmed fixes; then deliver ONE round: §6 builds
+   (web+apk+aab, sequential), gotcha #11 aapt checks + SCHEDULE_EXACT_ALARM present in aapt
+   permissions, APK -> Desktop, Pages /app/ redeploy (the widget round DID change
+   main.dart.js - hash 4697f911... vs live 78d8e801..., so Pages MUST be pushed this time),
+   push source.
 2. Rerun the mandate research workflow (4 areas: competitive-ux, seo-aso, notifications,
    store-policy; script owner-mandate-research-wf_5ba32da8-047.js) and execute its merged
    plan in rounds: notifications/permissions fixes -> competitive features + 0a per-habit
@@ -777,6 +783,18 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-18 round 5 (iOS PARITY - owner rule: Android features must reach iPhone)** -
+  (1) WIDGET: full WidgetKit twin prepared in-repo - ios/AwwadWidget/{AwwadWidgetBundle,
+  AwwadWidget}.swift (TimelineProvider over the group.com.awwad.awwad UserDefaults aw_* keys,
+  same midnight rollover, brand dark card, iOS17 interactive quick-log via
+  ios/Runner/AwwadQuickLogIntent.swift running the SAME Dart callback; iOS16 falls back to
+  open-app) + Dart side now iOS-enabled (HomeWidgetSync._supported includes iOS,
+  setAppGroupId(kAwwadAppGroup) before any write, updateWidget gets iOSName). (2) ADHAN on
+  iOS prepared behind `kIOSAdhanSoundBundled=false` (iOS sounds must be <=30s caf in the
+  bundle; naming a missing file would MUTE the alert, so default sound until the Mac step).
+  (3) docs/IOS_PARITY_SETUP.md: the complete Arabic Mac/Xcode guide (widget target + app
+  group + intent dual-membership + afconvert adhan one-liner + flag flip + verification).
+  Exactness needs nothing on iOS (native timing). analyze clean, 83/83.
 - **2026-07-18 round 4 (EXACT PRAYER ALARMS - notifications mandate, part 1)** - Every
   scheduled notification used inexactAllowWhileIdle, so Android alarm batching could delay
   prayer/adhan alerts 10-15 minutes. Now: SCHEDULE_EXACT_ALARM in the manifest, _safeZoned

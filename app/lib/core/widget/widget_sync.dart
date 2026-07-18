@@ -57,11 +57,26 @@ String widgetEmptyLabel(String locale) {
   }
 }
 
+/// Shared iOS app-group id: the WidgetKit extension (ios/AwwadWidget/) reads
+/// the aw_* keys from this group's UserDefaults. Must match the App Group
+/// capability added to BOTH Runner and the extension (docs/IOS_PARITY_SETUP.md).
+const String kAwwadAppGroup = 'group.com.awwad.awwad';
+
 class HomeWidgetSync {
   HomeWidgetSync._();
 
   static bool get _supported =>
-      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
+
+  static bool _iosGroupSet = false;
+
+  static Future<void> _ensureIosGroup() async {
+    if (defaultTargetPlatform != TargetPlatform.iOS || _iosGroupSet) return;
+    await HomeWidget.setAppGroupId(kAwwadAppGroup);
+    _iosGroupSet = true;
+  }
 
   /// Pushes the active habit's name / streak / logged-today state to the
   /// widget and asks Android to re-render it. Cheap; safe to call after
@@ -69,6 +84,7 @@ class HomeWidgetSync {
   static Future<void> push(AppState s) async {
     if (!_supported) return;
     try {
+      await _ensureIosGroup();
       final locale = s.settings.locale ?? 'ar';
       final habit = s.activeHabit;
       final today = dayKey(DateTime.now());
@@ -87,17 +103,20 @@ class HomeWidgetSync {
           'aw_btn_done', widgetButtonLabel(locale, logged: true));
       await HomeWidget.saveWidgetData<bool>('aw_logged', logged);
       await HomeWidget.saveWidgetData<String>('aw_date', today);
-      await HomeWidget.updateWidget(androidName: 'AwwadWidgetProvider');
+      await HomeWidget.updateWidget(
+          androidName: 'AwwadWidgetProvider', iOSName: 'AwwadWidget');
     } catch (_) {
       // Fail-open: the widget keeps its previous content.
     }
   }
 
-  /// Registers the background quick-log callback. Call once per app open
-  /// (idempotent); Android persists the callback handle across restarts.
+  /// Registers the background quick-log callback (Android alarms-style
+  /// broadcast; iOS 17 interactive-widget AppIntent). Call once per app open
+  /// (idempotent); the handle persists across restarts.
   static Future<void> registerCallback() async {
     if (!_supported) return;
     try {
+      await _ensureIosGroup();
       await HomeWidget.registerInteractivityCallback(
           homeWidgetBackgroundCallback);
     } catch (_) {
