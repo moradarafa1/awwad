@@ -413,7 +413,7 @@ const Map<String, Map<String, String>> _usageStrings = {
   'ar': {
     'title': 'استخدام الهاتف',
     'permIntro':
-        'لعرض وقت استخدامك لكل تطبيق وتنبيهك عند تجاوز حدّك اليومي، يحتاج عوّاد إذن «الوصول إلى بيانات الاستخدام». يُمنح هذا الإذن يدوياً من إعدادات النظام ولا يقرأ محتوى أي تطبيق، بل مدة الاستخدام فقط.',
+        'لعرض وقت استخدامك لكل تطبيق وتنبيهك عند تجاوز حدّك اليومي، يحتاج عوّاد إذن «الوصول إلى بيانات الاستخدام». يُمنح هذا الإذن يدوياً من إعدادات النظام ولا يقرأ محتوى أي تطبيق، بل مدة الاستخدام فقط. وتبقى هذه البيانات على جهازك وحده، فلا تُرسل إلى خوادمنا ولا تُشارك مع أي جهة.',
     'grantBtn': 'امنح الإذن من الإعدادات',
     'openManually':
         'افتح إعدادات النظام يدوياً وابحث عن «الوصول إلى بيانات الاستخدام».',
@@ -438,7 +438,7 @@ const Map<String, Map<String, String>> _usageStrings = {
   'en': {
     'title': 'Phone usage',
     'permIntro':
-        'To show your per-app screen time and warn you when you pass your daily limit, Awwad needs the "Usage access" permission. It is granted manually in system settings and reads usage DURATION only, never app content.',
+        'To show your per-app screen time and warn you when you pass your daily limit, Awwad needs the "Usage access" permission. It is granted manually in system settings and reads usage DURATION only, never app content. This data stays on your device alone: it is never sent to our servers and never shared with anyone.',
     'grantBtn': 'Grant access in Settings',
     'openManually':
         'Open system settings manually and search for "Usage access".',
@@ -463,7 +463,7 @@ const Map<String, Map<String, String>> _usageStrings = {
   'fr': {
     'title': 'Utilisation du téléphone',
     'permIntro':
-        "Pour afficher votre temps d'écran par application et vous avertir au-delà de votre limite quotidienne, Awwad a besoin de la permission « Accès aux données d'utilisation ». Elle s'accorde manuellement dans les réglages et ne lit que la DURÉE d'utilisation, jamais le contenu.",
+        "Pour afficher votre temps d'écran par application et vous avertir au-delà de votre limite quotidienne, Awwad a besoin de la permission « Accès aux données d'utilisation ». Elle s'accorde manuellement dans les réglages et ne lit que la DURÉE d'utilisation, jamais le contenu. Ces données restent uniquement sur votre appareil : elles ne sont jamais envoyées à nos serveurs ni partagées.",
     'grantBtn': "Accorder l'accès dans les réglages",
     'openManually':
         "Ouvrez les réglages manuellement et cherchez « Accès aux données d'utilisation ».",

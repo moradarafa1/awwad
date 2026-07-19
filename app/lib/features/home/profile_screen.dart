@@ -124,6 +124,21 @@ class ProfileScreen extends ConsumerWidget {
                           style: const TextStyle(fontSize: 14)),
                       onTap: () => _signOut(context, loc),
                     ),
+                    const Divider(height: 1),
+                    // Store policy (Play account deletion + Apple 5.1.1(v)):
+                    // deletion must be reachable IN THE APP, not only on the
+                    // website. Two confirmations: it is irreversible.
+                    ListTile(
+                      leading: Icon(Icons.delete_forever_outlined,
+                          color: AppColors.danger),
+                      title: Text(_s(_kAcc['deleteAcc']!, loc),
+                          style: TextStyle(
+                              fontSize: 14, color: AppColors.danger)),
+                      subtitle: Text(_s(_kAcc['deleteAccSub']!, loc),
+                          style: TextStyle(
+                              fontSize: 11, color: AppColors.muted)),
+                      onTap: () => _deleteAccount(context, ref, loc),
+                    ),
                   ],
                 ),
               ),
@@ -263,6 +278,72 @@ class ProfileScreen extends ConsumerWidget {
     }
   }
 
+  /// Irreversible account deletion, in-app (store requirement). Confirms
+  /// twice, calls the edge function with the caller's JWT, then wipes the
+  /// device so no orphan copy of the data survives locally.
+  Future<void> _deleteAccount(
+      BuildContext context, WidgetRef ref, String loc) async {
+    final first = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(_s(_kAcc['deleteAcc']!, loc),
+            style: TextStyle(fontSize: 16, color: AppColors.danger)),
+        content: Text(_s(_kAcc['deleteBody']!, loc),
+            style: const TextStyle(fontSize: 13.5, height: 1.7)),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(_s(_kAcc['cancel']!, loc))),
+          FilledButton(
+              style:
+                  FilledButton.styleFrom(backgroundColor: AppColors.danger),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(_s(_kAcc['deleteConfirm']!, loc))),
+        ],
+      ),
+    );
+    if (first != true || !context.mounted) return;
+
+    // Second gate: the first tap can be a mis-tap; this one cannot.
+    final second = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        content: Text(_s(_kAcc['deleteSure']!, loc),
+            style: const TextStyle(fontSize: 13.5, height: 1.7)),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(_s(_kAcc['cancel']!, loc))),
+          FilledButton(
+              style:
+                  FilledButton.styleFrom(backgroundColor: AppColors.danger),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(_s(_kAcc['deleteFinal']!, loc))),
+        ],
+      ),
+    );
+    if (second != true || !context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    try {
+      await SupabaseService.deleteAccount();
+      // The cloud rows are gone; the local copy must go too, otherwise the
+      // next sign-in would push the deleted data straight back up.
+      await ref.read(appControllerProvider.notifier).resetAll();
+      messenger.showSnackBar(
+          SnackBar(content: Text(_s(_kAcc['deleted']!, loc))));
+      navigator.maybePop();
+    } catch (e) {
+      final key = isNetworkError(e) ? 'errNetwork' : 'errGeneric';
+      messenger.showSnackBar(SnackBar(
+          content: Text(_s(_kAcc[key]!, loc)),
+          backgroundColor: AppColors.danger));
+    }
+  }
+
   Widget _featuredShield(String loc, BadgeDef? top, int count) {
     if (top == null) {
       return Container(
@@ -366,6 +447,36 @@ const Map<String, Map<String, String>> _kAcc = {
   'done': {'ar': 'تم تغيير كلمة المرور ✅', 'en': 'Password changed ✅', 'fr': 'Mot de passe changé ✅'},
   'signOut': {'ar': 'تسجيل الخروج', 'en': 'Sign out', 'fr': 'Se déconnecter'},
   'signedOut': {'ar': 'تم تسجيل الخروج', 'en': 'Signed out', 'fr': 'Déconnecté'},
+  'deleteAcc': {
+    'ar': 'حذف الحساب نهائياً',
+    'en': 'Delete account permanently',
+    'fr': 'Supprimer le compte définitivement'
+  },
+  'deleteAccSub': {
+    'ar': 'يمحو حسابك وكل بياناتك من التطبيق والخوادم.',
+    'en': 'Erases your account and all your data from the app and our servers.',
+    'fr': 'Efface votre compte et toutes vos données de l\'application et des serveurs.'
+  },
+  'deleteBody': {
+    'ar':
+        'سيُحذف حسابك وكل ما يتعلق به: عاداتك وسجلّك اليومي وأوسمتك وبياناتك الشخصية، من هذا الجهاز ومن خوادمنا معاً. لا يمكن التراجع عن هذه الخطوة ولا استعادة البيانات بعدها.',
+    'en':
+        'Your account and everything tied to it will be deleted: your habits, daily log, badges, and personal data, from this device and from our servers. This cannot be undone and the data cannot be recovered.',
+    'fr':
+        'Votre compte et tout ce qui s\'y rattache seront supprimés : habitudes, journal quotidien, badges et données personnelles, de cet appareil et de nos serveurs. Cette action est irréversible.'
+  },
+  'deleteConfirm': {'ar': 'متابعة الحذف', 'en': 'Continue', 'fr': 'Continuer'},
+  'deleteSure': {
+    'ar': 'تأكيد أخير: هل تريد فعلاً حذف حسابك وكل بياناتك؟',
+    'en': 'Final confirmation: do you really want to delete your account and all your data?',
+    'fr': 'Confirmation finale : voulez-vous vraiment supprimer votre compte et toutes vos données ?'
+  },
+  'deleteFinal': {'ar': 'نعم، احذف', 'en': 'Yes, delete', 'fr': 'Oui, supprimer'},
+  'deleted': {
+    'ar': 'تم حذف حسابك وبياناتك نهائياً.',
+    'en': 'Your account and data have been permanently deleted.',
+    'fr': 'Votre compte et vos données ont été définitivement supprimés.'
+  },
   'errNetwork': {
     'ar': 'تعذّر الاتصال بالخادم. تأكّد من اتصالك بالإنترنت ثم أعد المحاولة.',
     'en': 'Could not reach the server. Check your internet connection and try again.',

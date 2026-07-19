@@ -165,6 +165,25 @@ class SupabaseService {
     return data?['trusted'] == true;
   }
 
+  /// PERMANENTLY deletes the signed-in account and every row it owns, via the
+  /// account-export-delete edge function (admin.deleteUser cascades). Required
+  /// IN-APP by Google Play's account-deletion policy and Apple 5.1.1(v): a
+  /// web-only deletion page is a standard rejection on both stores.
+  /// Throws on failure so the caller can show a localized error.
+  static Future<void> deleteAccount() async {
+    final res = await client.functions
+        .invoke('account-export-delete', body: {'action': 'delete'});
+    final data = res.data as Map?;
+    if (data?['deleted'] != true) {
+      throw Exception('delete failed: ${data?['error'] ?? res.status}');
+    }
+    try {
+      await client.auth.signOut();
+    } catch (_) {
+      // The account is already gone; a failing sign-out must not surface.
+    }
+  }
+
   static Future<void> registerTrustedDevice(
       String deviceSecret, String label, String platform) async {
     await client.functions.invoke('register-trusted-device', body: {

@@ -23,8 +23,11 @@
         tools:ignore="ProtectedPermissions"/>
     <!-- Prayer-times engine: one coarse fix to pick the nearest city; the
          astronomical calculation itself is fully offline. -->
+    <!-- COARSE ONLY, deliberately: matching the nearest of 306 bundled cities
+         needs km-level accuracy, and the geolocator call already asks for
+         LocationAccuracy.low. Requesting FINE would be an unjustifiable
+         precise-location declaration at store review. Do not add it back. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:label="عوّاد"
