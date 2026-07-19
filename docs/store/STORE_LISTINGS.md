@@ -5,10 +5,10 @@
 > as-is. Arabic is the DEFAULT store language; add English and French as localizations.
 >
 > Live URLs used inside the copy:
-> - Website: https://awwad-habits.netlify.app
-> - Privacy: https://awwad-habits.netlify.app/privacy
-> - Delete account: https://awwad-habits.netlify.app/delete-account
-> - Web app: https://awwad-app.netlify.app
+> - Website: https://moradarafa1.github.io
+> - Privacy: https://moradarafa1.github.io/privacy/
+> - Delete account: https://moradarafa1.github.io/delete-account/
+> - Web app: https://moradarafa1.github.io/app/
 >
 > After each app is PUBLISHED: set `androidLive`/`iosLive` to `true` (and the real iOS id)
 > in `web/src/content/site.js`, rebuild the site and redeploy.
@@ -34,8 +34,23 @@
 🎯 مساران لتغيير حياتك
 • مسار "اترك عادة": التدخين، قضم الأظافر، التسويف، إدمان الهاتف، السهر، المشاهدة المفرطة، الغضب، العادة السرية، نتف الشعر وغيرها
 • مسار "ابنِ عادة": الصلاة في وقتها، الاستيقاظ لصلاة الفجر، الورد اليومي من القرآن، الصلاة على النبي، بر الوالدين، الدعاء، أذكار الصباح والمساء، الرياضة، القراءة، شرب الماء، النوم المبكر، الحمد والشكر، الصيام التطوعي
-• قوالب جاهزة: 36 عادة معدة مسبقاً، مع إمكانية إنشاء عادات مخصصة
+• قوالب جاهزة: 40 عادة معدة مسبقاً، مع إمكانية إنشاء عادات مخصصة
 • تابع حتى 3 عادات للترك و3 عادات للبناء معاً، مع مبدّل سريع بين العادات
+
+🕌 رفيقك في العبادة
+• مواقيت الصلاة الخمس بحساب فلكي يعمل دون إنترنت، مع تنبيه الأذان بصوته في وقته
+• تذكير أذكار الصباح والمساء تلقائياً، وتذكير سورة الكهف كل جمعة
+• ورد صوتي للقرآن بخمسين قارئاً، وإذاعة مباشرة للحديث والسنة، مع تسجيل تلقائي بعد الاستماع
+
+📵 أدوات السيطرة على الهاتف
+• راقب وقتك في كل تطبيق وعدد مرات فتحه اليوم
+• حدد حداً يومياً لأي تطبيق، واحصل على تنبيه فور تجاوزه حتى لو كان عوّاد مغلقاً
+• درع المحتوى: خطوات موجّهة لحجب المواقع الضارة على مستوى الهاتف كله
+
+✨ ما يعينك على الثبات
+• زر «هُدنة» للحظات الضعف: تنفّس موجّه حتى تمر الرغبة
+• ودجت على الشاشة الرئيسية: سلسلتك وتسجيل يومك بضغطة واحدة
+• تقرير شهري لتقدمك، وأوسمة ورتب، ومؤقت بومودورو للتركيز
 
 🧭 منهج علمي واضح
 يعتمد عوّاد على أسلوب التدريب على عكس العادة (Habit Reversal Training) في أربع مراحل:
@@ -56,7 +71,7 @@
 🤍 قيم نعتز بها
 • تطبيق متوافق مع القيم الإسلامية، بلغة داعمة من غير وعظ
 • مجاني بالكامل: لا إعلانات، ولا اشتراكات، ولا ميزات مدفوعة
-• الخصوصية أولاً: بياناتك تبقى على جهازك، والحساب اختياري للمزامنة السحابية المجانية
+• الخصوصية أولاً: يعمل التطبيق بالكامل دون إنترنت وبياناتك محفوظة على جهازك، والحساب اختياري تماماً فإن أنشأته تُزامَن بياناتك بحسابك وحده. لا إعلانات ولا بيع بيانات، وإحصاءات استخدام مجهولة المصدر فقط لتحسين التطبيق، ويمكنك حذف حسابك وكل بياناتك من داخل التطبيق في أي وقت
 • يعمل دون اتصال بالإنترنت بشكل كامل
 • ثلاث لغات: العربية (الافتراضية) والإنجليزية والفرنسية، مع وضع داكن مريح للعين
 
@@ -64,8 +79,8 @@
 
 ابدأ اليوم خطوتك الأولى في تطوير الذات: حمّل عوّاد الآن، فكل يوم جديد فرصة للعودة إلى ما هو أجمل.
 
-الموقع: https://awwad-habits.netlify.app
-سياسة الخصوصية: https://awwad-habits.netlify.app/privacy
+الموقع: https://moradarafa1.github.io
+سياسة الخصوصية: https://moradarafa1.github.io/privacy/
 ```
 
 ### App Store (iOS)
@@ -96,8 +111,23 @@ Awwad is a free habit tracker with two clear paths: break a bad habit or build a
 TWO TRACKS, ONE GOAL
 • Break a bad habit: quit smoking, nail biting, procrastination, phone addiction, staying up late, binge watching, anger and more
 • Build a good habit: prayer on time, waking up for Fajr, a daily Quran portion, salawat on the Prophet, morning and evening adhkar, dhikr and dua, honoring parents, exercise, reading, drinking water, sleeping early, gratitude, voluntary fasting
-• 36 ready-made habit templates, plus fully custom habits
+• 40 ready-made habit templates, plus fully custom habits
 • Work on up to 3 break and 3 build habits at once, with a quick habit switcher
+
+🕌 Worship companion
+• Offline astronomical prayer times with a real adhan alert at each prayer
+• Automatic morning and evening adhkar reminders, plus a Friday Surah Al-Kahf reminder
+• Quran audio wird with 50 reciters and live hadith radio, auto-logged after you listen
+
+📵 Phone-control tools
+• See your time in every app and how many times you opened it today
+• Set a daily limit per app and get warned the moment you cross it, even with Awwad closed
+• Content shield: guided steps to block harmful sites phone-wide
+
+✨ What keeps you steady
+• A "truce" button for moments of weakness: guided breathing until the urge passes
+• Home-screen widget: your streak and one-tap logging
+• Monthly progress report, badges and ranks, and a Pomodoro focus timer
 
 A REAL METHOD, NOT JUST CHECKBOXES
 Awwad walks you through Habit Reversal Training (HRT), a structured behavioral approach in four stages:
@@ -118,7 +148,7 @@ EVERYTHING YOU NEED TO STAY ON TRACK
 
 PRIVATE, FREE AND YOURS
 • 100% free: no ads, no subscriptions, no locked features
-• Works fully offline; your data stays on your device
+• Works fully offline and keeps your data on your device. An account is entirely optional; if you create one, your data syncs to that account only. No ads, no data selling, just anonymous usage stats to improve the app, and you can delete your account and all its data from inside the app at any time
 • Optional free account for cloud sync across your devices
 • Arabic (default), English and French
 • Comfortable dark theme
@@ -129,17 +159,17 @@ Awwad is a behavioral support tool. It is not medical advice and does not replac
 
 Start today: choose one habit to break or one to build, and let Awwad walk with you, one day at a time.
 
-Website: https://awwad-habits.netlify.app
-Privacy: https://awwad-habits.netlify.app/privacy
+Website: https://moradarafa1.github.io
+Privacy: https://moradarafa1.github.io/privacy/
 ```
 
 ### App Store (iOS)
 - **Name** (27/30): `Awwad: Muslim Habit Tracker`
 - **Subtitle** (27/30): `Quit smoking. Pray on time.`
 - **Keywords** (95/100):
-  `quran,fajr,adhkar,dhikr,salah,streak,routine,islamic,focus,pomodoro,discipline,goals,ramadan,dua`
+  `adhan,prayer times,quran,fajr,adhkar,dhikr,salah,streak,islamic,screen time,focus,pomodoro,dua`
 - **Promotional text** (163/170):
-  `Two paths: break a bad habit or build a good one. 36 ready templates, streaks, reminders and a Pomodoro timer. 100% free, no ads, works offline, private by design.`
+  `Break a bad habit or build a good one: 40 templates, prayer times with adhan, Quran and hadith audio, screen-time limits, streaks and a widget. Free, no ads, offline.`
 - **Description**: use the Play full description above.
 
 ---
@@ -160,7 +190,7 @@ Awwad (عوّاد) est votre compagnon gratuit pour changer vos habitudes, un jo
 DEUX PARCOURS, UN SEUL OBJECTIF
 • Rompre une mauvaise habitude : arrêter de fumer, se ronger les ongles, procrastination, dépendance au téléphone, veillées tardives, visionnage compulsif, colère et plus encore
 • Construire une bonne habitude : prière à l'heure, réveil pour le Fajr, lecture quotidienne du Coran, salawat sur le Prophète, adhkar du matin et du soir, invocations, bienfaisance envers les parents, sport, lecture, hydratation, coucher tôt, gratitude, jeûne surérogatoire
-• 36 modèles d'habitudes prêts à l'emploi, plus vos habitudes personnalisées
+• 40 modèles d'habitudes prêts à l'emploi, plus vos habitudes personnalisées
 • Jusqu'à 3 habitudes à rompre et 3 à construire en même temps, avec un sélecteur rapide
 
 UNE MÉTHODE STRUCTURÉE : LE RENVERSEMENT D'HABITUDES (HRT)
@@ -182,7 +212,7 @@ DES OUTILS QUI VOUS SUIVENT AU QUOTIDIEN
 VOS VALEURS, VOTRE LANGUE, VOTRE VIE PRIVÉE
 • 100 % gratuit : pas de publicité, pas d'achats intégrés, pas de fonctions payantes
 • Fonctionne entièrement hors ligne ; compte gratuit optionnel pour la synchronisation cloud
-• Vie privée d'abord : vos données restent sur votre appareil, sauf si vous créez un compte
+• Vie privée d'abord : l'application fonctionne hors ligne et vos données restent sur votre appareil. Le compte est entièrement facultatif ; si vous en créez un, vos données ne sont synchronisées qu'avec ce compte. Sans publicité ni revente de données, seulement des statistiques anonymes, et vous pouvez supprimer votre compte et toutes ses données depuis l'application
 • Trois langues : arabe (par défaut), français, anglais
 • Thème sombre élégant
 • Un ton bienveillant et digne, jamais moralisateur
@@ -191,8 +221,8 @@ Que vous souhaitiez arrêter de fumer, vous lever pour le Fajr, lire le Coran ch
 
 Téléchargez Awwad aujourd'hui et faites de votre prochaine bonne habitude une réalité.
 
-Site : https://awwad-habits.netlify.app
-Confidentialité : https://awwad-habits.netlify.app/privacy
+Site : https://moradarafa1.github.io
+Confidentialité : https://moradarafa1.github.io/privacy/
 ```
 
 ### App Store (iOS)

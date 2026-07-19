@@ -794,6 +794,30 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-19 round 12 (MANDATE_PLAN Round 8: store metadata + submission answers)** -
+  Docs only, no app build. STORE_LISTINGS: every dead `*.netlify.app` URL replaced with the
+  live GitHub Pages URLs (13 refs across both store docs; a dead privacy URL is an automatic
+  Play rejection), 36 -> 40 habits, and the listings now promote what actually shipped
+  (prayer times + adhan, Quran/hadith audio, usage limits + open counts, content shield,
+  truce button, home widget, monthly report) in ar/en/fr. The untruthful «بياناتك تبقى على
+  جهازك» claim is now the accurate offline-first + optional-account + anonymous-analytics +
+  in-app-deletion wording. iOS keyword field rewritten for Arabic/English ASO (adhan, prayer
+  times, screen time; «ال» stripped) and re-measured programmatically (94/100 keywords,
+  166/170 promo). SUBMISSION_GUIDE gained section 5: the complete Play Data-safety table,
+  Apple privacy labels, the PACKAGE_USAGE_STATS justification paragraph, the exact-alarm
+  justification + the never-add-USE_EXACT_ALARM rule, age rating/IARC answers, the Health
+  apps declaration, and the verified-compliance list (in-app deletion, Sign in with Apple
+  not required, guest mode, coarse location, background audio, religious sourcing, no UGC).
+- **2026-07-19 round 11 (MANDATE_PLAN Round 7 code: the store BLOCKERS)** - IN-APP ACCOUNT
+  DELETION shipped (Play account-deletion policy + Apple 5.1.1(v); the owner's 2026-07-12
+  web-only decision was a standard rejection on both stores - see MANDATE_PLAN ownerGated):
+  Profile > «حذف الحساب نهائياً» with two confirmation gates, calling the deployed
+  account-export-delete edge function with the caller's JWT (admin.deleteUser cascades), then
+  resetAll() so no local orphan copy can resurrect the data on the next sign-in; trilingual,
+  localized network/generic errors. SP7: ACCESS_FINE_LOCATION removed from the manifest
+  (nearest-city matching only ever needed coarse; geolocator already requests low accuracy) -
+  future-proofs the precise-location regime. SP3: the usage-access prominent disclosure now
+  carries the required no-sharing sentence in ar/en/fr. analyze clean, 93/93.
 - **2026-07-19 round 10 (MANDATE_PLAN Round 2: per-habit content 0a + retention wins)** - All
   8 items. CONTENT: break_porn now inherits secret_habit's tailored sliders (the alias only
   covered checklists, so the flagship recovery habit shipped generic urge/resistance);
