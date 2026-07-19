@@ -25,8 +25,10 @@ Future<void> schedulePomodoroDone(
 Future<void> sendTestNotifications(
     String title, String nowBody, String laterBody) async {}
 
-Future<void> scheduleAt(
-    int id, DateTime when, String title, String body) async {}
+enum PrayerChannel { main, preAlert, adhkar }
+
+Future<void> scheduleAt(int id, DateTime when, String title, String body,
+    {PrayerChannel channel = PrayerChannel.main}) async {}
 
 Future<void> scheduleAdhan(
     int id, DateTime when, String title, String body) async {}

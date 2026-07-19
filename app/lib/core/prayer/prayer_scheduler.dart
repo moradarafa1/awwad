@@ -124,10 +124,12 @@ Future<void> applyPrayerSchedule({
     switch (a.prayer) {
       case 'adhkar_am':
         await scheduleAt(
-            a.id, a.when, _t(_kAdhkarAm, locale), _t(_kAdhkarBody, locale));
+            a.id, a.when, _t(_kAdhkarAm, locale), _t(_kAdhkarBody, locale),
+            channel: PrayerChannel.adhkar);
       case 'adhkar_pm':
         await scheduleAt(
-            a.id, a.when, _t(_kAdhkarPm, locale), _t(_kAdhkarBody, locale));
+            a.id, a.when, _t(_kAdhkarPm, locale), _t(_kAdhkarBody, locale),
+            channel: PrayerChannel.adhkar);
       default:
         final p = prayerName(a.prayer, locale);
         final title =
@@ -138,7 +140,8 @@ Future<void> applyPrayerSchedule({
         if (cfg.adhanSound && !a.pre) {
           await scheduleAdhan(a.id, a.when, title, body);
         } else {
-          await scheduleAt(a.id, a.when, title, body);
+          await scheduleAt(a.id, a.when, title, body,
+              channel: a.pre ? PrayerChannel.preAlert : PrayerChannel.main);
         }
     }
   }

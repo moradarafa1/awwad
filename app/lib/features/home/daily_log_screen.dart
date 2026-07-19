@@ -371,7 +371,9 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
         ),
       );
       if (notifOn) {
-        await showBadgeNotification('record'.hashCode, title, body);
+        // Fixed id from the documented namespace, not a hashCode: badge ids
+        // are 2000 + key.hashCode, so a hashed literal could collide.
+        await showBadgeNotification(1006, title, body);
       }
     }
     for (final b in newBadges) {

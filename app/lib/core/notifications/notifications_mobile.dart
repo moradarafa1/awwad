@@ -1,11 +1,25 @@
 // Real local-notification implementation for mobile (Android/iOS).
 // All notifications are on-device (zero-cost); server push (FCM) is P4.
 //
-// Notification id namespace (keep stable):
-//   1001  daily habit reminder        (repeats daily at reminderHour)
-//   1002  daily Ibrahimic-prayer dhikr (repeats daily at dhikrHour)
-//   1003  one-off 3-day sign-up nudge  (fires once)
-//   2000+ badge/shield congratulations (immediate, one per badge)
+// Notification id namespace - THE authoritative list (keep stable; an id
+// collision silently replaces someone else's notification):
+//   1001       legacy single habit reminder (repeats daily at reminderHour)
+//   1002       daily Ibrahimic-prayer dhikr (repeats daily at dhikrHour)
+//   1003       one-off 3-day sign-up nudge (fires once)
+//   1004       Pomodoro end-of-phase chime (one-off)
+//   1005       end-of-month report (last day, 20:00, re-armed each open)
+//   1006       personal-record congratulation (one-off, on beating a record)
+//   1998/1999  Settings self-test (instant + 60s)
+//   2000+      badge/shield congratulations, id = badge key hashCode
+//   3000-3059  per-habit per-time reminders (60 slots; 30 on iOS, 64-cap)
+//   4000-4299  prayer window: mains, 5-min pre-alerts, adhkar (rebuilt daily)
+//   4300       weekly Surah Al-Kahf (Friday, outside the rebuilt window)
+//
+// Channels (an Android channel's sound/importance is FIXED at creation, so
+// changing behavior requires a NEW id, never an edit): awwad_daily,
+// awwad_dhikr, awwad_account, awwad_badges, awwad_adhan_v1, awwad_prayer_v1,
+// awwad_prayer_pre_v1, awwad_adhkar_v1, awwad_pomodoro_v1, awwad_report_v1,
+// plus awwad_usage_guard created natively in UsageLimitWorker.kt.
 
 import 'dart:ui' show Color;
 
@@ -31,6 +45,22 @@ const _badgeChannelName = 'Achievements';
 // channel and the silent prayer channel via the user's adhan-sound toggle.
 const _adhanChannelId = 'awwad_adhan_v1';
 const _adhanChannelName = 'Adhan (prayer call)';
+// Prayer notifications live on their OWN channels, separate from the habit
+// channel: a user who mutes daily habit nudges in system settings must not
+// silently lose the prayer times too (Android channel mutes are per-channel
+// and irreversible from inside the app). Ids are permanent: an Android
+// channel's sound/importance is fixed at creation, so changing behavior
+// means a new id (see the awwad_adhan_v1 precedent).
+const _prayerChannelId = 'awwad_prayer_v1';
+const _prayerChannelName = 'Prayer times';
+const _preAlertChannelId = 'awwad_prayer_pre_v1';
+const _preAlertChannelName = 'Before prayer';
+const _adhkarChannelId = 'awwad_adhkar_v1';
+const _adhkarChannelName = 'Morning and evening adhkar';
+const _pomodoroChannelId = 'awwad_pomodoro_v1';
+const _pomodoroChannelName = 'Pomodoro timer';
+const _reportChannelId = 'awwad_report_v1';
+const _reportChannelName = 'Monthly report';
 
 const _reminderId = 1001; // legacy single habit reminder
 const _dhikrId = 1002;
@@ -332,9 +362,9 @@ Future<void> scheduleMonthlyReport(String title, String body) async {
   final details = NotificationDetails(
     android: AndroidNotificationDetails(
       color: _kBrandColor,
-      _badgeChannelId,
-      _badgeChannelName,
-      channelDescription: 'Monthly report',
+      _reportChannelId,
+      _reportChannelName,
+      channelDescription: 'Your end-of-month progress report',
       importance: Importance.high,
       priority: Priority.high,
       styleInformation: BigTextStyleInformation(body),
@@ -346,7 +376,7 @@ Future<void> scheduleMonthlyReport(String title, String body) async {
 
 Future<void> cancelMonthlyReport() async {
   try {
-    await _plugin.cancel(_monthlyId);
+    await _safeCancel(_monthlyId);
   } catch (_) {}
 }
 
@@ -384,9 +414,9 @@ Future<void> schedulePomodoroDone(Duration after, String title, String body) asy
   const details = NotificationDetails(
     android: AndroidNotificationDetails(
       color: _kBrandColor,
-      _habitChannelId,
-      _habitChannelName,
-      channelDescription: 'Daily habit reminder',
+      _pomodoroChannelId,
+      _pomodoroChannelName,
+      channelDescription: 'End of a Pomodoro focus or break phase',
       importance: Importance.high,
       priority: Priority.high,
     ),
@@ -398,7 +428,7 @@ Future<void> schedulePomodoroDone(Duration after, String title, String body) asy
 
 Future<void> cancelPomodoroDone() async {
   try {
-    await _plugin.cancel(_pomodoroId);
+    await _safeCancel(_pomodoroId);
   } catch (_) {
     // plugin unavailable (tests) - nothing scheduled anyway
   }
@@ -406,15 +436,37 @@ Future<void> cancelPomodoroDone() async {
 
 /// Exact-moment one-off (prayer times shift daily, so these are scheduled as
 /// absolute datetimes for the next ~2 days and rebuilt on every app open).
-Future<void> scheduleAt(
-    int id, DateTime when, String title, String body) async {
+/// Which prayer-family channel a scheduled alert belongs to. Keeping these
+/// apart from the habit channel is the whole point: muting habit nudges in
+/// system settings must never silence the prayer times.
+enum PrayerChannel { main, preAlert, adhkar }
+
+Future<void> scheduleAt(int id, DateTime when, String title, String body,
+    {PrayerChannel channel = PrayerChannel.main}) async {
   await initNotifications();
+  final (chId, chName, chDesc) = switch (channel) {
+    PrayerChannel.main => (
+        _prayerChannelId,
+        _prayerChannelName,
+        'The five daily prayer times',
+      ),
+    PrayerChannel.preAlert => (
+        _preAlertChannelId,
+        _preAlertChannelName,
+        'A short alert before each prayer',
+      ),
+    PrayerChannel.adhkar => (
+        _adhkarChannelId,
+        _adhkarChannelName,
+        'Morning and evening adhkar reminders',
+      ),
+  };
   final details = NotificationDetails(
     android: AndroidNotificationDetails(
       color: _kBrandColor,
-      _habitChannelId,
-      _habitChannelName,
-      channelDescription: 'Daily habit reminder',
+      chId,
+      chName,
+      channelDescription: chDesc,
       importance: Importance.high,
       priority: Priority.high,
       styleInformation: BigTextStyleInformation(body),
@@ -470,7 +522,7 @@ Future<void> scheduleAdhan(
 Future<void> cancelIdRange(int from, int to) async {
   for (var i = from; i <= to; i++) {
     try {
-      await _plugin.cancel(i);
+      await _safeCancel(i);
     } catch (_) {
       return; // plugin unavailable (tests): nothing scheduled anyway
     }
@@ -514,22 +566,34 @@ Future<void> scheduleWeekly(
 }
 
 /// Clears all per-habit reminders (and the legacy single one) before a reschedule.
+/// Cancel that can never throw. applyNotificationSchedule() cancels BEFORE it
+/// reschedules, so an exception here (MissingPluginException under tests, a
+/// wedged plugin on device) used to abort the whole run and leave the user
+/// with no reminders at all.
+Future<void> _safeCancel(int id) async {
+  try {
+    await _plugin.cancel(id);
+  } catch (e) {
+    debugPrint('awwad notif: cancel #$id failed: $e');
+  }
+}
+
 Future<void> cancelHabitReminders() async {
   for (var i = 0; i < _habitReminderMax; i++) {
-    await _plugin.cancel(_habitReminderBase + i);
+    await _safeCancel(_habitReminderBase + i);
   }
-  await _plugin.cancel(_reminderId);
+  await _safeCancel(_reminderId);
 }
 
 Future<void> cancelReminders() async {
-  await _plugin.cancel(_reminderId);
+  await _safeCancel(_reminderId);
   await cancelHabitReminders();
 }
 
 Future<void> cancelDhikr() async {
-  await _plugin.cancel(_dhikrId);
+  await _safeCancel(_dhikrId);
 }
 
 Future<void> cancelReengageNudge() async {
-  await _plugin.cancel(_reengageId);
+  await _safeCancel(_reengageId);
 }
