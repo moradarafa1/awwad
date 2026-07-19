@@ -236,3 +236,35 @@ Confidentialité : https://moradarafa1.github.io/privacy/
 - **Texte promotionnel** (162/170):
   `Awwad vous accompagne pour rompre une mauvaise habitude ou en bâtir une bonne : méthode HRT, rappels, statistiques et badges. 100 % gratuit, sans pub, hors ligne.`
 - **Description** : utilisez la description complète Play ci-dessus.
+
+---
+
+## لقطات الشاشة (SA2) - كيف تُنتَج وما المطلوب
+
+**اللقطات جاهزة فعلاً** في `assets/screenshots/<locale>/` بمقاس **1125×2436**، وهي
+لقطات حقيقية من التطبيق العامل (وليست تصاميم)، وهذا ما تشترطه سياسات المتاجر.
+
+### إعادة إنتاجها في أي وقت
+```bash
+cd D:\Claude\awwad
+node ops/shotgen/capture.mjs --locale ar     # أو en / fr
+```
+يشغّل السكربت متصفح Chrome حقيقياً على النسخة المنشورة، يمشي في التطبيق خطوة خطوة،
+ويحفظ إحدى عشرة لقطة. يتطلب Chrome مثبتاً فقط، ولا ينزّل أي شيء.
+
+### ما ترفعه في Google Play
+- **الحد الأدنى لقطتان**، والمستحسن ست إلى ثماني.
+- الترتيب المقترح (بالعربية، فهي لغة المتجر الأساسية):
+  1. `07-today.png` شاشة اليوم: السلسلة والرتبة والمراحل
+  2. `05-catalog.png` كتالوج العادات (يُظهر الاتساع: أربعون عادة)
+  3. `08-stats.png` الإحصاءات وخريطة الشهر
+  4. `11-sos.png` زر الهدنة للحظات الضعف
+  5. `09-badges.png` الدروع والأوسمة
+  6. `10-pomodoro.png` مؤقت البومودورو
+  7. `01-language.png` أو `06-setup.png` للتعريف بالبداية
+- لقطات الإنجليزية والفرنسية اختيارية: يقبل المتجر استخدام المجموعة نفسها لكل اللغات.
+
+### ما تبقى (يحتاج تدخلك)
+- **الصورة الدعائية** `assets/store/play-feature-1024x500.png` موجودة بالشعار، ويُستحسن
+  تحديثها لاحقاً بلقطة حقيقية من الواجهة خلفها.
+- **لقطات آيفون** لا يمكن إنتاجها إلا من جهاز ماك بعد بناء نسخة iOS.
