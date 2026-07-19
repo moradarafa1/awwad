@@ -25,6 +25,45 @@ class ScholarVideo {
 }
 
 const Map<String, List<ScholarVideo>> kHabitVideos = {
+  'quit_smoking': [
+    ScholarVideo(id: 'mahHH2ArUo0', title: 'فرصة عمرك لتبطيل التدخين هي رمضان | إعرف أسرار محدش قالك عليها!', scholar: 'YourDocCast | بودكاست طبيبك', seconds: 561),
+  ],
+  'quit_vaping': [
+    ScholarVideo(id: 'KSUPAm51pfM', title: 'فارماستان - الفيب و السجائر الالكترونية', scholar: 'Pharmastan - فارماستان', seconds: 768),
+  ],
+  'caffeine_excess': [
+    ScholarVideo(id: 'n8Ek-4wtphU', title: 'سر في قهوتك بيدمر نومك! ☕️⚠️ إمتى تكون القهوة خطر؟ وايه حكاية الـ Decaf؟', scholar: 'Dr. Ahmed Elshafei د أحمد الشافعي', seconds: 186),
+  ],
+  'hair_pulling': [
+    ScholarVideo(id: 'NKEuwbzbKJ4', title: 'هوس نتف الشعر الأعراض والعلاج | دكتور محمود الوصيفي أستاذ الطب النفسي', scholar: 'محمود الوصيفي طب نفسي أطفال وبالغين', seconds: 269),
+  ],
+  'skin_picking': [
+    ScholarVideo(id: 'PdiNj-r1SRo', title: 'أهم أعراض هوس نتف الجلد| سلسلة أشباه الوسواس القهري| الجزء السابع| دكتور محمود الوصيفي| الطب النفسي', scholar: 'محمود الوصيفي طب نفسي أطفال وبالغين', seconds: 49),
+  ],
+  'phone_addiction': [
+    ScholarVideo(id: 'NdWgjha0u8U', title: 'إدمان الهواتف .. خطر صامت يهدد الصحة النفسية والجسدية', scholar: 'MEDI1 TV', seconds: 152),
+  ],
+  'excessive_gaming': [
+    ScholarVideo(id: 'BiLuivIxKLA', title: 'الحكيم في بيتك | كيفية علاج إدمان ألعاب الفيديو', scholar: 'CBC Egypt', seconds: 216),
+  ],
+  'procrastination': [
+    ScholarVideo(id: '22CW76-SARA', title: 'علي وكتاب - حل لغز التسويف Solving The Procrastination Puzzle', scholar: 'Ali Muhammad Ali', seconds: 676),
+  ],
+  'oversleeping': [
+    ScholarVideo(id: 'DnfUno7EyTA', title: 'النوم الكثير.. راحة أم علامة على مرض خطير؟.. الدكتور حسام موافي يوضح', scholar: 'Sada Elbalad - صدى البلد', seconds: 261),
+  ],
+  'late_nights': [
+    ScholarVideo(id: 'PPruqroGMIs', title: 'السهر لوقت متأخر وقلة النوم تسبب هذا المرض | #الصباح', scholar: 'سكاي نيوز عربية', seconds: 90),
+  ],
+  'bad_language': [
+    ScholarVideo(id: '78UsKNWiip8', title: 'خطبة الجمعة بعنوان #الفحش والبذاءة في اللسان للشيخ منصور بن ناصر الخالدي', scholar: 'قسم الدعوة والإرشاد بجمعية الهداية الخيرية', seconds: 599),
+  ],
+  'anger': [
+    ScholarVideo(id: 'CkgzD2XEG4M', title: 'كيفية التحكم بالغضب | برنامج نصيحة طبيب', scholar: 'Sharjah TV - تلفزيون الشارقة', seconds: 596),
+  ],
+  'junk_food': [
+    ScholarVideo(id: 'bZ__oH5QB60', title: 'اسئلة الناس عن كيفية اختيار اطعمة صحية في مطاعم الوجبات السريعة - د. ربى مشربش - تغذية', scholar: 'Donya Ya Donya', seconds: 637),
+  ],
   'secret_habit': [
     ScholarVideo(id: '-MBzN7N5FUk', title: 'خطوات ذهبية لعلاج إدمان الإباحية والعادة السرية 100%', scholar: 'قناة واعي', seconds: 761),
     ScholarVideo(id: '46q4vjTuKIY', title: 'نصائح ذهبية لترك الإباحية والعادة السرية', scholar: 'قناة واعي', seconds: 230),

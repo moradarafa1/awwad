@@ -25,13 +25,6 @@ List<String> habitChecklistLabels(
   return list.map((m) => m[locale] ?? m['ar'] ?? '').toList();
 }
 
-/// A YouTube search URL for the habit's recommended scholar video, or null.
-String? habitVideoSearchUrl(String? catalogKey) {
-  if (catalogKey == null) return null;
-  final q = kHabitVideoQuery[catalogKey];
-  if (q == null) return null;
-  return 'https://www.youtube.com/results?search_query=${Uri.encodeQueryComponent(q)}';
-}
 
 const Map<String, HabitChecklists> kHabitChecklists = {
   'quit_smoking': HabitChecklists(
@@ -307,24 +300,3 @@ const Map<String, HabitChecklists> kHabitChecklists = {
   ),
 };
 
-// Scholar-video search query per break habit (Arabic). Built into a YouTube
-// search URL at runtime; shown only when the device is online.
-const Map<String, String> kHabitVideoQuery = {
-  'quit_smoking': "مصطفى العدوي حكم التدخين والإقلاع عن السجائر",
-  'quit_vaping': "مصطفى العدوي حكم السجائر الإلكترونية الفيب والتدخين",
-  'nail_biting': "مصطفى العدوي حكم قضم الأظافر",
-  'hair_pulling': "عبدالرحمن ذاكر الهاشمي علاج الوسواس القهري والعادات القهرية",
-  'skin_picking': "عبدالرحمن ذاكر الهاشمي علاج القلق والتوتر والعادات القهرية",
-  'phone_addiction': "مصطفى العدوي حكم إضاعة الوقت في الجوال ووسائل التواصل",
-  'excessive_gaming': "مصطفى العدوي حكم إضاعة الوقت في الألعاب الإلكترونية",
-  'procrastination': "التسويف وتأخير العمل عبدالرحمن ذاكر الهاشمي",
-  'junk_food': "مصطفى العدوي الإسراف في الأكل وكثرة الشبع وذم الشره",
-  'oversleeping': "مصطفى العدوي علاج كثرة النوم والكسل عن العبادة",
-  'gossip': "مصطفى العدوي التحذير من الغيبة والنميمة وحفظ اللسان",
-  'bad_language': "مصطفى العدوي حفظ اللسان والسب والشتم",
-  'impulse_buying': "مصطفى العدوي الإسراف والتبذير في الشراء والإنفاق",
-  'caffeine_excess': "مصطفى العدوي الاعتدال وعدم الإسراف في الطعام والشراب",
-  'late_nights': "مفاسد السهر وأهمية النوم المبكر مصطفى العدوي",
-  'binge_watching': "حكم إضاعة الوقت في المشاهدة مصطفى العدوي",
-  'anger': "علاج الغضب وكظم الغيظ مصطفى العدوي",
-};

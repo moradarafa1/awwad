@@ -1,0 +1,114 @@
+[
+ {
+  "habit": "quit_smoking",
+  "id": "mahHH2ArUo0",
+  "title": "فرصة عمرك لتبطيل التدخين هي رمضان | إعرف أسرار محدش قالك عليها!",
+  "scholar": "YourDocCast | بودكاست طبيبك",
+  "confidence": "high",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "quit_vaping",
+  "id": "KSUPAm51pfM",
+  "title": "فارماستان - الفيب و السجائر الالكترونية",
+  "scholar": "Pharmastan - فارماستان",
+  "confidence": "medium",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "caffeine_excess",
+  "id": "n8Ek-4wtphU",
+  "title": "سر في قهوتك بيدمر نومك! إمتى تكون القهوة خطر؟ وايه حكاية الـ Decaf؟",
+  "scholar": "Dr. Ahmed Elshafei / د أحمد الشافعي",
+  "confidence": "medium",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "hair_pulling",
+  "id": "NKEuwbzbKJ4",
+  "title": "هوس أو متلازمة نتف الشعر الأعراض والعلاج | دكتور محمود الوصيفي أستاذ الطب النفسي",
+  "scholar": "دكتور محمود الوصيفي أستاذ الطب النفسي (Prof. Mahmoud Elwasify, Professor of Psychiatry, Mansoura Faculty of Medicine)",
+  "confidence": "high",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "skin_picking",
+  "id": "PdiNj-r1SRo",
+  "title": "أهم أعراض هوس نتف الجلد | سلسلة أشباه الوسواس القهري | الجزء السابع | دكتور محمود الوصيفي | الطب النفسي",
+  "scholar": "دكتور محمود الوصيفي أستاذ الطب النفسي (Prof. Mahmoud Elwasify, Professor of Psychiatry)",
+  "confidence": "high",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "phone_addiction",
+  "id": "NdWgjha0u8U",
+  "title": "إدمان الهواتف .. خطر صامت يهدد الصحة النفسية والجسدية",
+  "scholar": "MEDI1 TV (ميدي1 تيفي)",
+  "confidence": "medium",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "excessive_gaming",
+  "id": "BiLuivIxKLA",
+  "title": "الحكيم في بيتك | كيفية علاج إدمان ألعاب الفيديو",
+  "scholar": "CBC Egypt — برنامج الحكيم في بيتك (د. أحمد الزهاوي)",
+  "confidence": "medium",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "procrastination",
+  "id": "22CW76-SARA",
+  "title": "علي وكتاب - حل لغز التسويف Solving The Procrastination Puzzle",
+  "scholar": "علي محمد علي (Ali Muhammad Ali) — قناة \"علي وكتاب\"",
+  "confidence": "medium",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "oversleeping",
+  "id": "DnfUno7EyTA",
+  "title": "النوم الكثير.. راحة أم علامة على مرض خطير؟.. الدكتور حسام موافي يوضح",
+  "scholar": "د. حسام موافي — قناة صدى البلد (Sada Elbalad)",
+  "confidence": "medium",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "late_nights",
+  "id": "PPruqroGMIs",
+  "title": "السهر لوقت متأخر وقلة النوم تسبب هذا المرض | #الصباح",
+  "scholar": "سكاي نيوز عربية (Sky News Arabia)",
+  "confidence": "medium",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "bad_language",
+  "id": "78UsKNWiip8",
+  "title": "خطبة الجمعة بعنوان #الفحش والبذاءة في اللسان للشيخ منصور بن ناصر الخالدي",
+  "scholar": "قسم الدعوة والإرشاد بجمعية الهداية الخيرية — الشيخ منصور بن ناصر الخالدي",
+  "confidence": "medium",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "anger",
+  "id": "CkgzD2XEG4M",
+  "title": "كيفية التحكم بالغضب | برنامج نصيحة طبيب",
+  "scholar": "Sharjah TV — تلفزيون الشارقة (برنامج \"نصيحة طبيب\")",
+  "confidence": "high",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "impulse_buying",
+  "id": "dad53f5nA7M",
+  "title": "كيف تتجنب عملية الشراء العشوائي؟",
+  "scholar": "برنامج صباح السعودية (official Saudi TV morning programme)",
+  "confidence": "medium",
+  "maxMinutes": 30
+ },
+ {
+  "habit": "junk_food",
+  "id": "bZ__oH5QB60",
+  "title": "اسئلة الناس عن كيفية اختيار اطعمة صحية في مطاعم الوجبات السريعة - د. ربى مشربش - تغذية",
+  "scholar": "د. ربى مشربش (clinical dietitian) on Donya Ya Donya",
+  "confidence": "high",
+  "maxMinutes": 30
+ }
+]
