@@ -761,6 +761,27 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-19 round 14 (MANDATE_PLAN Round 5 part 1: tasbih counter + habit strength)** -
+  TASBIH «عدّاد الذكر» (core/widgets/tasbih_counter.dart): a large haptic tap counter for the
+  five COUNTED worship habits (istighfar/salawat/dua target 100, adhkar/gratitude 33), shown
+  above the primary slider in the daily log. The count persists per habit per day
+  (awwad_tasbih_v1_*, stale days purged) and MAPS onto the existing 0-10 primary metric via
+  the pure tasbihToMetric, so entry schema, sync and stats are untouched. HABIT STRENGTH
+  (AppState.habitStrength): 0-100 EWMA over ~8 weeks, 14-day half-life, bounded at the habit's
+  createdAt (a new habit is never capped), skips transparent, an unlogged today ignored,
+  weekly habits measured only on their weekday; rendered as the first Today chip. It answers
+  the biggest churn complaint - one bad day zeroes the streak but only dents the strength.
+  New tests: tasbih_test (5) + habit_strength_test (7). analyze clean, 106/106.
+- **2026-07-19 round 13 (MANDATE_PLAN Round 4 channels + N10 close-out)** - Prayer alerts moved
+  onto their OWN channels (awwad_prayer_v1, awwad_prayer_pre_v1, awwad_adhkar_v1) through a new
+  PrayerChannel enum on scheduleAt: muting daily habit nudges in system settings can no longer
+  silence the prayer times (Android mutes are per-channel and cannot be undone from inside the
+  app). Pomodoro (awwad_pomodoro_v1) and the monthly report (awwad_report_v1, previously riding
+  the badges channel with a mismatched description) got their own too. Documented THE
+  authoritative notification id + channel map at the top of notifications_mobile.dart, moved
+  the personal-record notification off a hashed literal onto namespaced id 1006, and routed
+  every cancel through _safeCancel so one plugin failure cannot abort a reschedule and leave
+  the user with zero reminders. analyze clean, 94/94.
 - **2026-07-19 round 12 (MANDATE_PLAN Round 8: store metadata + submission answers)** -
   Docs only, no app build. STORE_LISTINGS: every dead `*.netlify.app` URL replaced with the
   live GitHub Pages URLs (13 refs across both store docs; a dead privacy URL is an automatic
