@@ -45,12 +45,36 @@ async function shot(page, name) {
 /// Clicks by visible text using the accessibility-free approach: Flutter web
 /// renders to canvas, so text queries do not work. We click by COORDINATES
 /// derived from the CSS viewport, which is stable for this layout.
+const RTL = LOCALE === 'ar';
+/// x-fractions below are written for the ARABIC (RTL) layout; mirror them
+/// for LTR locales, where every row is laid out from the other side.
+const fx = (f) => (RTL ? f : 1 - f);
+
 async function tap(page, xFrac, yFrac, label) {
   const x = Math.round(CSS_W * xFrac);
   const y = Math.round(CSS_H * yFrac);
   await page.mouse.click(x, y);
   console.log(`  tap ${label} at (${x},${y})`);
   await sleep(900);
+}
+
+/// Waits for the Flutter engine to replace the splash with real UI. A fixed
+/// sleep is not enough on a cold load and silently produced a whole run of
+/// splash-screen captures. The splash is nearly flat dark, so its PNG is tiny
+/// (~30 KB) while any real screen is several hundred KB: that size gap is a
+/// reliable readiness signal for a canvas we cannot inspect via the DOM.
+async function waitForBoot(page, timeoutMs = 90000) {
+  const started = Date.now();
+  while (Date.now() - started < timeoutMs) {
+    const buf = await page.screenshot({ encoding: 'binary' });
+    if (buf.length > 120 * 1024) {
+      await sleep(1200); // let the entry animation settle
+      console.log();
+      return;
+    }
+    await sleep(2000);
+  }
+  throw new Error('app did not finish booting within ' + timeoutMs + 'ms');
 }
 
 const main = async () => {
@@ -70,8 +94,7 @@ const main = async () => {
 
   console.log(`opening ${URL_} (${LOCALE})`);
   await page.goto(URL_, { waitUntil: 'networkidle2', timeout: 90000 });
-  // The Flutter engine boots after the splash; give it room on a cold load.
-  await sleep(9000);
+  await waitForBoot(page);
 
   // 1. Language screen (the real first impression).
   await shot(page, '01-language');
@@ -85,39 +108,39 @@ const main = async () => {
   await sleep(1200);
   await shot(page, '03-survey');
 
-  await tap(page, 0.88, 0.169, 'gender');
+  await tap(page, fx(0.88), 0.169, 'gender');
   await tap(page, 0.5, 0.95, 'next');
   await shot(page, '04-track');
 
   await tap(page, 0.5, 0.165, 'break track');
-  await tap(page, 0.38, 0.95, 'next');
+  await tap(page, fx(0.38), 0.95, 'next');
   await sleep(700);
   await shot(page, '05-catalog');
 
-  await tap(page, 0.73, 0.338, 'quit smoking');
-  await tap(page, 0.38, 0.95, 'next');
+  await tap(page, fx(0.73), 0.338, 'quit smoking');
+  await tap(page, fx(0.38), 0.95, 'next');
   await sleep(700);
   await shot(page, '06-setup');
 
-  await tap(page, 0.38, 0.95, 'start');
+  await tap(page, fx(0.38), 0.95, 'start');
   await sleep(1600);
   await shot(page, '07-today');
 
   // Bottom nav: stats, badges, pomodoro, settings (5 slots).
   const NAV_Y = 0.948;
-  await tap(page, 0.742, NAV_Y, 'stats');
+  await tap(page, fx(0.742), NAV_Y, 'stats');
   await sleep(900);
   await shot(page, '08-stats');
 
-  await tap(page, 0.58, NAV_Y, 'badges');
+  await tap(page, fx(0.58), NAV_Y, 'badges');
   await sleep(900);
   await shot(page, '09-badges');
 
-  await tap(page, 0.258, NAV_Y, 'pomodoro');
+  await tap(page, fx(0.258), NAV_Y, 'pomodoro');
   await sleep(900);
   await shot(page, '10-pomodoro');
 
-  await tap(page, 0.42, NAV_Y, 'truce (SOS)');
+  await tap(page, fx(0.42), NAV_Y, 'truce (SOS)');
   await sleep(1500);
   await shot(page, '11-sos');
 

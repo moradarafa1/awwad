@@ -1,6 +1,7 @@
 // Blog posts (SEO engine), trilingual (ar/en/fr) in Modern Standard Arabic.
 // Each post renders with Article + FAQPage JSON-LD. No em-dashes.
-// Generated via the awwad-blog-30 workflow (30 articles).
+// Generated via the awwad-blog-30 workflow (30 articles) and extended by the
+// write-blog-round10 workflow (9 high-intent articles, MANDATE_PLAN SA6).
 
 export const POSTS = [
   {
@@ -4275,6 +4276,1302 @@ export const POSTS = [
         {
           "q": "Comment distinguer une rechute passagère d'un abandon complet du changement ?",
           "a": "La différence réside dans la réponse que vous choisissez. Une rechute passagère est suivie d'une reprise intentionnelle et rapide : vous réinitialisez votre compteur, vous analysez le déclencheur et vous ajustez votre plan. L'abandon se reconnaît à l'inaction prolongée et à l'évitement de toute réflexion sur le sujet. Tant que vous restez engagé à comprendre ce qui s'est passé et à recommencer, vous n'avez pas abandonné."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "stop-masturbation-habit",
+    "date": "2026-06-11",
+    "category": "break",
+    "title": {
+      "ar": "ترك العادة السرية نهائياً: خطة سلوكية عملية بلا لوم",
+      "en": "How to Quit Masturbation for Good: A Practical, Judgment-Free Plan",
+      "fr": "Arrêter la masturbation définitivement : un plan comportemental concret"
+    },
+    "description": {
+      "ar": "دليل عملي ومحترم لترك العادة السرية نهائياً: لماذا لا تكفي الإرادة وحدها، وكيف تبني خطة وعي واستجابة منافِسة وضبط بيئة، وكيف تعود بعد الانتكاسة.",
+      "en": "A practical, dignified guide to quitting masturbation: why willpower fails, how to plan for the urge, control your environment, and recover from a relapse.",
+      "fr": "Guide pratique et respectueux pour arrêter la masturbation : pourquoi la volonté ne suffit pas, comment gérer l'envie, l'environnement et la rechute."
+    },
+    "intro": {
+      "ar": "ترك العادة السرية من أكثر ما يبحث عنه الناس في صمت، ومن أقلّ ما يجدون فيه خطة عملية بدل الوعظ. والحقيقة السلوكية أن الأمر عادة لها محفّزات يمكن رصدها، وحلقة يمكن كسرها بخطوات واضحة قابلة للتكرار. في هذا الدليل نتناول المسألة بكرامة تامة: لماذا لا تكفي الإرادة وحدها، وكيف تُعدّ خطة جاهزة للحظة الرغبة، وكيف تعود بعد التعثّر دون أن تخسر ما بنيته.",
+      "en": "Quitting masturbation is one of the most privately searched goals there is, and one of the most poorly served by advice that offers exhortation instead of a plan. In behavioural terms it is a habit loop with identifiable triggers, and loops can be broken with specific, repeatable steps. This guide treats the subject with full dignity: why willpower alone fails, how to prepare for the urge, and how to recover from a relapse without losing what you have built.",
+      "fr": "Arrêter la masturbation est l'un des objectifs les plus recherchés en silence, et l'un des moins bien accompagnés : on y reçoit des sermons plutôt qu'une méthode. Sur le plan comportemental, il s'agit d'une boucle d'habitude aux déclencheurs identifiables, et une boucle se brise par des étapes précises et répétables. Ce guide aborde le sujet avec dignité : pourquoi la volonté ne suffit pas, comment préparer le moment de l'envie, et comment se relever après une rechute."
+    },
+    "sections": {
+      "ar": [
+        {
+          "h": "لماذا لا تكفي الإرادة وحدها في ترك هذه العادة",
+          "p": "يبدأ كثيرون بعزيمة صادقة ثم يتعثّرون بعد أيام، فيظنّون أن المشكلة في ضعف إرادتهم. والحقيقة السلوكية مختلفة: العادة ليست قراراً يُتخذ مرة واحدة، بل حلقة متكرّرة تبدأ بمحفّز، ثم رغبة متصاعدة، ثم سلوك، ثم راحة عابرة ترسّخ الحلقة من جديد. والإرادة مورد محدود يتآكل مع التعب والضغط والسهر، وهي بالضبط اللحظات التي تنشط فيها الحلقة. لذلك يأتي النجاح من هندسة الظروف والاستجابات مسبقاً، لا من مصارعة الرغبة في ذروتها."
+        },
+        {
+          "h": "المحفّزات الحقيقية: الخلوة والفراغ والضغط النفسي",
+          "p": "نادراً ما تبدأ الرغبة من فراغ، بل تسبقها ظروف يمكن التنبؤ بها: الخلوة الطويلة خلف باب مغلق، والساعات الفارغة بعد منتصف الليل، والتصفّح العشوائي في السرير، والشعور بالضغط أو الوحدة أو الملل. والخطوة الأولى في تدريب عكس العادات هي الوعي، أي أن تدوّن أسبوعاً كاملاً: متى ظهرت الرغبة، وأين كنت، وماذا كان بيدك، وما الحالة الشعورية التي سبقتها. لا تحاكم نفسك أثناء التدوين، فأنت تجمع بيانات لا تُصدر أحكاماً. وبعد أسبوع ستجد ثلاثة أو أربعة مواقف تتكرّر، وهي ميدان العمل الحقيقي."
+        },
+        {
+          "h": "لحظة الرغبة: استجابة منافِسة جاهزة قبل أن تحتاجها",
+          "p": "الرغبة موجة: ترتفع، وتبلغ ذروتها خلال دقائق، ثم تنحسر إن لم تُغذَّ. والمطلوب ليس إلغاؤها بل الصمود بعد قمّتها. جهّز خطة مكتوبة من ثلاث خطوات تنفّذها فور ظهور أول إشارة: غيّر وضع جسدك ومكانك بالوقوف والخروج من الغرفة، ثم اشغل يديك بعمل محسوس كالوضوء أو المشي أو ترتيب شيء أمامك، ثم اذكر الله بدعاء قصير يعيدك إلى نيّتك. التزم بعشر دقائق فقط، فالموجة لا تصمد أطول من ذلك غالباً. وزر الهدنة في تطبيق عوّاد صُمّم لهذه اللحظة بعينها."
+        },
+        {
+          "h": "ضبط البيئة: الهاتف والمكان والوقت الفارغ",
+          "p": "أكثر ما يخفّض احتمال التكرار هو تصعيب الوصول، لا تشديد اللوم على النفس. اجعل الهاتف يبيت خارج غرفة النوم، واستبدل بشاشة ما قبل النوم منبّهاً تقليدياً وكتاباً ورقياً. فعّل درع المحتوى الذي يحجب المواقع الإباحية على مستوى الشبكة، وضع حدوداً زمنية لتطبيقات التصفّح والتواصل، فالحاجز البسيط يكفي غالباً لكسر الاندفاع قبل أن يصير قراراً. غيّر أماكن الخلوة الطويلة، وذاكر واعمل في غرفة مفتوحة. ثم املأ الفراغ بجدول حقيقي: رياضة، ومهارة تتعلّمها، وصحبة صالحة، ونوم منتظم."
+        },
+        {
+          "h": "الانتكاسة: كيف تعود دون أن تهدم كل شيء",
+          "p": "الانتكاسة ليست نهاية الطريق، والخطر الأكبر ليس الزلّة نفسها بل ما يليها: موجة إحباط تدفع صاحبها إلى ترك الخطة كلها، وهذا وحده أغلى ثمناً من الزلّة. اتفق مع نفسك مسبقاً على بروتوكول عودة خلال ساعة واحدة: توضّأ، وسجّل ما حدث دون استرسال في التفاصيل، واكتب المحفّز الذي سبقها في سطر واحد، ثم عد إلى جدولك اليومي المعتاد فوراً. جدّد نيّتك واستعن بالله، ودع جلد الذات جانباً، فاليأس لا يبني شيئاً. وقارن الشهر بالشهر لا اليوم باليوم."
+        },
+        {
+          "h": "التعافي مسار أشهر: سند بلا كشف وروتين يحفظ المكتسب",
+          "p": "التعافي يُقاس بالأشهر لا بالأيام، وشكله الطبيعي منحنى صاعد فيه تعرّجات، لا خطاً مستقيماً بلا تعثّر. ولا يلزمك أن تكشف تفاصيلك لأحد، فالستر والدعم لا تعارض بينهما: يكفي سند واحد أمين تخبره بصيغة عامة، أو مختص نفسي يلتزم السرية، خصوصاً إن صاحب الأمر قلق أو اضطراب في النوم. راجع تقريرك الشهري لترى أنماطاً لا تظهر يوماً بيوم، وحافظ على روتين النوم والرياضة والذكر حتى في الأسابيع الهادئة، فهي ما يحفظ المكتسب. أما مسائل الحكم الشرعي فمرجعها أهل العلم عبر موقع islamweb.net."
+        }
+      ],
+      "en": [
+        {
+          "h": "Why Willpower Alone Keeps Failing",
+          "p": "Most people start with sincere resolve, hold out for a few days, then stumble and conclude they are simply weak. Behaviourally, that conclusion is wrong. This is not a single decision, it is a loop: a cue appears, craving builds, the behaviour follows, and short-lived relief stamps the loop in deeper. Willpower is a finite resource that thins out with fatigue, stress and late nights, which is precisely when the loop fires. Lasting change comes from designing your conditions in advance, not from wrestling a craving at its peak."
+        },
+        {
+          "h": "Your Real Triggers: Privacy, Boredom and Stress",
+          "p": "Urges rarely arrive out of nowhere. They are preceded by predictable conditions: long stretches alone behind a closed door, the empty hours after midnight, aimless scrolling in bed, or feeling stressed, lonely or bored. The first stage of Habit Reversal Training is awareness. For one full week, log the time, the place, what was in your hands, and the mood that came just before. Do not judge yourself while logging, because you are collecting data, not issuing verdicts. Three or four repeating situations will emerge, and those are the ones worth working on."
+        },
+        {
+          "h": "The Urge Is a Wave: Prepare a Competing Response",
+          "p": "An urge rises, peaks within minutes, then fades if you do not feed it. The goal is not to erase it but to outlast the peak. Write a three-step response and rehearse it before you need it: change your posture and location immediately by standing up and leaving the room, occupy your hands with something physical such as wudu, a brisk walk, or tidying a shelf, then say a short remembrance that reconnects you to your intention. Commit to ten minutes only. The truce button in Awwad exists for exactly this moment."
+        },
+        {
+          "h": "Environment Control: Phone, Room and Empty Hours",
+          "p": "What lowers repetition most is friction, not harsher self-criticism. Charge your phone outside the bedroom overnight and replace bedtime screens with a physical alarm clock and a paper book. Turn on a DNS content shield so explicit sites are blocked at the network level, and set app usage limits on your browser and social apps, since a small barrier is often enough to stop an impulse before it becomes a decision. Change where you spend long solitary hours and work in open rooms. Then fill the vacuum with exercise, a skill, good company and consistent sleep."
+        },
+        {
+          "h": "Relapse Without Collapse",
+          "p": "A slip is not the end of the road. The greater danger is what follows it, a wave of shame that convinces you to abandon the entire plan, which costs far more than the slip ever did. Agree with yourself in advance on a one-hour return protocol: make wudu, log what happened without dwelling on detail, write the trigger in a single line, and return to your ordinary daily schedule immediately. Renew your intention, turn to God, and skip the self-punishment, because despair builds nothing. Compare month to month rather than day to day."
+        },
+        {
+          "h": "What Recovery Actually Looks Like Over Months",
+          "p": "Recovery is measured in months, and its normal shape is a rising line with dips in it, not a flawless streak. You also do not owe anyone your details. One trustworthy person, or a counsellor bound by confidentiality, is enough, and a general phrasing such as \"I am working on a personal discipline, keep asking me about it\" preserves your privacy while still creating accountability. Review your monthly report to see patterns that are invisible day by day, and keep the sleep, exercise and worship routines running even in calm weeks, because those hold the gains."
+        }
+      ],
+      "fr": [
+        {
+          "h": "Pourquoi la seule volonté finit toujours par céder",
+          "p": "On commence avec une résolution sincère, on tient trois ou quatre jours, puis on craque et on en tire une conclusion fausse : je manque de caractère. Ce n'est pourtant pas une affaire de caractère mais de mécanique. Un déclencheur apparaît, l'envie monte, le geste suit, et le soulagement immédiat vient récompenser toute la séquence, qui s'inscrit un peu plus profondément. Or la volonté s'amenuise avec la fatigue, le stress et le manque de sommeil, c'est-à-dire précisément quand la séquence se déclenche. On ne gagne pas en luttant au pic, on gagne en préparant le terrain avant."
+        },
+        {
+          "h": "Repérer les vrais déclencheurs au lieu de lutter à l'aveugle",
+          "p": "Une envie ne tombe pas du ciel. Elle est presque toujours annoncée par une configuration : la porte fermée pendant des heures, le creux qui suit minuit, le téléphone au lit, ou un état de stress, de solitude ou d'ennui. La thérapie par inversion des habitudes commence donc par l'observation. Pendant sept jours, notez quatre choses seulement : l'heure, le lieu, ce que vous teniez en main et l'émotion qui a précédé. N'ajoutez aucun commentaire moral, vous relevez des faits. Au bout de la semaine, trois ou quatre configurations reviendront, et ce sont elles qu'il faut traiter."
+        },
+        {
+          "h": "La vague dure moins longtemps que vous ne le croyez",
+          "p": "Une envie monte, culmine en quelques minutes, puis redescend d'elle-même si rien ne l'entretient. L'objectif n'est donc pas de la supprimer, mais de tenir plus longtemps qu'elle. Préparez à froid une réponse concurrente en trois gestes, apprise par cœur : se lever et quitter la pièce dès le premier signal, occuper ses mains par une action concrète comme les ablutions, une marche rapide ou du rangement, puis prononcer une courte invocation qui remet l'intention au centre. Ne vous engagez que sur dix minutes. Le bouton de trêve d'Awwad a été pensé pour ce moment précis."
+        },
+        {
+          "h": "Ajouter de la friction : téléphone, pièce et heures creuses",
+          "p": "Ce qui fait le plus baisser la fréquence n'est pas la sévérité envers soi-même, c'est la friction. Le téléphone passe la nuit hors de la chambre, remplacé par un réveil et un livre papier. Un bouclier de contenu au niveau DNS bloque les sites explicites sans dépendre de votre humeur du soir, et des limites de temps sur le navigateur et les réseaux coupent l'élan avant qu'il ne devienne une décision. Changez ensuite de décor pour vos longues heures seul, travaillez porte ouverte, et comblez le vide : sport, apprentissage, bonne compagnie, horaires de sommeil stables."
+        },
+        {
+          "h": "Rechuter sans démolir tout le reste",
+          "p": "Un écart ne clôt pas le parcours. Le vrai risque vient de ce qui suit : une honte massive qui souffle d'abandonner le plan entier, ce qui coûte bien plus cher que l'écart lui-même. Décidez donc à froid d'un protocole d'une heure : ablutions, enregistrement de l'épisode sans détail, une ligne pour nommer le déclencheur, puis retour immédiat au programme du jour. Renouvelez votre intention, tournez-vous vers Dieu et laissez de côté la punition intérieure, qui n'a jamais rien construit. Comparez les mois entre eux, pas les jours : c'est à cette échelle que le progrès devient lisible."
+        },
+        {
+          "h": "Ce que donne un travail régulier sur plusieurs mois",
+          "p": "La progression se compte en mois et ressemble à une courbe montante accidentée, jamais à une ligne parfaite. Personne n'a droit à vos détails : une seule personne fiable, informée en termes généraux, ou un psychologue tenu au secret professionnel, suffit à créer une responsabilité sans exposer votre intimité. Relisez votre rapport mensuel, qui fait apparaître des tendances invisibles au jour le jour. Gardez enfin le sommeil, l'activité physique et la vie spirituelle en place même pendant les semaines calmes : ce sont ces routines, et non l'intensité des débuts, qui protègent ce que vous avez gagné."
+        }
+      ]
+    },
+    "faq": {
+      "ar": [
+        {
+          "q": "كم يستغرق ترك العادة السرية نهائياً؟",
+          "a": "لا يوجد رقم ثابت، فالمدة تختلف بحسب عمق العادة وكثافة المحفّزات. وتُشير أبحاث تكوين العادات إلى أن السلوك الجديد يحتاج أسابيع من التكرار المنتظم قبل أن يصير تلقائياً، وأن الأشهر الأولى هي الأصعب. والأدقّ أن تقيس تقدّمك بطول الفترات النظيفة وتباعد الانتكاسات، لا بتاريخ نهاية محدّد. وأول ما يتحسّن عادةً ليس العدّاد، بل قدرتك على التنبؤ بالمحفّز والتصرّف قبل أن تشتد الموجة."
+        },
+        {
+          "q": "انتكست بعد مدة طويلة، هل عدت إلى الصفر؟",
+          "a": "الانتكاسة لا تلغي ما بنيته، فكل مرة تجاوزت فيها الموجة دون استجابة بقيت مكسباً مخزّناً في سلوكك. وما يعيدك إلى الصفر فعلاً هو ترك الخطة بعد الزلّة، لا الزلّة ذاتها. عد إلى روتينك خلال ساعة، ودوّن المحفّز الذي سبقها، وعالج الثغرة التي كشفتها: هاتف في السرير، أو سهر طويل، أو ضغط لم تفرّغه. العدّاد يبدأ من جديد، أما الخبرة فتتراكم."
+        },
+        {
+          "q": "هل أخبر أحداً بالأمر، وأين أسأل عن الحكم الشرعي؟",
+          "a": "لا يلزمك كشف التفاصيل لأحد، فالستر جزء من الكرامة. يكفي سند واحد أمين تخبره بصيغة عامة، أو الاستعانة بمختص نفسي يلتزم السرية، خصوصاً إن صاحب الأمر قلق أو اكتئاب. أما السؤال عن الحكم الشرعي وما يترتب عليه فمرجعه أهل العلم، ويمكنك عرض حالتك بخصوصية عبر موقع islamweb.net. وتطبيق عوّاد يعمل دون اتصال بالإنترنت وبلا إعلانات."
+        }
+      ],
+      "en": [
+        {
+          "q": "How long does it take to quit masturbation for good?",
+          "a": "There is no fixed number, and it depends on how deep the habit runs and how frequent the triggers are. Research on habit formation suggests a new behaviour needs weeks of consistent repetition before it feels automatic, and the first months are the hardest. Measure progress by the length of your clean stretches and the growing gap between slips, rather than by a finish date on a calendar. What usually improves first is your ability to see a trigger coming."
+        },
+        {
+          "q": "Does a relapse mean I have to start from zero?",
+          "a": "No. Every urge you rode out without acting stayed with you as real learning. What actually resets progress is abandoning the plan after a slip, not the slip itself. Return to your routine within an hour, note the trigger, and close the gap it exposed, whether that was a phone in bed, a very late night, or stress you never discharged. The counter restarts, the experience accumulates."
+        },
+        {
+          "q": "Should I tell someone, and where do I ask about the religious ruling?",
+          "a": "You do not need to disclose details to anyone, and discretion is part of dignity here. One trustworthy person told in general terms is enough, or a counsellor bound by confidentiality, especially if anxiety or depression is involved. For the religious ruling and anything that follows from it, ask qualified scholars, and you can submit your case privately through islamweb.net rather than relying on forums."
+        }
+      ],
+      "fr": [
+        {
+          "q": "Combien de temps faut-il pour arrêter définitivement la masturbation ?",
+          "a": "Il n'existe aucun chiffre fixe : cela dépend de l'ancrage de l'habitude et de la fréquence des déclencheurs. Les recherches sur la formation des habitudes indiquent qu'un nouveau comportement demande plusieurs semaines de répétition régulière avant de devenir automatique, et que les premiers mois sont les plus exigeants. Mesurez vos progrès à la longueur des périodes propres et à l'espacement des rechutes, pas à une date d'arrivée fixée d'avance."
+        },
+        {
+          "q": "Une rechute signifie-t-elle que je repars de zéro ?",
+          "a": "Non. Chaque fois que vous avez laissé passer une envie sans agir, cet apprentissage est resté acquis. Ce qui annule réellement les progrès, c'est d'abandonner le plan après l'écart, pas l'écart lui-même. Revenez à votre routine dans l'heure, notez le déclencheur et corrigez la faille révélée : téléphone au lit, nuit trop tardive ou stress non évacué. Le compteur repart, l'expérience s'accumule."
+        },
+        {
+          "q": "Dois-je en parler à quelqu'un, et où poser la question religieuse ?",
+          "a": "Vous n'avez pas à révéler vos détails, et la discrétion fait partie de la dignité. Une seule personne de confiance informée en termes généraux suffit, ou un psychologue tenu au secret professionnel, surtout en cas d'anxiété ou de dépression. Pour la question du jugement religieux et de ses implications, adressez-vous à des savants qualifiés : vous pouvez exposer votre cas en privé via islamweb.net plutôt que dans un forum."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "quit-porn-lower-gaze",
+    "date": "2026-06-13",
+    "category": "break",
+    "title": {
+      "ar": "التخلص من إدمان المحتوى الإباحي وغضّ البصر: خطة عملية في تسعين يوماً",
+      "en": "Quitting Pornography and Guarding Your Gaze: A Practical 90-Day Plan",
+      "fr": "Arrêter la pornographie et baisser le regard : un plan pratique sur 90 jours"
+    },
+    "description": {
+      "ar": "دليل عملي هادئ للتخلص من إدمان المحتوى الإباحي وغضّ البصر: كيف يعمل التصعيد، ولماذا يتفوق الحجب على مستوى الشبكة على الإرادة وحدها، وخطة تسعين يوماً.",
+      "en": "A calm, practical guide to breaking pornography use and guarding the gaze: how escalation works, why network-level blocking beats willpower, and a 90-day plan.",
+      "fr": "Guide pratique et sans jugement pour sortir de la pornographie et baisser le regard : escalade, blocage au niveau du réseau et plan concret sur 90 jours."
+    },
+    "intro": {
+      "ar": "يظن كثير ممن يحاولون التوقف عن المحتوى الإباحي أن المشكلة في ضعف الإرادة، والأقرب أنها في المصدر أولاً: تيار متاح على بعد ثانيتين ومصمَّم ليتصاعد باستمرار. فإذا عالجت المصدر، وضبطت قاعدة واضحة للنظرة الأولى، صارت المقاومة اليومية أخف كثيراً. وهذا المقال خطة عملية هادئة، بلا وعظ ولا تجريح، تبدأ اليوم وتمتد تسعين يوماً.",
+      "en": "Most people who try to stop assume the problem is weak willpower. The real problem is usually supply: a stream that sits two seconds away from your thumb and is built to escalate. Deal with the supply first, add one clear rule for the first glance, and daily resistance becomes far lighter. What follows is a calm, practical ninety-day plan, written without shaming anyone.",
+      "fr": "La plupart de ceux qui tentent d'arrêter croient à un simple manque de volonté. Le vrai problème est souvent l'accès : un flux disponible à deux secondes du pouce et conçu pour aller toujours plus loin. Traitez d'abord la source, ajoutez une règle nette pour le premier regard, et la résistance quotidienne devient bien plus légère. Voici un plan concret sur quatre-vingt-dix jours, sans jugement."
+    },
+    "sections": {
+      "ar": [
+        {
+          "h": "لماذا يصعب التوقف: تيار محتوى مصمَّم ليتصاعد",
+          "p": "المسألة هنا ليست لحظة ضعف عابرة، بل تيار محتوى مصمَّم ليبقيك متصلاً به أطول وقت ممكن. تقترح الصفحات والخوارزميات ما هو أشد إثارة مما رأيته في المرة السابقة، فيألف الدماغ المستوى الحالي ويطلب بهدوء ما هو أقوى منه، وهو نمط يوصف عادة بالتصعيد وفقدان الحساسية. لذلك يشعر كثيرون أن ما كان يكفيهم قبل شهور لم يعد يكفي، وأن الفراغ الذي يعقب المشاهدة يزداد ولا ينقص. وإدراك هذه الآلية ينقل المعركة من لوم الذات إلى معالجة مصدر التيار نفسه."
+        },
+        {
+          "h": "كيف تتحول النظرة الأولى إلى حلقة كاملة",
+          "p": "النظرة الأولى غالباً غير مقصودة: صورة تمر في تطبيق، أو عنوان مثير في نتائج بحث. والفارق كله يقع في الثانية التالية لها. فإن صرفت بصرك فوراً انطفأ المسار قبل أن يشتعل، وإن بقيت لحظة إضافية بدأت سلسلة معروفة: فضول، ثم بحث، ثم انشغال يستغرق ساعة ويترك أثراً ثقيلاً في نفسك. لهذا كانت قاعدة النظرة الأولى قاعدة عملية لا وعظاً فحسب: لا تفاوض نفسك بعدها، بل حرّك إصبعك أو رأسك خلال ثانيتين. والحسم في البداية أرخص كثيراً من مقاومة الحلقة بعد اكتمالها."
+        },
+        {
+          "h": "الحجب على مستوى الشبكة أقوى من مقاومة كل تطبيق على حدة",
+          "p": "الاعتماد على الإرادة أمام كل تطبيق ومتصفح معركة خاسرة بتصميمها، لأنك تخوضها عشرات المرات يومياً وفي أضعف لحظاتك. والبديل العملي أن تقرر مرة واحدة على مستوى الشبكة، عبر خادم أسماء نطاقات عائلي يصفّي المحتوى للجهاز كله قبل أن تصل الصفحة إلى عينك. والفائدة الحقيقية ليست استحالة الالتفاف على الحجب، فذلك ممكن لمن أصرّ، بل أنه يضيف احتكاكاً وتأخيراً لا تحتمله الرغبة الاندفاعية. وفي تطبيق عوّاد يؤدي درع المحتوى هذه الخطوة تحديداً، ويُستحسن أن يحتفظ بكلمة المرور شخص تثق به."
+        },
+        {
+          "h": "نظافة الجهاز والمتصفح: خطوات تنفّذها اليوم",
+          "p": "امنح نفسك نصف ساعة واجعل بيئتك مملة قدر المستطاع. احذف التطبيقات التي كانت بوابتك المعتادة، وسجّل الخروج من الحسابات التي صارت اقتراحاتها ملوثة، وامسح سجل التصفح والإكمال التلقائي حتى يتوقف المتصفح عن إتمام الكلمة نيابة عنك. عطّل التصفح الخفي إن سمح جهازك بذلك، وفعّل البحث الآمن، واجعل الشاشة بالأبيض والأسود مساءً. ثم اتخذ القرار الأثقل أثراً من هذا كله: الهاتف يُشحن في المطبخ ويبيت خارج غرفة النوم. راجع سجلك وستجد على الأرجح أن أكثر التعثرات وقعت ليلاً وأنت وحدك في غرفة مغلقة."
+        },
+        {
+          "h": "الوقود الحقيقي: الفراغ والوحدة لا الشهوة وحدها",
+          "p": "إذا راجعت آخر عشر مرات تعثّرت فيها، فستجد نمطاً بعيداً عن الشهوة نفسها: ساعة فراغ، أو ليلة وحدة، أو مزاج منخفض بعد يوم متعب. والمحتوى هنا ليس هدفاً بذاته بقدر ما هو مهرب سريع من شعور ثقيل. لذلك لا تصمد خطة المنع طويلاً إن لم تصحبها خطة ملء. ضع بديلاً محدداً لكل نافذة خطر: مشي عشرين دقيقة، أو اتصال بصديق، أو تمرين قصير، أو ورد قرآن مسموع. وإن حدث تعثّر فسجّله بهدوء واسأل: ما الشعور الذي سبقه؟ فالتعثّر معلومة تصحّح الخطة، لا حكم على شخصك."
+        },
+        {
+          "h": "خطة التسعين يوماً: ثلاث مراحل متدرجة",
+          "p": "في الأيام الثلاثين الأولى ركّز على الحماية: اضبط الحجب، وأخرج الهاتف من غرفة النوم، واضغط زر الهدنة عند أول موجة رغبة لا بعد ثلاث دقائق منها. وفي الثلاثين التالية انتقل من المنع إلى البناء: نوم منتظم، ورياضة ثلاث مرات أسبوعياً، وعلاقات إنسانية حقيقية تشغل المساحة التي كانت تملؤها الوحدة. وفي الثلاثين الأخيرة اختبر ثباتك في الظروف العادية مع إبقاء كل الحواجز في مكانها، ولا ترفع حاجزاً مكافأةً لنفسك. وراجع تقريرك الشهري وعدّل عاملاً واحداً في كل مرة."
+        }
+      ],
+      "en": [
+        {
+          "h": "Why This One Resists Willpower: A Stream Built to Escalate",
+          "p": "Most people treat this as a character problem, and that framing keeps them stuck. What you are actually facing is a content stream engineered to hold attention, with recommendations that tend to push past whatever you saw last time. The brain adapts to the current level and quietly asks for something stronger, a pattern usually described as escalation and desensitisation. That is why what felt like enough six months ago can feel flat today, and why the emptiness afterwards tends to grow rather than fade. Understanding the mechanism moves the fight away from self-blame and toward the supply line."
+        },
+        {
+          "h": "How a Single Glance Becomes an Hour",
+          "p": "The first glance is usually accidental: a thumbnail in a feed, a suggestive headline in search results. Everything then depends on the second that follows it. Look away immediately and the path never lights up. Linger for one extra beat and a familiar sequence starts: curiosity, a search, then a slide that costs an hour and leaves a heavy feeling behind. This is why the first-glance rule is practical rather than merely aspirational. Do not negotiate with yourself after the glance; move your thumb or your head within two seconds. Deciding early is far cheaper than resisting late."
+        },
+        {
+          "h": "Block at the Network Level, Not App by App",
+          "p": "Fighting each app and browser separately is a losing design, because you have to win that fight dozens of times a day, usually at your lowest moments. The stronger move is to decide once, at the network layer, by pointing the device at a family DNS resolver that filters phone-wide before any page reaches your eyes. The point is not that filtering is unbreakable, since a determined person can work around anything. The point is friction and delay, which is what an impulsive urge handles worst. The content shield in Awwad performs this DNS step, and ideally someone you trust keeps the password."
+        },
+        {
+          "h": "Device and Browser Hygiene You Can Do Today",
+          "p": "Give yourself thirty minutes and make your environment boring. Delete the apps that have historically been your doorway. Log out of accounts whose recommendations are now contaminated. Clear browsing history and autocomplete so your browser stops finishing the word on your behalf. Turn off private browsing where your platform allows it, enable safe search, and schedule a greyscale screen in the evening. Then make the one structural decision that outperforms all the rest: the phone charges in the kitchen and sleeps outside the bedroom. Review your own log and you will probably find most slips happened late at night, alone, behind a closed door."
+        },
+        {
+          "h": "The Real Fuel Is Boredom and Loneliness",
+          "p": "Map your last ten slips and a pattern appears that has little to do with desire itself: an empty hour, a lonely evening, a flat mood after a draining day. The content is less a goal than a fast exit from a heavy feeling. A blocking plan without a filling plan therefore rarely holds for long. Assign a specific alternative to every risk window: a twenty-minute walk, a call to a friend, a short workout, recorded Quran while you tidy up. If a slip happens, log it calmly and ask what feeling came first. A slip is data that corrects the plan, not a verdict on you."
+        },
+        {
+          "h": "A Staged Ninety-Day Plan",
+          "p": "Days one to thirty are about protection: set the filtering, move the phone out of the bedroom, and press a truce button the moment an urge arrives rather than three minutes into it. Days thirty-one to sixty shift from removal to construction: regular sleep, exercise three times a week, and real human contact that occupies the space loneliness used to fill. Days sixty-one to ninety test your stability in ordinary conditions while every barrier stays exactly where it is. Never remove a safeguard as a reward. Review your monthly report and change one variable at a time."
+        }
+      ],
+      "fr": [
+        {
+          "h": "Pourquoi la volonté seule ne suffit pas : un flux conçu pour aller toujours plus loin",
+          "p": "Beaucoup abordent ce combat comme un problème de caractère, et cette lecture les enferme. En réalité, vous faites face à un flux conçu pour capter l'attention, dont les recommandations dépassent en général ce que vous aviez vu la fois précédente. Le cerveau s'habitue au niveau atteint et réclame discrètement plus fort : on parle souvent d'escalade et de désensibilisation. D'où ce constat fréquent : ce qui suffisait il y a six mois paraît fade aujourd'hui, et le vide ressenti après grandit au lieu de diminuer. Comprendre ce mécanisme déplace le combat de la culpabilité vers la source."
+        },
+        {
+          "h": "Comment un simple regard devient une heure perdue",
+          "p": "Le premier regard est presque toujours involontaire : une vignette dans un fil, un titre suggestif dans des résultats de recherche. Tout se joue dans la seconde qui suit. Détournez le regard immédiatement et le circuit ne s'allume pas. Attendez un instant de plus et la séquence démarre : curiosité, recherche, puis glissement qui coûte une heure et laisse un sentiment lourd. La règle du premier regard est donc pratique avant d'être morale : ne négociez pas après coup, bougez le pouce ou la tête en moins de deux secondes. Trancher tôt coûte bien moins cher que résister tard."
+        },
+        {
+          "h": "Filtrer au niveau du réseau plutôt qu'application par application",
+          "p": "Lutter séparément contre chaque application et chaque navigateur est une stratégie perdante : il faudrait gagner ce duel des dizaines de fois par jour, souvent dans vos moments les plus fragiles. Mieux vaut décider une seule fois, au niveau du réseau, en dirigeant l'appareil vers un résolveur DNS familial qui filtre tout le téléphone avant que la page n'atteigne vos yeux. L'objectif n'est pas l'infaillibilité, car un contournement reste possible. L'objectif est la friction et le délai, ce qu'une impulsion supporte le moins. Le bouclier de contenu d'Awwad réalise exactement cette étape ; confiez le mot de passe à un proche."
+        },
+        {
+          "h": "Hygiène de l'appareil et du navigateur : à faire aujourd'hui",
+          "p": "Accordez-vous une demi-heure pour rendre votre environnement ennuyeux. Supprimez les applications qui ont servi de porte d'entrée. Déconnectez-vous des comptes dont les recommandations sont contaminées. Effacez l'historique et la saisie automatique afin que le navigateur cesse de terminer le mot à votre place. Désactivez la navigation privée si votre système le permet, activez la recherche sécurisée et programmez l'écran en niveaux de gris le soir. Prenez ensuite la décision la plus lourde de conséquences : le téléphone se recharge dans la cuisine et dort hors de la chambre. Relisez votre journal : la plupart des faux pas arrivent tard, seul, porte fermée."
+        },
+        {
+          "h": "Le vrai carburant : l'ennui et la solitude",
+          "p": "Reprenez vos dix derniers faux pas et un schéma apparaît, assez éloigné du désir lui-même : une heure vide, une soirée solitaire, une humeur plate après une journée épuisante. Le contenu est moins un but qu'une sortie rapide devant une émotion lourde. Un plan de blocage sans plan de remplissage tient donc rarement dans la durée. Attribuez une activité précise à chaque fenêtre à risque : vingt minutes de marche, un appel à un ami, une séance courte de sport, une récitation du Coran écoutée en rangeant. En cas de faux pas, notez calmement l'émotion qui l'a précédé et corrigez un seul point."
+        },
+        {
+          "h": "Un plan progressif sur quatre-vingt-dix jours",
+          "p": "Les trente premiers jours servent à la protection : activez le filtrage, sortez le téléphone de la chambre et utilisez un bouton de trêve dès la première vague, pas trois minutes plus tard. Du trente et unième au soixantième jour, passez de la suppression à la construction : sommeil régulier, sport trois fois par semaine et liens humains réels qui occupent la place laissée par la solitude. Les trente derniers jours testent votre stabilité en conditions ordinaires, sans jamais retirer une protection en guise de récompense. Consultez votre rapport mensuel et modifiez un seul paramètre à la fois."
+        }
+      ]
+    },
+    "faq": {
+      "ar": [
+        {
+          "q": "كيف أتوقف عن مشاهدة المحتوى الإباحي نهائياً؟",
+          "a": "لا يكفي قرار واحد، بل تلزم ثلاث طبقات معاً: حجب يعمل على مستوى الشبكة للجهاز كله، وقاعدة صارمة للنظرة الأولى تُنفَّذ خلال ثانيتين، وبديل محدد يملأ ساعات الفراغ والوحدة. ابدأ اليوم بخطوتين فقط: اضبط الحجب، وأخرج الهاتف من غرفة النوم. تُنفَّذان في نصف ساعة، وتغلقان أكثر أبواب التعثّر شيوعاً."
+        },
+        {
+          "q": "هل يمكن تجاوز الحجب؟ وما فائدته إذن؟",
+          "a": "نعم يمكن تجاوزه لمن أصرّ، وليس هذا عيباً في الفكرة. فائدة الحجب أنه يضيف احتكاكاً وتأخيراً في اللحظة التي تبلغ فيها الرغبة ذروتها، والرغبة في الغالب اندفاعية قصيرة العمر لا خطة مدروسة. اجعل كلمة المرور عند شخص تثق به، حتى يصير تغيير الإعداد قراراً يحتاج إلى محادثة، لا نقرة واحدة في لحظة ضعف."
+        },
+        {
+          "q": "ما الحكم الشرعي في هذه المسألة؟ وهل التعثّر يعني نفاقاً؟",
+          "a": "لسنا جهة إفتاء ولا نصدر أحكاماً شرعية. وللسؤال عن حكم حالتك بتفاصيلها، يُرجى الرجوع إلى أهل العلم الموثوقين أو الاطلاع على الفتاوى المنشورة في موقع إسلام ويب islamweb.net وأمثاله من المصادر الموثوقة. أما من الناحية السلوكية فالعودة بعد التعثّر ليست نفاقاً، بل هي بالضبط ما يفعله كل من نجح في تغيير عادة راسخة."
+        }
+      ],
+      "en": [
+        {
+          "q": "How do I stop watching porn for good?",
+          "a": "One decision is not enough. You need three layers working together: filtering that applies to the whole phone, a strict first-glance rule executed within two seconds, and a specific alternative that fills empty and lonely hours. Start today with just two of them: set up the filtering and move the phone out of the bedroom. Both take half an hour and close the most common doors."
+        },
+        {
+          "q": "Does DNS filtering really help if it can be bypassed?",
+          "a": "Yes, and the fact that it can be bypassed is not a flaw in the idea. Filtering adds friction and delay at exactly the moment an urge peaks, and urges are usually impulsive and short-lived rather than planned. Let someone you trust hold the password, so changing the setting becomes a decision that needs a conversation instead of one tap in a weak moment."
+        },
+        {
+          "q": "Does relapsing mean I was never serious about quitting?",
+          "a": "Behaviourally, no. Returning after a slip is precisely what everyone who changed an entrenched habit did, usually more than once. Log what happened, name the feeling that preceded it, and adjust one thing. For questions about religious rulings in your specific situation, please consult qualified scholars or the vetted answers published on islamweb.net rather than an article like this one."
+        }
+      ],
+      "fr": [
+        {
+          "q": "Comment arrêter durablement la pornographie ?",
+          "a": "Une seule décision ne suffit pas. Il faut trois couches simultanées : un filtrage appliqué à tout le téléphone, une règle stricte du premier regard exécutée en deux secondes, et une activité précise qui remplit les heures vides et solitaires. Commencez aujourd'hui par deux gestes seulement : activez le filtrage et sortez le téléphone de la chambre. Une demi-heure suffit et l'essentiel des occasions disparaît."
+        },
+        {
+          "q": "Le filtrage DNS sert-il vraiment s'il peut être contourné ?",
+          "a": "Oui, et le fait qu'il soit contournable n'invalide pas le principe. Le filtrage ajoute de la friction et du délai au moment précis où l'envie atteint son pic, or l'envie est le plus souvent impulsive et brève plutôt que planifiée. Confiez le mot de passe à une personne de confiance : modifier le réglage exigera alors une conversation, et non un simple geste dans un moment de faiblesse."
+        },
+        {
+          "q": "Rechuter signifie-t-il que mon intention n'était pas sincère ?",
+          "a": "Sur le plan comportemental, non. Recommencer après un faux pas est exactement ce qu'ont fait les personnes qui ont changé une habitude enracinée, souvent à plusieurs reprises. Notez ce qui s'est passé, nommez l'émotion qui l'a précédé et ajustez un seul élément. Pour toute question de jugement religieux propre à votre situation, consultez des savants qualifiés ou les réponses publiées sur islamweb.net."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "control-anger",
+    "date": "2026-06-15",
+    "category": "break",
+    "title": {
+      "ar": "كيف أتحكم في غضبي: دليل عملي لضبط الانفعال في التسعين ثانية الأولى",
+      "en": "How to Control Your Anger: A Practical Guide to the First Ninety Seconds",
+      "fr": "Comment maîtriser sa colère : guide pratique des quatre-vingt-dix premières secondes"
+    },
+    "description": {
+      "ar": "تعلّم كيف تتحكم في غضبك بخطوات عملية: فهم ذروة التسعين ثانية، الفرق بين الكبت والتنظيم، استجابات بديلة فورية، وطريقة إصلاح العلاقات بعد الانفعال.",
+      "en": "Learn how to control anger with practical steps: the 90-second spike, suppression versus regulation, instant competing responses, and repair after an outburst.",
+      "fr": "Apprenez à maîtriser votre colère : le pic de 90 secondes, refoulement contre régulation, réponses concurrentes immédiates et réparation après un éclat."
+    },
+    "intro": {
+      "ar": "ليس الغضب في ذاته عيباً، فهو انفعال طبيعي يخبرك أن حدّاً من حدودك قد انتُهك. المشكلة تقع في الثواني القليلة التي تلي الشرارة، حين ينطق اللسان أو تتحرك اليد قبل أن يلحق العقل بالموقف. وهذا المقال يشرح ما يجري في جسدك في تلك اللحظة، ويعطيك استجابات عملية محددة تستطيع تدريب نفسك عليها اليوم، وطريقة لإصلاح ما انكسر إن سبقك انفعالك.",
+      "en": "Anger itself is not a flaw. It is a normal signal telling you that one of your limits has been crossed. The difficulty lives in the few seconds after the spark, when words leave your mouth before your thinking catches up with the situation. This article explains what happens in your body in that moment, gives you specific responses you can rehearse today, and shows how to repair a relationship when your temper got there first.",
+      "fr": "La colère n'est pas un défaut en soi : c'est un signal normal qui vous indique qu'une de vos limites a été franchie. La difficulté se joue dans les quelques secondes qui suivent l'étincelle, lorsque les mots partent avant que la réflexion ne rattrape la situation. Cet article explique ce qui se passe alors dans votre corps, propose des réponses concrètes à répéter dès aujourd'hui, et montre comment réparer une relation quand l'emportement a pris les devants."
+    },
+    "sections": {
+      "ar": [
+        {
+          "h": "لماذا يصعب ضبط الغضب: لأنه أسرع من التفكير",
+          "p": "الغضب في أصله استجابة دفاعية سريعة، ولهذا يصعب ضبطه: فهو يسبق التفكير بلحظات. حين تشعر بأنك مظلوم أو محتقَر أو متجاهَل، يتحرك الجسد قبل أن تصوغ جملة واحدة، ثم يأتي العقل متأخراً ليبرّر ما قيل وما فُعل. ولهذا لا تنفع كلمة «اهدأ» وحدها، لأنها تخاطب طبقة متأخرة من الاستجابة بعد أن تكون الموجة قد مرّت. والخبر الجيد أن ضبط الغضب مهارة تُتعلَّم كأي مهارة أخرى، بالتدريب على لحظة واحدة بعينها، لا بقرار أخلاقي يُتخذ مرة ثم يُنسى."
+        },
+        {
+          "h": "ما الذي يحدث في جسدك: ذروة التسعين ثانية",
+          "p": "عند التقاط أي تهديد، حقيقياً كان أم متخيَّلاً، يطلق الجسد موجة من هرمونات التوتر: يتسارع القلب، ويشتد الشدّ في الفك والكتفين واليدين، ويضيق الانتباه حتى لا ترى إلا من أمامك. وهذه الموجة الكيميائية قصيرة العمر، وتشير أدبيات تنظيم الانفعال إلى أن ذروتها تنقضي عادةً في نحو دقيقة ونصف ما لم تُغذَّ. والذي يغذّيها ليس الحدث نفسه، بل الجملة التي تعيد ترديدها في رأسك عنه. ومن هنا تأتي القاعدة العملية الأولى: امنح نفسك تسعين ثانية لا تتكلم فيها ولا ترد، فبعدها تتكلم وأنت على طبيعتك."
+        },
+        {
+          "h": "الكبت ليس ضبطاً: اختر استجابة منافِسة",
+          "p": "أن تبتلع الكلام ووجهك محتقن وقلبك يخفق ليس تنظيماً للغضب بل تأجيلاً له، وغالباً يعود أثقل في موقف أتفه بعد ساعات. أما التنظيم فهو أن تفعل شيئاً يخفض الموجة فعلاً. اختر استجابة منافِسة واحدة ودرّبها حتى تصير تلقائية: غيّر وضع جسدك، فإن كنت واقفاً فاجلس، وافتح قبضتك، وأرخِ فكّك. غادر الغرفة ولو لدقيقتين. اشرب كوب ماء ببطء. اجعل زفيرك أطول من شهيقك ستّ مرات. وإن كان الخلاف مكتوباً، فاكتب ردّك ولا ترسله قبل عشرين دقيقة."
+        },
+        {
+          "h": "اعرف محفزاتك ثم اضبط الظروف لا نفسك وحدها",
+          "p": "افتح دفتراً صغيراً، ورقياً أو في هاتفك، وسجّل بعد كل نوبة أربعة أشياء: الوقت، والمكان، وما قيل أو حدث قبلها مباشرة، ودرجة الغضب من عشرة. وأضف سطراً عن حالتك: هل كنت جائعاً، أم قليل النوم، أم متأخراً؟ وخلال أسبوعين ستجد على الأرجح أن غضبك يتركز في مواقف قليلة تتكرر. عندها ينتقل عملك من مصارعة نفسك إلى تعديل الظروف: لا تناقش المال قرب منتصف الليل، وأغلق إشعارات العمل بعد ساعة محددة، واتفق مع أهل بيتك على كلمة واحدة تعني «نكمل بعد ربع ساعة». ويعينك تطبيق عوّاد، وهو مجاني ويعمل دون إنترنت، على تسجيل هذه الأنماط يومياً، وفيه زر هدنة للحظات الاندفاع."
+        },
+        {
+          "h": "بعد أن ينفلت الغضب: كيف تُصلح ما انكسر",
+          "p": "الانفعال حين يقع لا يُمحى بالصمت ولا بالهدية، وإنما بالاعتذار الصريح القريب. اعتذر عن فعلك أنت، وسمِّ ما بدر منك بوضوح، ولا تُلحق الاعتذار بعبارة «لكنك أنت من بدأ»، فذلك يلغيه كله. واسأل الطرف الآخر عمّا كان سيجعل الأمر أهون عليه، ثم غيّر شيئاً واحداً ملموساً حتى لا تتكرر الليلة نفسها. ومع الأطفال خاصة، اعتذارك يعلّمهم أن الخطأ يُصلَح ولا يُنكَر. وإن تكرر غضبك بصورة تُخيف من حولك أو بلغ حدّ الأذى، فمراجعة مختص خطوة حكيمة لا عيب فيها."
+        },
+        {
+          "h": "المحافظة: نومك وجوعك وهاتفك تحسم نصف المعركة",
+          "p": "قدرتك على ضبط الغضب ليست ثابتة، بل ترتفع وتنخفض مع حالة جسدك. فليلة نوم ناقصة، أو ساعات طويلة بلا طعام، أو صباح كامل من التصفح المشحون، كلها تخفض عتبة احتمالك حتى تصير شرارة صغيرة كافية. ثبّت موعد نومك، ولا تدخل نقاشاً مهماً وأنت جائع، وضع حدّاً يومياً لوقت التطبيقات التي تتركك متوتراً. وراقب تقدمك شهرياً لا يومياً، فالمقياس ليس ألا تغضب أبداً، بل أن تقصر المدة بين الشرارة وعودتك إلى نفسك، وأن تخفّ آثار غضبك على من تحب."
+        }
+      ],
+      "en": [
+        {
+          "h": "Why Anger Is So Hard to Control: It Moves Faster Than You Do",
+          "p": "Anger is, at bottom, a fast defensive response, and that speed is exactly what makes it hard to manage. The moment you feel wronged, dismissed or disrespected, your body has already moved before you have formed a single sentence, and your reasoning mind arrives late to justify whatever was said. This is why being told to \"calm down\" rarely helps: it addresses a layer of the response that arrives far too late. The encouraging part is that anger control is a trainable skill built around one specific moment, not a moral decision you make once and forget."
+        },
+        {
+          "h": "What Happens in Your Body: The First Ninety Seconds",
+          "p": "When your brain registers a threat, real or imagined, it releases a surge of stress chemistry. Your heart rate climbs, your jaw, shoulders and hands tighten, and your attention narrows until the other person is all you can see. That surge is short-lived: work on emotion regulation suggests its peak passes in roughly a minute and a half unless something keeps feeding it. What feeds it is usually not the event but the sentence you keep replaying about the event. Hence the first practical rule: buy yourself ninety seconds in which you say nothing and reply to nothing."
+        },
+        {
+          "h": "Suppression Is Not Regulation: Build a Competing Response",
+          "p": "Swallowing your words while your face burns and your heart pounds is not regulation, it is postponement, and it usually returns heavier over something trivial hours later. Regulation means doing something that actually lowers the wave. Pick one competing response and rehearse it until it runs on its own: change your posture, so if you are standing, sit down, unclench your fists and let your jaw go loose. Leave the room for two minutes. Drink a glass of water slowly. Make your exhale longer than your inhale, six times. If the conflict is written, draft the reply and hold it for twenty minutes."
+        },
+        {
+          "h": "Find Your Real Triggers, Then Change the Conditions",
+          "p": "Keep a short log. After each episode write four things: the time, the place, what was said just before, and the intensity out of ten. Add a line on your state: hungry, short on sleep, running late? Within two weeks you will usually see your anger clustering into a handful of repeating situations. The work then shifts from wrestling with yourself to adjusting conditions: no money conversations near midnight, work notifications off after a set hour, an agreed word at home meaning \"let us continue in fifteen minutes\". Awwad, free and offline, logs these patterns and offers a truce button for the moment itself."
+        },
+        {
+          "h": "After an Outburst: Repairing What Was Damaged",
+          "p": "Once it has happened, silence does not fix it and neither does a gift. A clear, prompt apology does. Apologize for your own behaviour, name plainly what you did, and never attach the word \"but\" to it, because that cancels the apology entirely. Ask the other person what would have made it easier for them, then change one concrete thing so the same evening does not repeat itself. With children in particular, apologizing teaches them that damage can be repaired rather than denied. If your anger frightens the people around you or has ever become physical, seeing a professional is a wise step, not a shameful one."
+        },
+        {
+          "h": "Maintenance: Sleep, Hunger and Your Phone Decide Half of It",
+          "p": "Your capacity to hold your temper is not fixed; it rises and falls with the state of your body. A short night, a long stretch without food, or a morning spent scrolling through outrage all lower your threshold, so a small spark is suddenly enough to tip you over. Protect a consistent bedtime, avoid important conversations while hungry, and cap the apps that reliably leave you agitated. Judge your progress monthly rather than daily. The goal is not to stop feeling angry, but to shorten the gap between the spark and coming back to yourself, and to leave fewer marks on the people you love."
+        }
+      ],
+      "fr": [
+        {
+          "h": "Pourquoi la colère est si difficile à maîtriser : elle va plus vite que vous",
+          "p": "La colère est d'abord une réaction de défense très rapide, et c'est précisément cette vitesse qui la rend difficile à gérer. Dès que vous vous sentez lésé, ignoré ou humilié, votre corps a déjà réagi avant que vous n'ayez formulé une seule phrase, et votre raison arrive ensuite pour justifier ce qui a été dit. C'est pourquoi l'injonction « calme-toi » sert rarement à quelque chose : elle s'adresse à une couche de la réaction qui vient bien trop tard. Bonne nouvelle : la maîtrise de la colère s'apprend, comme toute compétence, en s'entraînant sur un instant précis."
+        },
+        {
+          "h": "Ce qui se passe dans votre corps : les quatre-vingt-dix premières secondes",
+          "p": "Lorsque le cerveau détecte une menace, réelle ou supposée, il déclenche une décharge d'hormones de stress. Le cœur s'accélère, la mâchoire, les épaules et les mains se crispent, et l'attention se rétrécit jusqu'à ne plus voir que l'autre. Cette vague chimique est brève : les travaux sur la régulation émotionnelle situent son pic autour d'une minute et demie, à condition de ne pas l'alimenter. Or ce qui l'alimente n'est pas l'événement lui-même, mais la phrase que vous vous répétez à son sujet. D'où la première règle pratique : offrez-vous quatre-vingt-dix secondes sans parler et sans répondre."
+        },
+        {
+          "h": "Refouler n'est pas réguler : installez une réponse concurrente",
+          "p": "Ravaler ses mots avec le visage brûlant et le cœur qui bat n'est pas une régulation, c'est un report : la colère revient plus lourde quelques heures plus tard, pour un motif dérisoire. Réguler, c'est faire quelque chose qui fait réellement redescendre la vague. Choisissez une seule réponse concurrente et répétez-la jusqu'à ce qu'elle devienne automatique : changez de posture, asseyez-vous si vous êtes debout, ouvrez les poings, relâchez la mâchoire. Quittez la pièce deux minutes. Buvez lentement un verre d'eau. Expirez plus longtemps que vous n'inspirez, six fois. Si le conflit est écrit, rédigez la réponse et attendez vingt minutes."
+        },
+        {
+          "h": "Repérez vos déclencheurs, puis modifiez les circonstances",
+          "p": "Tenez un carnet bref. Après chaque épisode, notez quatre éléments : l'heure, le lieu, ce qui a été dit juste avant, et l'intensité sur dix. Ajoutez une ligne sur votre état : faim, mauvaise nuit, retard accumulé. En deux semaines, votre colère se révélera concentrée sur quelques situations récurrentes. Le travail change alors de nature : au lieu de lutter contre vous-même, vous ajustez les circonstances. Pas de discussion d'argent tard le soir, notifications coupées après une heure fixe, un mot convenu à la maison signifiant « on reprend dans un quart d'heure ». L'application Awwad, gratuite et hors ligne, consigne ces schémas et propose un bouton de trêve."
+        },
+        {
+          "h": "Après l'éclat : réparer ce qui a été abîmé",
+          "p": "Une fois la scène passée, ni le silence ni un cadeau ne réparent quoi que ce soit ; des excuses claires et rapides, oui. Excusez-vous de votre propre comportement, nommez précisément ce que vous avez fait, et n'ajoutez jamais « mais c'est toi qui as commencé », car cela annule tout. Demandez à l'autre ce qui aurait rendu la chose plus supportable, puis changez une chose concrète pour que la soirée ne se répète pas. Avec les enfants surtout, s'excuser leur apprend qu'une faute se répare au lieu de se nier. Si votre colère effraie vos proches ou devient physique, consulter un professionnel est une décision sage."
+        },
+        {
+          "h": "Entretien : le sommeil, la faim et le téléphone font la moitié du travail",
+          "p": "Votre capacité à contenir la colère n'est pas constante : elle monte et descend avec l'état de votre corps. Une nuit trop courte, de longues heures sans manger ou une matinée passée à faire défiler des contenus énervants abaissent votre seuil de tolérance, et une simple étincelle suffit alors. Fixez une heure de coucher stable, n'entamez pas de discussion importante le ventre vide, et limitez les applications qui vous laissent tendu. Évaluez vos progrès chaque mois plutôt que chaque jour : l'objectif n'est pas de ne plus jamais ressentir de colère, mais de raccourcir le délai entre l'étincelle et le retour à soi."
+        }
+      ]
+    },
+    "faq": {
+      "ar": [
+        {
+          "q": "كيف أهدأ بسرعة في لحظة الغضب؟",
+          "a": "ابدأ بألا تتكلم. امنح نفسك تسعين ثانية صامتة، فذروة الموجة تمرّ عادةً في هذه المدة إن لم تُغذِّها بترديد الإهانة في رأسك. وخلالها غيّر وضع جسدك، واجلس إن كنت واقفاً، وافتح قبضتك، واجعل الزفير أطول من الشهيق ستّ مرات، ثم اشرب ماءً ببطء. وإن أمكنك مغادرة المكان دقيقتين فافعل، وأخبر الطرف الآخر أنك ستعود لإكمال الحديث."
+        },
+        {
+          "q": "هل كتم الغضب أفضل من إخراجه؟",
+          "a": "الخياران المطروحان عادةً، الكتم أو الانفجار، كلاهما غير مُجدٍ. فالكتم يؤجل الانفعال ويُبقي الجسد متوتراً، والتفريغ الصاخب يرسّخ العادة نفسها ويترك أثراً في العلاقات. والبديل الثالث هو التنظيم: خفض الموجة بسلوك بديل في اللحظة، ثم التعبير عن سبب الغضب بجملة واضحة هادئة بعد أن تهدأ، مثل: «انزعجت لأن كلامي قوطع مرتين». وهذا يحفظ حقك ويحفظ علاقتك معاً."
+        },
+        {
+          "q": "ما موقع ضبط الغضب في القيم الإسلامية؟",
+          "a": "يحتل ضبط النفس عند الغضب مكانة رفيعة في التربية الإسلامية، وقد أفاض أهل العلم في بيانه وذكر آدابه. غير أننا في عوّاد لا نُصدر أحكاماً شرعية ولا ننسب نصوصاً بغير تحقيق. فإن أردت النصوص بألفاظها الثابتة، أو حكماً يخص مسألتك بعينها، فارجع إلى موقع إسلام ويب أو اسأل عالماً موثوقاً في بلدك، فذلك أسلم وأدق."
+        }
+      ],
+      "en": [
+        {
+          "q": "How do I calm down fast when I am already angry?",
+          "a": "Start by not speaking. Give yourself ninety silent seconds, because the peak of the stress surge tends to pass in about that time unless you keep replaying the insult in your head. During those seconds change your posture, sit down if you are standing, unclench your hands, and make six exhales longer than your inhales. Then drink water slowly. If you can step out of the room for two minutes, say you will be back and go."
+        },
+        {
+          "q": "Is it better to hold anger in or let it out?",
+          "a": "Both of the usual options fail. Holding it in postpones the reaction and leaves your body tense, while venting loudly rehearses the very habit you are trying to break and leaves damage behind. The third option is regulation: lower the wave in the moment with a competing response, then, once you are calm, state the cause in one clear sentence, such as \"I was upset because I was interrupted twice.\" That protects both your point and the relationship."
+        },
+        {
+          "q": "When is anger a problem that needs professional help?",
+          "a": "Consider seeing a professional if your anger frightens the people you live with, if it has ever become physical, if it is costing you work or friendships, or if you cannot recall afterwards what you said. Frequent, intense anger often travels with poor sleep, chronic pain, grief or low mood, so a proper assessment usually addresses more than the temper itself. Asking for help is a practical step, not an admission of weakness."
+        }
+      ],
+      "fr": [
+        {
+          "q": "Comment se calmer rapidement quand la colère monte ?",
+          "a": "Commencez par ne rien dire. Offrez-vous quatre-vingt-dix secondes de silence : le pic de la décharge de stress retombe généralement dans ce laps de temps, tant que vous ne rejouez pas l'offense dans votre tête. Pendant ce temps, changez de posture, asseyez-vous si vous êtes debout, ouvrez les mains et faites six expirations plus longues que vos inspirations. Buvez ensuite lentement un verre d'eau, et si vous pouvez sortir deux minutes, annoncez-le et sortez."
+        },
+        {
+          "q": "Vaut-il mieux refouler sa colère ou l'exprimer ?",
+          "a": "Les deux options habituelles échouent. Refouler ne fait que reporter la réaction en laissant le corps tendu, tandis que se décharger bruyamment renforce l'habitude même que vous voulez briser et laisse des traces dans vos relations. La troisième voie est la régulation : faire redescendre la vague sur le moment grâce à une réponse concurrente, puis, une fois calme, exprimer la cause en une phrase claire, par exemple « j'ai été blessé d'avoir été interrompu deux fois »."
+        },
+        {
+          "q": "Quand la colère devient-elle un problème nécessitant un professionnel ?",
+          "a": "Consultez si votre colère effraie vos proches, si elle est devenue physique, si elle vous coûte un emploi ou des amitiés, ou si vous ne vous souvenez plus de ce que vous avez dit. Une colère fréquente et intense accompagne souvent un mauvais sommeil, des douleurs chroniques, un deuil ou une humeur basse : une évaluation sérieuse traite donc plus que le tempérament. Demander de l'aide est une démarche pratique, pas un aveu de faiblesse."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "social-media-addiction",
+    "date": "2026-06-17",
+    "category": "break",
+    "title": {
+      "ar": "إدمان مواقع التواصل الاجتماعي: كيف تستعيد ساعاتك وانتباهك",
+      "en": "Social Media Addiction: How to Take Back Your Hours and Your Attention",
+      "fr": "Addiction aux réseaux sociaux : reprendre vos heures et votre attention"
+    },
+    "description": {
+      "ar": "دليل عملي للتحرر من إدمان مواقع التواصل الاجتماعي: لماذا صُمّم التمرير بلا نهاية، وكيف تقيس ساعاتك الضائعة، وتبني احتكاكاً وبديلاً يصمدان معك.",
+      "en": "A practical guide to social media addiction: why the feed is built to be endless, how to measure what it costs you in hours, and how to build lasting friction.",
+      "fr": "Guide pratique contre l'addiction aux réseaux sociaux : pourquoi le fil est conçu sans fin, comment mesurer son coût en heures et créer des frictions durables."
+    },
+    "intro": {
+      "ar": "تفتح التطبيق لدقيقة واحدة، ثم ترفع عينيك فتجد أن أربعين دقيقة قد مضت. هذه التجربة المتكررة ليست دليلاً على ضعف في شخصيتك، بل هي نتيجة متوقعة لواجهة صُمّمت لتكون بلا نهاية ولتقدّم مكافأة لا يمكن التنبؤ بها. في هذا المقال نتناول الآلية بلغة واضحة، ثم نعرض خطوات عملية يمكنك البدء بها اليوم: قياس دقيق، واحتكاك مقصود، وبديل حقيقي يملأ الفراغ.",
+      "en": "You open the app for one minute, look up, and forty minutes are gone. That experience is not evidence of a weak character; it is the predictable result of an interface built to have no ending and to deliver rewards you cannot predict. This article explains the mechanism in plain language, then gives you steps you can start today: honest measurement, deliberate friction, and a replacement that actually fills the gap.",
+      "fr": "Vous ouvrez l'application pour une minute, vous relevez la tête, et quarante minutes ont disparu. Cette expérience n'est pas la preuve d'un manque de caractère : c'est le résultat prévisible d'une interface conçue pour n'avoir aucune fin et pour délivrer des récompenses imprévisibles. Cet article explique le mécanisme en termes simples, puis propose des étapes applicables dès aujourd'hui : mesurer honnêtement, créer de la friction et remplacer réellement le temps libéré."
+    },
+    "sections": {
+      "ar": [
+        {
+          "h": "لماذا يصعب التوقف: تطبيق بلا خط نهاية",
+          "p": "تنتهي الصحيفة الورقية عند صفحتها الأخيرة، وينتهي الكتاب بغلافه، أما شاشة التواصل الاجتماعي فلا نهاية لها. صُمّم التمرير اللانهائي عمداً كي لا تصل إلى نقطة تقول عندها: انتهيت. تُحمَّل المنشورات الجديدة قبل أن تبلغ أسفل الشاشة، فتغيب اللحظة التي يستيقظ فيها وعيك ويسألك: هل أكتفي؟ ولذلك فإن وصف نفسك بضعف الإرادة ليس دقيقاً، لأنك تواجه واجهة مصمَّمة بعناية ومختبَرة مراراً لتبقيك فيها أطول وقت ممكن."
+        },
+        {
+          "h": "المكافأة المتغيّرة: لماذا تسحبك الشاشة بهذه القوة",
+          "p": "تكمن الآلية في بساطتها: أنت لا تعرف ما الذي ستجده في التمريرة القادمة. ربما خبر يهمّك، وربما رسالة من صديق، وربما لا شيء على الإطلاق. هذا التذبذب هو ما تسمّيه بحوث السلوك المكافأة المتغيّرة، وتشير هذه البحوث إلى أنها أرسخ في تثبيت العادة من المكافأة المضمونة. ولهذا يجلس الصياد ساعات أمام الماء لأن كل رمية قد تأتي بشيء، بينما يغادر مشتري السمك الجاهز بعد دقيقة واحدة. والإشعار الذي يصل في وقت غير متوقّع يعمل بالمنطق نفسه، حتى يصير الترقّب ذاته هو المكافأة."
+        },
+        {
+          "h": "القياس قبل اللوم: احسب ساعاتك ومرات فتح التطبيق",
+          "p": "قبل أي قرار بالامتناع، اجمع رقمين اثنين لمدة سبعة أيام: كم ساعة قضيتها في كل تطبيق، وكم مرة فتحته. الرقم الثاني أهمّ من الأول، فلو تبيّن أنك تفتح تطبيقاً واحداً تسعين مرة في اليوم، فتلك تسعون مقاطعة لانتباهك حتى لو بدا مجموع الوقت معقولاً. وكلا الرقمين متاح في تقرير استخدام الشاشة المدمج في هاتفك. اكتبهما دون تعليق أخلاقي على نفسك، فأنت تجمع بيانات ولا تصدر أحكاماً. ثم استعن بحدّ الاستخدام اليومي في تطبيق عوّاد لتحويل الرقم إلى سقف تلتزم به."
+        },
+        {
+          "h": "الاحتكاك المفيد: اجعل الوصول أصعب بخطوات صغيرة",
+          "p": "لا تعتمد على القرار اللحظي، بل ضع بينك وبين التطبيق عوائق صغيرة متراكمة. أطفئ الإشعارات كلها ما عدا المكالمات والرسائل المباشرة من أشخاص تعرفهم. اضبط الشاشة على التدرّج الرمادي، فالألوان جزء أصيل من الجاذبية. انقل التطبيقات من الشاشة الرئيسية إلى مجلد بعيد، وسجّل الخروج من الحساب حتى يلزمك إدخال كلمة المرور في كل مرة. والخطوة الأقوى: اشحن هاتفك خارج غرفة النوم واستعمل منبّهاً مستقلاً. كل عائق يضيف ثوانيَ قليلة، وفي هذه الثواني يعود إليك الاختيار الواعي."
+        },
+        {
+          "h": "استبدال التصفح لا حذفه فقط: خطة أسبوع واقعية",
+          "p": "الفراغ الذي يتركه التصفح سيُملأ حتماً، فاختر أنت ما يملؤه. جهّز ثلاثة بدائل في متناول اليد: كتاب مفتوح على الطاولة، أو ورد قرآن قصير، أو مشي عشر دقائق. أما الأسبوع فيمكن أن يسير هكذا: اليومان الأول والثاني للقياس فقط، والثالث لإطفاء الإشعارات، والرابع لتحديد سقف زمني واحد، والخامس لإخراج الهاتف من غرفة النوم، والسادس لتجربة ساعتين متصلتين دون هاتف، والسابع لمراجعة الأرقام. التدرّج هنا ليس تهاوناً، بل هو ما يجعل التغيير ثابتاً."
+        },
+        {
+          "h": "الانتكاسة والثبات: ماذا تفعل بعد ليلة ضائعة",
+          "p": "ستمرّ ليلة تجد نفسك فيها قد أضعت ساعتين دون أن تنتبه. اللحظة الحاسمة ليست الانزلاق نفسه، بل الساعة التالية له. عُد إلى خطتك في اليوم ذاته ولا تشطب الأسبوع كله. ثم ابحث عن المحفّز الذي سبق الانزلاق: تعب، أو وحدة، أو انتظار طويل، أو مهمة كنت تتهرب منها. وغالباً ما يكون التصفح هروباً من شعور غير مريح، فعالج الشعور تخفّ العادة. وحين تشتدّ الرغبة يمنحك زر الهدنة في التطبيق دقائق تمرّ فيها الموجة. راجع أرقامك مرة كل شهر، وقارن نفسك بأسبوعك الماضي لا بأحد آخر."
+        }
+      ],
+      "en": [
+        {
+          "h": "Why It Is So Hard to Stop: An App With No Last Page",
+          "p": "A newspaper ends. A book has a back cover. A social feed has neither. Infinite scroll was a deliberate design choice, and its purpose is to remove the moment where you would naturally stop and think, that was enough. New posts load before you ever reach the bottom, so the small pause that lets you decide never arrives. If you feel you lack willpower, look again at what you are up against: a carefully tested interface whose success is measured in the minutes it keeps from you."
+        },
+        {
+          "h": "Variable Rewards, Explained Without the Jargon",
+          "p": "The pull comes from uncertainty. You do not know what the next swipe holds. It might be something genuinely interesting, a message from a friend, or absolutely nothing. Research on habit formation suggests that unpredictable rewards create stronger and more persistent habits than reliable ones. It is the same reason an angler will sit by the water for hours while someone buying fish at the market is gone in a minute: every cast might produce something. Notifications that arrive at unpredictable moments work the same way, and anticipation itself becomes the reward."
+        },
+        {
+          "h": "Count Hours and Opens Before You Judge Yourself",
+          "p": "Before you delete anything, gather two numbers for seven days: how long you spend in each app, and how many times you open it. The second number matters more. If it turns out you open one app ninety times a day, that is ninety interruptions to your attention, even when the total time looks modest. Your phone's built-in screen time report gives you both figures. Write them down without moral commentary, because you are collecting data, not building a case against yourself. Then use Awwad's daily app limit to turn the figure into a ceiling you have agreed to."
+        },
+        {
+          "h": "Useful Friction: Add Seconds, Buy Back Choices",
+          "p": "Do not rely on in-the-moment resolve. Stack small obstacles between you and the feed instead. Turn off every notification except calls and direct messages from people you actually know. Switch your screen to grayscale, since color is a genuine part of the appeal. Move the apps off your home screen into a buried folder, and log out so a password is required each time. The strongest single change: charge your phone outside the bedroom and use a separate alarm clock. Each obstacle adds a few seconds, and conscious choice lives in those seconds."
+        },
+        {
+          "h": "Replace the Scroll, Then Run a Realistic Week",
+          "p": "Whatever the scroll was doing for you, whether relieving boredom, providing company, or breaking up a hard task, something must take its place or the vacuum will pull you back. Keep three replacements physically within reach: a book left open on the table, a short passage of Quran, a ten-minute walk. A workable week looks like this. Days one and two, measure only. Day three, notifications off. Day four, set one time cap. Day five, phone out of the bedroom. Day six, two connected hours without a phone. Day seven, review your numbers."
+        },
+        {
+          "h": "Slips, Recovery, and the Long Maintenance Phase",
+          "p": "There will be an evening when two hours disappear before you notice. What decides the outcome is not the slip but the hour after it. Return to the plan the same day rather than writing off the week. Then look for the trigger that came first: exhaustion, loneliness, a long wait, a task you were avoiding. Scrolling is usually an escape from an uncomfortable feeling, so treating the feeling weakens the habit. When an urge peaks, the truce button in the app buys you a few minutes for the wave to pass. Review your numbers monthly, and compare yourself only to your own previous week."
+        }
+      ],
+      "fr": [
+        {
+          "h": "Pourquoi il est si difficile de s'arrêter : une application sans dernière page",
+          "p": "Un journal se termine. Un livre a une quatrième de couverture. Un fil d'actualité n'a ni l'un ni l'autre. Le défilement infini est un choix de conception délibéré, destiné à supprimer le moment où vous vous diriez naturellement : voilà, c'est assez. Les nouvelles publications se chargent avant même que vous n'atteigniez le bas de l'écran, si bien que la pause qui vous permettrait de décider n'arrive jamais. Ce n'est donc pas votre volonté qui est en cause, mais une interface testée avec soin pour retenir votre attention."
+        },
+        {
+          "h": "La récompense variable expliquée simplement",
+          "p": "L'attraction vient de l'incertitude. Vous ignorez ce que contient la prochaine publication : peut-être quelque chose de vraiment intéressant, un message d'un ami, ou strictement rien. Les recherches sur la formation des habitudes suggèrent que les récompenses imprévisibles ancrent des comportements bien plus tenaces que les récompenses garanties. C'est la raison pour laquelle un pêcheur reste des heures au bord de l'eau, alors que celui qui achète son poisson au marché repart en une minute : chaque lancer peut donner quelque chose. Les notifications qui tombent à des moments imprévisibles suivent la même logique, et l'attente devient elle-même la récompense."
+        },
+        {
+          "h": "Comptez vos heures et vos ouvertures avant de vous juger",
+          "p": "Avant de supprimer quoi que ce soit, relevez deux chiffres pendant sept jours : le temps passé dans chaque application et le nombre de fois où vous l'ouvrez. Le second compte davantage. Si vous ouvrez une application quatre-vingt-dix fois par jour, ce sont quatre-vingt-dix interruptions de votre attention, même si le total des minutes paraît raisonnable. Le rapport de temps d'écran intégré à votre téléphone fournit ces deux chiffres. Notez-les sans commentaire moral : vous collectez des données, vous ne dressez pas un réquisitoire contre vous-même. Utilisez ensuite la limite quotidienne d'Awwad pour transformer ce chiffre en plafond assumé."
+        },
+        {
+          "h": "La friction utile : gagner quelques secondes pour retrouver le choix",
+          "p": "Ne comptez pas sur la décision prise dans l'instant. Empilez plutôt de petits obstacles entre vous et le fil. Désactivez toutes les notifications sauf les appels et les messages directs de personnes que vous connaissez vraiment. Passez l'écran en niveaux de gris, car la couleur fait pleinement partie de l'attrait. Sortez les applications de l'écran d'accueil vers un dossier enfoui, et déconnectez-vous pour qu'un mot de passe soit exigé. Le changement le plus efficace reste de recharger le téléphone hors de la chambre, avec un réveil séparé. Chaque obstacle ajoute quelques secondes, et c'est là que naît le choix conscient."
+        },
+        {
+          "h": "Remplacer le défilement, puis suivre une semaine réaliste",
+          "p": "Le défilement vous rendait un service : tromper l'ennui, tenir compagnie, offrir une pause dans une tâche ingrate. Si rien ne prend cette place, le vide vous ramènera. Gardez trois solutions de rechange à portée de main : un livre laissé ouvert sur la table, un court passage du Coran, une marche de dix minutes. Une semaine réaliste ressemble à ceci : jours un et deux, mesurer seulement ; jour trois, couper les notifications ; jour quatre, fixer une seule limite de temps ; jour cinq, téléphone hors de la chambre ; jour six, deux heures d'affilée sans téléphone ; jour sept, relire vos chiffres."
+        },
+        {
+          "h": "Rechutes, retour et entretien sur la durée",
+          "p": "Il y aura un soir où deux heures s'évaporeront avant que vous ne le remarquiez. Ce qui compte n'est pas le dérapage lui-même, mais l'heure qui le suit. Revenez au plan le jour même plutôt que de sacrifier la semaine entière. Cherchez ensuite le déclencheur qui a précédé : fatigue, solitude, longue attente, tâche que vous évitiez. Le défilement sert le plus souvent à fuir une sensation inconfortable, et traiter la sensation affaiblit l'habitude. Quand l'envie devient forte, le bouton trêve de l'application vous offre quelques minutes pour laisser passer la vague. Relisez vos chiffres une fois par mois, en vous comparant à votre seule semaine précédente."
+        }
+      ]
+    },
+    "faq": {
+      "ar": [
+        {
+          "q": "كم يستغرق التخلص من إدمان مواقع التواصل الاجتماعي؟",
+          "a": "لا توجد مدة واحدة تصلح للجميع، لأن الأمر يتوقف على قِدم العادة وعلى عدد المحفزات المحيطة بك. الأسابيع الأولى هي الأصعب، إذ ما زال الدماغ ينتظر المكافأة المعتادة، ثم تخفّ حدّة الرغبة كلما مرّت دون استجابة. اجعل القياس مؤشرك بدل التخمين: قارن ساعاتك وعدد مرات فتحك هذا الأسبوع بالأسبوع الذي سبقه، فإن اتجه الرقمان إلى النزول فأنت على الطريق الصحيح."
+        },
+        {
+          "q": "هل الأفضل حذف التطبيقات نهائياً أم تحديد وقت يومي لها؟",
+          "a": "الحذف الكامل مفيد كإعادة ضبط سريعة لأسبوع أو أسبوعين، لكنه صعب الاستمرار لمن يحتاج هذه المنصات في عمله أو في صلة رحمه. والأنسب لأغلب الناس حدّ يومي واضح، مع إطفاء الإشعارات وإخراج الهاتف من غرفة النوم. جرّب الحذف المؤقت أولاً، ثم أعد التطبيق بشروط تضعها أنت مسبقاً وتكتبها، مثل تحديد وقت واحد في اليوم ومدة لا تتجاوزها."
+        },
+        {
+          "q": "لماذا أستمر في التصفح رغم أنني لا أستمتع به؟",
+          "a": "لأن المتعة لم تعد هي الدافع. العادة يُبقيها الترقّب لا الرضا، ولذلك تستمر الحلقة في الدوران بعد زوال المتعة بوقت طويل، ويأتي التوقف باهتاً لا مبهجاً. اكسر الحلقة بحركة جسدية: قم من مكانك، وضع الهاتف في غرفة أخرى، وابدأ بديلاً من دقيقتين قبل أن تجادلك الرغبة. تكرار هذا الرد البديل هو ما يضعف الحلقة تدريجياً."
+        }
+      ],
+      "en": [
+        {
+          "q": "How long does it take to break a social media addiction?",
+          "a": "There is no single timeline, because it depends on how long the habit has been running and how many cues surround you. The first weeks are hardest, since your brain is still expecting the usual reward, and the urge softens each time it passes without a response. Use measurement instead of guesswork: compare this week's hours and opens against last week's, and if both numbers are trending down, you are on the right path."
+        },
+        {
+          "q": "Should I delete the apps entirely or just set time limits?",
+          "a": "A full delete works well as a one or two week reset, but it is difficult to sustain if you need these platforms for work or for staying in touch with family. For most people, a clear daily cap, notifications off, and the phone out of the bedroom prove more durable. Try a temporary delete first, then reinstall under written conditions you set in advance: one time slot per day, and a length you do not exceed."
+        },
+        {
+          "q": "Why do I keep scrolling even when I am not enjoying it?",
+          "a": "Because enjoyment stopped being the driver. The habit is maintained by anticipation rather than satisfaction, so the loop keeps running long after the pleasure is gone. That is also why stopping feels flat rather than dramatic. Interrupt the loop physically: stand up, put the phone in another room, and start a two-minute replacement action before the urge can argue with you. Repeating that response is what weakens the loop."
+        }
+      ],
+      "fr": [
+        {
+          "q": "Combien de temps faut-il pour se libérer de l'addiction aux réseaux sociaux ?",
+          "a": "Il n'existe pas de délai unique : tout dépend de l'ancienneté de l'habitude et du nombre de déclencheurs qui vous entourent. Les premières semaines sont les plus difficiles, car le cerveau attend encore la récompense habituelle, puis l'envie s'atténue chaque fois qu'elle passe sans réponse. Fiez-vous à la mesure plutôt qu'à l'impression : comparez vos heures et vos ouvertures à celles de la semaine précédente."
+        },
+        {
+          "q": "Vaut-il mieux supprimer les applications ou fixer des limites de temps ?",
+          "a": "Une suppression complète fonctionne bien comme remise à zéro d'une ou deux semaines, mais elle tient rarement dans la durée si vous avez besoin de ces plateformes pour votre travail ou vos liens familiaux. Pour la plupart des gens, une limite quotidienne claire, les notifications coupées et le téléphone hors de la chambre sont plus tenables. Réinstallez ensuite avec des conditions écrites à l'avance : un créneau par jour, une durée à ne pas dépasser."
+        },
+        {
+          "q": "Pourquoi est-ce que je continue à faire défiler sans même y prendre plaisir ?",
+          "a": "Parce que le plaisir n'est plus le moteur. L'habitude est entretenue par l'attente et non par la satisfaction, si bien que la boucle tourne encore longtemps après que l'intérêt a disparu. Interrompez-la physiquement : levez-vous, posez le téléphone dans une autre pièce et lancez une action de remplacement de deux minutes avant que l'envie n'ait le temps de négocier. C'est la répétition qui affaiblit la boucle."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "best-habit-apps-for-muslims",
+    "date": "2026-06-19",
+    "category": "method",
+    "title": {
+      "ar": "أفضل تطبيقات تتبع العادات للمسلمين: كيف تختار بصدق لا بالإعلان",
+      "en": "The Best Habit Tracker Apps for Muslims: How to Choose Honestly",
+      "fr": "Les meilleures applications de suivi d'habitudes pour les musulmans: comment choisir honnêtement"
+    },
+    "description": {
+      "ar": "دليل صادق لاختيار تطبيق تتبع العادات المناسب للمسلم: العمل دون إنترنت، وسلامة العربية، ومواقيت الصلاة، والخصوصية، والمجاني مقابل الاشتراك، ومسار كسر العادة.",
+      "en": "An honest guide to choosing a habit tracker as a Muslim: offline use, real Arabic and RTL support, prayer times, privacy, and free versus subscription pricing.",
+      "fr": "Guide honnête pour choisir une application de suivi d'habitudes: hors ligne, arabe et RTL, heures de prière, respect de la vie privée, gratuit ou abonnement."
+    },
+    "intro": {
+      "ar": "يبدو اختيار تطبيق لتتبع العادات قراراً بسيطاً، غير أن معظم الناس يختارون بناءً على شكل الواجهة ثم يتركون التطبيق بعد أسبوعين. أما المعايير التي تهم فعلاً فقليلة وقابلة للاختبار: العمل دون إنترنت، وعربية سليمة الاتجاه، ومواقيت الصلاة، ووضوح مكان حفظ بياناتك، ثم هل يعالج التطبيق كسر العادة أم بناءها وحده. نعرض هنا أصناف التطبيقات وثمن كل صنف بصدق، بما في ذلك حدود تطبيقنا نفسه.",
+      "en": "Choosing a habit tracker looks like a small decision, yet most people pick on the strength of a screenshot and abandon the app two weeks later. The criteria that actually matter are few and testable: does it work offline, is the Arabic genuinely right to left, does it know prayer times, where does your data live, and does it help you break a habit or only build one. What follows is an honest map of the categories and their trade-offs, including the limits of our own app.",
+      "fr": "Choisir une application de suivi d'habitudes semble anodin, pourtant la plupart des gens se décident sur une capture d'écran et abandonnent au bout de quinze jours. Les critères qui comptent vraiment sont peu nombreux et vérifiables: fonctionne-t-elle hors ligne, l'arabe est-il correctement aligné de droite à gauche, connaît-elle les heures de prière, où sont stockées vos données, et sait-elle vous accompagner pour briser une habitude et pas seulement pour en construire une. Voici une carte honnête des familles d'applications et de leurs compromis."
+    },
+    "sections": {
+      "ar": [
+        {
+          "h": "لماذا يربكك متجر التطبيقات قبل أن تبدأ",
+          "p": "عند البحث عن تطبيق لتتبع العادات تجد عشرات الخيارات المتشابهة في الوصف والمختلفة تماماً في الجوهر. أغلبها صُمِّم في الأصل لبناء عادات جديدة كالرياضة والقراءة، لا لكسر عادة راسخة، والمسألتان ليستا واحدة. وكثير منها يعرض واجهة عربية مترجمة دون ضبط سليم لاتجاه النص، فتظهر الأرقام والتواريخ في غير مواضعها. وقد تكتشف في الأسبوع الثالث أن أهم ميزة تحتاج إليها محجوبة خلف اشتراك شهري. لذلك يبدأ الاختيار الصحيح بتحديد معاييرك أنت، لا بمقارنة التقييمات."
+        },
+        {
+          "h": "ما الذي يستطيع التطبيق أن يفعله حقاً",
+          "p": "لا يغيّر التطبيق عادتك نيابة عنك، لكنه يخدم أربع وظائف تعرفها أبحاث تعديل السلوك جيداً. أولاها الوعي: أن تسجّل الوقت والمكان والحال النفسية عند كل رغبة. وثانيتها الاستجابة المنافِسة: أن يذكّرك بالسلوك البديل الذي اتفقت مع نفسك على ممارسته فور ظهور الرغبة. وثالثتها ضبط البيئة: أن يضع عائقاً حقيقياً بينك وبين المحفز. ورابعتها الاستمرار: أن يجعل تقدمك مرئياً مدة تكفي لثبات النمط الجديد. وما خرج عن هذه الأربع فهو زينة لطيفة، لا سبب لتفضيل تطبيق على آخر."
+        },
+        {
+          "h": "أصناف التطبيقات، وما يضحّي به كل صنف",
+          "p": "تنقسم الخيارات المتاحة إلى أصناف واضحة، ولكل صنف قيمة حقيقية لمن يناسبه. فالمتتبع البسيط سريع وخفيف، غير أن علامة صح يومية لا تخبرك شيئاً عن سبب الرغبة. والتطبيق التنافسي القائم على النقاط والترتيب يمنح دفعة قوية في الأسابيع الأولى، وقد يغري بسجل مُجمَّل بدل سجل صادق. والحزمة الشاملة بالاشتراك غنية بالتحليلات، وتربط استمرارك بالدفع الشهري. وتطبيقات العبادات متقنة في المواقيت والأذكار، ونادراً ما تتضمن منهجاً كاملاً لكسر العادة. وأدوات ضبط وقت الشاشة تجيد الحجب وحده ولا تتجاوزه."
+        },
+        {
+          "h": "معايير عملية: دون إنترنت، وبالعربية، وبخصوصية",
+          "p": "قبل أن تودع شهراً من بياناتك في تطبيق، اختبر أربعة أمور بنفسك. أولها العمل دون اتصال: افتح التطبيق في وضع الطيران وسجّل يوماً كاملاً، فإن توقف التسجيل فلن يصلح لسفر ولا لمنطقة ضعيفة التغطية. وثانيها العربية: انظر إلى محاذاة النص والأرقام والتقويم، لا إلى دقة الترجمة وحدها. وثالثها مواقيت الصلاة إن أردت ربط عاداتك بإيقاع اليوم والأذان. ورابعها مكان حفظ بياناتك، فسجل رغباتك ومحفزاتك معلومة خاصة لا داعي لأن تغادر هاتفك."
+        },
+        {
+          "h": "هل يتعامل التطبيق مع التعثر أم يعاقبك عليه؟",
+          "p": "هنا يفترق التطبيق الجاد عن التطبيق الجميل فحسب. اسأل نفسك: ماذا يحدث في اليوم الذي أتعثر فيه؟ فإن كان الجواب تصفير السلسلة ورسالة جافة، فهذا تصميم ينتج شعوراً بالذنب لا سلوكاً جديداً. ما تحتاج إليه أداة مصممة للحظة الرغبة نفسها: زر تضغطه فيبطئك، ويقترح استجابتك البديلة، ويعبر بك الدقائق العشر الأولى، ثم مساحة تسجّل فيها ما الذي سبق التعثر. في تطبيق عوّاد يسمى هذا الزر الهدنة، ومسار كسر العادة فيه منفصل عن مسار بنائها."
+        },
+        {
+          "h": "المجاني والاشتراك، وحدود كل خيار",
+          "p": "الاشتراك ليس عيباً في ذاته، فالتطوير والصيانة يحتاجان تمويلاً، لكن اسأل سؤالين قبل الدفع: هل ستدفع في الشهر السابع حين يفتر الحماس؟ وهل تستطيع تصدير بياناتك إن توقفت؟ التطبيق المجاني بلا إعلانات يزيح هذا القلق، وينبغي أن يكون صريحاً في مصدر تمويله. ولأن الصراحة أنفع من الدعاية، فهذه حدود عوّاد اليوم: لم يُنشر بعد في متاجر التطبيقات، وأدوات الحد من استخدام الهاتف ودرع المحتوى تعمل بكامل قدرتها على أندرويد وتكتفي بإرشاد يدوي على الآيفون. وما عدا ذلك يعمل دون إنترنت وبلا إعلانات ودون رسوم."
+        }
+      ],
+      "en": [
+        {
+          "h": "Why the App Store Makes This Harder Than It Should Be",
+          "p": "Search for a habit tracker and you get dozens of apps whose store descriptions are nearly identical and whose actual behaviour is not. Most were designed to build new habits like running or reading, not to break an entrenched one, and those are different problems requiring different tools. Many offer an Arabic interface that is translated but not properly right to left, so dates and numerals land in the wrong places. And the feature you actually need often sits behind a subscription you only discover in week three. Knowing your criteria first saves all of that."
+        },
+        {
+          "h": "What a Habit App Can Actually Do for You",
+          "p": "No app changes a habit on your behalf. What a good one does is serve four functions that behavioural research keeps returning to. Awareness: capturing the time, place and mood of each urge. A competing response: prompting the specific alternative action you agreed in advance to do instead. Environment control: putting a genuine obstacle between you and the trigger. And maintenance: making progress visible long enough for the new pattern to hold. Anything outside those four is decoration. Pleasant, occasionally motivating, but not a reason to pick one app over another."
+        },
+        {
+          "h": "The Main Categories, and What Each One Trades Away",
+          "p": "Most options fall into recognisable families, and each is genuinely right for someone. Minimal trackers are fast and clean, but a daily checkmark tells you nothing about why the urge arrived. Gamified and social apps drive strong early motivation, though the pressure to keep a presentable record can quietly encourage tidy logging over honest logging. Full subscription suites offer deep analytics and tie your continuity to a monthly payment. Worship apps handle prayer times and adhkar beautifully and rarely include a complete habit breaking method. Screen time blockers do one job, and do it well."
+        },
+        {
+          "h": "Four Things to Test Before You Commit",
+          "p": "Before you invest a month of data, run four checks. Open the app in airplane mode and log a full day: if logging stops, it will fail you on a flight or in poor coverage. Switch it to Arabic and look at alignment, numerals and the calendar rather than the wording alone. Check whether prayer times are supported if you want habits anchored to the rhythm of the day. Finally, read where your entries are stored. A log of your urges and triggers is sensitive, and has no reason to leave your phone by default."
+        },
+        {
+          "h": "Does It Handle Slipping, or Just Punish It?",
+          "p": "This is where serious tools separate from merely attractive ones. Ask what the app does on the day you slip. If the answer is a reset counter and a cold message, the design is manufacturing guilt rather than behaviour. What genuinely helps is something built for the urge itself: a button you can press that slows you down, offers your competing response, and carries you through the first ten minutes, plus a place to record what preceded the slip. Awwad calls that the truce button, and keeps breaking and building as two separate tracks."
+        },
+        {
+          "h": "Free, Subscription, and Being Honest About Limits",
+          "p": "Subscriptions are not a flaw, since building and maintaining software costs money, but ask two questions before paying. Will you still be paying in month seven, once the initial motivation has cooled? And can you export your data if you stop? A free app with no ads removes that worry, and should be transparent about how it is funded. In that spirit, here are Awwad's current limits: it is not published in the app stores yet, and the phone usage limits and content shield work fully on Android while offering manual guidance on iPhone. Everything else runs offline, free, without ads."
+        }
+      ],
+      "fr": [
+        {
+          "h": "Pourquoi le choix est plus difficile qu'il n'y paraît",
+          "p": "Cherchez une application de suivi d'habitudes et vous trouverez des dizaines de propositions aux descriptions presque identiques et au fonctionnement très différent. La plupart ont été pensées pour installer une nouvelle habitude, courir ou lire, et non pour en briser une ancienne, ce qui n'est pas le même travail. Beaucoup proposent une interface arabe traduite mais mal alignée de droite à gauche, si bien que les dates et les chiffres se retrouvent au mauvais endroit. Et la fonction dont vous avez réellement besoin se révèle souvent payante au bout de trois semaines."
+        },
+        {
+          "h": "Ce qu'une application peut réellement faire",
+          "p": "Aucune application ne change une habitude à votre place. Une bonne application se contente de servir quatre fonctions que la recherche comportementale confirme sans cesse. La conscience: noter le moment, le lieu et l'état d'esprit de chaque envie. La réponse concurrente: vous rappeler le geste de remplacement décidé à l'avance. Le contrôle de l'environnement: placer un obstacle réel entre le déclencheur et vous. Et la durée: rendre vos progrès visibles assez longtemps pour que le nouveau schéma tienne. Tout le reste relève de la décoration, agréable mais rarement décisif."
+        },
+        {
+          "h": "Les grandes familles d'applications et leurs compromis",
+          "p": "Les applications se rangent dans quelques familles reconnaissables, et chacune convient réellement à quelqu'un. Le tracker minimaliste est rapide et lisible, mais une case cochée ne dit rien des déclencheurs. Les applications ludiques et sociales motivent fortement les premières semaines, au risque d'encourager un journal flatteur plutôt qu'un journal sincère. Les suites complètes par abonnement offrent des analyses poussées et lient votre continuité à un paiement mensuel. Les applications de culte gèrent très bien les horaires de prière et rarement une méthode complète de rupture d'habitude. Les bloqueurs d'écran font une seule chose, très bien."
+        },
+        {
+          "h": "Quatre tests à faire avant de vous engager",
+          "p": "Avant d'y consacrer un mois de données, faites quatre vérifications. Ouvrez l'application en mode avion et enregistrez une journée entière: si la saisie s'arrête, elle vous lâchera en voyage ou en zone mal couverte. Passez-la en arabe et observez l'alignement, les chiffres et le calendrier, pas seulement la traduction. Vérifiez la présence des horaires de prière si vous souhaitez ancrer vos habitudes au rythme de la journée. Enfin, lisez où sont stockées vos entrées: un journal d'envies et de déclencheurs n'a aucune raison de quitter votre téléphone."
+        },
+        {
+          "h": "Que se passe-t-il le jour où vous craquez?",
+          "p": "C'est ici que les outils sérieux se distinguent des outils simplement jolis. Regardez ce que l'application fait le jour d'une rechute. Si elle se contente de remettre un compteur à zéro et d'afficher un message sec, elle fabrique de la culpabilité plutôt qu'un comportement nouveau. Ce qui aide vraiment, c'est un outil pensé pour l'instant de l'envie: un bouton qui ralentit le geste, propose votre réponse concurrente et vous fait franchir les dix premières minutes, puis un espace pour noter ce qui a précédé. Awwad appelle cela le bouton de trêve, et sépare les deux parcours."
+        },
+        {
+          "h": "Gratuit, abonnement, et limites assumées",
+          "p": "L'abonnement n'est pas un défaut en soi, car concevoir et maintenir un logiciel coûte de l'argent. Posez cependant deux questions avant de payer: verserez-vous encore cette somme au septième mois, quand l'enthousiasme sera retombé, et pourrez-vous exporter vos données si vous arrêtez? Une application gratuite et sans publicité écarte ce souci, à condition d'être claire sur son financement. Par honnêteté, voici les limites actuelles d'Awwad: elle n'est pas encore publiée sur les magasins d'applications, et les limites d'usage du téléphone ainsi que le bouclier de contenu fonctionnent pleinement sur Android, avec un guidage manuel sur iPhone."
+        }
+      ]
+    },
+    "faq": {
+      "ar": [
+        {
+          "q": "ما أفضل تطبيق لتتبع العادات للمسلمين؟",
+          "a": "لا يوجد تطبيق واحد أفضل للجميع، بل يوجد تطبيق أنسب لهدفك أنت. فإن كنت تبني عادة عبادة فابحث عن مواقيت صلاة دقيقة وأذكار وتذكيرات مستقلة لكل عادة. وإن كنت تكسر عادة راسخة فابحث عن سجل وعي، واستجابة بديلة، وأداة تلجأ إليها لحظة الرغبة. واشترط في كل الأحوال واجهة عربية سليمة الاتجاه، وعملاً دون إنترنت، ووضوحاً في مكان حفظ بياناتك."
+        },
+        {
+          "q": "هل توجد تطبيقات عادات مجانية تعمل دون إنترنت وبلا إعلانات؟",
+          "a": "نعم، وهي أقل عدداً مما تتوقع. وأسرع طريقة للتحقق أن تفتح التطبيق في وضع الطيران وتسجّل يوماً كاملاً، ثم تراجع صفحة الخصوصية لتعرف إن كانت البيانات تُحفَظ على جهازك. وتطبيق عوّاد مثال على هذا النموذج: مجاني بالكامل، يعمل دون اتصال، بلا إعلانات. وتبقى المفاضلة بينه وبين غيره مسألة احتياج شخصي لا مفاضلة مطلقة."
+        },
+        {
+          "q": "هل يكفي التطبيق وحده لكسر عادة قوية؟",
+          "a": "التطبيق أداة متابعة وتذكير ودعم سلوكي، وليس علاجاً. فإن كانت العادة تسبب ضرراً كبيراً في صحتك أو عملك أو علاقاتك، فالأفضل أن تستعين بمختص إلى جانب المتابعة اليومية. وإذا كان سؤالك يتعلق بحكم شرعي في المسألة، فارجع فيه إلى أهل العلم عبر موقع إسلام ويب، فنحن نقدّم دعماً سلوكياً ولا نُصدر فتوى."
+        }
+      ],
+      "en": [
+        {
+          "q": "What is the best habit tracker app for Muslims?",
+          "a": "There is no single best app, only the one that fits your goal. If you are building a worship habit, look for accurate prayer times, adhkar and per habit reminders. If you are breaking an entrenched habit, look for an awareness log, a competing response, and something to reach for in the moment of an urge. In every case insist on proper right to left Arabic, offline use, and clarity about where your data is stored."
+        },
+        {
+          "q": "Are there free habit apps that work offline with no ads?",
+          "a": "Yes, though fewer than you would expect. The quickest way to check is to open the app in airplane mode, log a full day, then read the privacy page to see whether entries stay on your device. Awwad is one example of that model: completely free, offline capable, and ad free. Whether it suits you better than another app still depends on what you personally need it to do."
+        },
+        {
+          "q": "Can a habit app alone break a strong habit?",
+          "a": "An app is a tracking, reminder and support tool, not a treatment. If a habit is causing real harm to your health, work or relationships, working with a qualified professional alongside daily tracking is the wiser path. And if your question concerns a religious ruling on the matter, refer it to scholars through islamweb.net. We offer behavioural support and do not issue rulings."
+        }
+      ],
+      "fr": [
+        {
+          "q": "Quelle est la meilleure application de suivi d'habitudes pour les musulmans?",
+          "a": "Il n'existe pas une seule meilleure application, seulement celle qui correspond à votre objectif. Pour installer une habitude de culte, cherchez des horaires de prière fiables, des adhkar et des rappels propres à chaque habitude. Pour briser une habitude ancrée, cherchez un journal de prise de conscience, une réponse concurrente et un outil disponible au moment de l'envie. Exigez toujours un arabe correctement aligné, un usage hors ligne et de la clarté sur le stockage."
+        },
+        {
+          "q": "Existe-t-il des applications d'habitudes gratuites, hors ligne et sans publicité?",
+          "a": "Oui, mais elles sont moins nombreuses qu'on ne l'imagine. Le test le plus rapide consiste à ouvrir l'application en mode avion, enregistrer une journée complète, puis lire la page de confidentialité pour savoir si vos entrées restent sur l'appareil. Awwad illustre ce modèle: entièrement gratuite, utilisable hors ligne et sans publicité. Savoir si elle vous convient mieux qu'une autre dépend de vos besoins réels."
+        },
+        {
+          "q": "Une application suffit-elle à elle seule pour briser une habitude tenace?",
+          "a": "Une application est un outil de suivi, de rappel et de soutien comportemental, pas un traitement. Si l'habitude nuit sérieusement à votre santé, à votre travail ou à vos relations, il est plus sage de consulter un professionnel qualifié en parallèle du suivi quotidien. Et si votre question porte sur un jugement religieux, adressez-la aux savants via islamweb.net: nous proposons un accompagnement comportemental et n'émettons aucune fatwa."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "pray-on-time-consistently",
+    "date": "2026-06-21",
+    "category": "build",
+    "title": {
+      "ar": "المحافظة على الصلاة في وقتها: خطة عملية تصمد مع ضغط العمل",
+      "en": "Praying on Time Consistently: A Practical System That Survives a Busy Week",
+      "fr": "Prier à l'heure avec constance : un système pratique qui résiste aux semaines chargées"
+    },
+    "description": {
+      "ar": "دليل عملي للمحافظة على الصلاة في وقتها: لماذا يتراكم التأخير، وكيف تربط كل صلاة بروتينك اليومي، وتضبط تنبيه الأذان، وتنظّم عملك، وتعود بعد انقطاع دون يأس.",
+      "en": "A practical guide to praying on time every day: why delay compounds, how to anchor each prayer to your routine, set adhan alerts, and return after a lapse.",
+      "fr": "Un guide pratique pour prier à l'heure chaque jour : pourquoi le retard s'accumule, comment ancrer chaque prière, régler l'adhan et revenir après une pause."
+    },
+    "intro": {
+      "ar": "المحافظة على الصلاة في وقتها مسألة نظام أكثر مما هي مسألة إرادة. فكثير ممن تفوتهم أوقاتها ليسوا مقصّرين في نياتهم، وإنما يعيشون يوماً لم يُرتَّب أصلاً حول المواقيت الخمسة. في هذا المقال خطة عملية تبدأ من فهم كيف يتراكم التأخير، وتنتهي بكيفية العودة بعد فترة انقطاع دون يأس.",
+      "en": "Praying on time is less a test of willpower than a test of design. Most people who miss the window are not lacking in sincerity; they are living a day that was never arranged around the five prayer times. This article lays out a practical system, from understanding how delay compounds to returning after a lapse without despair.",
+      "fr": "Prier à l'heure relève moins de la volonté que de l'organisation. La plupart de ceux qui laissent passer le créneau ne manquent pas de sincérité : ils vivent une journée qui n'a jamais été construite autour des cinq horaires. Cet article propose un système pratique, de la compréhension du retard cumulé au retour après une interruption, sans découragement."
+    },
+    "sections": {
+      "ar": [
+        {
+          "h": "لماذا يتراكم التأخير حتى يضيع الوقت",
+          "p": "نادراً ما تضيع الصلاة دفعة واحدة، وإنما تضيع على مراحل. تسمع الأذان فتقول: أنهي هذه المهمة ثم أصلي، فتمتد المهمة، ويأتي اتصال، ثم تنتبه فإذا الوقت قد ضاق أو انقضى. والضرر الحقيقي تراكمي: فالظهر المؤخَّر يزاحم العصر، والعصر المؤخَّر يدفع المغرب إلى حافة وقته، حتى يصير اليوم كله سباقاً متأخراً. وإذا تكرر ذلك أسبوعاً، رسّخ في الذهن أن الصلاة بند مرن يقبل التأجيل. وهذا الاعتقاد، لا الكسل، هو أول ما ينبغي تفكيكه."
+        },
+        {
+          "h": "الآلية: اربط كل صلاة بمرساة قائمة في يومك",
+          "p": "الصلاة موقوتة بوقت لا تختاره أنت، وهذه، من زاوية علم السلوك، ميزة لا عبء، لأن المحفز الخارجي الثابت أوثق من نية داخلية بأن تتذكر. غير أن المحفز وحده لا يكفي، إذ يحتاج إلى مرساة، أي فعل مستقر في يومك تلتصق به الصلاة. فالفجر يسبق إعداد القهوة، والظهر يسبق الغداء، والعصر يفصل بين كتلتي عمل، والمغرب يسبق جلسة الأسرة، والعشاء يسبق إغلاق الهاتف. وبهذا الربط تخرج الصلاة من كونها قراراً يُعاد التفاوض عليه خمس مرات كل يوم."
+        },
+        {
+          "h": "الإعداد العملي: الأذان، ومكان مهيّأ، وقاعدة الدقيقة الأولى",
+          "p": "خصّص لهذا الإعداد عشر دقائق اليوم، لا في يوم قادم. أولاً: فعّل تنبيه أذان مستقلاً لكل صلاة من الخمس، ثم امنح تطبيق المواقيت الذي تعتمد عليه إذن التنبيهات الدقيقة، واستثنِه من ترشيد البطارية، فكثير من الهواتف يؤجّل الإشعارات في صمت. ثانياً: هيّئ المكان، سجادة مبسوطة وثوب نظيف بجوارها، فلا يقف بينك وبين الشروع في الصلاة عائق مادي. ثالثاً: التزم قاعدة الدقيقة الأولى، وهي أن تقوم إلى الوضوء خلال ستين ثانية من الأذان دون مفاوضة. ويحسب تطبيق عوّاد المواقيت دون اتصال بالإنترنت ويرفع الأذان في موعده."
+        },
+        {
+          "h": "رتّب عملك ودراستك حول المواقيت الخمسة",
+          "p": "الانتظار حتى يدخل الوقت ثم البحث عن فرصة هو ما يخذل أكثر الناس. رتّب يومك حول المواقيت الخمسة منذ أوله. افتح تقويم عملك أو جدول محاضراتك وضع عند كل صلاة فترة قصيرة محجوزة، عشر دقائق تكفي، واجعلها ظاهرة حتى لا يُحجز فوقها اجتماع. واطلب مبكراً وبهدوء استراحة قصيرة داخل الاجتماعات الطويلة، فأكثر الناس يستجيبون دون تعليق حين لا يأتي الطلب في اللحظة الأخيرة. وإن خلا مكان عملك من مصلى، فاسأل مقدماً عن غرفة هادئة بدل أن تبحث عنها والوقت يضيق."
+        },
+        {
+          "h": "الفجر يُحسم قبل النوم، والسفر حالة خاصة",
+          "p": "الفجر لا يُحسم في الصباح، وإنما يُحسم في الليلة السابقة. ومن ينام في الثانية بعد منتصف الليل يصارع طبيعة جسده لا صدق نيته، فالرافعة الفعّالة هي موعد النوم: قدّمه خمس عشرة دقيقة كل بضعة أيام حتى تبلغ موعداً يمنحك راحة حقيقية قبل الأذان. وأبعد الهاتف عن السرير، وضع المنبه في طرف الغرفة حتى تضطر إلى القيام. أما السفر والعمل بنظام المناوبات فحالتان مختلفتان فعلاً: تحقّق من أن مواقيتك محسوبة على المدينة التي أنت فيها، وخطط لصلواتك قبل السفر لا أثناءه. وأما أحكام القصر والجمع فمرجعها أهل العلم، وموقع إسلام ويب بداية مناسبة."
+        },
+        {
+          "h": "العودة بعد الانقطاع، ثم المحافظة على المكتسب",
+          "p": "من انقطع فترة يميل إلى أحد طريقين خاسرين: جلد النفس، أو انتظار أن يشعر بأنه أهل للعودة. وكلاهما يطيل الانقطاع. والطريق الثالث أبسط: صلِّ الصلاة الحاضرة الآن. واجعل هدفك في الأسبوع الأول صلاة واحدة تؤديها في وقتها بانتظام، ثم أضف الثانية. أما ما فات من صلوات فمسألة فقهية يُسأل عنها أهل العلم، وموقع إسلام ويب مدخل مناسب. وحين تستقر العادة، اجعل لك مراجعة شهرية قصيرة تسأل فيها: أي صلاة أتأخر فيها أكثر، وما الذي تغيّر في جدولي؟ فالمحافظة صيانة مستمرة لا إنجاز يُحرز مرة واحدة."
+        }
+      ],
+      "en": [
+        {
+          "h": "Why Delay Compounds Until the Window Closes",
+          "p": "Missed prayers rarely happen in one dramatic moment. The adhan sounds, you tell yourself you will finish this one task first, the task expands, a message arrives, and by the time you look up the window has narrowed or closed. The real damage is cumulative: a late Dhuhr crowds Asr, a late Asr pushes Maghrib to its edge, and the whole day becomes a chase. Repeat that for a week and your mind quietly reclassifies prayer as a flexible item that tolerates postponement. That belief, far more than laziness, is what has to be dismantled first."
+        },
+        {
+          "h": "The Mechanism: Anchor Each Prayer to Something Already Fixed",
+          "p": "Prayer arrives on a schedule you did not choose, and in behavioral terms that is an advantage rather than a burden. A fixed external cue is far more reliable than an internal intention to remember. But a cue alone is not enough. It needs an anchor, an action already settled in your day that the prayer attaches to. Fajr comes before making coffee. Dhuhr comes before lunch. Asr separates two blocks of work. Maghrib precedes family time, and Isha precedes putting the phone away. Anchored this way, prayer stops being a decision you renegotiate five times a day."
+        },
+        {
+          "h": "The Ten-Minute Setup: Adhan Alert, Ready Space, One-Minute Rule",
+          "p": "Give this setup ten minutes today rather than someday. First, enable a separate adhan alert for each of the five prayers, then grant whichever prayer times app you rely on permission for exact alarms and exclude it from battery optimization, because many phones delay notifications silently. Second, prepare the place: a mat left out, a clean garment beside it, no physical obstacle between you and starting. Third, adopt a one-minute rule, meaning you stand up for wudu within sixty seconds of the adhan, with no negotiation. Awwad calculates prayer times offline and plays the adhan."
+        },
+        {
+          "h": "Arranging Work and Study Around the Five Windows",
+          "p": "Waiting for the time to arrive and then hunting for a gap is what usually fails. Build the day around the five windows from the start. Open your work calendar or class timetable and place a short blocked slot at each prayer, ten minutes is enough, and make it visible so nobody books a meeting over it. Ask early and calmly for a short break inside long meetings; most people accommodate it without comment when the request is not last-minute. If your workplace has no prayer room, ask in advance about a quiet space rather than searching while the window closes."
+        },
+        {
+          "h": "Fajr Is Decided the Night Before, and Travel Is a Real Exception",
+          "p": "Fajr is not decided in the morning. It is decided the night before. Someone sleeping at two is fighting their physiology, not their sincerity, so the effective lever is bedtime: move it earlier by fifteen minutes every few days until you are genuinely rested before dawn. Put the alarm across the room so standing up is required. Travel and shift work are genuinely different situations: check that your times are calculated for the city you are actually in, and plan prayers before a journey rather than during it. Rulings on shortening or combining belong to qualified scholars, and islamweb.net is a sound place to start."
+        },
+        {
+          "h": "Coming Back After a Lapse, Then Keeping What You Built",
+          "p": "People returning after a long lapse tend to pick one of two losing paths: harsh self-blame, or waiting until they feel worthy enough to begin. Both extend the absence. A third path is simpler. Pray the current prayer now. For the first week, aim for one prayer performed on time consistently, then add a second. Questions about prayers already missed are matters of jurisprudence, and islamweb.net is a sound place to begin. Once the habit holds, keep a short monthly review: which prayer slips most, and what changed in my schedule? Consistency is maintenance, not a trophy."
+        }
+      ],
+      "fr": [
+        {
+          "h": "Pourquoi le retard s'accumule jusqu'à faire perdre le créneau",
+          "p": "Une prière n'est presque jamais manquée d'un seul coup. L'adhan retentit, vous vous dites que vous finissez d'abord cette tâche, la tâche s'étire, un message arrive, et quand vous relevez la tête le créneau s'est réduit ou refermé. Le vrai dégât est cumulatif : un Dhuhr tardif empiète sur l'Asr, un Asr tardif repousse le Maghrib jusqu'à sa limite, et la journée entière devient une course. Répétez cela pendant une semaine et votre esprit reclasse discrètement la prière parmi les éléments souples, ceux qui tolèrent le report. C'est cette croyance, bien plus que la paresse, qu'il faut démonter en premier."
+        },
+        {
+          "h": "Le mécanisme : ancrer chaque prière à un repère déjà installé",
+          "p": "La prière arrive selon un horaire que vous n'avez pas choisi, ce qui, du point de vue comportemental, constitue un avantage et non une contrainte. Un déclencheur externe fixe est bien plus fiable qu'une intention intérieure de s'en souvenir. Mais un déclencheur seul ne suffit pas : il lui faut un point d'ancrage, une action déjà installée dans votre journée. Le Fajr précède le café. Le Dhuhr précède le déjeuner. L'Asr sépare deux blocs de travail. Le Maghrib précède le moment en famille, l'Isha précède le rangement du téléphone. Ainsi ancrée, la prière cesse d'être une décision renégociée cinq fois par jour."
+        },
+        {
+          "h": "L'installation en dix minutes : adhan, lieu prêt, règle de la première minute",
+          "p": "Accordez dix minutes à cette installation aujourd'hui, pas un autre jour. D'abord, activez une alerte adhan distincte pour chacune des cinq prières, autorisez les alarmes exactes et excluez de l'optimisation de batterie l'application d'horaires que vous utilisez, car beaucoup de téléphones retardent les notifications en silence. Ensuite, préparez le lieu : un tapis déroulé, un vêtement propre à côté, aucun obstacle matériel entre vous et le début de la prière. Enfin, adoptez la règle de la première minute : vous vous levez pour les ablutions dans les soixante secondes, sans négocier. Awwad calcule les horaires hors connexion et diffuse l'adhan."
+        },
+        {
+          "h": "Organiser le travail et les études autour des cinq horaires",
+          "p": "Attendre l'heure puis chercher un créneau est précisément ce qui échoue. Organisez plutôt la journée autour des cinq horaires. Ouvrez votre agenda professionnel ou votre emploi du temps et placez un court créneau réservé à chaque prière, dix minutes suffisent, et rendez-le visible pour que personne ne planifie une réunion par-dessus. Demandez tôt et calmement une courte pause au milieu des réunions longues : la plupart des gens l'acceptent sans commentaire quand la demande n'arrive pas à la dernière seconde. Si votre lieu de travail n'a pas de salle de prière, renseignez-vous à l'avance sur un espace calme."
+        },
+        {
+          "h": "Le Fajr se joue la veille, et le voyage est une vraie exception",
+          "p": "Le Fajr ne se joue pas le matin, il se joue la veille. Celui qui se couche à deux heures lutte contre sa physiologie et non contre sa sincérité : le levier efficace est donc l'heure du coucher. Avancez-la de quinze minutes tous les quelques jours jusqu'à obtenir un repos réel avant l'aube. Placez le réveil hors de portée du lit. Le voyage et le travail posté sont de vrais cas particuliers : vérifiez que vos horaires correspondent à la ville où vous êtes. Quant au raccourcissement et au regroupement des prières, ces règles relèvent des savants, et islamweb.net est un bon point de départ."
+        },
+        {
+          "h": "Revenir après une interruption, puis préserver l'acquis",
+          "p": "Après une longue interruption, on choisit souvent l'une des deux voies perdantes : se blâmer durement, ou attendre de se sentir digne de recommencer. Les deux prolongent l'absence. La troisième voie est plus simple : accomplissez la prière en cours maintenant. La première semaine, visez une seule prière faite à l'heure de façon régulière, puis ajoutez-en une deuxième. Les questions relatives aux prières déjà manquées relèvent de la jurisprudence, et le site islamweb.net constitue un point de départ raisonnable. Une fois l'habitude tenue, gardez un bilan mensuel court : quelle prière glisse le plus, et qu'est-ce qui a changé dans mon emploi du temps ?"
+        }
+      ]
+    },
+    "faq": {
+      "ar": [
+        {
+          "q": "كيف أضبط تنبيه الأذان ليعمل بالفعل كل يوم؟",
+          "a": "أكثر ما يعطّل التنبيه ليس التطبيق بل إعدادات الهاتف. فعّل تنبيهاً مستقلاً لكل صلاة، ثم امنح التطبيق إذن التنبيهات الدقيقة، واستثنِه من ترشيد البطارية أو وضع توفير الطاقة، فهذه الأوضاع تؤجل الإشعارات بصمت وخاصة ليلاً. وتأكد من أن المواقيت محسوبة على موقعك الصحيح، ثم راجع تنبيه الفجر تحديداً بعد أول ليلة."
+        },
+        {
+          "q": "ماذا أفعل إذا دخل وقت الصلاة وأنا في اجتماع أو محاضرة؟",
+          "a": "عالج الأمر قبل وقوعه لا بعده. ضع في تقويمك فترة قصيرة محجوزة عند كل صلاة حتى لا تُحجز فوقها الاجتماعات، واطلب من منظّم الاجتماع الطويل استراحة قصيرة في وقت مناسب، فالطلب المبكر الهادئ يُقابَل بالتفهم في الغالب. وإن تعذّر ذلك تماماً، فحدد سلفاً أقرب لحظة يمكنك الخروج فيها، وهيّئ مكاناً قريباً للصلاة."
+        },
+        {
+          "q": "انقطعت عن الصلاة شهوراً، فمن أين أبدأ؟",
+          "a": "ابدأ بالصلاة الحاضرة الآن، لا بخطة كاملة تبدأ غداً. اجعل هدف الأسبوع الأول صلاة واحدة تؤديها في وقتها بانتظام، ثم أضف صلاة ثانية كل أسبوع حتى تكتمل الخمس، فالتدرج أثبت من الاندفاع الذي ينطفئ سريعاً. أما ما فات من صلوات وكيفية التعامل معه فمسألة شرعية مرجعها أهل العلم، ويمكنك الرجوع إلى موقع إسلام ويب."
+        }
+      ],
+      "en": [
+        {
+          "q": "Do prayer time apps work without an internet connection?",
+          "a": "The calculation itself does not need the internet. Prayer times are derived from your coordinates, the date, and a chosen calculation method, so a well-built app computes them on the device and keeps working on a plane, in a basement, or abroad. What does need attention is your location: after you travel, confirm the times shown match the city you are actually in."
+        },
+        {
+          "q": "Why does my adhan notification arrive late or not at all?",
+          "a": "This is almost always the phone rather than the app. Battery optimization, power-saving mode, and sleep restrictions delay notifications silently, especially overnight, which is why Fajr is the alert that fails most often. Grant the app exact-alarm permission, exclude it from battery optimization, allow notifications for each prayer, and test Fajr specifically on the first night."
+        },
+        {
+          "q": "How do I pray on time with a demanding full-time job?",
+          "a": "Stop treating prayer as something you squeeze into gaps and put it in the calendar instead. Block ten visible minutes at each prayer so meetings are not scheduled over them, identify a quiet room in advance, and agree with your team that long meetings include a short break. Colleagues generally accommodate a request made early and calmly."
+        }
+      ],
+      "fr": [
+        {
+          "q": "Les applications d'horaires de prière fonctionnent-elles sans connexion ?",
+          "a": "Le calcul lui-même ne nécessite aucune connexion. Les horaires se déduisent de vos coordonnées, de la date et d'une méthode de calcul : une bonne application les calcule donc sur l'appareil et reste fiable en avion, en sous-sol ou à l'étranger. Le point à surveiller reste la localisation : après un déplacement, vérifiez que les horaires affichés correspondent à la ville où vous vous trouvez."
+        },
+        {
+          "q": "Pourquoi ma notification d'adhan arrive-t-elle en retard ?",
+          "a": "Le problème vient presque toujours du téléphone et non de l'application. L'optimisation de la batterie, le mode économie d'énergie et la mise en veille prolongée retardent les notifications en silence, surtout la nuit, ce qui explique que le Fajr soit l'alerte la plus fragile. Autorisez les alarmes exactes, excluez l'application de l'optimisation et testez le Fajr dès la première nuit."
+        },
+        {
+          "q": "Comment prier à l'heure quand on travaille à temps plein ?",
+          "a": "Cessez de considérer la prière comme un reste à caser entre deux tâches et inscrivez-la dans l'agenda. Réservez dix minutes visibles à chaque horaire pour éviter les réunions par-dessus, repérez à l'avance une pièce calme, et convenez avec votre équipe qu'une réunion longue comporte une courte pause. Une demande formulée tôt et calmement est presque toujours acceptée."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "daily-salawat-wird",
+    "date": "2026-06-23",
+    "category": "build",
+    "title": {
+      "ar": "ورد يومي من الصلاة على النبي: كيف تختار عدداً تداوم عليه",
+      "en": "A Daily Salawat Portion: How to Choose a Count You Will Actually Keep",
+      "fr": "Un wird quotidien de salawat : choisir un nombre que vous tiendrez vraiment"
+    },
+    "description": {
+      "ar": "دليل عملي لبناء ورد يومي ثابت من الصلاة على النبي صلى الله عليه وسلم: كيف تختار عدداً واقعياً، وتربطه بموعد ثابت في يومك، وتعود بعد أيام التقصير دون انقطاع.",
+      "en": "Build a daily salawat portion that lasts: choose a realistic count, anchor it to a fixed time, use a counter, and recover from missed days without quitting.",
+      "fr": "Construisez un wird quotidien de salawat qui dure : choisir un nombre réaliste, l'ancrer à une heure fixe, utiliser un compteur et repartir après un oubli."
+    },
+    "intro": {
+      "ar": "كثير من المسلمين يعقدون العزم على ورد يومي من الصلاة على النبي صلى الله عليه وسلم، ثم تمضي الأسابيع دون أن يثبت الورد على حال. والمشكلة في الغالب ليست في المحبة ولا في الصدق، بل في طريقة بناء العادة نفسها: عدد كبير اختير في لحظة حماس، وبلا موعد ثابت يحمله. ويقدم علم بناء العادات هنا أدوات عملية بسيطة تجعل هذا الورد جزءاً راسخاً من يومك.",
+      "en": "Many Muslims resolve to keep a daily portion of salawat on the Prophet, peace be upon him, only to watch the practice fade within a few weeks. The problem is rarely sincerity or love; it is usually the way the habit was built, with an ambitious number chosen in a moment of enthusiasm and no fixed time to carry it. Behavioral science offers simple, practical tools that turn this intention into a routine that holds.",
+      "fr": "Beaucoup de musulmans décident de réciter chaque jour une part de salawat sur le Prophète, paix et bénédictions sur lui, puis voient la pratique s'effacer au bout de quelques semaines. Le problème vient rarement de la sincérité, mais de la façon dont l'habitude a été bâtie : un nombre ambitieux choisi dans un élan, sans moment fixe pour le porter. Les sciences du comportement offrent ici des repères simples et concrets."
+    },
+    "sections": {
+      "ar": [
+        {
+          "h": "لماذا يتعثر الورد اليومي رغم صدق النية؟",
+          "p": "يدفع الحماس الأول صاحبه إلى التزام ضخم: ألف مرة في اليوم مثلاً. تمضي ثلاثة أيام على خير، ثم يأتي يوم مزدحم أو مرض أو سفر، فيعجز عن الوفاء بالعدد، فيثقل عليه شعور التقصير، فيترك الورد كله. والسبب في الغالب ليس ضعف المحبة، بل غياب التحديد الواقعي: عدد لا يحتمله أسوأ أيامك، وموعد غير مرتبط بشيء ثابت في يومك. فالعادات تنقطع حيث يتراكم الاحتكاك بين الالتزام والواقع، لا حيث ينفد الإخلاص."
+        },
+        {
+          "h": "القليل الدائم: الآلية السلوكية وراء الثبات",
+          "p": "تشير الأبحاث في تكوين العادات إلى أن ما يحوّل الفعل من قرار يومي متعب إلى استجابة شبه تلقائية هو تكراره في سياق ثابت، لا حجمه. فقيمة وردك ليست في عدده، بل في عدد المرات التي أدّيته فيها. مئة مرة تؤديها ثلاثين يوماً متتالياً ترسّخ عادة حقيقية وهوية جديدة تقول فيها لنفسك: أنا ممن يصلّون على النبي كل يوم. أما ألف مرة تؤديها ثلاثة أيام ثم تنقطع، فتترك ذكرى جميلة لا عادة قائمة."
+        },
+        {
+          "h": "اختر عدداً واقعياً واربطه بموعد ثابت",
+          "p": "ابدأ باختيار عدد تستطيع أداءه في أسوأ أيامك لا في أفضلها. اسأل نفسك: لو كنت مرهقاً أو مسافراً أو مثقلاً بالعمل، فكم مرة أقدر عليها يقيناً؟ إن كان الجواب ثلاثين، فاجعل وردك ثلاثين. ثم اربطه بموعد لا يتغير: بعد سلام الفجر، أو في طريقك إلى العمل، أو عقب صلاة العصر، أو قبل النوم مباشرة. والموعد الثابت أهم من العدد، لأنه هو الذي يذكّرك دون أن تحتاج إلى تذكّر. واكتب عهدك صريحاً: بعد سلام الفجر، في مصلاي، أؤدي وردي كاملاً."
+        },
+        {
+          "h": "العدّاد والمكان: هيّئ ما حولك ليحضر قلبك",
+          "p": "العدّاد ليس ترفاً، بل وسيلة تحرر انتباهك. فحين تنشغل بحفظ الرقم في ذهنك يذهب أكثر تركيزك إلى الحساب لا إلى المعنى، والسبحة أو أي عدّاد بسيط يتكفل بالعد فيبقى قلبك مع الكلمات. وهيّئ المكان كذلك: موضع ثابت تجلس فيه، وهاتف صامت، ودقائق لا يقطعها أحد. ويمكنك ضبط تذكير يومي في تطبيق عوّاد على موعد وردك ومتابعة أيامك المتصلة، والتطبيق مجاني ويعمل دون إنترنت. والتمهّل مع حضور الذهن يجعل الورد أرسخ في نفسك من تكرار سريع لا تعي فيه ما تقول."
+        },
+        {
+          "h": "أيام التقصير: ماذا تفعل حين ينكسر الورد؟",
+          "p": "سيأتي يوم تتذكر فيه وردك وأنت على فراشك، ويوم تنساه فيه كلياً. والقاعدة العملية المعروفة في بناء العادات: لا تفوّت مرتين متتاليتين. فإن أدركت الوقت وأنت مرهق، فأدِّ الحد الأدنى ولو عشر مرات، حتى يبقى الخيط موصولاً في نفسك. ولا تحاول تعويض ما فات بأعداد مضاعفة، فذلك يحوّل الورد إلى دين ثقيل تهرب منه بعد أيام. عد إلى وردك المعتاد في اليوم التالي دون لوم لنفسك، فالعبرة بسرعة العودة لا بسلسلة لا تنكسر."
+        },
+        {
+          "h": "الزيادة البطيئة: ورد يرافقك سنوات",
+          "p": "بعد أن يثبت وردك أربعة أسابيع كاملة دون تعثر ملحوظ، زده زيادة صغيرة بمقدار الربع مثلاً، ثم اتركه يستقر شهراً آخر قبل أي زيادة جديدة. فالتدرج يحفظ لك شعور القدرة، وهو الوقود الحقيقي للاستمرار. وإن وجدت العدد الجديد يثقل عليك أسبوعين متتاليين، فارجع إلى السابق دون حرج. وراجع سجلك آخر كل شهر: كم يوماً أتممت؟ وفي أي الأيام تعثرت؟ ثم عالج السبب لا العدد. فهدفك ورد يرافقك سنوات، لا حملة تنطفئ بعد أسبوعين."
+        }
+      ],
+      "en": [
+        {
+          "h": "Why the Daily Portion Collapses Despite a Sincere Start",
+          "p": "Enthusiasm pushes people toward an enormous commitment: a thousand recitations a day. Three days go well, then a crowded day arrives, or illness, or travel. The target is missed, the sense of falling short becomes heavy, and the whole practice is abandoned. The cause is not weak devotion. It is the absence of a realistic definition: a number your worst day cannot carry, and a time that is not attached to anything stable. Habits break where friction between commitment and reality accumulates, not where sincerity runs out."
+        },
+        {
+          "h": "Small and Constant: The Mechanism Behind Consistency",
+          "p": "Research on habit formation suggests that what converts an effortful daily decision into a near-automatic response is repetition in a stable context, not the size of the act. The value of your portion therefore lies in how many times you have performed it, not in how many recitations it contains. One hundred recitations kept for thirty consecutive days build a genuine habit and a new self-image: I am someone who sends salawat every day. A thousand kept for three days and then dropped leaves a memory, not a practice."
+        },
+        {
+          "h": "Choose a Realistic Count and Anchor It to a Fixed Time",
+          "p": "Pick a number you could complete on your worst day rather than your best. Ask yourself honestly: if I were exhausted, travelling, or buried in work, how many could I certainly manage? If the answer is thirty, make thirty your portion. Then attach it to a moment that does not move: right after Fajr, during your commute, after Asr, or in the minutes before sleep. The fixed time matters more than the number, because it reminds you without requiring you to remember. Write the commitment out plainly and keep it visible."
+        },
+        {
+          "h": "The Counter and the Space: Freeing Your Attention",
+          "p": "A counter is not decoration. It frees your attention. When you hold the running total in your head, most of your focus goes to arithmetic rather than meaning. Prayer beads, or any simple counter, take the counting off your mind so your attention can stay with the words. Prepare the space as well: one regular spot, a silenced phone, a few uninterrupted minutes. You can also set a daily reminder in the free, offline Awwad app for the time you chose and follow your streak there. Unhurried repetition settles into a habit far better than rushed counting."
+        },
+        {
+          "h": "Days You Fall Short: Recovering Without Quitting",
+          "p": "There will be a day you remember your portion only as you lie down, and a day you forget it entirely. The practical rule most widely used in habit building is simple: never miss twice in a row. If you catch the time while exhausted, do a minimum version, even ten recitations, so the thread stays connected. Do not try to repay missed days with doubled totals, because that turns a beloved practice into a debt you eventually run from. Return to your normal portion the next day without self-reproach. Speed of return matters more than an unbroken record."
+        },
+        {
+          "h": "Growing Slowly: A Portion That Lasts for Years",
+          "p": "Once your portion has held for four full weeks without noticeable strain, raise it by a small margin, roughly a quarter, then let it settle for another month before increasing again. Gradual growth protects your sense of capability, which is the real fuel for long-term consistency. If the new number feels heavy for two consecutive weeks, return to the previous one without embarrassment. At the end of each month, review your record: how many days were completed, and which days broke? Then fix the cause rather than lowering the number reflexively."
+        }
+      ],
+      "fr": [
+        {
+          "h": "Pourquoi le wird quotidien s'effondre malgré une intention sincère",
+          "p": "L'élan du début pousse vers un engagement démesuré : mille récitations par jour. Trois jours se passent bien, puis arrive une journée surchargée, une maladie ou un déplacement. L'objectif n'est pas atteint, le sentiment de manquement s'alourdit, et toute la pratique s'arrête. La cause n'est presque jamais un manque de dévotion. C'est l'absence de cadre réaliste : un nombre que votre pire journée ne peut pas porter, et un horaire qui ne s'appuie sur rien de stable. Une habitude cède là où les frictions s'accumulent, pas là où la sincérité s'épuise."
+        },
+        {
+          "h": "Peu mais constant : le mécanisme de la régularité",
+          "p": "Les recherches sur la formation des habitudes indiquent que ce qui transforme une décision pénible en réponse presque automatique, c'est la répétition dans un contexte stable, et non l'ampleur de l'acte. La valeur de votre wird tient donc au nombre de fois où vous l'avez accompli, bien plus qu'au nombre de récitations qu'il contient. Cent récitations tenues trente jours d'affilée installent une habitude réelle et une image de soi nouvelle. Mille récitations tenues trois jours, puis abandonnées, ne laissent qu'un souvenir agréable."
+        },
+        {
+          "h": "Choisir un nombre réaliste et l'ancrer à un moment fixe",
+          "p": "Retenez un nombre que vous pourriez accomplir lors de votre pire journée, et non lors de la meilleure. Posez-vous honnêtement la question : épuisé, en déplacement ou débordé de travail, combien puis-je tenir à coup sûr ? Si la réponse est trente, que votre wird soit de trente. Rattachez-le ensuite à un moment immuable : juste après la prière de Fajr, dans les transports du matin, après Asr, ou dans les minutes qui précèdent le sommeil. L'horaire compte davantage que le nombre, car c'est lui qui vous rappelle sans effort de mémoire."
+        },
+        {
+          "h": "Le compteur et le lieu : libérer votre attention",
+          "p": "Un compteur n'est pas un accessoire décoratif : il libère votre attention. Tant que vous gardez le total en tête, l'essentiel de votre concentration part dans le calcul plutôt que dans le sens des mots. Un chapelet, ou n'importe quel compteur simple, prend le comptage en charge. Soignez aussi le lieu : une place habituelle, un téléphone en silence, quelques minutes sans interruption. Vous pouvez également programmer un rappel quotidien à l'heure choisie dans Awwad, une application gratuite qui fonctionne hors ligne, et y suivre vos jours consécutifs."
+        },
+        {
+          "h": "Les jours manqués : repartir sans tout abandonner",
+          "p": "Il y aura un soir où vous penserez à votre wird une fois couché, et un jour où vous l'oublierez tout à fait. La règle pratique la plus utile en construction d'habitudes tient en une phrase : ne jamais manquer deux fois de suite. Si vous y pensez alors que vous êtes épuisé, faites une version minimale, dix récitations suffisent, pour que le fil reste tendu. N'essayez pas de rattraper avec des totaux doublés : la pratique deviendrait une dette, et l'on finit par fuir ses dettes. Reprenez le lendemain, sans vous accabler."
+        },
+        {
+          "h": "Augmenter lentement : un wird qui vous accompagne des années",
+          "p": "Une fois votre wird tenu quatre semaines pleines sans tension particulière, augmentez-le d'un quart environ, puis laissez-le se stabiliser un mois de plus avant toute nouvelle hausse. Cette progression lente préserve le sentiment d'être capable, qui reste le vrai carburant de la constance. Si le nouveau nombre pèse deux semaines de suite, revenez au précédent sans gêne. À la fin de chaque mois, relisez votre relevé : combien de jours accomplis, et quels jours ont cédé ? Traitez ensuite la cause, plutôt que de rogner le nombre par réflexe."
+        }
+      ]
+    },
+    "faq": {
+      "ar": [
+        {
+          "q": "كم مرة ينبغي أن أصلي على النبي في اليوم؟",
+          "a": "لا نصدر هنا حكماً شرعياً في تحديد عدد معين، ولمعرفة الجانب الفقهي يمكنك الرجوع إلى موقع islamweb.net أو سؤال أهل العلم الموثوقين. أما من الناحية السلوكية، فالأفضل عدد تستطيع أداءه في أسوأ أيامك بلا مشقة، ثم تزيده تدريجياً بعد أن يثبت شهراً كاملاً. والثبات على القليل أنفع في بناء العادة من عدد كبير ينقطع سريعاً."
+        },
+        {
+          "q": "هل الأفضل استخدام سبحة أم عدّاد في الهاتف؟",
+          "a": "من الناحية العملية، تؤدي الأداتان الغرض نفسه: تحرير ذهنك من العد ليبقى قلبك حاضراً مع المعنى. فاختر ما هو أقرب إلى يدك في وقت وردك، فإن كان هاتفك معك دائماً فالعدّاد فيه أنسب، وإن كنت تفضل الابتعاد عن الشاشات فالسبحة أهدأ. ولأي مسألة شرعية متعلقة بذلك، يمكنك الرجوع إلى موقع islamweb.net."
+        },
+        {
+          "q": "انقطع وردي أسابيع طويلة، كيف أعود؟",
+          "a": "عد اليوم بربع وردك السابق فقط، لا بكامله ولا بقضاء ما فات. فالانقطاع الطويل يعني في الغالب أن العدد كان أكبر من طاقتك الواقعية، أو أن الموعد لم يكن ثابتاً أصلاً. حدد وقتاً واحداً مرتبطاً بفعل يومي لا تتركه، والتزم به أسبوعين قبل التفكير في أي زيادة. والبدايات الصغيرة المتكررة هي ما يعيد بناء العادة."
+        }
+      ],
+      "en": [
+        {
+          "q": "How many salawat should I recite each day?",
+          "a": "We do not issue religious rulings on a specific required number here; for the jurisprudential side, consult islamweb.net or a qualified scholar. Behaviorally, the best number is one you could complete comfortably on your worst day, increased gradually only after it has held for a full month. Consistency with a small portion builds the habit far more reliably than a large one that collapses within a week."
+        },
+        {
+          "q": "Are prayer beads better than a phone counter?",
+          "a": "Practically, both serve the same purpose: they take the counting off your mind so your attention can stay with the meaning. Choose whichever is closest to hand at your chosen time. If your phone is always with you, a counter app fits naturally; if you prefer to stay off screens, beads are quieter. For any religious question about the tools themselves, refer to islamweb.net."
+        },
+        {
+          "q": "I stopped for several weeks. How do I restart?",
+          "a": "Restart today with a quarter of your old portion, not the full amount and not any make-up total. A long gap usually means the number exceeded your realistic capacity, or the time was never truly fixed. Choose one moment attached to something you do daily without fail, hold it for two weeks, and only then consider increasing. Small repeated starts are what rebuild the habit."
+        }
+      ],
+      "fr": [
+        {
+          "q": "Combien de salawat faut-il réciter chaque jour ?",
+          "a": "Nous n'émettons ici aucun avis juridique sur un nombre précis ; pour l'aspect religieux, consultez islamweb.net ou un savant de confiance. Sur le plan comportemental, le bon nombre est celui que vous pourriez accomplir sans peine lors de votre pire journée, à augmenter progressivement une fois qu'il a tenu un mois entier. Un petit wird constant vaut mieux qu'un grand nombre abandonné en une semaine."
+        },
+        {
+          "q": "Chapelet ou compteur sur téléphone : que choisir ?",
+          "a": "En pratique, les deux remplissent la même fonction : décharger votre esprit du comptage pour que l'attention reste sur le sens des mots. Prenez ce qui se trouve le plus près de votre main au moment choisi. Si votre téléphone vous suit partout, un compteur d'application convient très bien ; si vous cherchez à éviter les écrans, le chapelet reste plus apaisant. Pour toute question religieuse, référez-vous à islamweb.net."
+        },
+        {
+          "q": "J'ai arrêté pendant plusieurs semaines : comment reprendre ?",
+          "a": "Reprenez dès aujourd'hui avec un quart de votre ancien wird, sans rattrapage ni total doublé. Une longue interruption signale presque toujours un nombre supérieur à votre capacité réelle, ou un horaire jamais vraiment fixé. Choisissez un seul moment rattaché à un geste quotidien que vous ne manquez jamais, tenez-le deux semaines, et n'envisagez qu'ensuite une augmentation. Ce sont les petits recommencements qui reconstruisent l'habitude."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "honoring-parents-daily-habits",
+    "date": "2026-06-25",
+    "category": "build",
+    "title": {
+      "ar": "برّ الوالدين في عادات يومية: كيف تحوّل الواجب إلى سلوك ثابت",
+      "en": "Honouring Your Parents as Daily Habits: Turning Duty into Behaviour",
+      "fr": "Honorer ses parents au quotidien: transformer le devoir en habitudes"
+    },
+    "description": {
+      "ar": "دليل عملي يحوّل برّ الوالدين إلى عادات يومية محددة: موعد مكالمة ثابت، وخدمة أسبوعية تنجزها بنفسك، وإنصات بلا تصحيح، وتوزيع عادل للحمل بين الإخوة.",
+      "en": "Turn honouring your parents into concrete daily habits: a fixed call slot, one weekly act of service, listening without correcting, and sharing the load.",
+      "fr": "Transformez le respect de vos parents en habitudes concrètes: un créneau d'appel fixe, un service hebdomadaire, écouter sans corriger, partager la charge."
+    },
+    "intro": {
+      "ar": "برّ الوالدين قيمة كبيرة يتفق عليها الجميع، لكن القيم الكبيرة لا تُنفَّذ من تلقاء نفسها، بل تحتاج إلى مواعيد محجوزة وسلوكيات صغيرة تصمد في أسبوع مزدحم. في هذا الدليل نحوّل هذا الواجب إلى عادات يمكن تتبّعها: مكالمة قصيرة ثابتة، وخدمة عملية أسبوعية، وإنصات بلا تصحيح. وستجد أيضاً طريقة عملية لتوزيع الحمل بين الإخوة، وللعودة بعد الأسابيع التي ينقطع فيها التواصل.",
+      "en": "Honouring your parents is a value almost everyone agrees on, and values do not execute themselves. They need slots in a calendar and behaviours small enough to survive a busy week. This guide turns that duty into trackable habits: a short fixed call, one weekly act of service, listening without correcting, and a fair way to share the load with siblings.",
+      "fr": "Honorer ses parents est une valeur que personne ne conteste, mais les valeurs ne s'exécutent pas toutes seules: elles ont besoin de créneaux réservés et de gestes assez petits pour tenir une semaine chargée. Ce guide transforme ce devoir en habitudes suivies: un appel court à heure fixe, un service concret par semaine, une écoute sans correction, et un partage honnête de la charge entre frères et sœurs."
+    },
+    "sections": {
+      "ar": [
+        {
+          "h": "لماذا يبقى برّ الوالدين نيّة طيبة ولا يصير سلوكاً يومياً؟",
+          "p": "يكاد الناس يجمعون على عِظَم منزلة برّ الوالدين، ومع ذلك تمرّ الأسابيع دون مكالمة حقيقية. والسبب في الغالب ليس قسوة القلب، بل أن الواجب في صيغته العامة لا يعطي الذهن أمراً واضحاً: متى، وكم، وماذا أفعل بالضبط؟ فتتحول النية إلى شعور بالتقصير، ويجعل هذا الشعور التواصل ثقيلاً فيزداد التأجيل. والمخرج ليس مزيداً من تأنيب النفس، بل تحويل القيمة الكبيرة إلى سلوكيات صغيرة محددة يمكن تتبّعها والحفاظ عليها في أسبوع مزدحم."
+        },
+        {
+          "h": "من قيمة عامة إلى سلوك محدَّد: كيف تُبنى العادة",
+          "p": "تشير أبحاث تكوين العادات إلى أن السلوك يثبت حين يرتبط بإشارة ثابتة في اليوم، ويبقى صغيراً بما يكفي لتنفيذه حتى في يوم سيئ. طبّق ذلك هنا: بدلاً من نية غامضة من نوع سأكون أفضل مع والديّ، اكتب جملة تنفيذية واحدة: بعد صلاة المغرب أتصل بأمي خمس دقائق. فالإشارة ثابتة، والسلوك محدد بالوقت والمدة، والأثر الذي تجنيه سماع صوتهما ودعاؤهما لك. ابدأ بالحد الأدنى الذي لن تحتاج يوماً إلى الاعتذار عن تركه، فالقليل المستمر يسبق الكثير المتقطع."
+        },
+        {
+          "h": "موعدان في أسبوعك: مكالمة يومية قصيرة وخدمة عملية أسبوعية",
+          "p": "ثبّت موعدين لا أكثر. الأول مكالمة يومية قصيرة في الساعة نفسها كل يوم، فالانتظام يطمئن الوالد أكثر مما يفعل طول المكالمة. والثاني خدمة عملية واحدة كل أسبوع تُنجزها بنفسك: اصطحابهما إلى العيادة، أو شراء الدواء ومراجعة مواعيده، أو إصلاح ما تعطّل في البيت، أو إنهاء معاملة رسمية، أو زيارة تجلس فيها ساعة والهاتف بعيد عن يدك. فالأفعال الملموسة تطمئن الوالدين أكثر من العبارات، وهي أيسر في التتبّع: إما أنجزتها أو لم تنجزها."
+        },
+        {
+          "h": "الإنصات دون تصحيح: مهارة تُكتسب بالتدريب لا بالطبع",
+          "p": "كثيراً ما يكون الجرح الأعمق ليس في الغياب، بل في نبرة الاستعجال والتصحيح الدائم. فحين تعود القصة نفسها للمرة العاشرة، أو يختلط اسم أو تاريخ، تندفع رغبة تلقائية إلى التصويب. درّب استجابة منافِسة تحلّ محلها: نفَس بطيء واحد، ثم سؤال عن تفصيل في الحكاية لا تصحيح لها. ومع المرض أو ضعف الذاكرة يصير هذا الإنصات جوهر البرّ لا هامشه: صوت هادئ، وجلسة لا تنظر عيناك فيها إلى الباب، ووعد صغير يُنفَّذ فعلاً."
+        },
+        {
+          "h": "البيئة والإخوة: هيّئ ما حولك ولا تحمل العبء وحدك",
+          "p": "لا تعتمد على أن تتذكر وحدك. اضبط تذكيراً لموعد المكالمة، واحتفظ بقائمة قصيرة باحتياجاتهما المتكررة، وضع ما يذكّرك بالزيارة في مسارك اليومي. ويتيح لك تطبيق عوّاد تذكيراً خاصاً بهذه العادة وحدها، وأداة مصغّرة على الشاشة الرئيسية تُغنيك عن اتخاذ القرار كل يوم. ثم وزّع الحمل بصدق: جدول مكتوب بين الإخوة والأخوات، لكل واحد يومه في الاتصال ومهمته الشهرية، بدل أن يقع كل شيء على الأقرب سكناً والأقلّ اعتراضاً."
+        },
+        {
+          "h": "حين ينقطع التواصل، وحين تكون العلاقة صعبة",
+          "p": "ستمرّ أسابيع تنقطع فيها لسفر أو مرض أو ضغط عمل، والشعور بالتقصير هنا أخطر من الانقطاع نفسه لأنه يؤخر العودة. عُد بأصغر نسخة ممكنة: رسالة صوتية قصيرة اليوم، ومكالمة غداً، دون انتظار أن تشعر بأنك تستحق العودة. وإن كانت العلاقة نفسها متوترة أو مؤذية، فالاعتراف بالأذى لا يمنع حفظ أدب الخطاب ولين الصوت، ومن الحكمة طلب دعم مختص. أما حدود الطاعة والصلة في مثل هذه الحالات فمرجعها أهل العلم وموقع إسلام ويب. وما يبقيك سنوات هو سلسلة ظاهرة أمامك وتقرير شهري يريك أثر ما فعلت."
+        }
+      ],
+      "en": [
+        {
+          "h": "Why a Duty Everyone Agrees On Rarely Becomes a Daily Behaviour",
+          "p": "Almost nobody disputes that parents deserve honour and care, yet weeks pass without a proper phone call. The problem is usually not a cold heart. A duty stated as a value gives your brain no instruction: no time, no duration, no first move. So the intention turns into guilt, and guilt makes contact feel heavy, which delays it further. The way out is not more remorse. It is translating a large moral commitment into small, specific, trackable behaviours that survive an ordinary busy week."
+        },
+        {
+          "h": "From Value to Behaviour: How the Habit Is Actually Built",
+          "p": "Research on habit formation suggests that behaviour becomes automatic when it is tied to a stable daily cue and kept small enough to complete on a bad day. Apply that here. Instead of a vague resolution to be better to your parents, write one implementation sentence: after the evening prayer, I call my mother for five minutes. The cue is fixed, the behaviour is defined by time and length, and the reward is the sound of their voice. Start with a minimum you will never need to excuse yourself from."
+        },
+        {
+          "h": "Two Slots: A Short Daily Call and One Weekly Act of Service",
+          "p": "Protect two slots and nothing more. First, a short daily call at the same hour every day, because predictability reassures a parent far more than length does. Second, one practical service each week that you carry out yourself: a lift to the clinic, collecting medication and checking the schedule, fixing something broken at home, sorting official paperwork, or a visit where you sit for an hour with your phone away. Concrete acts reassure parents in a way words do not, and they are easy to track: done or not done."
+        },
+        {
+          "h": "Listening Without Correcting: A Skill, Not a Personality Trait",
+          "p": "What wounds parents most is often not absence but the tone of hurry and constant correction. When a story arrives for the tenth time, or a name or a date comes out wrong, the impulse to fix it is automatic. Train a competing response instead: one slow breath, then a question about a detail rather than a correction. As memory fades or illness arrives, this becomes the substance of honouring them rather than a side note: an unhurried voice, a seat that does not glance at the door, and small promises actually kept."
+        },
+        {
+          "h": "Environment and Siblings: Design It So It Does Not Rest on One Person",
+          "p": "Do not rely on remembering. Set a reminder for the call slot, keep a short running list of what they need, and put a visible prompt for the visit somewhere in your daily path. Awwad lets you attach a reminder to this specific habit and keep it on a home-screen widget, which removes the daily decision entirely. Then divide the load honestly: a written rota among siblings, each with a named day and a monthly task, instead of everything falling on whoever lives nearest and complains least."
+        },
+        {
+          "h": "When the Rhythm Breaks, and When the Relationship Is Hard",
+          "p": "Weeks will break: travel, illness, a heavy stretch at work. Guilt is more dangerous than the gap itself, because it delays the return. Restart at the smallest possible size, a short voice note today and a call tomorrow, rather than waiting until you feel worthy of it. If the relationship itself is strained or harmful, naming the harm honestly does not stop you keeping your speech dignified and your tone gentle, and seeking qualified support is wisdom. For the limits of obedience and contact in such cases, refer to trusted scholars and to islamweb.net. Over years, what sustains you is a visible streak and a monthly report."
+        }
+      ],
+      "fr": [
+        {
+          "h": "Pourquoi un devoir que tout le monde reconnaît ne devient presque jamais quotidien",
+          "p": "Personne ne conteste que les parents méritent respect et attention, et pourtant les semaines passent sans un vrai appel. Le problème vient rarement de l'indifférence. Un devoir formulé comme une valeur ne donne au cerveau aucune consigne: ni heure, ni durée, ni premier geste. L'intention se transforme alors en culpabilité, et la culpabilité rend le contact plus lourd, donc encore plus repoussé. La sortie n'est pas dans le remords supplémentaire, mais dans la traduction d'un engagement moral en comportements petits, précis et vérifiables."
+        },
+        {
+          "h": "De la valeur au comportement: comment l'habitude se construit",
+          "p": "Les recherches sur la formation des habitudes indiquent qu'un comportement s'automatise lorsqu'il est rattaché à un signal stable de la journée et qu'il reste assez court pour tenir même un mauvais jour. Appliquez-le ici. Au lieu d'une résolution floue du type être meilleur avec mes parents, écrivez une phrase d'exécution: après la prière du Maghreb, j'appelle ma mère cinq minutes. Le signal est fixe, le comportement est défini par l'heure et la durée, et la récompense est leur voix. Commencez par un minimum dont vous n'aurez jamais à vous excuser."
+        },
+        {
+          "h": "Deux créneaux: un appel quotidien court et un service concret par semaine",
+          "p": "Protégez deux créneaux, pas davantage. D'abord un appel quotidien bref, toujours à la même heure, car la régularité rassure un parent bien plus que la durée. Ensuite un service pratique chaque semaine, que vous assurez vous-même: un trajet jusqu'au cabinet médical, les médicaments et le suivi des rendez-vous, une réparation à la maison, des papiers administratifs, ou une visite d'une heure avec le téléphone rangé. Les gestes concrets rassurent bien plus que les formules, et ils se suivent facilement: fait ou pas fait."
+        },
+        {
+          "h": "Écouter sans corriger: une compétence qui s'entraîne",
+          "p": "Ce qui blesse le plus n'est souvent pas l'absence, mais le ton pressé et la correction permanente. Quand la même histoire revient pour la dixième fois, ou qu'un prénom et une date se mélangent, l'envie de rectifier est automatique. Entraînez plutôt une réponse concurrente: une respiration lente, puis une question sur un détail du récit au lieu d'une correction. Avec la maladie ou la mémoire qui faiblit, c'est là que se joue l'essentiel: une voix calme, une visite qui ne regarde pas la porte, et de petites promesses réellement tenues."
+        },
+        {
+          "h": "L'environnement et la fratrie: ne faites pas reposer tout sur une seule personne",
+          "p": "Ne comptez pas sur votre mémoire. Programmez un rappel pour le créneau d'appel, tenez une courte liste de leurs besoins récurrents, et placez un repère visible sur votre trajet quotidien. Awwad permet d'attacher un rappel à cette habitude précise et de la garder sur un widget d'écran d'accueil, ce qui supprime la décision quotidienne. Répartissez ensuite la charge honnêtement: un planning écrit entre frères et sœurs, chacun avec son jour d'appel et une tâche mensuelle, au lieu de tout laisser à celui qui habite le plus près et proteste le moins."
+        },
+        {
+          "h": "Quand le rythme se rompt, et quand la relation est difficile",
+          "p": "Des semaines vont sauter: un voyage, une maladie, une période chargée. La culpabilité est plus dangereuse que l'interruption elle-même, car elle retarde le retour. Reprenez à la plus petite taille possible, un message vocal aujourd'hui et un appel demain, sans attendre de vous sentir digne. Si la relation est tendue ou blessante, reconnaître le mal subi n'empêche pas de garder une parole digne et un ton mesuré, et chercher un accompagnement compétent relève du bon sens. Pour les limites de l'obéissance et du lien dans ces cas, référez-vous à des savants reconnus et à islamweb.net. Sur la durée, ce sont une série visible et un rapport mensuel qui entretiennent l'élan."
+        }
+      ]
+    },
+    "faq": {
+      "ar": [
+        {
+          "q": "كيف أبرّ والديّ وأنا مسافر أو مشغول طوال اليوم؟",
+          "a": "ابدأ بأصغر التزام لا يسقط أبداً: مكالمة من ثلاث إلى خمس دقائق في وقت ثابت يومياً، ولو كنت في الطريق. وأضف رسالة صوتية قصيرة في أيام السفر، واختر خدمة واحدة تُنجزها عن بُعد كل أسبوع، مثل حجز موعد طبي، أو تسديد فاتورة، أو ترتيب توصيل الدواء. فالانتظام القصير أعمق أثراً من زيارة طويلة كل بضعة أشهر."
+        },
+        {
+          "q": "ماذا أفعل إذا كانت علاقتي بوالديّ متوترة أو فيها أذى؟",
+          "a": "الاعتراف بالواقع أول خطوة، فالتظاهر بعلاقة مثالية يؤجل الانفجار ولا يمنعه. احفظ أدب الخطاب ولين الصوت، وقلّل المواضيع التي تشتعل سريعاً، واختر لقاءات قصيرة محددة بدل جلسات طويلة متوترة، واستعن بمختص نفسي إن كان الأذى مستمراً. أما ما يتعلق بالأحكام الشرعية في حدود الطاعة والصلة، فمرجعه أهل العلم الموثوقون وموقع إسلام ويب."
+        },
+        {
+          "q": "كيف أتحمّل تكرار الوالد لكلامه أو تغيّر طبعه مع المرض؟",
+          "a": "اعلم أولاً أن التكرار وتقلب المزاج عرضان شائعان مع تقدم السن أو المرض، وليسا تصرفاً موجهاً ضدك. واتفق مع نفسك على ردّ ثابت: نفَس عميق، ثم سؤال عن تفصيل في القصة. وأنهِ الزيارة قبل أن ينفد صبرك لا بعده، ووزّع الأيام مع إخوتك، واعرض على الطبيب أي تغيّر واضح في الذاكرة أو السلوك."
+        }
+      ],
+      "en": [
+        {
+          "q": "How can I honour my parents when I live abroad or work long hours?",
+          "a": "Commit to the smallest thing that will never fail: a three to five minute call at a fixed time every day, even from the road. Add a short voice note on travel days, and choose one remote service each week, such as booking an appointment, paying a bill, or arranging a medicine delivery. Short and regular reaches them far more than one long visit every few months."
+        },
+        {
+          "q": "What should I do if my relationship with my parents is strained or harmful?",
+          "a": "Start by naming the reality, because pretending the relationship is fine usually postpones a worse rupture rather than preventing it. Keep your speech dignified, shrink the topics that ignite, prefer short defined visits to long tense ones, and involve a qualified counsellor if the harm is ongoing. For questions about religious rulings on obedience, distance or contact, refer to islamweb.net and to trusted scholars."
+        },
+        {
+          "q": "How do I stay patient when a parent repeats themselves or changes with illness?",
+          "a": "Remember first that repetition and mood changes are common features of ageing or illness, not something aimed at you. Agree on a fixed personal response: one slow breath, then a question about a detail in the story. End the visit before your patience runs out rather than after it, share the days with your siblings, and raise any clear memory or behaviour change with their doctor."
+        }
+      ],
+      "fr": [
+        {
+          "q": "Comment honorer mes parents quand je vis loin ou que je travaille beaucoup?",
+          "a": "Engagez-vous sur le plus petit geste qui ne tombera jamais: un appel de trois à cinq minutes à heure fixe, chaque jour, même depuis la voiture. Ajoutez un message vocal les jours de déplacement, et choisissez un service à distance par semaine: prendre un rendez-vous, régler une facture, organiser la livraison d'un médicament. Court et régulier vaut mieux qu'une longue visite tous les trimestres."
+        },
+        {
+          "q": "Que faire si la relation avec mes parents est tendue ou blessante?",
+          "a": "Commencez par nommer la réalité: faire semblant que tout va bien ne fait que reporter une rupture plus dure. Gardez une parole digne, réduisez les sujets qui s'enflamment, préférez des visites courtes et cadrées aux longues soirées tendues, et faites appel à un professionnel si le mal se répète. Pour les questions de jugement religieux sur l'obéissance ou la distance, référez-vous à islamweb.net et à des savants reconnus."
+        },
+        {
+          "q": "Comment rester patient quand un parent se répète ou change avec la maladie?",
+          "a": "Rappelez-vous d'abord que la répétition et les changements d'humeur accompagnent souvent l'âge ou la maladie: ce n'est pas dirigé contre vous. Fixez-vous une réponse constante: une respiration lente, puis une question sur un détail du récit. Terminez la visite avant que la patience ne s'épuise, partagez les jours avec vos frères et sœurs, et signalez au médecin tout changement net de mémoire ou de comportement."
+        }
+      ]
+    }
+  },
+  {
+    "slug": "ramadan-habits-plan",
+    "date": "2026-06-27",
+    "category": "build",
+    "title": {
+      "ar": "خطة عادات رمضان: كيف تستعد قبل الشهر وتحافظ على عاداتك بعده",
+      "en": "Your Ramadan Habits Plan: Prepare Before the Month, Keep the Gains After",
+      "fr": "Plan d'habitudes pour le Ramadan: se préparer avant le mois et garder les acquis après"
+    },
+    "description": {
+      "ar": "خطة عملية لبناء عادات رمضان قبل بدء الشهر: تجربة مصغّرة، وأهداف قليلة واقعية، وتنظيم النوم، ووِرد يومي ثابت، مع طريقة للحفاظ على العادات بعد رمضان.",
+      "en": "A practical Ramadan habits plan: prepare in the weeks before, pick three realistic targets, reset your sleep, keep a daily Quran portion, and stay steady after.",
+      "fr": "Un plan concret pour le Ramadan: préparer les semaines qui précèdent, viser trois objectifs réalistes, réorganiser le sommeil et tenir une lecture quotidienne."
+    },
+    "intro": {
+      "ar": "أفضل وقت لكتابة خطة رمضان ليس أول ليلة من الشهر، بل الأسابيع التي تسبقه. فرمضان يعيد ترتيب نومك وطعامك وأوقات عملك دفعة واحدة، ومن يدخله بقائمة نوايا طويلة وبلا استعداد يجد بعد أسبوع أن معظم بنودها قد سقط. في هذا الدليل خطة عملية تبدأ قبل الشهر، وتضبط إيقاع اليوم داخله، وتحمي عادتين أو ثلاثاً بعد انتهائه.",
+      "en": "The best time to write a Ramadan plan is not the first night of the month, it is the weeks before it. Ramadan rearranges your sleep, your meals, and your working hours all at once, and anyone who walks in with a long list of intentions and no preparation usually watches most of it fall away within a week. This guide gives you a plan that starts before the month, structures the day inside it, and protects two or three habits after it ends.",
+      "fr": "On écrit rarement son plan de Ramadan au bon moment: la première nuit du mois est déjà trop tard. En quelques jours, le jeûne bouleverse le sommeil, les repas et le rythme de travail, et une longue liste de bonnes intentions ne survit presque jamais à la première semaine. Voici un plan en trois temps: ce qu'il faut préparer avant, comment structurer la journée pendant, et quelles habitudes garder une fois le mois terminé."
+    },
+    "sections": {
+      "ar": [
+        {
+          "h": "لماذا تنهار خطط رمضان بعد الأسبوع الأول؟",
+          "p": "يدخل كثير من الناس رمضان بقائمة طويلة من النوايا: ختم القرآن، وقيام الليل، وترك التدخين، والابتعاد عن الشاشات ليلاً، وكل ذلك ابتداءً من اليوم الأول. المشكلة نادراً ما تكون في صدق العزيمة، بل في أن الشهر يغيّر جدول النوم والطعام والعمل في آن واحد، فتُطلب من النفس سلوكيات جديدة في الوقت الذي تكون فيه طاقتها في أدنى مستوياتها. النتيجة المتوقعة أن تصمد الخطة أياماً معدودة، ثم تتساقط بنودها واحداً تلو الآخر، ويبقى إحساس بالتقصير لا يستحقه صاحبه."
+        },
+        {
+          "h": "الآلية: رمضان يزيل المثيرات التي عُلِّقت عليها عاداتك",
+          "p": "كل عادة مرتبطة بمثير ثابت: القهوة الصباحية، أو الاستراحة بعد الغداء، أو طريق العودة من العمل. حين يبدأ الصيام تختفي هذه المثيرات أو تنتقل إلى ساعات أخرى، فتفقد العادات القديمة مرساتها، ولا تجد العادات الجديدة ما تتعلق به. وهذا يفسّر أمرين معاً: سهولة ترك بعض العادات الضارة في رمضان لأن مثيراتها غابت، وصعوبة تثبيت العادات النافعة لأن اليوم كله صار غير مألوف. الاستعداد المبكر معناه ببساطة أن تختار مثيراتك الجديدة بنفسك بدل أن تفاجئك."
+        },
+        {
+          "h": "قبل الشهر بأسبوعين: تجربة مصغّرة وثلاثة أهداف فقط",
+          "p": "اعتبر الأسبوعين السابقين لرمضان تجربة عملية لا مجرد تجهيزات مطبخ. قدّم موعد نومك عشرين دقيقة كل ثلاثة أيام، وصم يوماً أو يومين في الأسبوع إن كان ذلك من عادتك، واقرأ وِردك في التوقيت الذي تنوي اعتماده داخل الشهر. ثم اكتب أهدافك واحصرها في ثلاثة: عبادة واحدة تزيدها، وعادة واحدة تتركها، وعادة صحية واحدة تحمي طاقتك. القائمة القصيرة التي تصمد ثلاثين يوماً أنفع بكثير من قائمة طويلة تُهجَر في اليوم العاشر."
+        },
+        {
+          "h": "هيكل اليوم: وِرد موزّع وبيئة مهيّأة",
+          "p": "وزّع وِردك اليومي على الصلوات الخمس بدل تأجيله إلى جلسة واحدة متأخرة قبل الفجر، وهي جلسة نادراً ما تتحقق. أربع صفحات بعد كل صلاة تُنجز جزءاً كاملاً دون أن تشعر بثقله. والمنطق نفسه ينطبق على النوم: نافذة أساسية بعد التراويح، وأخرى قصيرة بعد الفجر أو في الظهيرة، تُعامَلان كموعدين ثابتين لا كفائض من الوقت. ثم هيّئ ما حولك: الهاتف خارج غرفة النوم، والسحور مجهَّز من الليل، والمصحف في مكان تراه عند الإفطار. تطبيق عوّاد مجاني ويعمل دون إنترنت، ويتيح تذكيراً مستقلاً لكل عادة إلى جانب مواقيت الصلاة والأذان."
+        },
+        {
+          "h": "منتصف الشهر والعشر الأواخر: احمِ ما بنيته",
+          "p": "التراجع في الأسبوع الثاني متوقع لا استثنائي، إذ يخفت حماس البداية ويتراكم أثر قلة النوم. القاعدة العملية هنا مختصرة: لا تفوّت مرتين. فإن ضاع منك يوم، عد في اليوم التالي مباشرة دون تأنيب مفرط للنفس ودون محاولة تعويض ثلاثة أيام دفعة واحدة. ومع دخول العشر الأواخر احذر النقيض الآخر: خطة مضاعفة تُنهك الجسد فتنتهي بانقطاع تام. اجعل لك حداً أدنى تلتزم به مهما حدث، ثم أضف فوقه بقدر طاقتك الحقيقية في تلك الليلة."
+        },
+        {
+          "h": "أصعب جزء في الخطة: ما بعد رمضان",
+          "p": "حين يعود الجدول القديم تعود معه المثيرات القديمة، ولهذا يتبدّد كثير من مكاسب رمضان في الأسبوع الأول من شوال. اختر قبل نهاية الشهر عادتين أو ثلاثاً تنوي إبقاءها، وامنح كل واحدة مثيراً جديداً داخل روتينك المعتاد: صفحتان بعد صلاة الفجر بدلاً مما بعد التراويح مثلاً. وصغّر المقدار عمداً في أول أسبوعين حتى لا تصطدم العادة بالواقع. النصف المستمر خير من الكل المنقطع، ومراجعة تقرير شهري بسيط تكشف لك سريعاً أي عادة تحتاج مثيراً أوضح."
+        }
+      ],
+      "en": [
+        {
+          "h": "Why Most Ramadan Plans Collapse in the First Week",
+          "p": "Most people enter Ramadan carrying an unwritten list that would be ambitious in any month: finish the Quran, pray qiyam every night, quit smoking, stop scrolling late, and begin all of it on day one. The problem is rarely weak sincerity. It is that the month rearranges your sleep, your meals, and your working hours simultaneously, so you are demanding new behaviour at the exact moment your energy is lowest. The plan holds for a few days, then sheds items one by one, leaving a sense of failure that was never really earned."
+        },
+        {
+          "h": "The Mechanism: Ramadan Removes the Cues Your Habits Hang On",
+          "p": "Every habit is anchored to a cue: the morning coffee, the break after lunch, the drive home. Fasting either deletes those cues or moves them to a different hour, so old routines lose their anchor and new ones have nothing to attach to. This explains two things at once: why some harmful habits become surprisingly easy to drop during the month, since their triggers have vanished, and why good intentions struggle to take hold, since the whole day is unfamiliar. Preparing early simply means choosing the new cues yourself instead of being ambushed by them."
+        },
+        {
+          "h": "Two Weeks Out: Run a Rehearsal and Pick Three Targets",
+          "p": "Treat the fortnight before Ramadan as a rehearsal, not just a shopping list. Shift your bedtime twenty minutes earlier every three days, fast a day or two a week if that is already your practice, and read your Quran portion at the hour you intend to use during the month. Then write your goals down and cut them to three: one act of worship to increase, one habit to leave, and one health habit that protects your energy. A short list that survives thirty days beats a long one abandoned on day ten."
+        },
+        {
+          "h": "Structure the Day: A Portion Spread Out, an Environment Prepared",
+          "p": "Split your daily Quran reading across the five prayers instead of saving it for one late session that rarely happens. Four pages after each prayer completes a full juz without ever feeling heavy. Apply the same logic to sleep: one main window after taraweeh and one short window after Fajr or at midday, both treated as fixed appointments rather than leftover time. Then prepare the space: phone outside the bedroom, suhoor set out the night before, mushaf where you will see it at iftar. Awwad is free, works offline, and gives each habit its own reminder alongside prayer times and the adhan."
+        },
+        {
+          "h": "Mid-Month and the Last Ten Nights: Protect What You Built",
+          "p": "A dip in the second week is normal rather than exceptional: the opening enthusiasm fades and lost sleep accumulates. The working rule is short, never miss twice. If a day slips, return the very next day without self-punishment and without trying to repay three days at once. As the last ten nights arrive, watch for the opposite danger: a doubled plan that exhausts the body and ends in a complete stop. Keep a fixed minimum you will meet whatever happens, then add on top of it according to your real capacity that night."
+        },
+        {
+          "h": "The Hardest Part: The Weeks After Ramadan",
+          "p": "When the old schedule returns, the old cues return with it, which is why so many Ramadan gains quietly slip away during the first week of Shawwal. Before the month ends, choose two or three habits you intend to keep and give each one a new cue inside your ordinary routine: two pages after Fajr rather than after taraweeh, for example. Deliberately shrink the amount for the first fortnight so the habit does not collide with reality. Half of something continued is worth far more than all of something abandoned, and a simple monthly review shows you quickly which habit needs a clearer cue."
+        }
+      ],
+      "fr": [
+        {
+          "h": "Pourquoi la plupart des plans de Ramadan s'effondrent dès la première semaine",
+          "p": "Beaucoup abordent le Ramadan avec une liste qui serait ambitieuse n'importe quel autre mois: terminer le Coran, prier le qiyam chaque nuit, arrêter de fumer, ne plus faire défiler l'écran le soir, et tout commencer dès le premier jour. Le problème vient rarement d'un manque de sincérité. Le mois réorganise d'un seul coup le sommeil, les repas et les horaires de travail: on exige donc de nouveaux comportements au moment précis où l'énergie est la plus basse. Le plan tient quelques jours, perd ses éléments un à un, et laisse un sentiment d'échec parfaitement immérité."
+        },
+        {
+          "h": "Le mécanisme: le jeûne efface les repères sur lesquels reposent vos habitudes",
+          "p": "Chaque habitude est ancrée à un déclencheur: le café du matin, la pause après le déjeuner, le trajet du retour. Le jeûne supprime ces repères ou les déplace à une autre heure, si bien que les anciennes routines perdent leur ancrage et que les nouvelles n'ont plus rien à quoi s'accrocher. Cela explique deux choses à la fois: pourquoi certaines habitudes nuisibles s'abandonnent si facilement pendant le mois, leurs déclencheurs ayant disparu, et pourquoi les bonnes intentions peinent à s'installer, la journée entière étant devenue inhabituelle. Se préparer, c'est choisir soi-même ses nouveaux déclencheurs."
+        },
+        {
+          "h": "Deux semaines avant: faire une répétition et retenir trois objectifs",
+          "p": "Considérez la quinzaine qui précède comme une répétition générale, et pas seulement comme une liste de courses. Avancez l'heure du coucher de vingt minutes tous les trois jours, jeûnez un ou deux jours par semaine si c'est déjà votre pratique, et lisez votre portion de Coran à l'heure que vous comptez adopter pendant le mois. Écrivez ensuite vos objectifs et réduisez-les à trois: une adoration à augmenter, une habitude à quitter, une habitude de santé qui protège votre énergie. Une liste courte tenue trente jours vaut mieux qu'une longue abandonnée au dixième."
+        },
+        {
+          "h": "Structurer la journée: une portion répartie et un environnement préparé",
+          "p": "Répartissez votre lecture quotidienne sur les cinq prières au lieu de la reporter à une seule session tardive qui a rarement lieu: quatre pages après chaque prière achèvent un juz complet sans jamais peser. Appliquez la même logique au sommeil: une fenêtre principale après les tarawih, une courte après le Fajr ou en milieu de journée, traitées comme des rendez-vous fixes. Préparez enfin les lieux: téléphone hors de la chambre, souhour prêt la veille, mushaf visible au moment de la rupture du jeûne. L'application Awwad est gratuite, fonctionne hors connexion et donne à chaque habitude son propre rappel, en plus des horaires de prière."
+        },
+        {
+          "h": "Milieu du mois et dix dernières nuits: protéger les acquis",
+          "p": "Le creux de la deuxième semaine est normal et non exceptionnel: l'enthousiasme initial retombe et le manque de sommeil s'accumule. La règle pratique tient en peu de mots: ne jamais manquer deux fois. Si une journée vous échappe, reprenez dès le lendemain, sans vous punir et sans vouloir rattraper trois jours d'un coup. À l'approche des dix dernières nuits, méfiez-vous du danger inverse: un programme doublé qui épuise le corps et se termine par un arrêt complet. Fixez un minimum que vous tiendrez quoi qu'il arrive, puis ajoutez au-dessus selon votre capacité réelle de la nuit."
+        },
+        {
+          "h": "Le plus difficile: les semaines qui suivent le Ramadan",
+          "p": "Quand l'ancien emploi du temps revient, les anciens déclencheurs reviennent avec lui: c'est pourquoi une grande partie des acquis se perd dès la première semaine de Chawwal. Avant la fin du mois, choisissez deux ou trois habitudes à conserver et attribuez à chacune un nouveau déclencheur dans votre routine ordinaire: deux pages après le Fajr plutôt qu'après les tarawih, par exemple. Réduisez volontairement la quantité pendant les quinze premiers jours pour éviter le choc avec la réalité. La moitié maintenue vaut bien mieux que la totalité abandonnée, et un simple bilan mensuel montre vite quelle habitude manque d'un déclencheur clair."
+        }
+      ]
+    },
+    "faq": {
+      "ar": [
+        {
+          "q": "متى أبدأ الاستعداد لرمضان؟",
+          "a": "أفضل نافذة للاستعداد تمتد من أسبوعين إلى أربعة أسابيع قبل دخول الشهر. قدّم موعد نومك عشرين دقيقة كل ثلاثة أيام، وصم يوماً أو يومين في الأسبوع إن كان ذلك من عادتك، واقرأ وِردك في التوقيت الذي تنوي اعتماده داخل رمضان. الهدف أن تدخل الليلة الأولى وجسدك يعرف الإيقاع الجديد مسبقاً، فتذهب طاقتك إلى العبادة بدلاً من التكيّف مع الصدمة."
+        },
+        {
+          "q": "كم عادة أضع في خطة رمضان؟",
+          "a": "ثلاث عادات سقف واقعي لأكثر الناس: عبادة تزيدها، وعادة تتركها، وعادة صحية تحمي نومك أو طاقتك. وما زاد على ذلك يتنافس على القدر نفسه من الانتباه المحدود فيسقط مجتمعاً في الغالب. وإذا تعلّق هدفك بمسألة شرعية كأحكام القضاء أو ضوابط النوافل، فمرجعها أهل العلم، ويمكنك الرجوع إلى موقع إسلام ويب."
+        },
+        {
+          "q": "كيف أحافظ على عادات رمضان بعد انتهائه؟",
+          "a": "قرّر قبل انتهاء الشهر لا بعده. اختر عادتين أو ثلاثاً، وامنح كل واحدة مثيراً جديداً موجوداً في جدولك المعتاد، ثم اخفض المقدار اليومي إلى النصف تقريباً في أول أسبوعين من شوال. أكثر الناس يفقدون مكاسبهم لأن المثير اختفى مع انتهاء الصيام، لا لأن الدافع تبخّر. النسخة الأصغر التي تستمر هي المقصودة أصلاً."
+        }
+      ],
+      "en": [
+        {
+          "q": "When should I start preparing for Ramadan?",
+          "a": "The window that works best is the two to four weeks before the month begins. Move your bedtime twenty minutes earlier every three days, fast a day or two each week if that is already part of your practice, and read your portion at the time you plan to use in Ramadan. The aim is to arrive on the first night with your body already familiar with the rhythm, so your energy goes into worship rather than adjustment."
+        },
+        {
+          "q": "How many habits should I put in my Ramadan plan?",
+          "a": "Three is a realistic ceiling for most people: one act of worship to increase, one habit to leave, and one health habit that protects your sleep or energy. Anything longer competes for the same limited attention and usually collapses together. If your goal touches a religious ruling, such as make-up fasts or the conditions of voluntary acts, take that question to qualified scholars or a reference such as islamweb.net."
+        },
+        {
+          "q": "How do I keep my Ramadan habits after Ramadan ends?",
+          "a": "Decide before the month ends, not after. Pick two or three habits, give each one a new cue that already exists in your ordinary schedule, and cut the daily amount roughly in half for the first two weeks of Shawwal. People usually lose their gains because the cue disappeared along with the fasting day, not because motivation vanished. A smaller version that survives is the entire point."
+        }
+      ],
+      "fr": [
+        {
+          "q": "Quand faut-il commencer à préparer le Ramadan?",
+          "a": "La meilleure fenêtre se situe entre deux et quatre semaines avant le début du mois. Avancez votre coucher de vingt minutes tous les trois jours, jeûnez un ou deux jours par semaine si cela fait déjà partie de votre pratique, et lisez votre portion à l'heure prévue pour le mois. L'objectif est d'arriver à la première nuit avec un corps déjà habitué au rythme, afin que votre énergie serve l'adoration plutôt que l'adaptation."
+        },
+        {
+          "q": "Combien d'habitudes mettre dans un plan de Ramadan?",
+          "a": "Trois constituent un plafond réaliste pour la plupart des gens: une adoration à augmenter, une habitude à quitter, une habitude de santé qui protège le sommeil ou l'énergie. Au-delà, tout se dispute la même attention limitée et s'effondre ensemble. Si votre objectif touche une question de jurisprudence, comme les jours à rattraper ou les conditions des actes surérogatoires, adressez-la à des savants qualifiés ou à une référence comme islamweb.net."
+        },
+        {
+          "q": "Comment garder les habitudes du Ramadan une fois le mois terminé?",
+          "a": "Décidez avant la fin du mois, et non après. Retenez deux ou trois habitudes, donnez à chacune un déclencheur qui existe déjà dans votre emploi du temps ordinaire, et réduisez la quantité quotidienne de moitié environ pendant les deux premières semaines de Chawwal. La plupart perdent leurs acquis parce que le déclencheur a disparu avec la journée de jeûne, non parce que la motivation s'est évaporée."
         }
       ]
     }
