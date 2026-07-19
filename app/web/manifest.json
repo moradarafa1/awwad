@@ -4,7 +4,7 @@
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0D1117",
-    "theme_color": "#4F8EF7",
+    "theme_color": "#0D1117",
     "description": "عوّاد - تطبيق مجاني يساعدك على ترك العادات السيئة وبناء عادات نافعة بأسلوب علمي وقيم إسلامية.",
     "lang": "ar",
     "dir": "rtl",
@@ -32,6 +32,40 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
+        }
+    ],
+    "id": "/app/",
+    "categories": [
+        "health",
+        "lifestyle",
+        "productivity"
+    ],
+    "shortcuts": [
+        {
+            "name": "تسجيل اليوم",
+            "short_name": "تسجيل",
+            "description": "سجّل تقدّمك في عادتك النشطة اليوم",
+            "url": "./?shortcut=log",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "هُدنة",
+            "short_name": "هُدنة",
+            "description": "تنفّس موجّه حتى تمر لحظة الضعف",
+            "url": "./?shortcut=sos",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
         }
     ]
 }
