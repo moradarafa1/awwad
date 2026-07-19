@@ -224,6 +224,67 @@ class AppState {
     return weekly != null ? longest * 7 : longest;
   }
 
+  /// HABIT STRENGTH (0-100): an exponentially weighted view of the last ~8
+  /// weeks, where recent days matter most (14-day half-life). Unlike the
+  /// streak it does NOT collapse to zero after one bad day, which is the
+  /// single most common reason people abandon a tracker. Excused skips are
+  /// transparent (neither credit nor penalty), matching every other getter.
+  int get habitStrength {
+    final byDay = {for (final e in activeEntries) e.date: e};
+    if (byDay.isEmpty) return 0;
+    final weekly = _weeklyWeekday;
+    const halfLifeDays = 14.0;
+    const windowDays = 56; // ~4 half-lives: older days add nothing visible
+    // Days BEFORE the habit was created are out of scope: counting them
+    // would cap a brand-new habit's score far below 100 no matter how
+    // perfectly the user performs.
+    final created = activeHabit?.createdAt;
+    final floor = created == null
+        ? null
+        : DateTime(created.year, created.month, created.day);
+    var weighted = 0.0, total = 0.0;
+    var d = _todayMidnight;
+    for (var i = 0; i < windowDays; i++, d = _minusDays(d, 1)) {
+      if (floor != null && d.isBefore(floor)) break;
+      // A weekly habit is only measured on its own weekday.
+      if (weekly != null && d.weekday != weekly) continue;
+      final e = byDay[dayKey(d)];
+      if (e != null && e.isSkip) continue; // excused: transparent
+      // Today counts only once logged, so an unfinished day never drags
+      // the score down before it is over.
+      if (i == 0 && e == null) continue;
+      final w = _pow2(-i / halfLifeDays);
+      total += w;
+      if (e != null && !e.didSlip) weighted += w;
+    }
+    if (total <= 0) return 0;
+    return (weighted / total * 100).round().clamp(0, 100);
+  }
+
+  /// 2^x without importing dart:math into this file's const-heavy scope.
+  static double _pow2(double x) {
+    var r = 1.0;
+    var n = x;
+    // exp(x * ln2) via repeated squaring on the integer part + a short
+    // series on the fraction: accurate enough for a 0-100 display value.
+    final whole = n.floor();
+    n -= whole;
+    if (whole >= 0) {
+      for (var i = 0; i < whole; i++) {
+        r *= 2;
+      }
+    } else {
+      for (var i = 0; i < -whole; i++) {
+        r /= 2;
+      }
+    }
+    // 2^n for n in [0,1) = e^(n*ln2), 5 terms is well within display error.
+    const ln2 = 0.6931471805599453;
+    final y = n * ln2;
+    final frac = 1 + y + y * y / 2 + y * y * y / 6 + y * y * y * y / 24;
+    return r * frac;
+  }
+
   bool get hasComeback =>
       activeEntries.any((e) => !e.isSkip && e.didSlip) && currentStreak >= 1;
 

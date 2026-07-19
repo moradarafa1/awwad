@@ -10,6 +10,7 @@ import '../../core/analytics/analytics.dart';
 import '../../core/catalog/badge_catalog.dart';
 import '../../core/catalog/default_fields.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/widgets/tasbih_counter.dart';
 import '../../core/catalog/habit_content.dart';
 import '../../core/catalog/habit_daily_content.dart';
 import '../../core/catalog/habit_stages.dart';
@@ -210,6 +211,11 @@ const Map<String, Map<String, String>> _kRank = {
 // far, and the excuse days still available this week.
 const Map<String, Map<String, String>> _kChips = {
   'best': {'ar': 'أفضل سلسلة', 'en': 'Best streak', 'fr': 'Meilleure série'},
+  'strength': {
+    'ar': 'قوة العادة',
+    'en': 'Habit strength',
+    'fr': "Force de l'habitude"
+  },
   'saved': {'ar': 'وفّرت', 'en': 'Saved', 'fr': 'Économisé'},
   'skips': {
     'ar': 'إعفاءات متبقية',
@@ -458,7 +464,13 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
             ? wk.limit - wk.used
             : mo.limit - mo.used;
 
+    final strength = s.habitStrength;
     final chips = <Widget>[
+      // Strength before the record: it is the honest "how am I doing"
+      // number, and it survives the bad day that zeroes the streak.
+      if (strength > 0)
+        _chip('💪', '${_dl(_kChips, 'strength', locale)}: $strength%',
+            AppColors.accent),
       if (best > 0)
         _chip('🏆', '${_dl(_kChips, 'best', locale)}: $best', AppColors.accent3),
       if (money > 0)
@@ -810,6 +822,20 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
               style: const TextStyle(
                   fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
+          // Counted worship (istighfar, salawat, adhkar, gratitude, dua): a
+          // tap counter fits «مئة أو أكثر» far better than a 1-10 slider. The
+          // count DRIVES the primary metric, so nothing downstream changes.
+          if (habit != null && habitUsesTasbih(habit.catalogKey))
+            TasbihCounter(
+              habitId: habit.id,
+              dayKey: dayKey(DateTime.now()),
+              target: tasbihTargetFor(habit.catalogKey!),
+              onChanged: (count) {
+                final v = tasbihToMetric(
+                    count, tasbihTargetFor(habit.catalogKey!));
+                if (v != _urge.round()) setState(() => _urge = v.toDouble());
+              },
+            ),
           // primary slider (urge / progress / prayer-delay ...)
           SectionCard(
             child: _slider(
