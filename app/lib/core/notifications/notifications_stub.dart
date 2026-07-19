@@ -63,3 +63,5 @@ const String kTapHabit = 'habit:';
 const String kTapReport = 'report';
 
 void onNotificationTap(void Function(String payload) listener) {}
+
+void removeNotificationTapListener(void Function(String payload) listener) {}

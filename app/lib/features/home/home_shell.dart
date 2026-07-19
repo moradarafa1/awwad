@@ -1,6 +1,7 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +14,7 @@ import '../../core/cloud/sync_service.dart';
 import '../../core/content/dhikr.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/notifications/notif_scheduler.dart';
+import '../../core/platform/reliability.dart';
 import '../../core/prayer/prayer_scheduler.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widget/widget_sync.dart';
@@ -78,22 +80,30 @@ class _HomeShellState extends ConsumerState<HomeShell>
   /// `report` opens the monthly report. Unknown payloads are ignored.
   void _handleNotificationTap(String payload) {
     if (!mounted) return;
+    // Two taps in a row must not stack two identical screens, so anything
+    // pushed by a previous tap is popped back to this shell first.
+    void pushOnce(Widget Function() build) {
+      final nav = Navigator.of(context);
+      nav.popUntil((r) => r.isFirst);
+      nav.push(MaterialPageRoute(builder: (_) => build()));
+    }
+
     if (payload == kTapPrayer) {
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const PrayerSettingsScreen()));
+      pushOnce(() => const PrayerSettingsScreen());
       return;
     }
     if (payload == kTapReport) {
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const MonthlyReportScreen()));
+      pushOnce(() => const MonthlyReportScreen());
       return;
     }
     if (payload.startsWith(kTapHabit)) {
       final id = payload.substring(kTapHabit.length);
       final s = ref.read(appControllerProvider);
-      if (s.habits.any((h) => h.id == id)) {
-        ref.read(appControllerProvider.notifier).setActiveHabit(id);
-      }
+      // A habit deleted after its reminder was scheduled leaves a stale
+      // payload: ignore it rather than yanking the user to a habit that is
+      // no longer there.
+      if (!s.habits.any((h) => h.id == id)) return;
+      ref.read(appControllerProvider.notifier).setActiveHabit(id);
       ref.read(homeTabProvider.notifier).state = 0; // Today
     }
   }
@@ -101,6 +111,10 @@ class _HomeShellState extends ConsumerState<HomeShell>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    // This shell is unmounted whenever the last habit is deleted (the root
+    // gate falls back to onboarding), so an un-removed listener would retain
+    // the disposed State and stack up another one on the next mount.
+    removeNotificationTapListener(_handleNotificationTap);
     super.dispose();
   }
 
@@ -156,12 +170,14 @@ class _HomeShellState extends ConsumerState<HomeShell>
     var s = ref.read(appControllerProvider);
     final loc = Localizations.localeOf(context).languageCode;
 
-    // CONTEXTUAL permission prompt (SP9): ask only once the user actually has
-    // something to be reminded about, i.e. a habit with reminder times. A
-    // cold prompt on first launch is both a known Apple soft-rejection flag
-    // and the worst possible moment to ask, since the value is not yet clear.
-    final wantsReminders = s.habits.any((h) => h.times.isNotEmpty);
-    if (!s.settings.notifPromptShown && wantsReminders) {
+    // CONTEXTUAL permission prompt (SP9). This screen only ever renders once
+    // onboarding is done and a habit exists, so by here the user HAS picked a
+    // habit and its reminder times: that is the contextual moment, and it is
+    // strictly later than the old first-launch prompt on the auth screen.
+    // NOTE: do not gate this on "has reminder times" - Habit.times always
+    // falls back to [reminderHour], so such a condition is always true and
+    // the gate would be dead code pretending to be a decision.
+    if (!kIsWeb && !s.settings.notifPromptShown) {
       final granted = await ensureNotificationPermission();
       if (!granted) await ctrl.setNotificationsEnabled(false);
       await ctrl.markNotifPromptShown();
@@ -170,14 +186,28 @@ class _HomeShellState extends ConsumerState<HomeShell>
     }
 
     // The OS-level switch can be flipped in system settings at ANY time:
-    // reconcile on every open so the in-app toggle never lies. (Unknown
-    // platform states report true, so this can never falsely disable.)
+    // reconcile so the in-app toggle never lies. Gated on notifPromptShown
+    // because a NOT-YET-DETERMINED permission also reads as "not enabled",
+    // and treating that as a denial would silently and permanently disable
+    // the user's notifications before they were ever asked.
     if (!kIsWeb &&
+        s.settings.notifPromptShown &&
         s.settings.notificationsEnabled &&
         !await osNotificationsEnabled()) {
       await ctrl.setNotificationsEnabled(false);
       if (!mounted) return;
       s = ref.read(appControllerProvider);
+    }
+
+    // The adhan channel must exist WITH its bypass flag before any adhan is
+    // scheduled onto it. Doing this only on the settings toggle missed every
+    // upgrade and backup-restore user (their adhanSound is already true), and
+    // the plugin would then create a plain, bypass-less channel first.
+    // Re-calling also re-applies the flag once DND access is finally granted.
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      final ch = _kAdhanChannel[loc] ?? _kAdhanChannel['ar']!;
+      await createAdhanBypassChannel(
+          name: ch['name']!, description: ch['desc']!);
     }
 
     if (!mounted) return;
@@ -432,3 +462,23 @@ class _HomeShellState extends ConsumerState<HomeShell>
     );
   }
 }
+
+/// What the user reads for the adhan channel in Android system settings.
+/// Native code cannot know the app locale, so these are passed down.
+const Map<String, Map<String, String>> _kAdhanChannel = {
+  'ar': {
+    'name': 'الأذان',
+    'desc':
+        'تنبيه الأذان عند دخول وقت كل صلاة، ويتجاوز وضع عدم الإزعاج إن سمحت له بذلك من إعدادات النظام.',
+  },
+  'en': {
+    'name': 'Adhan (prayer call)',
+    'desc':
+        'The call to prayer at each prayer time. It bypasses Do Not Disturb if you grant that access in system settings.',
+  },
+  'fr': {
+    'name': "Adhan (appel à la prière)",
+    'desc':
+        "L'appel à la prière à chaque heure de prière. Il outrepasse le mode Ne pas déranger si vous accordez cet accès dans les réglages.",
+  },
+};

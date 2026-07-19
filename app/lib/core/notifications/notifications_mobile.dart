@@ -660,12 +660,21 @@ String? _pendingTap;
 /// Registers a listener for notification taps. Any tap that arrived BEFORE a
 /// listener existed (the launch-from-notification case) is replayed once.
 void onNotificationTap(void Function(String payload) listener) {
+  if (_tapListeners.contains(listener)) return; // idempotent re-registration
   _tapListeners.add(listener);
   final pending = _pendingTap;
   if (pending != null) {
     _pendingTap = null;
     listener(pending);
   }
+}
+
+/// Unregisters a listener. The screen that registers MUST call this in
+/// dispose: HomeShell is unmounted whenever the last habit is deleted, and
+/// without removal the disposed State (and its whole element subtree) would
+/// be retained and would keep receiving taps.
+void removeNotificationTapListener(void Function(String payload) listener) {
+  _tapListeners.remove(listener);
 }
 
 void _routeTap(String? payload) {

@@ -246,28 +246,40 @@ class MainActivity : FlutterActivity() {
                     try {
                         if (android.os.Build.VERSION.SDK_INT >= 26) {
                             val nm = getSystemService(NotificationManager::class.java)
-                            val id = "awwad_adhan_v2"
-                            if (nm.getNotificationChannel(id) == null) {
-                                val ch = NotificationChannel(
-                                    id,
-                                    "الأذان (يتجاوز عدم الإزعاج)",
-                                    NotificationManager.IMPORTANCE_HIGH
-                                )
-                                ch.description =
-                                    "تنبيه الأذان عند دخول وقت الصلاة، ويتجاوز وضع عدم الإزعاج إن سمحت له بذلك."
-                                ch.setBypassDnd(true)
-                                ch.setSound(
-                                    android.net.Uri.parse(
-                                        "android.resource://$packageName/raw/adhan"
-                                    ),
-                                    android.media.AudioAttributes.Builder()
-                                        .setUsage(android.media.AudioAttributes.USAGE_ALARM)
-                                        .setContentType(
-                                            android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION
-                                        )
-                                        .build()
-                                )
-                                nm.createNotificationChannel(ch)
+                            val ch = NotificationChannel(
+                                "awwad_adhan_v2",
+                                call.argument<String>("name")
+                                    ?: "Adhan (bypasses Do Not Disturb)",
+                                NotificationManager.IMPORTANCE_HIGH
+                            )
+                            ch.description = call.argument<String>("description")
+                            ch.setBypassDnd(true)
+                            ch.setSound(
+                                android.net.Uri.parse(
+                                    "android.resource://$packageName/raw/adhan"
+                                ),
+                                android.media.AudioAttributes.Builder()
+                                    .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                                    .setContentType(
+                                        android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION
+                                    )
+                                    .build()
+                            )
+                            // Deliberately NOT guarded by "channel does not
+                            // exist yet". setBypassDnd only takes effect while
+                            // the app holds DND policy access, which the user
+                            // grants LATER, so this must be re-callable to
+                            // apply the flag once it is granted. (Android
+                            // ignores importance/sound changes on an existing
+                            // channel, so re-calling cannot override the
+                            // user's own tuning.)
+                            nm.createNotificationChannel(ch)
+                            // The v1 channel is dead: leaving it behind shows
+                            // two adhan entries in system settings, one inert.
+                            try {
+                                nm.deleteNotificationChannel("awwad_adhan_v1")
+                            } catch (e: Exception) {
+                                // nothing to delete on a fresh install
                             }
                             result.success(true)
                         } else {

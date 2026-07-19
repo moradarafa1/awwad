@@ -16,6 +16,11 @@
          user-visible, time-critical religious reminders. NEVER swap this for
          USE_EXACT_ALARM (Play restricts that to alarm-clock/calendar apps). -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- Required for the adhan to be ABLE to bypass Do Not Disturb. Holding
+         it grants nothing by itself: it is the marker Android uses to list
+         Awwad under Settings > Do Not Disturb access, where the user decides.
+         Without it that screen can never show us and the bypass is dead. -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
     <!-- App-usage monitoring for the phone-addiction habit: a SPECIAL permission
          the user grants manually in system settings (Usage access); it cannot be
          requested at runtime. tools:ignore silences the lint for declaring it. -->

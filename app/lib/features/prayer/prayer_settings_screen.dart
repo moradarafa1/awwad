@@ -368,7 +368,6 @@ class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen>
                       setState(() => _cfg = _cfg.copyWith(adhanSound: v));
                       // The bypass channel must exist before the first adhan
                       // is scheduled onto it.
-                      if (v) await createAdhanBypassChannel();
                       await _checkDnd();
                       await _save();
                     },
@@ -390,6 +389,12 @@ class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen>
                       onTap: () async {
                         await openDndAccessSettings();
                         await _checkDnd();
+                        // Re-create the channel now that access may have been
+                        // granted: setBypassDnd only sticks while held.
+                        if (!_dndMissing) {
+                          await createAdhanBypassChannel(
+                              name: _s('dndChName'), description: _s('dndChDesc'));
+                        }
                       },
                     ),
                 ],
@@ -503,6 +508,19 @@ const Map<String, Map<String, String>> _kStr = {
     'ar': 'يُشغّل الأذان عند دخول وقت كل صلاة (أندرويد).',
     'en': 'Plays the call to prayer when each prayer time enters (Android).',
     'fr': "Joue l'appel a la priere a l'entree de chaque priere (Android)."
+  },
+  'dndChName': {
+    'ar': 'الأذان',
+    'en': 'Adhan (prayer call)',
+    'fr': "Adhan (appel à la prière)"
+  },
+  'dndChDesc': {
+    'ar':
+        'تنبيه الأذان عند دخول وقت كل صلاة، ويتجاوز وضع عدم الإزعاج إن سمحت له بذلك من إعدادات النظام.',
+    'en':
+        'The call to prayer at each prayer time. It bypasses Do Not Disturb if you grant that access in system settings.',
+    'fr':
+        "L'appel à la prière à chaque heure de prière. Il outrepasse le mode Ne pas déranger si vous accordez cet accès dans les réglages."
   },
   'dnd': {
     'ar': 'اسمح للأذان بتجاوز عدم الإزعاج',

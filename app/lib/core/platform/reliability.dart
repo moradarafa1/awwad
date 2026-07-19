@@ -57,11 +57,21 @@ Future<bool> openNotificationSettings() async {
 // flutter_local_notifications cannot express that flag, so the channel is
 // created natively. All three calls fail open.
 
-/// Creates the DND-bypassing adhan channel (Android 8+). Idempotent.
-Future<bool> createAdhanBypassChannel() async {
+/// Creates (or refreshes) the DND-bypassing adhan channel on Android 8+.
+/// Safe to call on every app open, and it MUST be called again after the user
+/// grants DND access: setBypassDnd only sticks while the app holds that
+/// access, so a channel created before the grant needs re-applying.
+/// [name] and [description] are what the user reads in system settings, so
+/// they are passed in localized rather than hardcoded natively.
+Future<bool> createAdhanBypassChannel(
+    {required String name, required String description}) async {
   if (kIsWeb) return false;
   try {
-    return await _ch.invokeMethod<bool>('createAdhanChannel') ?? false;
+    return await _ch.invokeMethod<bool>(
+          'createAdhanChannel',
+          {'name': name, 'description': description},
+        ) ??
+        false;
   } catch (_) {
     return false;
   }
