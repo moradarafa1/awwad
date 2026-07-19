@@ -1,6 +1,8 @@
 package com.awwad.awwad
 
 import android.app.AppOpsManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.Context
@@ -234,6 +236,67 @@ class MainActivity : FlutterActivity() {
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "manufacturer" -> result.success(android.os.Build.MANUFACTURER)
+                // The adhan channel with DND BYPASS. flutter_local_notifications
+                // cannot express setBypassDnd, so the channel is created here and
+                // the Dart side just posts to its id. Bypass is only GRANTED if
+                // the user gives Awwad "Do Not Disturb access" in system
+                // settings; without it Android keeps the channel but ignores the
+                // flag, which is a silent, safe degrade.
+                "createAdhanChannel" -> {
+                    try {
+                        if (android.os.Build.VERSION.SDK_INT >= 26) {
+                            val nm = getSystemService(NotificationManager::class.java)
+                            val id = "awwad_adhan_v2"
+                            if (nm.getNotificationChannel(id) == null) {
+                                val ch = NotificationChannel(
+                                    id,
+                                    "الأذان (يتجاوز عدم الإزعاج)",
+                                    NotificationManager.IMPORTANCE_HIGH
+                                )
+                                ch.description =
+                                    "تنبيه الأذان عند دخول وقت الصلاة، ويتجاوز وضع عدم الإزعاج إن سمحت له بذلك."
+                                ch.setBypassDnd(true)
+                                ch.setSound(
+                                    android.net.Uri.parse(
+                                        "android.resource://$packageName/raw/adhan"
+                                    ),
+                                    android.media.AudioAttributes.Builder()
+                                        .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                                        .setContentType(
+                                            android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION
+                                        )
+                                        .build()
+                                )
+                                nm.createNotificationChannel(ch)
+                            }
+                            result.success(true)
+                        } else {
+                            result.success(false) // pre-Oreo has no channels
+                        }
+                    } catch (e: Exception) {
+                        result.success(false)
+                    }
+                }
+                // Whether the user has granted DND access, so the UI can tell
+                // the truth instead of promising a bypass that will not happen.
+                "hasDndAccess" -> {
+                    try {
+                        val nm = getSystemService(NotificationManager::class.java)
+                        result.success(nm.isNotificationPolicyAccessGranted)
+                    } catch (e: Exception) {
+                        result.success(false)
+                    }
+                }
+                "openDndAccessSettings" -> {
+                    try {
+                        startActivity(
+                            Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+                        )
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.success(false)
+                    }
+                }
                 "openNotificationSettings" -> {
                     // Deep link into this app's notification settings (API 26+),
                     // falling back to app details, then general Settings.

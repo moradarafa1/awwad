@@ -19,6 +19,7 @@
 // changing behavior requires a NEW id, never an edit): awwad_daily,
 // awwad_dhikr, awwad_account, awwad_badges, awwad_adhan_v1, awwad_prayer_v1,
 // awwad_prayer_pre_v1, awwad_adhkar_v1, awwad_kahf_v1, awwad_pomodoro_v1,
+// awwad_adhan_v2 (created natively in MainActivity with setBypassDnd),
 // awwad_report_v1, plus awwad_usage_guard created natively in
 // UsageLimitWorker.kt.
 
@@ -44,7 +45,7 @@ const _badgeChannelName = 'Achievements';
 // Prayer notifications with the adhan sound. A dedicated channel because an
 // Android channel's sound is fixed at creation; the app switches between this
 // channel and the silent prayer channel via the user's adhan-sound toggle.
-const _adhanChannelId = 'awwad_adhan_v1';
+const _adhanChannelId = 'awwad_adhan_v2'; // created natively with setBypassDnd
 const _adhanChannelName = 'Adhan (prayer call)';
 // Prayer notifications live on their OWN channels, separate from the habit
 // channel: a user who mutes daily habit nudges in system settings must not
@@ -115,7 +116,18 @@ Future<void> initNotifications() async {
   try {
     await _plugin.initialize(
       const InitializationSettings(android: android, iOS: ios),
+      onDidReceiveNotificationResponse: (r) => _routeTap(r.payload),
     );
+    // A notification that LAUNCHED the app is not delivered to the callback
+    // above, so it has to be read separately or the tap silently does nothing.
+    try {
+      final launch = await _plugin.getNotificationAppLaunchDetails();
+      if (launch?.didNotificationLaunchApp ?? false) {
+        _routeTap(launch!.notificationResponse?.payload);
+      }
+    } catch (_) {
+      // Fail-open: the app still opens on its normal first screen.
+    }
     _ready = true;
   } catch (e) {
     // e.g. MissingPluginException under `flutter test`; callers stay no-op.
@@ -216,6 +228,7 @@ Future<void> _safeZoned(
   NotificationDetails details, {
   DateTimeComponents? match,
   bool exact = false,
+  String? payload,
 }) async {
   var mode = AndroidScheduleMode.inexactAllowWhileIdle;
   if (exact && await canUseExactAlarms()) {
@@ -227,6 +240,7 @@ Future<void> _safeZoned(
         body,
         when,
         details,
+        payload: payload,
         androidScheduleMode: m,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
@@ -332,7 +346,7 @@ Future<void> showBadgeNotification(int slot, String title, String body) async {
 
 /// One per-habit, per-time daily reminder ([slot] 0.._habitReminderMax-1).
 Future<void> scheduleHabitReminder(
-    int slot, int hour, String title, String body) async {
+    int slot, int hour, String title, String body, [String? habitId]) async {
   if (slot < 0 || slot >= _habitReminderMax) return;
   await initNotifications();
   const details = NotificationDetails(
@@ -348,7 +362,8 @@ Future<void> scheduleHabitReminder(
   );
   await _safeZoned(_habitReminderBase + slot, title, body,
       _nextInstanceOfHour(hour), details,
-      match: DateTimeComponents.time); // repeat daily
+      match: DateTimeComponents.time, // repeat daily
+      payload: habitId == null ? null : '$kTapHabit$habitId');
 }
 
 const _testNowId = 1998;
@@ -381,7 +396,8 @@ Future<void> scheduleMonthlyReport(String title, String body) async {
     ),
     iOS: const DarwinNotificationDetails(),
   );
-  await _safeZoned(_monthlyId, title, body, when, details);
+  await _safeZoned(_monthlyId, title, body, when, details,
+      payload: kTapReport);
 }
 
 Future<void> cancelMonthlyReport() async {
@@ -489,7 +505,7 @@ Future<void> scheduleAt(int id, DateTime when, String title, String body,
         interruptionLevel: InterruptionLevel.timeSensitive),
   );
   await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details,
-      exact: true); // prayer-family timing must be minute-accurate
+      exact: true, payload: kTapPrayer); // minute-accurate, opens prayer screen
 }
 
 /// A prayer notification that plays the ADHAN sound (Android). The sound is the
@@ -525,7 +541,7 @@ Future<void> scheduleAdhan(
     ),
   );
   await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details,
-      exact: true); // the adhan must play AT prayer time, not minutes later
+      exact: true, payload: kTapPrayer); // must play AT prayer time
 }
 
 /// Cancels an inclusive id range (used for the 4000-4299 prayer window).
@@ -620,5 +636,49 @@ Future<void> cancelAllNotifications() async {
     await _plugin.cancelAll();
   } catch (e) {
     debugPrint('awwad notif: cancelAll failed: $e');
+  }
+}
+
+// ---------------------------------------------------------------------------
+// TAP ROUTING (MANDATE_PLAN N8)
+// A tapped notification must land the user where the notification was about:
+// a prayer alert opens the prayer screen, a habit reminder opens that habit's
+// log. The payload is a plain string so it survives the plugin's Android and
+// iOS paths identically; the UI layer listens on [notificationTaps] and does
+// the navigating, keeping this file free of any Flutter widget dependency.
+// ---------------------------------------------------------------------------
+
+/// Payload prefixes. Keep stable: a payload can outlive an app update inside
+/// an already-scheduled notification.
+const String kTapPrayer = 'prayer';
+const String kTapHabit = 'habit:'; // + habit id
+const String kTapReport = 'report';
+
+final List<void Function(String)> _tapListeners = [];
+String? _pendingTap;
+
+/// Registers a listener for notification taps. Any tap that arrived BEFORE a
+/// listener existed (the launch-from-notification case) is replayed once.
+void onNotificationTap(void Function(String payload) listener) {
+  _tapListeners.add(listener);
+  final pending = _pendingTap;
+  if (pending != null) {
+    _pendingTap = null;
+    listener(pending);
+  }
+}
+
+void _routeTap(String? payload) {
+  if (payload == null || payload.isEmpty) return;
+  if (_tapListeners.isEmpty) {
+    _pendingTap = payload; // replayed as soon as the UI registers
+    return;
+  }
+  for (final l in List.of(_tapListeners)) {
+    try {
+      l(payload);
+    } catch (e) {
+      debugPrint('awwad notif: tap listener failed: $e');
+    }
   }
 }

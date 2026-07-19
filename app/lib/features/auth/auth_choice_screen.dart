@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/cloud/supabase_service.dart';
-import '../../core/notifications/notifications.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/ambient_background.dart';
 import '../../core/widgets/glass_button.dart';
@@ -14,9 +13,8 @@ import 'auth_screen.dart';
 /// as a guest (data stays offline on the device). Shown once, then the
 /// settings.authChoiceMade flag advances the root gate to onboarding.
 ///
-/// It also requests the permissions the app needs (notifications) up front on
-/// first open, with no extra in-app dialog. Internet is granted at install and
-/// connectivity needs no permission, so notifications is the only OS prompt.
+/// It requests NO OS permission: the notification prompt moved to the first
+/// moment the user actually has a habit with reminder times (see home_shell).
 class AuthChoiceScreen extends ConsumerStatefulWidget {
   const AuthChoiceScreen({super.key});
   @override
@@ -24,24 +22,12 @@ class AuthChoiceScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthChoiceScreenState extends ConsumerState<AuthChoiceScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _requestPermissions());
-  }
-
-  Future<void> _requestPermissions() async {
-    final s = ref.read(appControllerProvider);
-    if (s.settings.notifPromptShown) return;
-    // OS prompt directly, no extra dialog. If the user DENIES, flip the
-    // in-app toggle off too: otherwise Settings shows notifications as ON
-    // while the OS silently blocks them, and the permission is never asked
-    // again (turning the toggle back ON re-requests it).
-    final granted = await ensureNotificationPermission();
-    final ctrl = ref.read(appControllerProvider.notifier);
-    if (!granted) await ctrl.setNotificationsEnabled(false);
-    await ctrl.markNotifPromptShown();
-  }
+  // The notification permission is NO LONGER requested here (SP9). Asking on
+  // the very first screen, before the user has any habit or reminder, is the
+  // weakest possible moment: the value is unexplained, a denial is permanent
+  // on Android 13+, and a cold prompt is a known Apple soft-rejection flag.
+  // home_shell now asks the first time the user actually has a habit with
+  // reminder times, and Settings re-requests on demand.
 
   String _s(Map<String, String> m, String loc) => m[loc] ?? m['ar'] ?? '';
 

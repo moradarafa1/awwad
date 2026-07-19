@@ -7,8 +7,8 @@ Future<bool> ensureNotificationPermission() async => false;
 
 Future<void> scheduleDailyReminder(int hour, String title, String body) async {}
 
-Future<void> scheduleHabitReminder(
-    int slot, int hour, String title, String body) async {}
+Future<void> scheduleHabitReminder(int slot, int hour, String title,
+    String body, [String? habitId]) async {}
 
 Future<void> cancelHabitReminders() async {}
 
@@ -57,3 +57,9 @@ Future<bool> requestExactAlarmsPermission() async => false;
 Future<bool> osNotificationsEnabled() async => true;
 
 Future<void> cancelAllNotifications() async {}
+
+const String kTapPrayer = 'prayer';
+const String kTapHabit = 'habit:';
+const String kTapReport = 'report';
+
+void onNotificationTap(void Function(String payload) listener) {}

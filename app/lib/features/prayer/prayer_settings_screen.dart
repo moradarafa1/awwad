@@ -11,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 
 import '../../app/theme.dart';
 import '../../core/notifications/notifications.dart';
+import '../../core/platform/reliability.dart';
 import '../../core/prayer/prayer_engine.dart';
 import '../../core/prayer/prayer_scheduler.dart';
 import '../../core/state/app_state.dart';
@@ -30,6 +31,8 @@ class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen>
   // Android 12+ «Alarms and reminders» grant missing: the adhan/prayer
   // notifications would be delayed by inexact batching until it is given.
   bool _exactMissing = false;
+  // Adhan is on but the OS will still mute it inside Do Not Disturb.
+  bool _dndMissing = false;
 
   @override
   void initState() {
@@ -38,6 +41,13 @@ class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen>
     final raw = ref.read(localStoreProvider).loadPrayer();
     if (raw != null) _cfg = PrayerConfig.fromJson(raw);
     _checkExact();
+    _checkDnd();
+  }
+
+  Future<void> _checkDnd() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+    final ok = await hasDndAccess();
+    if (mounted) setState(() => _dndMissing = !ok);
   }
 
   @override
@@ -356,9 +366,32 @@ class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen>
                             TextStyle(fontSize: 11, color: AppColors.muted)),
                     onChanged: (v) async {
                       setState(() => _cfg = _cfg.copyWith(adhanSound: v));
+                      // The bypass channel must exist before the first adhan
+                      // is scheduled onto it.
+                      if (v) await createAdhanBypassChannel();
+                      await _checkDnd();
                       await _save();
                     },
                   ),
+                  // Honest DND note: the adhan can only pierce Do Not Disturb
+                  // if the user grants that access, so we say so plainly
+                  // instead of quietly failing at prayer time.
+                  if (_cfg.adhanSound && _dndMissing)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.do_not_disturb_on_outlined,
+                          color: AppColors.accent2),
+                      title: Text(_s('dnd'),
+                          style: const TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w700)),
+                      subtitle: Text(_s('dndSub'),
+                          style: TextStyle(
+                              fontSize: 11, color: AppColors.muted)),
+                      onTap: () async {
+                        await openDndAccessSettings();
+                        await _checkDnd();
+                      },
+                    ),
                 ],
                 if (_exactMissing) ...[
                   const Divider(),
@@ -470,6 +503,19 @@ const Map<String, Map<String, String>> _kStr = {
     'ar': 'يُشغّل الأذان عند دخول وقت كل صلاة (أندرويد).',
     'en': 'Plays the call to prayer when each prayer time enters (Android).',
     'fr': "Joue l'appel a la priere a l'entree de chaque priere (Android)."
+  },
+  'dnd': {
+    'ar': 'اسمح للأذان بتجاوز عدم الإزعاج',
+    'en': 'Let the adhan bypass Do Not Disturb',
+    'fr': "Laisser l'adhan outrepasser le mode Ne pas déranger"
+  },
+  'dndSub': {
+    'ar':
+        'بدون هذا الإذن يكتم النظام الأذان أثناء وضع عدم الإزعاج. امنح عوّاد «الوصول إلى عدم الإزعاج» ليصلك الأذان في وقته.',
+    'en':
+        'Without this access the system mutes the adhan during Do Not Disturb. Grant Awwad "Do Not Disturb access" so the adhan still reaches you.',
+    'fr':
+        "Sans cet accès, le système coupe l'adhan en mode Ne pas déranger. Accordez à Awwad l'accès « Ne pas déranger »."
   },
   'exactAlarm': {
     'ar': 'فعّل دقة المواعيد',

@@ -50,3 +50,40 @@ Future<bool> openNotificationSettings() async {
     return false;
   }
 }
+
+// --- Adhan vs Do Not Disturb (MANDATE_PLAN N7, safe half) ---
+// Android channels can bypass DND, but only if the user grants the app "Do
+// Not Disturb access" AND the channel was created with the flag.
+// flutter_local_notifications cannot express that flag, so the channel is
+// created natively. All three calls fail open.
+
+/// Creates the DND-bypassing adhan channel (Android 8+). Idempotent.
+Future<bool> createAdhanBypassChannel() async {
+  if (kIsWeb) return false;
+  try {
+    return await _ch.invokeMethod<bool>('createAdhanChannel') ?? false;
+  } catch (_) {
+    return false;
+  }
+}
+
+/// Whether the user has actually granted DND access. Without it the bypass
+/// silently does nothing, so the UI must not promise it.
+Future<bool> hasDndAccess() async {
+  if (kIsWeb) return false;
+  try {
+    return await _ch.invokeMethod<bool>('hasDndAccess') ?? false;
+  } catch (_) {
+    return false;
+  }
+}
+
+/// Opens the system screen where DND access is granted.
+Future<bool> openDndAccessSettings() async {
+  if (kIsWeb) return false;
+  try {
+    return await _ch.invokeMethod<bool>('openDndAccessSettings') ?? false;
+  } catch (_) {
+    return false;
+  }
+}

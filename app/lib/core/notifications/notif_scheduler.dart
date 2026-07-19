@@ -14,7 +14,9 @@ class HabitReminderSpec {
   final int hour;
   final String title;
   final String body;
-  const HabitReminderSpec(this.hour, this.title, this.body);
+  /// The habit this reminder belongs to, so tapping it can open that habit.
+  final String habitId;
+  const HabitReminderSpec(this.hour, this.title, this.body, this.habitId);
 }
 
 /// Build the reminder list for all habits at all their chosen times.
@@ -23,7 +25,7 @@ List<HabitReminderSpec> habitRemindersFor(List<Habit> habits, String loc) {
   final out = <HabitReminderSpec>[];
   for (final h in habits) {
     for (final hour in h.times) {
-      out.add(HabitReminderSpec(hour, h.title, body));
+      out.add(HabitReminderSpec(hour, h.title, body, h.id));
     }
   }
   return out;
@@ -52,7 +54,7 @@ Future<void> applyNotificationSchedule({
   var slot = 0;
   for (final r in habitReminders) {
     if (slot >= maxSlots) break;
-    await scheduleHabitReminder(slot++, r.hour, r.title, r.body);
+    await scheduleHabitReminder(slot++, r.hour, r.title, r.body, r.habitId);
   }
   if (dhikrEnabled && showReligious) {
     await scheduleDhikrReminder(dhikrHour, dhikrTitle, kIbrahimicPrayer);

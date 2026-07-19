@@ -22,6 +22,8 @@ import 'stats_screen.dart';
 import 'badges_screen.dart';
 import 'settings_screen.dart';
 import '../pomodoro/pomodoro_screen.dart';
+import '../prayer/prayer_settings_screen.dart';
+import '../report/monthly_report_screen.dart';
 import '../sos/sos_screen.dart';
 
 /// Selected bottom-nav tab index, shared so any screen can switch tabs
@@ -65,7 +67,35 @@ class _HomeShellState extends ConsumerState<HomeShell>
       _autoSync();
       // Seed the home-screen widget with the current state on every open.
       HomeWidgetSync.push(ref.read(appControllerProvider));
+      // A tapped notification must land where it was about (N8). Registered
+      // here because this shell owns the tabs; a tap that arrived before this
+      // (app launched BY the notification) is replayed on registration.
+      onNotificationTap(_handleNotificationTap);
     });
+  }
+
+  /// `prayer` opens prayer settings, `habit:<id>` opens that habit's log,
+  /// `report` opens the monthly report. Unknown payloads are ignored.
+  void _handleNotificationTap(String payload) {
+    if (!mounted) return;
+    if (payload == kTapPrayer) {
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const PrayerSettingsScreen()));
+      return;
+    }
+    if (payload == kTapReport) {
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const MonthlyReportScreen()));
+      return;
+    }
+    if (payload.startsWith(kTapHabit)) {
+      final id = payload.substring(kTapHabit.length);
+      final s = ref.read(appControllerProvider);
+      if (s.habits.any((h) => h.id == id)) {
+        ref.read(appControllerProvider.notifier).setActiveHabit(id);
+      }
+      ref.read(homeTabProvider.notifier).state = 0; // Today
+    }
   }
 
   @override
@@ -126,11 +156,12 @@ class _HomeShellState extends ConsumerState<HomeShell>
     var s = ref.read(appControllerProvider);
     final loc = Localizations.localeOf(context).languageCode;
 
-    // First open: request the OS notification permission directly (no extra
-    // in-app dialog). Covers users who skipped the first-open auth screen.
-    // A DENIAL flips the in-app toggle off, so Settings tells the truth and
-    // switching it back ON re-requests the permission.
-    if (!s.settings.notifPromptShown) {
+    // CONTEXTUAL permission prompt (SP9): ask only once the user actually has
+    // something to be reminded about, i.e. a habit with reminder times. A
+    // cold prompt on first launch is both a known Apple soft-rejection flag
+    // and the worst possible moment to ask, since the value is not yet clear.
+    final wantsReminders = s.habits.any((h) => h.times.isNotEmpty);
+    if (!s.settings.notifPromptShown && wantsReminders) {
       final granted = await ensureNotificationPermission();
       if (!granted) await ctrl.setNotificationsEnabled(false);
       await ctrl.markNotifPromptShown();
