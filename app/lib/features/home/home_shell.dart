@@ -28,6 +28,11 @@ import '../sos/sos_screen.dart';
 /// (e.g. the daily log jumps to Stats after saving).
 final homeTabProvider = StateProvider<int>((ref) => 0);
 
+/// Set by the SOS screen when the user reports the outcome of an urge wave.
+/// true = slipped (the daily log opens with the slip answer preselected so
+/// the trigger gets journaled while it is fresh), null = nothing pending.
+final sosSlipPendingProvider = StateProvider<bool?>((ref) => null);
+
 
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});

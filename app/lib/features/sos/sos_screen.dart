@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
+import '../home/home_shell.dart';
 import '../../core/catalog/habit_content.dart';
 import '../../core/models.dart';
 import '../../core/state/app_state.dart';
@@ -376,6 +377,19 @@ class _SosScreenState extends ConsumerState<SosScreen>
               onPressed: () => setState(_startWave),
               child: Text(_tr('stillBtn')),
             ),
+            // Honest third option: hiding it would make the journal lie, and
+            // the trigger is most accurate right now. Goes straight to
+            // today's log with the slip answer preselected.
+            TextButton(
+              onPressed: () {
+                AnalyticsService.instance.track('sos_slipped');
+                ref.read(sosSlipPendingProvider.notifier).state = true;
+                ref.read(homeTabProvider.notifier).state = 0;
+                Navigator.of(context).pop();
+              },
+              child: Text(_tr('slipBtn'),
+                  style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
+            ),
           ],
         ),
       ),
@@ -448,6 +462,7 @@ const Map<String, Map<String, String>> _sosStrings = {
     'dhikrTitle': 'اذكر الله',
     'winBtn': 'انتصرت، الحمد لله',
     'stillBtn': 'ما زلت أقاوم، أعد المؤقت',
+    'slipBtn': 'تعثّرت هذه المرة، سجّل ما حدث',
     'entryBtn': 'لحظة ضعف؟ اضغط هنا وسنعبرها معاً',
   },
   'en': {
@@ -468,6 +483,7 @@ const Map<String, Map<String, String>> _sosStrings = {
     'dhikrTitle': 'Remember Allah',
     'winBtn': 'I made it through',
     'stillBtn': 'Still fighting, restart the timer',
+    'slipBtn': 'I slipped this time, log what happened',
     'entryBtn': 'Weak moment? Tap here, we will get through it together',
   },
   'fr': {
@@ -488,6 +504,7 @@ const Map<String, Map<String, String>> _sosStrings = {
     'dhikrTitle': 'Invoquez Allah',
     'winBtn': "J'ai tenu bon",
     'stillBtn': 'Je résiste encore, relancer le minuteur',
+    'slipBtn': "J'ai cédé cette fois, enregistrer ce qui s'est passé",
     'entryBtn': 'Moment de faiblesse ? Appuyez ici, traversons-le ensemble',
   },
 };

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/theme.dart';
 import '../../core/catalog/motivation.dart';
 import '../../core/models.dart';
+import '../../core/report/weekly_insight.dart';
 
 /// Journey cards for BREAK habits on the stats screen: the recovery
 /// timeline, the money/time-saved calculator, and the top slip triggers.
@@ -281,5 +282,127 @@ const Map<String, Map<String, String>> _jcStrings = {
     'basis': 'sur la base de vos jours réussis :',
     'triggersTitle': 'Vos déclencheurs les plus fréquents',
     'triggersHint': 'Connaissez votre ennemi : ils précèdent souvent un écart.',
+  },
+};
+
+/// Weekly insight (MANDATE_PLAN CU8): the dominant slip trigger, the best
+/// weekday, and whether urges eased versus last week. Renders NOTHING until
+/// there is enough data, because a "finding" from two entries is noise.
+class WeeklyInsightCard extends StatelessWidget {
+  const WeeklyInsightCard(
+      {super.key, required this.insight, required this.track});
+
+  final WeeklyInsight insight;
+  final String track;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!insight.hasEnoughData) return const SizedBox.shrink();
+    final loc = Localizations.localeOf(context).languageCode;
+    final lines = <String>[];
+
+    // Success rate, phrased for the track.
+    final pct = (insight.successRate * 100).round();
+    lines.add(_wi('rate', loc)
+        .replaceFirst('{p}', '$pct')
+        .replaceFirst('{n}', '${insight.logged}'));
+
+    if (insight.bestWeekday != null) {
+      lines.add(_wi('best', loc)
+          .replaceFirst('{d}', weekdayName(insight.bestWeekday!, loc)));
+    }
+
+    // Urge trend: only reported when the change is meaningful (>= 1 point on
+    // the 1-10 scale), so noise never reads as a finding.
+    if (insight.urgeDelta <= -1) {
+      lines.add(_wi(track == 'break' ? 'easing' : 'up', loc));
+    } else if (insight.urgeDelta >= 1) {
+      lines.add(_wi(track == 'break' ? 'rising' : 'down', loc));
+    }
+
+    final advice =
+        isKnownTrigger(insight.topTrigger) ? triggerAdvice(insight.topTrigger, loc) : null;
+
+    return Container(
+      margin: const EdgeInsets.only(top: 14),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.accent.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('🔎 ${_wi('title', loc)}',
+              style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                  color: AppColors.accent)),
+          const SizedBox(height: 8),
+          for (final l in lines)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text('• $l',
+                  style: TextStyle(
+                      fontSize: 12.5, height: 1.6, color: AppColors.text)),
+            ),
+          if (advice != null) ...[
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(advice,
+                  style: TextStyle(
+                      fontSize: 12, height: 1.7, color: AppColors.muted)),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+String _wi(String k, String loc) =>
+    _kWeeklyInsight[k]?[loc] ?? _kWeeklyInsight[k]?['ar'] ?? '';
+
+const Map<String, Map<String, String>> _kWeeklyInsight = {
+  'title': {
+    'ar': 'قراءة أسبوعك',
+    'en': 'Your week in review',
+    'fr': 'Votre semaine en bref'
+  },
+  'rate': {
+    'ar': 'سجّلت {n} أياماً هذا الأسبوع، ونجحت في {p}٪ منها.',
+    'en': 'You logged {n} days this week and succeeded on {p}% of them.',
+    'fr': 'Vous avez enregistré {n} jours cette semaine, réussis à {p} %.'
+  },
+  'best': {
+    'ar': 'أفضل أيامك هذا الأسبوع كان {d}.',
+    'en': 'Your strongest day this week was {d}.',
+    'fr': 'Votre meilleur jour cette semaine a été {d}.'
+  },
+  'easing': {
+    'ar': 'رغبتك تخفّ مقارنة بالأسبوع الماضي، وهذه علامة تقدّم حقيقي.',
+    'en': 'Your urges eased compared with last week, a real sign of progress.',
+    'fr': 'Vos envies ont diminué par rapport à la semaine dernière.'
+  },
+  'rising': {
+    'ar': 'رغبتك ارتفعت مقارنة بالأسبوع الماضي، فراجع بيئتك ومحفزاتك.',
+    'en': 'Your urges rose compared with last week; revisit your environment and triggers.',
+    'fr': 'Vos envies ont augmenté ; revoyez votre environnement et vos déclencheurs.'
+  },
+  'up': {
+    'ar': 'إنجازك ارتفع مقارنة بالأسبوع الماضي، فواصل على هذا النهج.',
+    'en': 'Your progress rose compared with last week, keep this rhythm.',
+    'fr': 'Votre progression a augmenté, gardez ce rythme.'
+  },
+  'down': {
+    'ar': 'إنجازك انخفض مقارنة بالأسبوع الماضي، فابدأ بأصغر خطوة ممكنة غداً.',
+    'en': 'Your progress dipped versus last week; start with the smallest possible step tomorrow.',
+    'fr': 'Votre progression a baissé ; commencez demain par la plus petite étape.'
   },
 };

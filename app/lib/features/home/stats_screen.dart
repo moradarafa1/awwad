@@ -6,6 +6,7 @@ import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
 import '../../core/catalog/habit_daily_content.dart';
+import '../../core/report/weekly_insight.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import '../report/monthly_report_screen.dart';
@@ -178,6 +179,14 @@ class StatsScreen extends ConsumerWidget {
               ],
             ),
           ),
+          // Weekly insight: one honest sentence from this week's own data.
+          if (habit != null) ...[
+            const SizedBox(height: 14),
+            WeeklyInsightCard(
+              insight: computeWeeklyInsight(s.entries, habit.id),
+              track: habit.track,
+            ),
+          ],
           // Break-habit journey cards: recovery timeline, savings, triggers.
           if (habit != null && habit.track == 'break') ...[
             const SizedBox(height: 14),

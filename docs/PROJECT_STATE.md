@@ -759,7 +759,16 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ---
 
-## 13. Changelog
+
+- **2026-07-19 round 15 (MANDATE_PLAN Round 5 complete: SOS outcome loop + weekly insight)** -
+  SOS: the wave screen gained an honest third option «تعثّرت هذه المرة» beside «صمدت», which
+  sets sosSlipPendingProvider and jumps to today's log with the slip answer PRESELECTED, so
+  the trigger is journaled while the moment is fresh instead of being lost (hiding the option
+  would have made the relapse journal lie). WEEKLY INSIGHT (core/report/weekly_insight.dart,
+  pure + 9 tests): dominant slip trigger, cleanest weekday, and the week-over-week urge delta
+  (only reported at >= 1 point so noise never reads as a finding), rendered as a Stats card
+  that stays HIDDEN below 4 logged days, with one actionable MSA sentence per trigger
+  (behavioural/HRT advice, never a ruling). analyze clean, 115/115.
 
 - **2026-07-19 round 14 (MANDATE_PLAN Round 5 part 1: tasbih counter + habit strength)** -
   TASBIH «عدّاد الذكر» (core/widgets/tasbih_counter.dart): a large haptic tap counter for the

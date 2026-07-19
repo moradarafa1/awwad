@@ -284,7 +284,12 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
 
   void _hydrateFromToday(AppState s) {
     final activeId = s.activeHabitId;
-    if (_loadedHabitId == activeId) return;
+    if (_loadedHabitId == activeId) {
+      // The SOS screen can hand back an outcome for the SAME habit, so this
+      // has to be honored even when there is nothing to re-hydrate.
+      _consumeSosOutcome();
+      return;
+    }
     // Reset, then load today's entry for the (possibly newly-selected) habit.
     _urge = 5;
     _resistance = 5;
@@ -308,6 +313,20 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
       _selectedEnv.addAll(e.environment);
     }
     _loadedHabitId = activeId;
+    _consumeSosOutcome();
+  }
+
+  /// Applies (once) an outcome handed over by the SOS screen: a slip
+  /// preselects the answer so the user lands directly on the trigger
+  /// question while the moment is still fresh.
+  void _consumeSosOutcome() {
+    final pending = ref.read(sosSlipPendingProvider);
+    if (pending == null) return;
+    _didSlip = pending;
+    // Clear AFTER this frame: writing to a provider during build throws.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(sosSlipPendingProvider.notifier).state = null;
+    });
   }
 
   Future<void> _save() async {
