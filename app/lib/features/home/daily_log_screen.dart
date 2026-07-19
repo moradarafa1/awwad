@@ -306,8 +306,13 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
 
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context);
-    // Snapshot the record BEFORE saving so a new personal best is detectable.
-    final bestBefore = ref.read(appControllerProvider).longestStreak;
+    // Snapshot the record AND the running streak before saving. Both are
+    // needed: a user whose CURRENT run is already their all-time best beats
+    // "the record" every single day, so celebrating on longestStreak alone
+    // would fire a modal on every save forever.
+    final stateBefore = ref.read(appControllerProvider);
+    final bestBefore = stateBefore.longestStreak;
+    final streakBefore = stateBefore.currentStreak;
     final newBadges = await ref.read(appControllerProvider.notifier).saveEntry(
           urge: _urge.round(),
           resistance: _resistance.round(),
@@ -339,8 +344,14 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     // Personal record: beating your own longest streak deserves its own
     // moment, independent of the badge thresholds (a user between two badge
     // tiers otherwise gets nothing for weeks).
-    final bestAfter = ref.read(appControllerProvider).longestStreak;
-    if (bestAfter > bestBefore && bestBefore > 0 && mounted) {
+    final stateAfter = ref.read(appControllerProvider);
+    final bestAfter = stateAfter.longestStreak;
+    final streakAfter = stateAfter.currentStreak;
+    // Fire ONLY when this run overtakes a record set by an EARLIER run.
+    if (bestBefore > 0 &&
+        streakBefore < bestBefore &&
+        streakAfter >= bestBefore &&
+        mounted) {
       final title = '🏆 ${_dl(_kChips, 'record', loc)}';
       final body = _dl(_kChips, 'recordBody', loc);
       await showDialog<void>(
@@ -436,8 +447,14 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     final best = s.longestStreak;
     final cost = habit?.costPerDay ?? 0;
     final money = cost > 0 ? cost * s.cleanDays : 0;
-    final skips = s.weeklySkipUsage;
-    final skipsLeft = skips.limit - skips.used;
+    // The chip must match what skipBlockedBy() actually enforces: a skip is
+    // refused when EITHER quota is exhausted, so show the binding one.
+    final wk = s.weeklySkipUsage;
+    final mo = s.monthlySkipUsage;
+    final skipsLeft =
+        (wk.limit - wk.used) < (mo.limit - mo.used)
+            ? wk.limit - wk.used
+            : mo.limit - mo.used;
 
     final chips = <Widget>[
       if (best > 0)
@@ -750,7 +767,10 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
           _statChips(s, habit, locale),
           // Streak repair: yesterday has no entry -> offer quick backfill or
           // an excused day, so one forgotten evening does not kill the streak.
+          // Weekly habits are exempt: yesterday is a transparent off-day for
+          // them, so a "you missed yesterday" banner would be nonsense.
           if (habit != null &&
+              weeklyWeekdayFor(habit.catalogKey) == null &&
               s.entryForYesterday() == null &&
               DateTime.now().difference(habit.createdAt).inDays >= 1) ...[
             const SizedBox(height: 10),

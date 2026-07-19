@@ -257,7 +257,7 @@ const Map<String, HabitChecklists> kHabitChecklists = {
       {'ar': "احتفظ بزجاجة ماء بارد في متناول يدك على المكتب طوال اليوم.", 'en': "Keep a bottle of cold water within reach on your desk all day.", 'fr': "Garde une bouteille d'eau fraîche à portée de main sur ton bureau toute la journée."},
       {'ar': "لا تحتفظ بحبوب القهوة وكبسولات الكافيين إلا بكمية قليلة في البيت.", 'en': "Keep only a small amount of coffee beans and caffeine pods at home.", 'fr': "Ne garde qu'une petite quantite de grains de café et de capsules a la maison."},
       {'ar': "لا تشرب أي كافيين بعد العصر لحماية نومك وتقليل الحاجة إليه.", 'en': "Avoid all caffeine after mid-afternoon to protect your sleep and lower your need for it.", 'fr': "Évite toute caféine après le milieu de l'après-midi pour protéger ton sommeil."},
-      {'ar': "تجنّب الطريق المار بالمقهى وأبعد آلة القهوة عن مجال نظرك.", 'en': "Avoid the route that passes the cafe and move the coffee machine out of sight.", 'fr': "Évite le chemin qui passe devant le café et rangé la machine a café hors de vue."},
+      {'ar': "تجنّب الطريق المار بالمقهى وأبعد آلة القهوة عن مجال نظرك.", 'en': "Avoid the route that passes the cafe and move the coffee machine out of sight.", 'fr': "Évite le chemin qui passe devant le café et range la machine à café hors de vue."},
     ],
   ),
   'late_nights': HabitChecklists(

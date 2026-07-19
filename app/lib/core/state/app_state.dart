@@ -147,24 +147,27 @@ class AppState {
     if (byDay.isEmpty) return 0;
     final weekly = _weeklyWeekday;
     var s = 0;
-    var d = DateTime.now();
+    // Calendar arithmetic ONLY (never Duration): a DST shift makes absolute
+    // 24h/168h steps land on the wrong calendar day, which for a weekly
+    // habit silently skips an entire week.
+    var d = _todayMidnight;
     if (byDay[dayKey(d)] == null) {
-      d = d.subtract(const Duration(days: 1)); // today still pending
+      d = _minusDays(d, 1); // today still pending
     }
     // A weekly habit's run may only be walked back from its own weekday;
     // start by rewinding to the most recent one that is not still pending.
     if (weekly != null) {
       while (d.weekday != weekly) {
-        d = d.subtract(const Duration(days: 1));
+        d = _minusDays(d, 1);
       }
       if (byDay[dayKey(d)] == null && !d.isBefore(_todayMidnight)) {
-        d = d.subtract(const Duration(days: 7)); // this week still pending
+        d = _minusDays(d, 7); // this week still pending
       }
     }
     while (true) {
       final e = byDay[dayKey(d)];
       if (weekly != null && d.weekday != weekly) {
-        d = d.subtract(const Duration(days: 1)); // off-day: transparent
+        d = _minusDays(d, 1); // off-day: transparent
         continue;
       }
       if (e == null) break; // missed, unexcused day -> broken
@@ -172,10 +175,17 @@ class AppState {
         if (e.didSlip) break;
         s++;
       }
-      d = d.subtract(Duration(days: weekly != null ? 7 : 1));
+      d = _minusDays(d, weekly != null ? 7 : 1);
     }
-    return s;
+    // The COUNT STAYS IN DAYS for weekly habits (7 per kept week): every
+    // consumer (badges, ranks, stages, the widget label, «أيام متتالية»)
+    // reads this number as days, so returning weeks would make all of them
+    // lie. Only the walk is weekly.
+    return weekly != null ? s * 7 : s;
   }
+
+  static DateTime _minusDays(DateTime d, int n) =>
+      DateTime(d.year, d.month, d.day - n);
 
   static DateTime get _todayMidnight {
     final n = DateTime.now();
@@ -210,7 +220,8 @@ class AppState {
       } // skip: pass through
       d = DateTime(d.year, d.month, d.day + 1);
     }
-    return longest;
+    // Same unit rule as currentStreak: days, not weeks.
+    return weekly != null ? longest * 7 : longest;
   }
 
   bool get hasComeback =>

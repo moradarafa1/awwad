@@ -42,86 +42,53 @@ context or dropping anything:
 
 ---
 
-## 0.5 HANDOFF 2026-07-18 round 2 (RESUME HERE)
+## 0.5 HANDOFF 2026-07-19 (RESUME HERE)
 
-**STATE: everything delivered and verified; nothing half-done.** The adhan + radio + autolog
-round IS LIVE: Pages commit `324b61d` was pushed by the previous session before it died and a
-fresh rebuild from committed source is hash-identical to the live main.dart.js + every asset
-(byte-verified 2026-07-18; the size mismatch you may see in a Windows clone is only git
-autocrlf inflating text checkouts - compare git blob hashes, not working-tree bytes).
-NEW this round: **PER-APP OPEN COUNTS** in «استخدام الهاتف» (the owner's screenshot request) -
-MainActivity.kt `todayUsage` also walks `queryEvents` counting ACTIVITY_RESUMED
-(MOVE_TO_FOREGROUND < API 29), deduping consecutive same-package resumes; AppUsage gains
-`opens` (default 0, old payloads fine); row subtitle shows `usageOpensLabel` (pure, tested,
-MSA number agreement: فُتح مرة واحدة/مرتين/N مرات/N مرة اليوم) only when opens>0. Reviewed by a
-3-lens adversarial workflow (Android API / Arabic copy / Flutter UI): 10 raw findings, 0
-confirmed. analyze clean, 79/79 tests. APK+AAB rebuilt + aapt-verified (gotcha #11 checks),
-APK on the Desktop as `Awwad-1.0.0-final.apk`. The web bundle is BYTE-UNCHANGED by this
-feature (Android-only code, tree-shaken from web) so no Pages push was needed.
+**OWNER MANDATE (2026-07-18/19), the standing order:** (a) competitive features + per-habit
+UX polish; (b) organic search: site SEO + store ASO; (c) perfect all notifications/alarms/
+permissions; (d) Play + App Store policy compliance; (e) **whatever ships on Android must
+ship on iPhone wherever iOS allows**; (f) if the 5h limit pauses work, resume when it renews.
+The merged 10-round execution plan lives in **docs/MANDATE_PLAN.md** (items ticked there per
+round). Mandate (a) UNGATES the old 0a per-habit review, which is now DONE for the gaps found.
 
-**OWNER MANDATE (2026-07-18 ~03:30, supersedes the old next-steps order):** (a) competitive
-features/UX polish on the EXISTING habits; (b) organic-search domination: site SEO + app-store
-ASO; (c) perfect ALL notifications/alarms/reminders/permissions; (d) Google Play + App Store
-policy compliance; (e) if the 5h usage limit pauses work, RESUME after it renews (it did:
-limit hit ~03:40, resets 05:20 Cairo). NOTE: mandate (a) UNGATES the 0a deep per-habit
-appropriateness review.
+**DONE AND SHIPPED so far (all committed + pushed; see §13 for detail):** per-app open counts;
+home-screen widget (Android + the full iOS WidgetKit twin in-repo); exact prayer alarms
+(SCHEDULE_EXACT_ALARM, prayer family only, silent degrade) + the iOS timeSensitive twin;
+notification-reliability core (monochrome ic_stat_awwad status icon, 6-day prayer window on
+Android / 2 on iOS, fixed-offset timezone fallback, usage-guard worker gated on limits,
+OS-toggle reconciliation + deep link after permanent denial); Round 2 content and retention
+(break_porn metrics alias, content for the 3 newest build habits, WEEKLY streak semantics for
+surah_kahf, French accents, default reminder hours, best-streak/savings/excuse chips,
+personal-record celebration, daily rotating line); Round 3 site SEO (slashed canonicals,
+keyword title+H1, internal linking, JSON-LD, self-hosted fonts, i18n sitemap) DEPLOYED;
+Round 7 code (IN-APP ACCOUNT DELETION - the hard store blocker, coarse-only location, usage
+disclosure); Round 8 store metadata + ready-to-paste console answers; SA11 PWA polish.
 
-**STATE AT THE PAUSE: HOME-SCREEN WIDGET (0c item 4) fully IMPLEMENTED + COMMITTED in this
-commit, analyze clean, 83/83 tests, manually self-reviewed; the 4-lens adversarial review
-workflow + the 4-area mandate research workflow both DIED on the session limit BEFORE
-producing anything - RERUN BOTH after 05:20.** Widget pieces: AwwadWidgetProvider.kt +
-res/{layout,xml,drawable} + manifest receivers (.AwwadWidgetProvider + home_widget
-HomeWidgetBackgroundReceiver + LAUNCH filter) + proguard keep; Dart core/widget/widget_sync.dart
-(pure trilingual labels + HomeWidgetSync.push/registerCallback + @pragma vm:entry-point
-homeWidgetBackgroundCallback quick-log, idempotent via shared buildQuickEntry extracted in
-app_state.dart); LocalStore.reload() + AppController.refreshFromStore() reconcile the
-foreground cache after a background widget log (called from home_shell on resume;
-WidgetsBindingObserver added there + ref.listen pushes on every state change);
-main.dart registers the callback post-frame. home_widget 0.9.3 added to pubspec.
-
-**ALSO DONE DURING THE PAUSE (main loop kept working): EXACT PRAYER ALARMS.** All scheduling
-used inexactAllowWhileIdle - Android batching could delay the ADHAN 10-15 min past prayer
-time. Fixed: SCHEDULE_EXACT_ALARM declared in the manifest (Play-justifiable: time-critical
-religious reminders are core functionality); _safeZoned gained `exact:` (used ONLY by
-scheduleAt + scheduleAdhan = the prayer family; habit/dhikr reminders stay inexact by design)
-with silent degrade-to-inexact when the grant is missing/revoked; new canUseExactAlarms() +
-requestExactAlarmsPermission() (facade + web stub); prayer-settings gained a «فعّل دقة
-المواعيد» tile (Android-only, shown while the grant is missing; granting re-runs _save so
-queued prayer notifs upgrade). analyze clean, 83/83. NOT yet in the built APK (build predates
-this) - the next build after the review picks it up.
-
-**OWNER RULE ADDED (05:30): whatever ships on Android must ship on iPhone wherever iOS
-allows.** iOS parity round done in-repo (see changelog round 5); the ONLY Mac-gated steps
-are documented in docs/IOS_PARITY_SETUP.md (Xcode widget target + app group + adhan30.caf).
-
-**IN FLIGHT (05:30+): review workflow wf_ed42c57d-d79 (6 lenses: widget-native, bg-integrity,
-exact-alarms, arabic-copy, flutter-integration, ios-parity) + mandate research workflow
-wf_93a19fab-46a (4 areas) both RUNNING after the limit renewed.**
-
-**DELIVERY DONE (2026-07-18 ~07:30): the unified round IS BUILT + SHIPPED.** APK/AAB built
-from fdc706e with ALL aapt checks green (3 perms incl. SCHEDULE_EXACT_ALARM, 4 receivers,
-background receiver exported=false, adhan raw+mp3, ic_stat_awwad, 5 widget resources);
-APK on the Desktop (Awwad-1.0.0-final.apk, md5 80f38762...); Pages deploy pushed
-(commit 15226b5, source fdc706e) with the new app build - byte-verify performed right after
-push (see changelog). The 6-lens review completed across 3 resumed runs: 4 confirmed
-findings ALL FIXED (MSA n%100, French à, exported receiver, AppDelegate registrant) plus 4
-self-adjudicated cheap fixes; remaining unverified findings dispositioned in the round-8
-changelog (accepted limits documented).
+**IN FLIGHT at handoff time:** (1) a 5-lens adversarial review of Round 2
+(wf_55983c7b-e3b, task wv56vr1c3) - READ ITS RESULT and apply confirmed fixes; (2) a
+web+APK+AAB build (task b5tkdc40m) started BEFORE the PWA-manifest/index.html edits, so the
+WEB part must be rebuilt before deploying.
 
 **EXECUTE NEXT, in order:**
-1. Continue docs/MANDATE_PLAN.md IN ORDER: Round 2 (per-habit content 0a + retention wins)
-   is NEXT for the app; Round 3 (site technical SEO) was STARTED in parallel (app builds do
-   not block site work) - finish it, npm build + em-dash check + Pages root deploy.
-2. THE MANDATE RESEARCH IS DONE and its merged 10-round execution plan is persisted at
-   **docs/MANDATE_PLAN.md** (rounds: notification-reliability core -> per-habit content 0a +
-   retention wins -> site technical SEO -> notification architecture + iOS notif parity ->
-   flagship competitive features (tasbih counter, SOS loop, habit strength, weekly insight)
-   -> scholar-video curation -> store-compliance code (IN-APP ACCOUNT DELETION is a hard
-   store blocker; owner's web-only decision must be reversed - see the owner-gated list) ->
-   store metadata/submission docs -> screenshots + PWA -> 8-9 new blog articles). Execute
-   IN ORDER from that file, marking items done there + changelog here per round.
-3. Still later: 0c (7) share-image, 0c (6) late-night detection. OWNER-GATED: 0c phase C
-   hard app-blocking, «غض البصر» habit, store submission (owner action).
+1. Apply the Round 2 review's confirmed findings (if any), then run ONE delivery: rebuild web
+   (the manifest/viewport changes need it) + APK + AAB, the §6 aapt checks (INTERNET,
+   POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM, NO ACCESS_FINE_LOCATION, 4 receivers,
+   background receiver exported=false, raw/adhan=1 + res mp3, ic_stat_awwad, 5 widget
+   resources), APK -> Desktop, Pages /app/ redeploy + byte-verify, push.
+2. Continue docs/MANDATE_PLAN.md: **Round 4** (notification channels split so muting habit
+   nudges cannot kill prayer alerts, tap routing + payloads on both platforms, contextual
+   permission prompt, DND-bypass adhan channel), then **Round 5** (tasbih counter, SOS
+   outcome loop, habit strength score, weekly insight), **Round 6** (scholar-video curation
+   workflow), **Round 9** (store screenshots - assets/screenshots/ is EMPTY and Play needs
+   2 minimum), **Round 10** (8-9 new trilingual articles).
+3. OWNER-GATED, do not start without a decision (full list at the end of MANDATE_PLAN.md):
+   full-screen-intent adhan, hard app-blocking (0c phase C), «غض البصر» habit, custom domain,
+   and the store submissions themselves (Play $25 / Apple $99 + a Mac).
+
+**TELL THE OWNER (blocking his submission, not ours):** his 2026-07-12 decision to offer
+account deletion ONLY on the website violates Play's account-deletion policy and Apple
+5.1.1(v). The in-app flow is now built and shipped anyway, since submission is impossible
+without it; he only needs to know the decision was reversed.
 
 ## 0.5-OLD HANDOFF 2026-07-18 (superseded - kept for the round's technical details)
 

@@ -64,8 +64,10 @@ void main() {
       _entry(f0.subtract(const Duration(days: 7))),
       _entry(f0.subtract(const Duration(days: 14))),
     ]);
-    expect(ctrl.state.currentStreak, 3);
-    expect(ctrl.state.longestStreak, 3);
+    // Weeks are reported as DAYS (7 per kept week) so badges, ranks,
+    // stages and the widget label all stay coherent.
+    expect(ctrl.state.currentStreak, 21);
+    expect(ctrl.state.longestStreak, 21);
   });
 
   test('the empty days between Fridays never break the streak', () async {
@@ -75,7 +77,7 @@ void main() {
       _entry(f0),
       _entry(f0.subtract(const Duration(days: 7))),
     ]);
-    expect(ctrl.state.currentStreak, 2);
+    expect(ctrl.state.currentStreak, 14);
   });
 
   test('a missed Friday breaks the weekly streak', () async {
@@ -85,7 +87,7 @@ void main() {
       // f0 - 7 missing
       _entry(f0.subtract(const Duration(days: 14))),
     ]);
-    expect(ctrl.state.currentStreak, 1);
+    expect(ctrl.state.currentStreak, 7);
   });
 
   test('a daily habit keeps its day-by-day semantics', () async {
@@ -102,5 +104,18 @@ void main() {
       _entry(today.subtract(const Duration(days: 1))),
     ]);
     expect(ctrl.state.currentStreak, 2);
+  });
+test('weekly streak is expressed in DAYS so badges and labels stay honest', () async {
+    // Regression guard for the review's critical finding: returning WEEKS
+    // made the widget say «يومان» for a two-week run and made the
+    // "30 days" badge require 30 Fridays (about 7 months).
+    final f0 = _lastFriday();
+    final entries = <DailyEntry>[];
+    for (var i = 0; i < 5; i++) {
+      entries.add(_entry(f0.subtract(Duration(days: 7 * i))));
+    }
+    final ctrl = await _controller(_kahf(), entries);
+    expect(ctrl.state.currentStreak, 35); // 5 Fridays kept = 5 weeks of days
+    expect(ctrl.state.currentStreak % 7, 0);
   });
 }
