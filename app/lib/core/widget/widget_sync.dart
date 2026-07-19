@@ -106,6 +106,7 @@ class HomeWidgetSync {
       await HomeWidget.saveWidgetData<String>(
           'aw_btn_done', widgetButtonLabel(locale, logged: true));
       await HomeWidget.saveWidgetData<bool>('aw_logged', logged);
+      await HomeWidget.saveWidgetData<bool>('aw_has', habit != null);
       await HomeWidget.saveWidgetData<String>('aw_date', today);
       await HomeWidget.updateWidget(
           androidName: 'AwwadWidgetProvider', iOSName: 'AwwadWidget');

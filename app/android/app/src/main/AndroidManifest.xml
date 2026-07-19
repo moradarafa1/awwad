@@ -94,8 +94,12 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/awwad_widget_info"/>
         </receiver>
+        <!-- exported=false ON PURPOSE (differs from the plugin example): the
+             widget button's PendingIntent is same-UID so it still reaches a
+             non-exported receiver, while a co-installed app can no longer
+             forge awwad://quicklog broadcasts to fake habit entries. -->
         <receiver android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="es.antonborri.home_widget.action.BACKGROUND"/>
             </intent-filter>

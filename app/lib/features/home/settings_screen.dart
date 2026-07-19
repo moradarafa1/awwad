@@ -75,6 +75,12 @@ const Map<String, Map<String, String>> _kSet = {
     'en': 'Notifications are blocked. Enable them for Awwad in system settings.',
     'fr': "Les notifications sont bloquées. Activez-les pour Awwad dans les réglages système."
   },
+  'openNotifSettings': {
+    'ar': 'افتح إعدادات الإشعارات',
+    'en': 'Open notification settings',
+    'fr': 'Ouvrir les réglages de notifications'
+  },
+  'later': {'ar': 'لاحقاً', 'en': 'Later', 'fr': 'Plus tard'},
   'testNotif': {
     'ar': 'اختبار الإشعارات',
     'en': 'Test notifications',
@@ -272,9 +278,10 @@ class SettingsScreen extends ConsumerWidget {
                     if (v && !kIsWeb) {
                       final granted = await ensureNotificationPermission();
                       if (!granted) {
+                        // Permanently denied: the OS prompt can no longer
+                        // appear, deep-link into the settings instead.
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(_set('permDenied', loc))));
+                          await _showNotifBlockedDialog(context, loc);
                         }
                         return;
                       }
@@ -326,8 +333,7 @@ class SettingsScreen extends ConsumerWidget {
                       final granted = await ensureNotificationPermission();
                       if (!context.mounted) return;
                       if (!granted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(_set('permDenied', loc))));
+                        await _showNotifBlockedDialog(context, loc);
                         return;
                       }
                       await sendTestNotifications(
@@ -614,6 +620,31 @@ class SettingsScreen extends ConsumerWidget {
 
   String _set(String key, String loc) =>
       _kSet[key]?[loc] ?? _kSet[key]?['ar'] ?? key;
+
+  /// After a permanent OS denial the permission prompt can no longer appear;
+  /// the only recovery is the system notification-settings screen.
+  Future<void> _showNotifBlockedDialog(BuildContext context, String loc) =>
+      showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          content: Text(_set('permDenied', loc),
+              style: const TextStyle(fontSize: 13.5, height: 1.6)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(_set('later', loc)),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                openNotificationSettings();
+              },
+              child: Text(_set('openNotifSettings', loc)),
+            ),
+          ],
+        ),
+      );
 
   /// Account card, reactive to auth state (built inside a ValueListenableBuilder
   /// on SupabaseService.authRevision). Signed in -> «حسابك» opening the account

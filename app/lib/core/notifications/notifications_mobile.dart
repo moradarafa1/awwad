@@ -119,6 +119,28 @@ tz.TZDateTime _nextInstanceOfHour(int hour) {
   return scheduled;
 }
 
+/// Whether notifications are currently allowed at the OS level. Used to
+/// reconcile the in-app toggle on every open (the OS switch can be flipped
+/// from system settings at any time). Unknown states return true so a false
+/// negative can never silently disable the user's reminders.
+Future<bool> osNotificationsEnabled() async {
+  await initNotifications();
+  try {
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      return await android.areNotificationsEnabled() ?? true;
+    }
+    final ios = _plugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    if (ios != null) {
+      final p = await ios.checkPermissions();
+      return p?.isEnabled ?? true;
+    }
+  } catch (_) {}
+  return true;
+}
+
 /// True when Android will honor EXACT alarms for us (always below Android 12;
 /// 12+ only while the user grant «المنبهات والتذكيرات» is active). Exactness
 /// is reserved for the PRAYER family (mains + pre-alerts + adhkar + adhan),

@@ -31,7 +31,10 @@ public struct AwwadQuickLogIntent: AppIntent {
   }
 
   public func perform() async throws -> some IntentResult {
-    await HomeWidgetBackgroundWorker.run(url: url, appGroup: appGroup!)
+    // No force-unwrap: the Shortcuts app can instantiate intents with nil
+    // parameters, and a crash there would be a store-review flag.
+    guard let group = appGroup else { return .result() }
+    await HomeWidgetBackgroundWorker.run(url: url, appGroup: group)
     return .result()
   }
 }

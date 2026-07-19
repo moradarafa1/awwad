@@ -28,6 +28,7 @@ struct AwwadEntry: TimelineEntry {
   let streak: String
   let button: String
   let logged: Bool
+  let hasHabit: Bool
 }
 
 struct AwwadProvider: TimelineProvider {
@@ -42,7 +43,8 @@ struct AwwadProvider: TimelineProvider {
       button: logged
         ? (d?.string(forKey: "aw_btn_done") ?? "سُجّل اليوم")
         : (d?.string(forKey: "aw_btn_log") ?? "سجّل هذا اليوم"),
-      logged: logged)
+      logged: logged,
+      hasHabit: d?.bool(forKey: "aw_has") ?? false)
   }
 
   func placeholder(in context: Context) -> AwwadEntry { makeEntry() }
@@ -75,7 +77,7 @@ struct AwwadWidgetView: View {
         .font(.system(size: 12))
         .foregroundColor(Color(red: 0.18, green: 0.83, blue: 0.75))
         .lineLimit(1)
-      if #available(iOSApplicationExtension 17, *), !entry.logged {
+      if #available(iOSApplicationExtension 17, *), entry.hasHabit, !entry.logged {
         // Interactive quick log: runs the same Dart background callback as
         // the Android widget, without opening the app.
         Button(

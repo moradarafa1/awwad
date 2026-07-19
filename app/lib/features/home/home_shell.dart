@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -128,6 +129,17 @@ class _HomeShellState extends ConsumerState<HomeShell>
       final granted = await ensureNotificationPermission();
       if (!granted) await ctrl.setNotificationsEnabled(false);
       await ctrl.markNotifPromptShown();
+      if (!mounted) return;
+      s = ref.read(appControllerProvider);
+    }
+
+    // The OS-level switch can be flipped in system settings at ANY time:
+    // reconcile on every open so the in-app toggle never lies. (Unknown
+    // platform states report true, so this can never falsely disable.)
+    if (!kIsWeb &&
+        s.settings.notificationsEnabled &&
+        !await osNotificationsEnabled()) {
+      await ctrl.setNotificationsEnabled(false);
       if (!mounted) return;
       s = ref.read(appControllerProvider);
     }

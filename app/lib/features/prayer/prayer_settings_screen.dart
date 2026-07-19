@@ -23,7 +23,8 @@ class PrayerSettingsScreen extends ConsumerStatefulWidget {
       _PrayerSettingsScreenState();
 }
 
-class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen> {
+class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen>
+    with WidgetsBindingObserver {
   PrayerConfig _cfg = const PrayerConfig();
   bool _locating = false;
   // Android 12+ «Alarms and reminders» grant missing: the adhan/prayer
@@ -33,9 +34,28 @@ class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     final raw = ref.read(localStoreProvider).loadPrayer();
     if (raw != null) _cfg = PrayerConfig.fromJson(raw);
     _checkExact();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // The user may grant «Alarms and reminders» straight from system settings:
+  // re-check on return so the tile disappears and queued alarms upgrade.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    Future(() async {
+      final was = _exactMissing;
+      await _checkExact();
+      if (mounted && was && !_exactMissing) await _save();
+    });
   }
 
   Future<void> _checkExact() async {

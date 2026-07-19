@@ -234,6 +234,30 @@ class MainActivity : FlutterActivity() {
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "manufacturer" -> result.success(android.os.Build.MANUFACTURER)
+                "openNotificationSettings" -> {
+                    // Deep link into this app's notification settings (API 26+),
+                    // falling back to app details, then general Settings.
+                    val intents = listOf(
+                        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                            .putExtra(Settings.EXTRA_APP_PACKAGE, packageName),
+                        Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            android.net.Uri.parse("package:$packageName")
+                        ),
+                        Intent(Settings.ACTION_SETTINGS),
+                    )
+                    var opened = false
+                    for (intent in intents) {
+                        try {
+                            startActivity(intent)
+                            opened = true
+                            break
+                        } catch (e: Exception) {
+                            // try the next fallback
+                        }
+                    }
+                    result.success(opened)
+                }
                 "openBatterySettings" -> {
                     // The per-OEM "app auto-start / battery saver" screens are
                     // non-public; the stock exemption list + app details are

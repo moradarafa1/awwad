@@ -59,16 +59,19 @@ class AwwadWidgetProvider : HomeWidgetProvider() {
                     R.id.aw_container,
                     HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
                 )
-                // The button quick-logs in the background while unlogged;
-                // once logged it just opens the app.
+                // The button quick-logs in the background while a habit
+                // exists and today is unlogged; otherwise (already logged, or
+                // no habit yet: a background log would be a dead tap) it
+                // opens the app.
+                val hasHabit = widgetData.getBoolean("aw_has", false)
                 setOnClickPendingIntent(
                     R.id.aw_btn,
-                    if (logged) {
-                        HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
-                    } else {
+                    if (hasHabit && !logged) {
                         HomeWidgetBackgroundIntent.getBroadcast(
                             context, Uri.parse("awwad://quicklog")
                         )
+                    } else {
+                        HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
                     }
                 )
             }
@@ -76,9 +79,12 @@ class AwwadWidgetProvider : HomeWidgetProvider() {
         }
     }
 
-    /** Must produce the same yyyy-MM-dd string as Dart's dayKey(). */
+    /** Must produce the same yyyy-MM-dd string as Dart's dayKey(). Explicitly
+     *  Gregorian: Calendar.getInstance() follows the device locale and would
+     *  return Buddhist/Japanese years on those devices, so the saved Dart
+     *  date would never match and the logged state would never display. */
     private fun todayKey(): String {
-        val cal = Calendar.getInstance()
+        val cal = java.util.GregorianCalendar()
         return String.format(
             Locale.US, "%04d-%02d-%02d",
             cal.get(Calendar.YEAR),

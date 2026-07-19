@@ -786,6 +786,24 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-18 round 8 (N5 + final review fixes: security + iOS-crash + calendar + dead-tap)** -
+  N5 done: osNotificationsEnabled() reconciles the in-app toggle on every open (unknown =
+  true, never false-disables); permanently-denied flow now shows a dialog deep-linking to
+  the app's system notification settings (new openNotificationSettings on awwad/reliability,
+  API-26 action + fallbacks) replacing the dead-end snackbars. Review-confirmed fixes:
+  HomeWidgetBackgroundReceiver exported=false (a co-installed app could forge awwad://quicklog
+  and fake habit entries; same-UID PendingIntents still deliver) + AppDelegate.swift now sets
+  HomeWidgetBackgroundWorker.setPluginRegistrantCallback (without it the iOS widget button
+  would silently no-op forever: only HomeWidgetPlugin gets registered in the headless engine).
+  Self-adjudicated cheap fixes from the unverified findings: AwwadQuickLogIntent guard-let
+  (Shortcuts can pass nil appGroup = crash path), GregorianCalendar in the provider's
+  todayKey (locale calendars like Buddhist would never match Dart dayKey), widget button is
+  launch-not-broadcast when no habit exists (aw_has flag, both platforms), prayer-settings
+  re-checks the exact grant on resume + reschedules (tile no longer stale after granting
+  from system settings). Accepted + documented limits: widget streak display can go stale
+  while the app stays closed; sub-second resume race between refreshFromStore and an instant
+  manual save; Android <=11 deep-Doze pre-alert can push the adhan ~4 min (while-idle
+  budget). analyze clean, 83/83.
 - **2026-07-18 round 7 (MANDATE_PLAN Round 1 batch A: notification reliability)** -
   (1) STATUS-BAR ICON: white-on-transparent ic_stat_awwad generated from the official sprout
   into drawable-{m..xxx}dpi (sharp mask script), wired in AndroidInitializationSettings and

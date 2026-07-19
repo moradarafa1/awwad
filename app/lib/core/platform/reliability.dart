@@ -39,3 +39,14 @@ Future<bool> openBatterySettings() async {
     return false;
   }
 }
+
+/// Opens THIS app's notification settings (the only recovery path after a
+/// permanently-denied POST_NOTIFICATIONS: the OS prompt can no longer show).
+Future<bool> openNotificationSettings() async {
+  if (kIsWeb) return false;
+  try {
+    return await _ch.invokeMethod<bool>('openNotificationSettings') ?? false;
+  } catch (_) {
+    return false;
+  }
+}
