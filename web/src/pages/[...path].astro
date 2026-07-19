@@ -4,9 +4,9 @@ import { t, LOCALES, PAGES, WEB_APP_URL } from '../content/site.js';
 import { POSTS, postsForLocale } from '../content/posts.js';
 
 const BLOG = {
-  ar: { title: 'المدوّنة: مقالات عن العادات', desc: 'مقالات عن كسر العادات السيّئة وبناء عادات جديدة بمنهجٍ علميّ.', read: 'اقرأ المزيد', faq: 'أسئلة شائعة', published: 'نُشر في' },
-  en: { title: 'Blog: articles on habits', desc: 'Articles on breaking bad habits and building new ones with a science-based method.', read: 'Read more', faq: 'FAQ', published: 'Published' },
-  fr: { title: 'Blog : articles sur les habitudes', desc: 'Articles pour arrêter de mauvaises habitudes et en bâtir de nouvelles.', read: 'Lire la suite', faq: 'FAQ', published: 'Publié le' },
+  ar: { title: 'المدوّنة: مقالات عن العادات', desc: 'مقالات عن كسر العادات السيّئة وبناء عادات جديدة بمنهجٍ علميّ.', read: 'اقرأ المزيد', faq: 'أسئلة شائعة', published: 'نُشر في', related: 'مقالات ذات صلة', fromBlog: 'من المدوّنة', more: 'كل المقالات', hubBreak: 'دليل كسر العادة كاملاً', hubBuild: 'دليل بناء العادة كاملاً' },
+  en: { title: 'Blog: articles on habits', desc: 'Articles on breaking bad habits and building new ones with a science-based method.', read: 'Read more', faq: 'FAQ', published: 'Published', related: 'Related articles', fromBlog: 'From the blog', more: 'All articles', hubBreak: 'The full habit-breaking guide', hubBuild: 'The full habit-building guide' },
+  fr: { title: 'Blog : articles sur les habitudes', desc: 'Articles pour arrêter de mauvaises habitudes et en bâtir de nouvelles.', read: 'Lire la suite', faq: 'FAQ', published: 'Publié le', related: 'Articles liés', fromBlog: 'Du blog', more: 'Tous les articles', hubBreak: "Le guide complet pour arrêter une habitude", hubBuild: "Le guide complet pour bâtir une habitude" },
 };
 
 export function getStaticPaths() {
@@ -54,14 +54,50 @@ if (isBlog) { title = BLOG[lang].title; description = BLOG[lang].desc; }
 else if (isPost) { title = `${post.title[lang]} | عوّاد`; description = post.description[lang]; }
 else { title = page.title; description = page.description; }
 
+// Internal-linking data: 3 same-category posts per article, 6 per hub.
+const hubCategory = pageKey === 'break-habit' ? 'break'
+  : pageKey === 'build-habit' ? 'build' : null;
+const relatedPosts = isPost
+  ? POSTS.filter((p) => p.category === post.category && p.slug !== post.slug).slice(0, 3)
+  : [];
+const hubPosts = hubCategory
+  ? POSTS.filter((p) => p.category === hubCategory).slice(0, 6)
+  : [];
+const hubHref = isPost
+  ? `${blogPfx}/${post.category === 'break' ? 'break-habit' : 'build-habit'}/`
+  : null;
+const hubLabel = isPost
+  ? (post.category === 'break' ? BLOG[lang].hubBreak : BLOG[lang].hubBuild)
+  : null;
+
 // Article + FAQ JSON-LD for posts
 const articleLd = isPost ? {
   '@context': 'https://schema.org', '@type': 'Article',
   headline: post.title[lang], description: post.description[lang],
-  datePublished: post.date, inLanguage: lang,
+  datePublished: post.date, dateModified: post.date, inLanguage: lang,
+  image: site + '/og-image.png',
   author: { '@type': 'Organization', name: 'Awwad' },
-  publisher: { '@type': 'Organization', name: 'Awwad' },
-  mainEntityOfPage: site + (lang === 'ar' ? '' : `/${lang}`) + `/blog/${post.slug}`,
+  publisher: {
+    '@type': 'Organization', name: 'Awwad',
+    logo: { '@type': 'ImageObject', url: site + '/icon-512.png' },
+  },
+  mainEntityOfPage: site + (lang === 'ar' ? '' : `/${lang}`) + `/blog/${post.slug}/`,
+} : null;
+// Breadcrumbs for posts and the two hub pages.
+const crumbHome = site + (lang === 'ar' ? '/' : `/${lang}/`);
+const breadcrumbLd = isPost ? {
+  '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: t[lang].nav.home, item: crumbHome },
+    { '@type': 'ListItem', position: 2, name: BLOG[lang].title, item: site + `${blogPfx}/blog/` },
+    { '@type': 'ListItem', position: 3, name: post.title[lang] },
+  ],
+} : hubCategory ? {
+  '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: t[lang].nav.home, item: crumbHome },
+    { '@type': 'ListItem', position: 2, name: page.h1 },
+  ],
 } : null;
 const faqLd = isPost && post.faq[lang]?.length ? {
   '@context': 'https://schema.org', '@type': 'FAQPage',
@@ -71,12 +107,17 @@ const faqLd = isPost && post.faq[lang]?.length ? {
   })),
 } : null;
 ---
-<Base lang={lang} pageKey={pageKey} pageSlug={pageSlug} title={title} description={description}>
+<Base lang={lang} pageKey={pageKey} pageSlug={pageSlug} title={title} description={description}
+    ogType={isPost ? 'article' : 'website'} publishedTime={isPost ? post.date : null}>
+  {breadcrumbLd && (
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+  )}
   {isHome && (
     <>
       <section class="hero">
         <p class="slogan">{tt.slogan}</p>
-        <h1 class="sub">{page.sub}</h1>
+        <h1 class="sub">{page.h1}</h1>
+        <p class="sub" style="color:var(--muted);font-size:17px;margin-top:8px">{page.sub}</p>
         <div class="cta-row">
         <button class="btn btn-lg" type="button" onclick="awDownload()">{tt.cta_download}</button>
         <span class="cta-or">{tt.cta_or}</span>
@@ -86,7 +127,7 @@ const faqLd = isPost && post.faq[lang]?.length ? {
       <h2 class="section-title">{page.sectionTitle}</h2>
       <div class="cards">
         {page.tracks.map((tr) => (
-          <a class="card" href={`${blogPfx}/${tr.href}`}>
+          <a class="card" href={`${blogPfx}/${tr.href}/`}>
             <div class="icon">{tr.icon}</div>
             <h3>{tr.title}</h3>
             <p>{tr.desc}</p>
@@ -102,6 +143,19 @@ const faqLd = isPost && post.faq[lang]?.length ? {
           </div>
         ))}
       </div>
+      <h2 class="section-title">{BLOG[lang].fromBlog}</h2>
+      <div class="cards">
+        {postsForLocale().slice(0, 3).map((p) => (
+          <a class="card" href={`${blogPfx}/blog/${p.slug}/`}>
+            <h3>{p.title[lang]}</h3>
+            <p>{p.description[lang]}</p>
+            <p style="color:var(--accent2);font-size:12px;margin-top:8px">{BLOG[lang].read} →</p>
+          </a>
+        ))}
+      </div>
+      <p style="text-align:center;margin-top:14px">
+        <a class="btn btn-ghost btn-sm" href={`${blogPfx}/blog/`}>{BLOG[lang].more}</a>
+      </p>
     </>
   )}
 
@@ -116,6 +170,20 @@ const faqLd = isPost && post.faq[lang]?.length ? {
           <p>{page.resource.p}</p>
           <a class="btn" href={page.resource.url} target="_blank" rel="noopener noreferrer">{page.resource.cta} →</a>
         </aside>
+      )}
+      {hubPosts.length > 0 && (
+        <>
+          <h2>{BLOG[lang].fromBlog}</h2>
+          <div class="cards">
+            {hubPosts.map((p) => (
+              <a class="card" href={`${blogPfx}/blog/${p.slug}/`}>
+                <h3>{p.title[lang]}</h3>
+                <p>{p.description[lang]}</p>
+                <p style="color:var(--accent2);font-size:12px;margin-top:8px">{BLOG[lang].read} →</p>
+              </a>
+            ))}
+          </div>
+        </>
       )}
       <div class="cta-row">
         <button class="btn btn-lg" type="button" onclick="awDownload()">{tt.cta_download}</button>
@@ -138,7 +206,7 @@ const faqLd = isPost && post.faq[lang]?.length ? {
       <p class="sub" style="color:var(--muted);margin-top:8px">{BLOG[lang].desc}</p>
       <div class="cards" style="margin-top:24px">
         {postsForLocale().map((p) => (
-          <a class="card" href={`${blogPfx}/blog/${p.slug}`}>
+          <a class="card" href={`${blogPfx}/blog/${p.slug}/`}>
             <h3>{p.title[lang]}</h3>
             <p>{p.description[lang]}</p>
             <p style="color:var(--accent2);font-size:12px;margin-top:8px">{BLOG[lang].read} →</p>
@@ -158,6 +226,23 @@ const faqLd = isPost && post.faq[lang]?.length ? {
         <>
           <h2>{BLOG[lang].faq}</h2>
           {post.faq[lang].map((f) => (<><h3>{f.q}</h3><p>{f.a}</p></>))}
+        </>
+      )}
+      {relatedPosts.length > 0 && (
+        <>
+          <h2>{BLOG[lang].related}</h2>
+          <div class="cards">
+            {relatedPosts.map((p) => (
+              <a class="card" href={`${blogPfx}/blog/${p.slug}/`}>
+                <h3>{p.title[lang]}</h3>
+                <p>{p.description[lang]}</p>
+                <p style="color:var(--accent2);font-size:12px;margin-top:8px">{BLOG[lang].read} →</p>
+              </a>
+            ))}
+          </div>
+          <p style="margin-top:14px">
+            <a class="btn btn-ghost btn-sm" href={hubHref}>{hubLabel} →</a>
+          </p>
         </>
       )}
       <div class="cta-row">

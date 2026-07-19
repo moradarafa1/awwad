@@ -794,6 +794,21 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-19 round 9 (MANDATE_PLAN Round 3: site technical SEO, DEPLOYED)** - All 6 items:
+  (SA4) trailingSlash 'always' + slashed localizedPath/localizedSlug/articleLd/internal
+  links - canonicals no longer point at a 301 hop; (SA5) keyword-bearing home title
+  («عوّاد: تطبيق مجاني لترك العادات السيئة وبناء عادات جديدة» + en/fr) and the home now
+  renders the keyword H1 with the old sub demoted to a p (slogan pill untouched); (SA7)
+  internal links: 3 related same-category articles + hub link on every post, «من المدوّنة»
+  6-article block on both hubs + 3-article block + all-articles button on home; (SA8)
+  JSON-LD: Organization.logo, MobileApplication url/description/image/inLanguage/
+  subCategory, BreadcrumbList on posts + hubs, Article image/dateModified/publisher.logo,
+  og:type article + article:published_time on posts; (SA9) Cairo self-hosted as 3 variable
+  woff2 subsets (81KB total, public/fonts/) with preload + font-display swap - ZERO
+  third-party requests now, site fully first-party; (SA10) sitemap i18n xhtml:link
+  alternates (333 entries). Verified in dist: 112 pages, 0 em-dashes, slashed canonicals/
+  sitemap, breadcrumbs + related blocks + article og present, no fonts.googleapis refs.
+  Pages deploy 0152e86 (site root replaced, /app/ untouched); live H1 + fonts poll-verified.
 - **2026-07-18 round 8 (N5 + final review fixes: security + iOS-crash + calendar + dead-tap)** -
   N5 done: osNotificationsEnabled() reconciles the in-app toggle on every open (unknown =
   true, never false-disables); permanently-denied flow now shows a dialog deep-linking to

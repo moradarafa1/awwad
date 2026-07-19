@@ -58,9 +58,9 @@ export const t = {
     dl_soon: 'قريباً على المتاجر، استخدم إصدار الويب الآن',
     pages: {
       home: {
-        title: 'عوّاد | رفيقٌ مَن زانَ عُمرَه، وحُسُنُ عملَه',
+        title: 'عوّاد: تطبيق مجاني لترك العادات السيئة وبناء عادات جديدة',
         description: 'تطبيقٌ عربيّ يساعدك على التخلُّص من عادةٍ سيّئة أو بناء عادةٍ جديدة، بمنهجٍ علميّ (HRT) وروحٍ داعمةٍ متوافقةٍ مع قيمك. مجّانيّ، يحفظ خصوصيّتك، ويعمل دون اتصال بالإنترنت.',
-        h1: 'لليوم فقط، خطوة واحدة لنتغير',
+        h1: 'تطبيق تغيير العادات: اترك عادة سيئة وابنِ عادة جديدة',
         sub: 'رفيقك اليوميّ لتغيير العادات: خطوةٌ واحدةٌ كلّ يوم، بمنهجٍ علميٍّ وروحٍ داعمة.',
         tracks: [
           { icon: '🚭', title: 'كسر عادة', desc: 'التدخين، قضم الأظافر، التسويف، الهاتف، السهر، الغضب... نتعامل معها بوعيٍ وبمنهج التدريب على عكس العادة (HRT).', href: 'break-habit' },
@@ -159,9 +159,9 @@ export const t = {
     dl_soon: 'Coming soon to the stores, use the web version for now',
     pages: {
       home: {
-        title: 'Awwad | Always for the better',
+        title: 'Awwad: free app to break bad habits and build new ones',
         description: 'An app that helps you break a bad habit or build a new one with an evidence-based method (HRT) and a supportive, values-aligned tone. Free, private, works offline.',
-        h1: 'Just for today, one step to change',
+        h1: 'The habit-change app: break a bad habit, build a new one',
         sub: 'Your daily companion for changing habits: one step a day, with a proven method and a supportive spirit.',
         tracks: [
           { icon: '🚭', title: 'Break a habit', desc: 'Smoking, nail-biting, procrastination, phone, late nights, anger... handled with awareness and Habit Reversal Training.', href: 'break-habit' },
@@ -260,9 +260,9 @@ export const t = {
     dl_soon: 'Bientôt sur les stores, utilisez la version web en attendant',
     pages: {
       home: {
-        title: 'Awwad | Toujours pour le meilleur',
+        title: 'Awwad : application gratuite pour changer ses habitudes',
         description: "Une app qui vous aide à arrêter une mauvaise habitude ou à en bâtir une nouvelle avec une méthode éprouvée (HRT) et un ton bienveillant aligné sur vos valeurs. Gratuit, privé, hors ligne.",
-        h1: "Juste pour aujourd'hui, un pas pour changer",
+        h1: "Arrêter une mauvaise habitude, en bâtir une nouvelle",
         sub: "Votre compagnon quotidien pour changer vos habitudes : un pas par jour, avec une méthode éprouvée.",
         tracks: [
           { icon: '🚭', title: 'Arrêter une habitude', desc: 'Tabac, ongles rongés, procrastination, téléphone, veilles tardives, colère... avec la méthode Habit Reversal Training.', href: 'break-habit' },

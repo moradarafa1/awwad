@@ -7,11 +7,21 @@ import sitemap from '@astrojs/sitemap';
 // so it is intentionally NOT part of this marketing site's sitemap.
 export default defineConfig({
   site: 'https://moradarafa1.github.io',
-  trailingSlash: 'ignore',
+  // 'always': GitHub Pages 301-redirects extensionless URLs to the slashed
+  // directory form, so slashless canonicals contradicted the served URLs
+  // (and the sitemap). Slashed everywhere = zero redirect hops.
+  trailingSlash: 'always',
   i18n: {
     defaultLocale: 'ar',
     locales: ['ar', 'en', 'fr'],
     routing: { prefixDefaultLocale: false },
   },
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      i18n: {
+        defaultLocale: 'ar',
+        locales: { ar: 'ar', en: 'en', fr: 'fr' },
+      },
+    }),
+  ],
 });
