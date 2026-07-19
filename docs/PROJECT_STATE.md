@@ -794,6 +794,24 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-19 round 10 (MANDATE_PLAN Round 2: per-habit content 0a + retention wins)** - All
+  8 items. CONTENT: break_porn now inherits secret_habit's tailored sliders (the alias only
+  covered checklists, so the flagship recovery habit shipped generic urge/resistance);
+  surah_kahf + listening_wird + hadith_wird gained tailored metrics and 5 competing + 4
+  environment checklist items each (generated via scratchpad/add_round2_content.mjs, never
+  hand-edited). WEEKLY STREAK FIX: new kWeeklyHabitWeekday/weeklyWeekdayFor +
+  currentStreak/longestStreak treat non-Friday days as transparent for weekly habits and step
+  7 days at a time, so an honest Kahf reader no longer shows a permanently broken 1-day streak
+  (test/weekly_streak_test.dart, 5 cases). CU7 closed: 13 French strings re-accented by script
+  (one manual correction: «Je range les miroirs» is the verb, not rangé). CU13: sensible
+  defaultReminderHours for sleep_early/late_nights/qiyam/voluntary_fasting/exercise/read_books/
+  istighfar. RETENTION: passive chip row on Today (🏆 best streak, 💰 money saved =
+  costPerDay*cleanDays, 🧊 excuse days left) + a personal-record dialog and tray notification
+  when longestStreak is beaten (snapshot taken before saveEntry); daily rotating encouragement
+  replacing the two static banner strings - 14 general + 10 faith DailyLines picked
+  deterministically from the day key, faith pool gated on showReligiousContent, no verse or
+  hadith quoted (quoted religious text stays on the verified pipeline) with
+  test/daily_motivation_test.dart. analyze clean, 93/93 tests.
 - **2026-07-19 round 9 (MANDATE_PLAN Round 3: site technical SEO, DEPLOYED)** - All 6 items:
   (SA4) trailingSlash 'always' + slashed localizedPath/localizedSlug/articleLd/internal
   links - canonicals no longer point at a 301 hop; (SA5) keyword-bearing home title

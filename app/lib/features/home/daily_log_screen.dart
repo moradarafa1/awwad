@@ -206,6 +206,28 @@ const Map<String, Map<String, String>> _kRank = {
   },
 };
 
+// Passive stat chips under the rank line: personal record, money saved so
+// far, and the excuse days still available this week.
+const Map<String, Map<String, String>> _kChips = {
+  'best': {'ar': 'أفضل سلسلة', 'en': 'Best streak', 'fr': 'Meilleure série'},
+  'saved': {'ar': 'وفّرت', 'en': 'Saved', 'fr': 'Économisé'},
+  'skips': {
+    'ar': 'إعفاءات متبقية',
+    'en': 'Excuse days left',
+    'fr': 'Jours excusés restants',
+  },
+  'record': {
+    'ar': 'رقم قياسي جديد',
+    'en': 'New personal record',
+    'fr': 'Nouveau record personnel',
+  },
+  'recordBody': {
+    'ar': 'تجاوزت أطول سلسلة لك حتى الآن. واصل، فالثبات هو الطريق.',
+    'en': 'You just beat your longest streak. Keep going; consistency is the way.',
+    'fr': 'Vous venez de battre votre plus longue série. Continuez, la constance est la voie.',
+  },
+};
+
 const Map<String, String> _kDoneQuestion = {
   'ar': 'هل أدّيت العادة اليوم؟',
   'en': 'Did you do the habit today?',
@@ -284,6 +306,8 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
 
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context);
+    // Snapshot the record BEFORE saving so a new personal best is detectable.
+    final bestBefore = ref.read(appControllerProvider).longestStreak;
     final newBadges = await ref.read(appControllerProvider.notifier).saveEntry(
           urge: _urge.round(),
           resistance: _resistance.round(),
@@ -312,6 +336,33 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
     );
     final notifOn = ref.read(appControllerProvider).settings.notificationsEnabled;
     final loc = Localizations.localeOf(context).languageCode;
+    // Personal record: beating your own longest streak deserves its own
+    // moment, independent of the badge thresholds (a user between two badge
+    // tiers otherwise gets nothing for weeks).
+    final bestAfter = ref.read(appControllerProvider).longestStreak;
+    if (bestAfter > bestBefore && bestBefore > 0 && mounted) {
+      final title = '🏆 ${_dl(_kChips, 'record', loc)}';
+      final body = _dl(_kChips, 'recordBody', loc);
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(title,
+              style: TextStyle(fontSize: 16, color: AppColors.accent3)),
+          content: Text('$body\n\n${_dl(_kChips, 'best', loc)}: $bestAfter',
+              style: const TextStyle(fontSize: 13.5, height: 1.6)),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(AppLocalizations.of(ctx).done),
+            ),
+          ],
+        ),
+      );
+      if (notifOn) {
+        await showBadgeNotification('record'.hashCode, title, body);
+      }
+    }
     for (final b in newBadges) {
       final def = badgeByKey(b.badgeKey);
       if (def != null && mounted) {
@@ -378,6 +429,45 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
 
   String _dl(Map<String, Map<String, String>> m, String k, String locale) =>
       m[k]?[locale] ?? m[k]?['ar'] ?? '';
+
+  /// Personal record + savings + remaining excuse days. Each chip appears
+  /// only when it carries real information, so a fresh user sees none.
+  Widget _statChips(AppState s, Habit? habit, String locale) {
+    final best = s.longestStreak;
+    final cost = habit?.costPerDay ?? 0;
+    final money = cost > 0 ? cost * s.cleanDays : 0;
+    final skips = s.weeklySkipUsage;
+    final skipsLeft = skips.limit - skips.used;
+
+    final chips = <Widget>[
+      if (best > 0)
+        _chip('🏆', '${_dl(_kChips, 'best', locale)}: $best', AppColors.accent3),
+      if (money > 0)
+        _chip('💰',
+            '${_dl(_kChips, 'saved', locale)}: ${money.toStringAsFixed(0)}',
+            AppColors.success),
+      if (skipsLeft > 0)
+        _chip('🧊', '${_dl(_kChips, 'skips', locale)}: $skipsLeft',
+            AppColors.muted),
+    ];
+    if (chips.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Wrap(spacing: 8, runSpacing: 8, children: chips),
+    );
+  }
+
+  Widget _chip(String emoji, String text, Color color) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: color.withValues(alpha: 0.32)),
+        ),
+        child: Text('$emoji $text',
+            style: TextStyle(
+                fontSize: 11.5, fontWeight: FontWeight.w700, color: color)),
+      );
 
   Widget _rankLine(int streak, String locale) {
     final r = rankForStreak(streak);
@@ -655,6 +745,9 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
           // Rank chip (levels): streak-based, consistent with the shields.
           const SizedBox(height: 10),
           _rankLine(s.currentStreak, locale),
+          // Personal record + savings + remaining excuse days: three passive
+          // chips that answer "how am I really doing" at a glance.
+          _statChips(s, habit, locale),
           // Streak repair: yesterday has no entry -> offer quick backfill or
           // an excused day, so one forgotten evening does not kill the streak.
           if (habit != null &&
@@ -674,12 +767,18 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
             const UsageEntryButton(),
           ],
           const SizedBox(height: 14),
-          if (s.settings.showReligiousContent)
-            MotivationBanner(
-              emoji: '🤍',
-              title: l10n.motivationIntention,
-              subtitle: s.currentStreak > 0 ? l10n.motivationPatience : null,
-            ),
+          // Daily rotating line: deterministic per day, offline, and the
+          // faith pool joins only when religious content is on. Replaces the
+          // banner that showed the same two sentences every single day.
+          MotivationBanner(
+            emoji: '🤍',
+            title: dailyLineFor(dayKey(DateTime.now()),
+                    showReligious: s.settings.showReligiousContent)
+                .t(locale),
+            subtitle: s.settings.showReligiousContent && s.currentStreak > 0
+                ? l10n.motivationPatience
+                : null,
+          ),
           const SizedBox(height: 12),
           // Progressive stage card: the recovery / commitment journey evolves
           // with the streak (thresholds aligned with the 30/60/90 shields).

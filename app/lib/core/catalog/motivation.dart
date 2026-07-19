@@ -115,3 +115,65 @@ SlipTrigger? triggerByKey(String? key) {
   }
   return null;
 }
+
+// ---------------------------------------------------------------------------
+// DAILY ROTATING ENCOURAGEMENT (MANDATE_PLAN CU6)
+// One short line per day, chosen deterministically from the day key so the
+// whole app agrees on today's line offline, and it changes every morning.
+// Two pools: GENERAL (always eligible) and FAITH (only when the user keeps
+// religious content on). The faith lines are plain encouragement in an
+// Islamic register: no verse or hadith is quoted or attributed here, since
+// every quoted religious text in this app must come from the verified
+// pipeline (see core/content/dhikr.dart and the islamweb-sourced content).
+// MSA, no em-dash.
+// ---------------------------------------------------------------------------
+
+class DailyLine {
+  final Map<String, String> text;
+  const DailyLine(this.text);
+  String t(String loc) => text[loc] ?? text['ar']!;
+}
+
+const List<DailyLine> kDailyGeneral = [
+  DailyLine({'ar': 'خطوةٌ صغيرةٌ اليوم خيرٌ من خطةٍ كبيرةٍ تؤجَّل.', 'en': 'A small step today beats a grand plan postponed.', 'fr': "Un petit pas aujourd'hui vaut mieux qu'un grand plan reporté."}),
+  DailyLine({'ar': 'أنت لا تبني يوماً واحداً، بل تبني الشخص الذي ستكونه.', 'en': 'You are not building one day; you are building who you become.', 'fr': "Vous ne bâtissez pas un jour, mais la personne que vous devenez."}),
+  DailyLine({'ar': 'التعثّر ليس نهاية الطريق، بل جزءٌ من تعلّمه.', 'en': 'A stumble is not the end of the road; it is part of learning it.', 'fr': "Un faux pas n'est pas la fin du chemin, mais une étape pour l'apprendre."}),
+  DailyLine({'ar': 'اجعل البداية سهلة جداً حتى لا تجد عذراً للتأجيل.', 'en': 'Make starting so easy that postponing has no excuse.', 'fr': "Rendez le départ si facile qu'aucune excuse ne tienne."}),
+  DailyLine({'ar': 'ما تكرّره كل يوم يصير طبعاً، فاختر ما تكرّره بعناية.', 'en': 'What you repeat daily becomes your nature; choose it carefully.', 'fr': "Ce que vous répétez chaque jour devient votre nature, choisissez-le avec soin."}),
+  DailyLine({'ar': 'قلّل من قوّة المثير قبل أن تختبر قوّة إرادتك.', 'en': 'Weaken the trigger before you test your willpower.', 'fr': "Affaiblissez le déclencheur avant d'éprouver votre volonté."}),
+  DailyLine({'ar': 'الرغبة موجةٌ ترتفع ثم تنحسر، فاصبر عليها قليلاً.', 'en': 'An urge is a wave: it rises, then it passes. Ride it out.', 'fr': "L'envie est une vague : elle monte puis retombe. Tenez bon."}),
+  DailyLine({'ar': 'سجّل يومك ولو كان متعثّراً، فالصدق أساس التغيير.', 'en': 'Log your day even if it went badly; honesty is the base of change.', 'fr': "Notez votre journée même difficile, l'honnêteté fonde le changement."}),
+  DailyLine({'ar': 'قارن نفسك بنفسك بالأمس، لا بأحدٍ سواك.', 'en': 'Compare yourself to yesterday, not to anyone else.', 'fr': "Comparez-vous à vous-même hier, à personne d'autre."}),
+  DailyLine({'ar': 'رتّب بيئتك، فهي تنوب عنك في نصف المعركة.', 'en': 'Arrange your environment; it fights half the battle for you.', 'fr': "Aménagez votre environnement, il livre la moitié du combat."}),
+  DailyLine({'ar': 'يومٌ واحدٌ متقنٌ خيرٌ من أسبوعٍ متردّد.', 'en': 'One deliberate day beats a hesitant week.', 'fr': "Une journée décidée vaut mieux qu'une semaine hésitante."}),
+  DailyLine({'ar': 'الاستمرار البطيء يهزم الحماس المتقطّع.', 'en': 'Slow consistency beats bursts of enthusiasm.', 'fr': "La régularité lente bat l'enthousiasme intermittent."}),
+  DailyLine({'ar': 'إن عدت اليوم فأنت لم تخسر، إنما استأنفت.', 'en': 'Coming back today is not losing; it is resuming.', 'fr': "Revenir aujourd'hui n'est pas perdre, c'est reprendre."}),
+  DailyLine({'ar': 'اكتب سببك ثم اقرأه حين تضعف.', 'en': 'Write down your reason, then read it when you weaken.', 'fr': "Écrivez votre raison, puis relisez-la dans les moments faibles."}),
+];
+
+const List<DailyLine> kDailyFaith = [
+  DailyLine({'ar': 'استعن بالله على نفسك، فمن استعان به لم يخذله.', 'en': 'Seek God\'s help with yourself; He does not fail those who ask.', 'fr': "Demandez l'aide de Dieu, Il ne délaisse pas celui qui la demande."}),
+  DailyLine({'ar': 'باب التوبة مفتوح، فلا تجعل ذنب الأمس عذر اليوم.', 'en': 'The door of repentance is open; do not let yesterday excuse today.', 'fr': "La porte du repentir est ouverte, qu'hier n'excuse pas aujourd'hui."}),
+  DailyLine({'ar': 'اجعل لك ورداً يومياً ولو قلّ، فأحبّ العمل أدومه.', 'en': 'Keep a small daily portion; the most beloved deed is the steady one.', 'fr': "Gardez une portion quotidienne, même petite : l'acte constant est le plus aimé."}),
+  DailyLine({'ar': 'حاسِب نفسك قبل النوم بسؤالٍ واحد: ماذا قدّمت اليوم؟', 'en': 'Before sleep, ask one question: what did I offer today?', 'fr': "Avant de dormir, posez une question : qu'ai-je offert aujourd'hui ?"}),
+  DailyLine({'ar': 'الدعاء سلاحٌ لا يصدأ، فادعُ لنفسك بالثبات.', 'en': 'Supplication never rusts; ask for steadfastness.', 'fr': "L'invocation ne rouille jamais, demandez la fermeté."}),
+  DailyLine({'ar': 'غضّ بصرك تسلم، فأول الطريق نظرة.', 'en': 'Lower your gaze and stay safe; it all starts with a look.', 'fr': "Baissez le regard : tout commence par un coup d'œil."}),
+  DailyLine({'ar': 'اصحب من يذكّرك بالخير، فالرفقة نصف الطريق.', 'en': 'Keep company that reminds you of good; company is half the road.', 'fr': "Fréquentez qui vous rappelle le bien, la compagnie fait la moitié du chemin."}),
+  DailyLine({'ar': 'إذا ثقلت عليك الطاعة فابدأ بأيسرها ولا تتركها.', 'en': 'If worship feels heavy, start with its easiest form and do not abandon it.', 'fr': "Si l'adoration pèse, commencez par la plus simple sans l'abandonner."}),
+  DailyLine({'ar': 'اشكر على القليل يُبارك لك فيه ويزد.', 'en': 'Be grateful for little and it is blessed and increased.', 'fr': "Soyez reconnaissant du peu, il sera béni et accru."}),
+  DailyLine({'ar': 'استغفر بلسانك وقلبك، فالاستغفار يفتح المغلق.', 'en': 'Seek forgiveness with tongue and heart; it opens what is shut.', 'fr': "Demandez pardon du cœur et de la langue, cela ouvre ce qui est fermé."}),
+];
+
+/// Today's line, chosen deterministically from [dayKey] (yyyy-MM-dd) so the
+/// app agrees with itself offline and the text changes each morning. Faith
+/// lines join the pool only when [showReligious] is true.
+DailyLine dailyLineFor(String dayKey, {required bool showReligious}) {
+  final pool = showReligious
+      ? <DailyLine>[...kDailyGeneral, ...kDailyFaith]
+      : kDailyGeneral;
+  var h = 0;
+  for (final c in dayKey.codeUnits) {
+    h = (h * 31 + c) & 0x7fffffff;
+  }
+  return pool[h % pool.length];
+}

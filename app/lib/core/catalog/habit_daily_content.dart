@@ -129,6 +129,22 @@ const Map<String, Map<String, String>> kHabitQuestions = {
 };
 
 const Map<String, HabitMetrics> kHabitMetricsOverrides = {
+  'break_porn': HabitMetrics(
+    primary: HabitMetric(label: {'ar': 'التعرّض للمثيرات اليوم', 'en': 'Trigger exposure today', 'fr': 'Exposition aux déclencheurs'}, low: {'ar': 'لا تعرّض', 'en': 'None', 'fr': 'Aucune'}, high: {'ar': 'تعرّض كثير', 'en': 'Very high', 'fr': 'Très forte'}),
+    secondary: HabitMetric(label: {'ar': 'سرعة الابتعاد عن المثير', 'en': 'Speed of turning away', 'fr': 'Rapidité à se détourner'}, low: {'ar': 'بطيئة', 'en': 'Slow', 'fr': 'Lente'}, high: {'ar': 'فورية', 'en': 'Immediate', 'fr': 'Immédiate'}),
+  ),
+  'surah_kahf': HabitMetrics(
+    primary: HabitMetric(label: {'ar': 'ما قرأته من سورة الكهف', 'en': 'How much of Surah Al-Kahf you read', 'fr': 'Part lue de la sourate Al-Kahf'}, low: {'ar': 'لم أقرأ', 'en': 'Nothing', 'fr': 'Rien'}, high: {'ar': 'السورة كاملة', 'en': 'The whole surah', 'fr': 'La sourate entière'}),
+    secondary: HabitMetric(label: {'ar': 'التدبّر أثناء القراءة', 'en': 'Reflection while reading', 'fr': 'Méditation pendant la lecture'}, low: {'ar': 'قراءة سريعة', 'en': 'Rushed reading', 'fr': 'Lecture rapide'}, high: {'ar': 'تدبّر عميق', 'en': 'Deep reflection', 'fr': 'Méditation profonde'}),
+  ),
+  'listening_wird': HabitMetrics(
+    primary: HabitMetric(label: {'ar': 'مقدار استماعك اليوم', 'en': 'How much you listened today', 'fr': 'Durée d\'écoute aujourd\'hui'}, low: {'ar': 'لم أستمع', 'en': 'Nothing', 'fr': 'Rien'}, high: {'ar': 'وِرد كامل', 'en': 'A full portion', 'fr': 'Une portion complète'}),
+    secondary: HabitMetric(label: {'ar': 'حضور القلب والإنصات', 'en': 'Presence of heart while listening', 'fr': 'Attention du cœur à l\'écoute'}, low: {'ar': 'سماع عابر', 'en': 'Background only', 'fr': 'Écoute distraite'}, high: {'ar': 'إنصات وتدبّر', 'en': 'Attentive and reflective', 'fr': 'Écoute attentive'}),
+  ),
+  'hadith_wird': HabitMetrics(
+    primary: HabitMetric(label: {'ar': 'مقدار استماعك للسنّة اليوم', 'en': 'Sunnah listening today', 'fr': 'Écoute de la Sunna aujourd\'hui'}, low: {'ar': 'لم أستمع', 'en': 'Nothing', 'fr': 'Rien'}, high: {'ar': 'وِرد كامل', 'en': 'A full portion', 'fr': 'Une portion complète'}),
+    secondary: HabitMetric(label: {'ar': 'العمل بما سمعت', 'en': 'Acting on what you heard', 'fr': 'Mise en pratique de l\'écoute'}, low: {'ar': 'لم أطبّق شيئاً', 'en': 'Nothing applied', 'fr': 'Rien appliqué'}, high: {'ar': 'طبّقت ما تعلّمت', 'en': 'Applied what you learned', 'fr': 'Appliqué ce qui a été appris'}),
+  ),
   'quit_smoking': HabitMetrics(
     primary: HabitMetric(label: {'ar': 'عدد السجائر اليوم', 'en': 'Cigarettes today', 'fr': 'Cigarettes aujourd\'hui'}, low: {'ar': 'لا شيء', 'en': 'None', 'fr': 'Aucune'}, high: {'ar': 'عشر فأكثر', 'en': 'Ten or more', 'fr': 'Dix ou plus'}),
     secondary: HabitMetric(label: {'ar': 'الصمود أمام الرغبة', 'en': 'Craving control', 'fr': 'Contrôle des envies'}, low: {'ar': 'استسلمت سريعاً', 'en': 'Gave in fast', 'fr': 'Cédé vite'}, high: {'ar': 'تجاوزتها كلها', 'en': 'Beat them all', 'fr': 'Toutes surmontées'}),
@@ -268,6 +284,27 @@ const Map<String, HabitMetrics> kHabitMetricsOverrides = {
 };
 
 const Map<String, List<Map<String, String>>> kExtraCompeting = {
+  'surah_kahf': [
+    {'ar': 'اقرأ سورة الكهف يوم الجمعة فهو وقتها المسنون.', 'en': 'Read Surah Al-Kahf on Friday, its recommended day.', 'fr': 'Lisez la sourate Al-Kahf le vendredi, son jour recommandé.'},
+    {'ar': 'ابدأ بعد صلاة الفجر يوم الجمعة قبل انشغال اليوم.', 'en': 'Start after Fajr on Friday, before the day fills up.', 'fr': 'Commencez après le Fajr du vendredi, avant que la journée ne se remplisse.'},
+    {'ar': 'إن ضاق وقتك فاقرأها على أربع وقفات خلال اليوم.', 'en': 'If time is tight, read it over four sittings across the day.', 'fr': 'Si le temps manque, lisez-la en quatre fois dans la journée.'},
+    {'ar': 'اقرأ بصوت مسموع منخفض فهو أعون على التركيز.', 'en': 'Read aloud in a low voice; it steadies your focus.', 'fr': 'Lisez à voix basse, cela aide à rester concentré.'},
+    {'ar': 'استمع للسورة في طريقك إن تعذّرت القراءة.', 'en': 'Listen to the surah on your commute if reading is not possible.', 'fr': 'Écoutez la sourate en chemin si la lecture est impossible.'},
+  ],
+  'listening_wird': [
+    {'ar': 'اربط وِردك بوقت ثابت: بعد الفجر أو في الطريق.', 'en': 'Anchor your portion to a fixed time: after Fajr or on your commute.', 'fr': 'Ancrez votre portion à un moment fixe : après le Fajr ou en chemin.'},
+    {'ar': 'ابدأ بعشر دقائق يومياً فالقليل الدائم خير.', 'en': 'Start with ten minutes a day; small and steady wins.', 'fr': 'Commencez par dix minutes par jour, peu mais régulier.'},
+    {'ar': 'اختر قارئاً يريحك والزمه حتى تألف صوته.', 'en': 'Pick a reciter you find calming and stay with him.', 'fr': 'Choisissez un récitant apaisant et gardez-le.'},
+    {'ar': 'أنصت بقلبك ولا تجعله صوتاً في الخلفية.', 'en': 'Listen with your heart, not as background noise.', 'fr': 'Écoutez avec le cœur, pas comme un fond sonore.'},
+    {'ar': 'ردّد بعض الآيات بعد القارئ لتثبت معك.', 'en': 'Repeat some verses after the reciter so they settle in.', 'fr': 'Répétez quelques versets après le récitant pour les retenir.'},
+  ],
+  'hadith_wird': [
+    {'ar': 'اجعل لاستماع السنّة وقتاً ثابتاً كل يوم.', 'en': 'Give Sunnah listening a fixed slot every day.', 'fr': 'Réservez chaque jour un créneau fixe à l\'écoute de la Sunna.'},
+    {'ar': 'استمع أثناء الأعمال التي لا تحتاج تركيزاً.', 'en': 'Listen while doing tasks that need no concentration.', 'fr': 'Écoutez pendant les tâches qui ne demandent pas de concentration.'},
+    {'ar': 'قيّد فائدة واحدة مما سمعت واعمل بها اليوم.', 'en': 'Write down one benefit you heard and act on it today.', 'fr': 'Notez un enseignement entendu et appliquez-le aujourd\'hui.'},
+    {'ar': 'ابدأ برياض الصالحين فهو أقرب إلى العمل اليومي.', 'en': 'Start with Riyad as-Salihin; it is closest to daily practice.', 'fr': 'Commencez par Riyad as-Salihin, le plus proche du quotidien.'},
+    {'ar': 'شارك ما تعلّمته مع أهلك ليثبت عندك.', 'en': 'Share what you learned with your family so it sticks.', 'fr': 'Partagez ce que vous avez appris avec vos proches pour l\'ancrer.'},
+  ],
   'pray_on_time': [
     {'ar': 'توضأ فور سماع الأذان قبل أي انشغال.', 'en': 'Make wudu the moment you hear the adhan, before anything else.', 'fr': 'Faites les ablutions dès l\'appel, avant toute occupation.'},
     {'ar': 'أغلق شاشتك عند الأذان وقم إلى الصلاة مباشرة.', 'en': 'Close your screen at the adhan and get up to pray.', 'fr': 'Éteignez votre écran à l\'adhan et levez-vous pour prier.'},
@@ -397,6 +434,24 @@ const Map<String, List<Map<String, String>>> kExtraCompeting = {
 };
 
 const Map<String, List<Map<String, String>>> kExtraEnvironment = {
+  'surah_kahf': [
+    {'ar': 'ضع تذكيراً أسبوعياً صباح الجمعة.', 'en': 'Set a weekly reminder on Friday morning.', 'fr': 'Réglez un rappel hebdomadaire le vendredi matin.'},
+    {'ar': 'اجعل المصحف مفتوحاً على السورة ليلة الجمعة.', 'en': 'Leave the mushaf open at the surah on Thursday night.', 'fr': 'Laissez le Coran ouvert à la sourate le jeudi soir.'},
+    {'ar': 'حمّل تلاوة السورة على هاتفك للاستماع دون إنترنت.', 'en': 'Download a recitation of the surah for offline listening.', 'fr': 'Téléchargez une récitation de la sourate pour l\'écoute hors ligne.'},
+    {'ar': 'اتفق مع أهل بيتك على قراءتها معاً كل جمعة.', 'en': 'Agree with your household to read it together each Friday.', 'fr': 'Convenez avec vos proches de la lire ensemble chaque vendredi.'},
+  ],
+  'listening_wird': [
+    {'ar': 'جهّز قائمة الاستماع مسبقاً حتى لا تتردد.', 'en': 'Prepare your playlist in advance so you never hesitate.', 'fr': 'Préparez votre liste d\'écoute à l\'avance pour ne pas hésiter.'},
+    {'ar': 'احتفظ بسمّاعتك في مكان ثابت تصل إليه بسهولة.', 'en': 'Keep your earphones in one fixed, easy-to-reach place.', 'fr': 'Gardez vos écouteurs à un endroit fixe et accessible.'},
+    {'ar': 'حمّل وِردك مسبقاً ليعمل دون إنترنت.', 'en': 'Download your portion in advance so it works offline.', 'fr': 'Téléchargez votre portion à l\'avance pour l\'écoute hors ligne.'},
+    {'ar': 'أسكت إشعارات هاتفك أثناء وقت الوِرد.', 'en': 'Silence your notifications during your listening time.', 'fr': 'Coupez vos notifications pendant le temps d\'écoute.'},
+  ],
+  'hadith_wird': [
+    {'ar': 'ثبّت قناة السنّة في مقدّمة قائمتك.', 'en': 'Pin the Sunnah channel at the top of your list.', 'fr': 'Épinglez la chaîne de la Sunna en tête de votre liste.'},
+    {'ar': 'اجعل دفتراً صغيراً بجوارك لتقييد الفوائد.', 'en': 'Keep a small notebook nearby to jot down benefits.', 'fr': 'Gardez un carnet à portée pour noter les enseignements.'},
+    {'ar': 'اربط الاستماع بعادة قائمة كالمشي أو القيادة.', 'en': 'Attach listening to an existing habit like walking or driving.', 'fr': 'Associez l\'écoute à une habitude existante comme la marche.'},
+    {'ar': 'أبعد ما يشتّتك أثناء وقت الاستماع.', 'en': 'Remove distractions during your listening time.', 'fr': 'Écartez les distractions pendant le temps d\'écoute.'},
+  ],
   'pray_on_time': [
     {'ar': 'ثبّت تطبيق أذان وفعّل تنبيهاً لكل فريضة.', 'en': 'Install an adhan app and enable an alert for each prayer.', 'fr': 'Installez une application d\'adhan avec une alerte par prière.'},
     {'ar': 'افرش سجادتك في مكان ظاهر تراه دائماً.', 'en': 'Keep your prayer rug visible where you always see it.', 'fr': 'Laissez votre tapis de prière visible en permanence.'},

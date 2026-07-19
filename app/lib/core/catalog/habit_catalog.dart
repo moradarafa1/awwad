@@ -224,6 +224,18 @@ String categoryName(String category, String locale) {
   }
 }
 
+/// Habits whose UNIT IS A WEEK, not a day: only the mapped weekday counts.
+/// Every other day is TRANSPARENT to the streak engine (like an excused
+/// skip), otherwise an honest weekly logger would show a permanently broken
+/// 1-day streak. Values are DateTime weekday constants.
+const Map<String, int> kWeeklyHabitWeekday = {
+  'surah_kahf': DateTime.friday,
+};
+
+/// The weekday this habit is measured on, or null for normal daily habits.
+int? weeklyWeekdayFor(String? catalogKey) =>
+    catalogKey == null ? null : kWeeklyHabitWeekday[catalogKey];
+
 const List<CatalogHabit> kHabitCatalog = [
   // ---------- BREAK ----------
   CatalogHabit(key: 'quit_smoking', track: 'break', category: 'health', icon: '🚭', templateKey: 'hrt_8week', islamwebRef: 'https://www.islamweb.net/ar/fatwa/4257/',
@@ -271,7 +283,7 @@ const List<CatalogHabit> kHabitCatalog = [
   CatalogHabit(key: 'caffeine_excess', track: 'break', category: 'health', icon: '☕',
     title: {'ar': 'الإفراط في الكافيين', 'en': 'Too much caffeine', 'fr': 'Excès de caféine'},
     description: {'ar': 'قلّل القهوة ومشروبات الطاقة', 'en': 'Cut back on caffeine.', 'fr': 'Réduisez la caféine.'}),
-  CatalogHabit(key: 'late_nights', track: 'break', category: 'health', icon: '🌙', templateKey: 'hrt_8week',
+  CatalogHabit(key: 'late_nights', defaultReminderHours: [21], track: 'break', category: 'health', icon: '🌙', templateKey: 'hrt_8week',
     title: {'ar': "السهر المتأخر", 'en': "Staying up late", 'fr': "Veiller tard"},
     description: {'ar': "تخلّص من عادة السهر المتأخر الذي يسرق نومك وصلاة فجرك ونشاط نهارك، ونظّم وقت نومك.", 'en': "Break the habit of staying up late, which steals your sleep, your Fajr prayer, and your daytime energy. Regulate your bedtime.", 'fr': "Rompez avec l'habitude de veiller tard, qui vous prive de sommeil, de la prière de Fajr et de votre énergie. Régulez l'heure du coucher."}),
   CatalogHabit(key: 'binge_watching', track: 'break', category: 'productivity', icon: '📺', templateKey: 'hrt_8week',
@@ -291,10 +303,10 @@ const List<CatalogHabit> kHabitCatalog = [
   CatalogHabit(key: 'adhkar', track: 'build', category: 'worship', icon: '📿', isIslamic: true, defaultReminderHours: [6, 17],
     title: {'ar': 'أذكار الصباح والمساء', 'en': 'Morning & evening adhkar', 'fr': 'Adhkar matin et soir'},
     description: {'ar': 'حصّن يومك بالذكر', 'en': 'Fortify your day.', 'fr': 'Protégez votre journée.'}),
-  CatalogHabit(key: 'voluntary_fasting', track: 'build', category: 'worship', icon: '🌙', isIslamic: true, islamwebRef: 'https://www.islamweb.net/ar/fatwa/50964/',
+  CatalogHabit(key: 'voluntary_fasting', defaultReminderHours: [20], track: 'build', category: 'worship', icon: '🌙', isIslamic: true, islamwebRef: 'https://www.islamweb.net/ar/fatwa/50964/',
     title: {'ar': 'صيام النوافل', 'en': 'Voluntary fasting', 'fr': 'Jeûne surérogatoire'},
     description: {'ar': 'الاثنين والخميس والأيام البيض', 'en': 'Mondays, Thursdays, white days.', 'fr': 'Lundi, jeudi, jours blancs.'}),
-  CatalogHabit(key: 'qiyam', track: 'build', category: 'worship', icon: '🌌', isIslamic: true,
+  CatalogHabit(key: 'qiyam', defaultReminderHours: [21], track: 'build', category: 'worship', icon: '🌌', isIslamic: true,
     title: {'ar': 'قيام الليل', 'en': 'Night prayer (Qiyam)', 'fr': 'Prière de nuit'},
     description: {'ar': 'شرف المؤمن قيامه بالليل', 'en': 'The honor of the believer.', 'fr': 'L\'honneur du croyant.'}),
   CatalogHabit(key: 'keeping_ties', track: 'build', category: 'social', icon: '🤝', isIslamic: true,
@@ -303,19 +315,19 @@ const List<CatalogHabit> kHabitCatalog = [
   CatalogHabit(key: 'daily_charity', track: 'build', category: 'worship', icon: '💝', isIslamic: true,
     title: {'ar': 'صدقة يومية', 'en': 'Daily charity', 'fr': 'Aumône quotidienne'},
     description: {'ar': 'ولو بالقليل الصدقة تطفئ الخطيئة', 'en': 'Even a little, every day.', 'fr': 'Même peu, chaque jour.'}),
-  CatalogHabit(key: 'istighfar', track: 'build', category: 'worship', icon: '🤲', isIslamic: true,
+  CatalogHabit(key: 'istighfar', defaultReminderHours: [8, 13, 20], track: 'build', category: 'worship', icon: '🤲', isIslamic: true,
     title: {'ar': 'الاستغفار اليومي', 'en': 'Daily istighfar', 'fr': 'Istighfar quotidien'},
     description: {'ar': 'عوّد لسانك على الاستغفار', 'en': 'Keep your tongue in istighfar.', 'fr': 'Habituez votre langue.'}),
-  CatalogHabit(key: 'exercise', track: 'build', category: 'health', icon: '🏃',
+  CatalogHabit(key: 'exercise', defaultReminderHours: [17], track: 'build', category: 'health', icon: '🏃',
     title: {'ar': 'ممارسة الرياضة', 'en': 'Exercise', 'fr': 'Faire du sport'},
     description: {'ar': 'حرّك جسمك كل يوم', 'en': 'Move your body daily.', 'fr': 'Bougez chaque jour.'}),
   CatalogHabit(key: 'drink_water', track: 'build', category: 'health', icon: '💧', defaultReminderHours: [9, 12, 15, 18, 21], metrics: kWaterMetrics,
     title: {'ar': 'شرب الماء بانتظام', 'en': 'Drink water', 'fr': 'Boire de l\'eau'},
     description: {'ar': 'رطّب جسمك على مدار اليوم', 'en': 'Stay hydrated.', 'fr': 'Restez hydraté.'}),
-  CatalogHabit(key: 'read_books', track: 'build', category: 'productivity', icon: '📚',
+  CatalogHabit(key: 'read_books', defaultReminderHours: [20], track: 'build', category: 'productivity', icon: '📚',
     title: {'ar': 'القراءة اليومية', 'en': 'Daily reading', 'fr': 'Lecture quotidienne'},
     description: {'ar': 'صفحات كل يوم تبني عقلك', 'en': 'A few pages every day.', 'fr': 'Quelques pages chaque jour.'}),
-  CatalogHabit(key: 'sleep_early', track: 'build', category: 'health', icon: '🌃',
+  CatalogHabit(key: 'sleep_early', defaultReminderHours: [21], track: 'build', category: 'health', icon: '🌃',
     title: {'ar': 'النوم مبكراً', 'en': 'Sleep early', 'fr': 'Dormir tôt'},
     description: {'ar': 'نوم مبكر = استيقاظ للفجر بنشاط', 'en': 'Early to bed, up for Fajr.', 'fr': 'Au lit tôt.'}),
   CatalogHabit(key: 'gratitude', track: 'build', category: 'mind', icon: '🤍', isIslamic: true,

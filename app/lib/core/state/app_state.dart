@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../analytics/analytics.dart';
 import '../catalog/badge_catalog.dart';
 import '../catalog/default_fields.dart';
+import '../catalog/habit_catalog.dart' show weeklyWeekdayFor;
 import '../custom_field.dart';
 import '../data/local_store.dart';
 import '../models.dart';
@@ -137,24 +138,48 @@ class AppState {
   // Streaks are CALENDAR-AWARE: a day with no entry and no excuse BREAKS the
   // streak (that is what the repair banner protects against); an excused skip
   // passes through; TODAY without an entry does not break (day not over yet).
+  /// For a WEEKLY habit (e.g. surah_kahf on Friday) every other weekday is
+  /// transparent: it neither counts nor breaks. Null for daily habits.
+  int? get _weeklyWeekday => weeklyWeekdayFor(activeHabit?.catalogKey);
+
   int get currentStreak {
     final byDay = {for (final e in activeEntries) e.date: e};
     if (byDay.isEmpty) return 0;
+    final weekly = _weeklyWeekday;
     var s = 0;
     var d = DateTime.now();
     if (byDay[dayKey(d)] == null) {
       d = d.subtract(const Duration(days: 1)); // today still pending
     }
+    // A weekly habit's run may only be walked back from its own weekday;
+    // start by rewinding to the most recent one that is not still pending.
+    if (weekly != null) {
+      while (d.weekday != weekly) {
+        d = d.subtract(const Duration(days: 1));
+      }
+      if (byDay[dayKey(d)] == null && !d.isBefore(_todayMidnight)) {
+        d = d.subtract(const Duration(days: 7)); // this week still pending
+      }
+    }
     while (true) {
       final e = byDay[dayKey(d)];
+      if (weekly != null && d.weekday != weekly) {
+        d = d.subtract(const Duration(days: 1)); // off-day: transparent
+        continue;
+      }
       if (e == null) break; // missed, unexcused day -> broken
       if (!e.isSkip) {
         if (e.didSlip) break;
         s++;
       }
-      d = d.subtract(const Duration(days: 1));
+      d = d.subtract(Duration(days: weekly != null ? 7 : 1));
     }
     return s;
+  }
+
+  static DateTime get _todayMidnight {
+    final n = DateTime.now();
+    return DateTime(n.year, n.month, n.day);
   }
 
   int get longestStreak {
@@ -169,8 +194,13 @@ class AppState {
         ? DateTime(now.year, now.month, now.day)
         : DateTime(now.year, now.month, now.day)
             .subtract(const Duration(days: 1));
+    final weekly = _weeklyWeekday;
     var longest = 0, run = 0;
     while (!d.isAfter(end)) {
+      if (weekly != null && d.weekday != weekly) {
+        d = DateTime(d.year, d.month, d.day + 1); // off-day: transparent
+        continue;
+      }
       final e = byDay[dayKey(d)];
       if (e == null || (!e.isSkip && e.didSlip)) {
         run = 0; // gap or slip breaks the run
