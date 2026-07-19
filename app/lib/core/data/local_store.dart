@@ -155,6 +155,19 @@ class LocalStore {
     await _prefs.remove(_kSurvey);
     await _prefs.remove(_kBadges);
     await _prefs.remove(_kFields);
+    // Everything else the user generated. The delete/erase copy promises
+    // «كل بياناتك», and prayer config in particular holds real GPS
+    // coordinates, so leaving these behind made that claim false.
+    await _prefs.remove(_kPrayer);
+    await _prefs.remove(_kPomodoro);
+    await _prefs.remove(_kQuranWird);
+    for (final k in _prefs.getKeys().toList()) {
+      if (k.startsWith('awwad_tasbih_v1_') ||
+          k == 'app_usage_limits_v1' ||
+          k == 'awwad_pull_pending') {
+        await _prefs.remove(k);
+      }
+    }
     // settings (incl. locale) intentionally preserved; onboarding flag reset by caller.
   }
 }

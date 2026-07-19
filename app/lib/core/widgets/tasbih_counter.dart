@@ -33,10 +33,12 @@ bool habitUsesTasbih(String? catalogKey) =>
 int tasbihTargetFor(String catalogKey) =>
     catalogKey == 'adhkar' || catalogKey == 'gratitude' ? 33 : 100;
 
-/// Maps a raw count onto the 0-10 primary metric the entry actually stores,
-/// so counts need no schema change. Reaching the target is a full 10. Pure.
+/// Maps a raw count onto the primary metric the entry actually stores, so
+/// counts need no schema change. Reaching the target is a full 10. The floor
+/// is 1, NOT 0: the metric feeds a Slider whose minimum is 1, and a 0 would
+/// both break that slider and persist an out-of-domain value. Pure.
 int tasbihToMetric(int count, int target) {
-  if (count <= 0) return 0;
+  if (count <= 0) return 1;
   if (target <= 0) return 10;
   final v = (count * 10 / target).round();
   return v < 1 ? 1 : (v > 10 ? 10 : v);
@@ -130,6 +132,18 @@ class _TasbihCounterState extends State<TasbihCounter> {
     _load();
   }
 
+  @override
+  void didUpdateWidget(TasbihCounter old) {
+    super.didUpdateWidget(old);
+    // The daily-log screen is a preserved stack slot: switching habits (or
+    // crossing midnight) rebuilds it in place, so the count MUST reload or
+    // the previous habit's number would linger.
+    if (old.habitId != widget.habitId || old.dayKey != widget.dayKey) {
+      _loaded = false;
+      _load();
+    }
+  }
+
   Future<void> _load() async {
     final c = await TasbihStore.load(widget.habitId, widget.dayKey);
     if (!mounted) return;
@@ -137,7 +151,10 @@ class _TasbihCounterState extends State<TasbihCounter> {
       _count = c;
       _loaded = true;
     });
-    widget.onChanged?.call(c);
+    // Deliberately NOT calling onChanged here: loading must never overwrite
+    // the metric the screen already hydrated from today's saved entry, and a
+    // zero count must never be pushed into a slider whose minimum is 1.
+    // Only real user taps move the slider.
   }
 
   Future<void> _bump() async {

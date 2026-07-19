@@ -24,7 +24,9 @@ void main() {
   });
 
   test('count maps onto the 0-10 metric without losing the extremes', () {
-    expect(tasbihToMetric(0, 100), 0);
+    // Never 0: the metric feeds a Slider with min:1, and a 0 both breaks
+    // that slider and persists an out-of-domain value.
+    expect(tasbihToMetric(0, 100), 1);
     // Any real effort must register as at least 1, never round down to 0.
     expect(tasbihToMetric(1, 100), 1);
     expect(tasbihToMetric(4, 100), 1);
@@ -39,7 +41,7 @@ void main() {
 
   test('mapping is safe for a zero or negative target', () {
     expect(tasbihToMetric(5, 0), 10);
-    expect(tasbihToMetric(0, 0), 0);
+    expect(tasbihToMetric(0, 0), 1);
   });
 
   test('labels are trilingual, non-empty and em-dash free', () {

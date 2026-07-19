@@ -55,3 +55,5 @@ Future<bool> canUseExactAlarms() async => false;
 Future<bool> requestExactAlarmsPermission() async => false;
 
 Future<bool> osNotificationsEnabled() async => true;
+
+Future<void> cancelAllNotifications() async {}

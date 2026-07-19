@@ -18,8 +18,9 @@
 // Channels (an Android channel's sound/importance is FIXED at creation, so
 // changing behavior requires a NEW id, never an edit): awwad_daily,
 // awwad_dhikr, awwad_account, awwad_badges, awwad_adhan_v1, awwad_prayer_v1,
-// awwad_prayer_pre_v1, awwad_adhkar_v1, awwad_pomodoro_v1, awwad_report_v1,
-// plus awwad_usage_guard created natively in UsageLimitWorker.kt.
+// awwad_prayer_pre_v1, awwad_adhkar_v1, awwad_kahf_v1, awwad_pomodoro_v1,
+// awwad_report_v1, plus awwad_usage_guard created natively in
+// UsageLimitWorker.kt.
 
 import 'dart:ui' show Color;
 
@@ -59,6 +60,8 @@ const _adhkarChannelId = 'awwad_adhkar_v1';
 const _adhkarChannelName = 'Morning and evening adhkar';
 const _pomodoroChannelId = 'awwad_pomodoro_v1';
 const _pomodoroChannelName = 'Pomodoro timer';
+const _kahfChannelId = 'awwad_kahf_v1';
+const _kahfChannelName = 'Weekly Surah Al-Kahf';
 const _reportChannelId = 'awwad_report_v1';
 const _reportChannelName = 'Monthly report';
 
@@ -317,7 +320,14 @@ Future<void> showBadgeNotification(int slot, String title, String body) async {
     ),
     iOS: const DarwinNotificationDetails(),
   );
-  await _plugin.show(_badgeIdBase + (slot.abs() % 900), title, body, details);
+  // Guarded like every other post: the caller loops over newly earned badges
+  // and marks each celebrated, so a throw here would abort the loop and make
+  // the remaining badges re-fire their celebration on every future log.
+  try {
+    await _plugin.show(_badgeIdBase + (slot.abs() % 900), title, body, details);
+  } catch (e) {
+    debugPrint('awwad notif: badge show failed: $e');
+  }
 }
 
 /// One per-habit, per-time daily reminder ([slot] 0.._habitReminderMax-1).
@@ -534,17 +544,21 @@ Future<void> cancelIdRange(int from, int to) async {
 Future<void> scheduleWeekly(
     int id, int weekday, int hour, int minute, String title, String body) async {
   await initNotifications();
+  // Its own channel: the only caller is the weekly Surah Al-Kahf reminder,
+  // a RELIGIOUS alert that must survive muting the habit channel (and must
+  // not be mislabelled as a daily habit reminder in system settings).
   final details = NotificationDetails(
     android: AndroidNotificationDetails(
       color: _kBrandColor,
-      _habitChannelId,
-      _habitChannelName,
-      channelDescription: 'Daily habit reminder',
+      _kahfChannelId,
+      _kahfChannelName,
+      channelDescription: 'Weekly reminder to read Surah Al-Kahf on Friday',
       importance: Importance.high,
       priority: Priority.high,
       styleInformation: BigTextStyleInformation(body),
     ),
-    iOS: const DarwinNotificationDetails(),
+    iOS: const DarwinNotificationDetails(
+        interruptionLevel: InterruptionLevel.timeSensitive),
   );
   var when = tz.TZDateTime.now(tz.local);
   when = tz.TZDateTime(
@@ -596,4 +610,15 @@ Future<void> cancelDhikr() async {
 
 Future<void> cancelReengageNudge() async {
   await _safeCancel(_reengageId);
+}
+
+/// Cancels EVERY scheduled notification this app owns. Used by the account
+/// deletion and «امسح كل بياناتي» paths: wiping the habits without wiping
+/// their alarms leaves reminders firing for data that no longer exists.
+Future<void> cancelAllNotifications() async {
+  try {
+    await _plugin.cancelAll();
+  } catch (e) {
+    debugPrint('awwad notif: cancelAll failed: $e');
+  }
 }

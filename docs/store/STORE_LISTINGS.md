@@ -170,7 +170,10 @@ Privacy: https://moradarafa1.github.io/privacy/
   `adhan,prayer times,quran,fajr,adhkar,dhikr,salah,streak,islamic,screen time,focus,pomodoro,dua`
 - **Promotional text** (163/170):
   `Break a bad habit or build a good one: 40 templates, prayer times with adhan, Quran and hadith audio, screen-time limits, streaks and a widget. Free, no ads, offline.`
-- **Description**: use the Play full description above.
+- **Description**: use the Play full description above, MINUS the phone-control
+  section (usage monitoring, per-app limits, DNS shield). Those are Android-only by
+  Apple platform restrictions, and promising them in an App Store listing is a
+  rejection. Everything else applies as-is.
 
 ---
 

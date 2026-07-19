@@ -180,8 +180,14 @@ class SyncService {
                       .map((n) => n.toInt())
                       .toList() ??
                   const [],
-              createdAt: DateTime.tryParse(h['created_at'] as String? ?? '') ??
-                  DateTime.now(),
+              // .toLocal() is REQUIRED: the column is timestamptz, so the
+              // parsed value is UTC, and every consumer (dayKey, streak
+              // walks, the habit-strength floor) reads LOCAL calendar
+              // fields. Without it a restored habit's creation day can land
+              // on the wrong date and shift those windows.
+              createdAt:
+                  DateTime.tryParse(h['created_at'] as String? ?? '')?.toLocal() ??
+                      DateTime.now(),
             ))
         .toList();
 

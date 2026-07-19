@@ -171,11 +171,22 @@ class SupabaseService {
   /// web-only deletion page is a standard rejection on both stores.
   /// Throws on failure so the caller can show a localized error.
   static Future<void> deleteAccount() async {
-    final res = await client.functions
-        .invoke('account-export-delete', body: {'action': 'delete'});
-    final data = res.data as Map?;
-    if (data?['deleted'] != true) {
-      throw Exception('delete failed: ${data?['error'] ?? res.status}');
+    try {
+      final res = await client.functions
+          .invoke('account-export-delete', body: {'action': 'delete'});
+      final data = res.data as Map?;
+      if (data?['deleted'] != true) {
+        throw Exception('delete failed: ${data?['error'] ?? res.status}');
+      }
+    } catch (e) {
+      // A RETRY after a partially-completed delete hits 401: the auth user is
+      // already gone, so the JWT no longer resolves. That is SUCCESS from the
+      // user's point of view, not an error to show them.
+      final s = e.toString().toLowerCase();
+      final alreadyGone = s.contains('401') ||
+          s.contains('unauthorized') ||
+          s.contains('user_not_found');
+      if (!alreadyGone) rethrow;
     }
     try {
       await client.auth.signOut();

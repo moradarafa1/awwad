@@ -5,6 +5,8 @@ import '../../app/theme.dart';
 import '../../core/catalog/badge_catalog.dart';
 import '../../core/cloud/net_errors.dart';
 import '../../core/cloud/supabase_service.dart';
+import '../../core/cloud/sync_service.dart';
+import '../../core/notifications/notifications.dart';
 import '../../core/state/app_state.dart';
 import '../auth/auth_screen.dart';
 
@@ -333,6 +335,10 @@ class ProfileScreen extends ConsumerWidget {
       // The cloud rows are gone; the local copy must go too, otherwise the
       // next sign-in would push the deleted data straight back up.
       await ref.read(appControllerProvider.notifier).resetAll();
+      // Reminders for habits that no longer exist would keep firing, and a
+      // stale owner tag would make the NEXT account look like a foreign one.
+      await cancelAllNotifications();
+      await SyncService.clearOwner();
       messenger.showSnackBar(
           SnackBar(content: Text(_s(_kAcc['deleted']!, loc))));
       navigator.maybePop();

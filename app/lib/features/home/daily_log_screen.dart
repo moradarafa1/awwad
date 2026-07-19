@@ -827,6 +827,9 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
           // count DRIVES the primary metric, so nothing downstream changes.
           if (habit != null && habitUsesTasbih(habit.catalogKey))
             TasbihCounter(
+              // Keyed so a habit switch or a midnight rollover rebuilds the
+              // state instead of showing the previous habit's count.
+              key: ValueKey('tasbih-${habit.id}-${dayKey(DateTime.now())}'),
               habitId: habit.id,
               dayKey: dayKey(DateTime.now()),
               target: tasbihTargetFor(habit.catalogKey!),
