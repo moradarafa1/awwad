@@ -98,12 +98,20 @@ are documented in docs/IOS_PARITY_SETUP.md (Xcode widget target + app group + ad
 exact-alarms, arabic-copy, flutter-integration, ios-parity) + mandate research workflow
 wf_93a19fab-46a (4 areas) both RUNNING after the limit renewed.**
 
+**DELIVERY DONE (2026-07-18 ~07:30): the unified round IS BUILT + SHIPPED.** APK/AAB built
+from fdc706e with ALL aapt checks green (3 perms incl. SCHEDULE_EXACT_ALARM, 4 receivers,
+background receiver exported=false, adhan raw+mp3, ic_stat_awwad, 5 widget resources);
+APK on the Desktop (Awwad-1.0.0-final.apk, md5 80f38762...); Pages deploy pushed
+(commit 15226b5, source fdc706e) with the new app build - byte-verify performed right after
+push (see changelog). The 6-lens review completed across 3 resumed runs: 4 confirmed
+findings ALL FIXED (MSA n%100, French à, exported receiver, AppDelegate registrant) plus 4
+self-adjudicated cheap fixes; remaining unverified findings dispositioned in the round-8
+changelog (accepted limits documented).
+
 **EXECUTE NEXT, in order:**
-1. When the review returns: apply confirmed fixes; then deliver ONE round: §6 builds
-   (web+apk+aab, sequential), gotcha #11 aapt checks + SCHEDULE_EXACT_ALARM present in aapt
-   permissions, APK -> Desktop, Pages /app/ redeploy (the widget round DID change
-   main.dart.js - hash 4697f911... vs live 78d8e801..., so Pages MUST be pushed this time),
-   push source.
+1. Continue docs/MANDATE_PLAN.md IN ORDER: Round 2 (per-habit content 0a + retention wins)
+   is NEXT for the app; Round 3 (site technical SEO) was STARTED in parallel (app builds do
+   not block site work) - finish it, npm build + em-dash check + Pages root deploy.
 2. THE MANDATE RESEARCH IS DONE and its merged 10-round execution plan is persisted at
    **docs/MANDATE_PLAN.md** (rounds: notification-reliability core -> per-habit content 0a +
    retention wins -> site technical SEO -> notification architecture + iOS notif parity ->
