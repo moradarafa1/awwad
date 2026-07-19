@@ -113,12 +113,18 @@ Future<void> applyPrayerSchedule({
   final wantAdhkar = keys.contains('adhkar');
   if (!wantPrayers && !wantAdhkar) return;
 
-  // 6 days on Android so prayers keep firing when the app stays closed for a
-  // long weekend (id scheme d*10+i fits: 60 slots per 100-id base). iOS keeps
-  // 2 days: it caps pending requests at 64 and 6 days of prayers alone would
-  // eat 72 slots.
+  // 10 days on Android: the MAXIMUM the id scheme allows without collision
+  // (mains use kPrayerIdBase + d*10 + i with i <= 4, and the next base is
+  // 100 ids away, so d <= 9). Rebuilt on every app open, so this only has to
+  // cover a stretch of the app never being opened. iOS keeps 2 days: it caps
+  // pending requests at 64 and 10 days of prayers alone would eat 120 slots.
+  //
+  // Going beyond 10 would need a background re-arm. Deliberately NOT built: a
+  // native re-implementation of the astronomical engine could compute WRONG
+  // prayer times, and a wrong adhan is worse than a lapsed reminder for a
+  // user who has not opened the app in ten days. See kMaxPrayerWindowDays.
   final windowDays =
-      (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) ? 2 : 6;
+      (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) ? 2 : kMaxPrayerWindowDays;
   for (final a in buildAlarms(cfg,
       wantPrayers: wantPrayers, wantAdhkar: wantAdhkar, days: windowDays)) {
     switch (a.prayer) {

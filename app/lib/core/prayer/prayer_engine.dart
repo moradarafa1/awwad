@@ -194,6 +194,12 @@ const kPrayerIdBase = 4000;
 const kPreIdBase = 4100;
 const kAdhkarIdBase = 4200;
 
+/// Largest window buildAlarms can emit without ids colliding across families.
+/// Mains are kPrayerIdBase + d*10 + i (i <= 4) and the next base is only 100
+/// ids away, so d must stay <= 9. Locked by a test; raising it requires
+/// widening the id bases first.
+const int kMaxPrayerWindowDays = 10;
+
 /// Builds every alarm for the next [days] days that is still in the future.
 /// [wantPrayers] = user has a prayer habit; [wantAdhkar] = adhkar habit
 /// (fajr+30 morning, asr+30 evening, per the owner spec).
