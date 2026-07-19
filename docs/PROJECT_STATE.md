@@ -27,8 +27,8 @@ context or dropping anything:
      `flutter build web`; for the site `npm run build` + confirm 0 em-dashes in `web/dist`.
      Keep changes mirrored in **app + Astro site + seed.sql + the live Supabase catalog** when
      they touch habits/content. Update this file's §7/§12 and add a Changelog line.
-   - The CanvasKit web preview cannot screenshot the Flutter canvas (gotcha #4) — verify via
-     analyze/tests/build and reasoning, not screenshots.
+   - The in-app preview may not screenshot the Flutter canvas (gotcha #4), but real Chrome
+     does: use ops/shotgen/capture.mjs to SEE the running app, plus analyze/tests/build.
 
 4. **Two priority tasks the owner has queued** (do when asked):
    - **A. Deep "appropriateness" review of the whole app, like an expert human** who knows
@@ -42,53 +42,61 @@ context or dropping anything:
 
 ---
 
-## 0.5 HANDOFF 2026-07-19 (RESUME HERE)
+## 0.5 HANDOFF 2026-07-19 late (RESUME HERE)
 
-**OWNER MANDATE (2026-07-18/19), the standing order:** (a) competitive features + per-habit
-UX polish; (b) organic search: site SEO + store ASO; (c) perfect all notifications/alarms/
-permissions; (d) Play + App Store policy compliance; (e) **whatever ships on Android must
-ship on iPhone wherever iOS allows**; (f) if the 5h limit pauses work, resume when it renews.
-The merged 10-round execution plan lives in **docs/MANDATE_PLAN.md** (items ticked there per
-round). Mandate (a) UNGATES the old 0a per-habit review, which is now DONE for the gaps found.
+**OWNER MANDATE (standing order):** (a) competitive features + per-habit UX polish; (b) organic
+search: site SEO + store ASO; (c) perfect all notifications/alarms/permissions; (d) Play +
+App Store policy compliance; (e) **whatever ships on Android must ship on iPhone wherever iOS
+allows**; (f) if the 5h limit pauses work, resume when it renews. The execution plan is
+**docs/MANDATE_PLAN.md**: 39 of 44 items done, 2 partial, 3 open (all in Round 4).
 
-**DONE AND SHIPPED so far (all committed + pushed; see §13 for detail):** per-app open counts;
-home-screen widget (Android + the full iOS WidgetKit twin in-repo); exact prayer alarms
-(SCHEDULE_EXACT_ALARM, prayer family only, silent degrade) + the iOS timeSensitive twin;
-notification-reliability core (monochrome ic_stat_awwad status icon, 6-day prayer window on
-Android / 2 on iOS, fixed-offset timezone fallback, usage-guard worker gated on limits,
-OS-toggle reconciliation + deep link after permanent denial); Round 2 content and retention
-(break_porn metrics alias, content for the 3 newest build habits, WEEKLY streak semantics for
-surah_kahf, French accents, default reminder hours, best-streak/savings/excuse chips,
-personal-record celebration, daily rotating line); Round 3 site SEO (slashed canonicals,
-keyword title+H1, internal linking, JSON-LD, self-hosted fonts, i18n sitemap) DEPLOYED;
-Round 7 code (IN-APP ACCOUNT DELETION - the hard store blocker, coarse-only location, usage
-disclosure); Round 8 store metadata + ready-to-paste console answers; SA11 PWA polish.
+**EVERYTHING BELOW IS COMMITTED, PUSHED AND (where noted) LIVE.** Rounds 1,2,3,5,6,7,8,10 are
+complete; see §13 for the per-round detail. Highlights: per-app open counts; home-screen widget
+(Android + the full iOS WidgetKit twin in-repo); exact prayer alarms + the iOS timeSensitive
+twin; the notification-reliability core; prayer window at the id-scheme maximum (10 days
+Android / 2 iOS) with prayer_window_test locking it; separate notification channels so muting
+habit nudges cannot silence prayers; per-habit content for the 3 newest build habits + WEEKLY
+streak semantics for surah_kahf; tasbih counter; habit-strength score; SOS outcome loop;
+weekly insight card; IN-APP ACCOUNT DELETION (the hard store blocker); store metadata +
+ready-to-paste console answers; site SEO round DEPLOYED; 9 new articles (blog 30 -> 39, site
+LIVE at 139 pages); 13 habits gained mechanically-verified videos.
 
-**IN FLIGHT at handoff time:** (1) a 5-lens adversarial review of Round 2
-(wf_55983c7b-e3b, task wv56vr1c3) - READ ITS RESULT and apply confirmed fixes; (2) a
-web+APK+AAB build (task b5tkdc40m) started BEFORE the PWA-manifest/index.html edits, so the
-WEB part must be rebuilt before deploying.
+**NEW TOOLING (both under ops/shotgen/, both used already):**
+- `capture.mjs` drives the LIVE web build in real Chrome and writes genuine 1125x2436 store
+  screenshots to assets/screenshots/<locale>/. **GOTCHA #4 IS OBSOLETE**: the CanvasKit canvas
+  screenshots fine outside the Electron preview. The Arabic set (11 shots) is committed; the
+  en/fr runs need the boot-wait fix that is now in the script (a cold load can exceed the old
+  fixed sleep and silently captured splash screens).
+- `verify_videos.mjs` checks any candidate video id against YouTube (existence,
+  embeddability, true duration) before it may enter kHabitVideos. Never add a video without it.
 
 **EXECUTE NEXT, in order:**
-1. Apply the Round 2 review's confirmed findings (if any), then run ONE delivery: rebuild web
-   (the manifest/viewport changes need it) + APK + AAB, the §6 aapt checks (INTERNET,
-   POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM, NO ACCESS_FINE_LOCATION, 4 receivers,
-   background receiver exported=false, raw/adhan=1 + res mp3, ic_stat_awwad, 5 widget
-   resources), APK -> Desktop, Pages /app/ redeploy + byte-verify, push.
-2. Continue docs/MANDATE_PLAN.md: **Round 4** (notification channels split so muting habit
-   nudges cannot kill prayer alerts, tap routing + payloads on both platforms, contextual
-   permission prompt, DND-bypass adhan channel), then **Round 5** (tasbih counter, SOS
-   outcome loop, habit strength score, weekly insight), **Round 6** (scholar-video curation
-   workflow), **Round 9** (store screenshots - assets/screenshots/ is EMPTY and Play needs
-   2 minimum), **Round 10** (8-9 new trilingual articles).
-3. OWNER-GATED, do not start without a decision (full list at the end of MANDATE_PLAN.md):
-   full-screen-intent adhan, hard app-blocking (0c phase C), «غض البصر» habit, custom domain,
-   and the store submissions themselves (Play $25 / Apple $99 + a Mac).
+1. Finish the delivery in flight: build task b3xuwsfsn (web+APK+AAB) -> §6 aapt checks (3
+   perms incl. SCHEDULE_EXACT_ALARM, NO ACCESS_FINE_LOCATION, 4 receivers, background
+   receiver exported=false, raw/adhan=1 + res mp3, ic_stat_awwad, 5 widget resources) ->
+   APK to the Desktop -> Pages /app/ redeploy + byte-verify -> push.
+2. The 3 open MANDATE_PLAN items, all Round 4 notifications:
+   - **N8** tap routing: wire onDidReceiveNotificationResponse + payloads on both platforms so
+     a prayer notification opens the prayer screen and a habit reminder opens that habit's log.
+   - **SP9** move the OS notification prompt out of first launch into context (when the user
+     sets reminder times or enables prayer alerts). Raises grant rates and removes a known
+     Apple soft-rejection flag.
+   - **N7 partial** adhan vs DND: a new awwad_adhan_v2 channel created natively with
+     setBypassDnd (the plugin does not expose it) + an honest note in prayer settings. The
+     full-screen-intent version stays OWNER-GATED.
+3. Re-run `node ops/shotgen/capture.mjs --locale en` and `--locale fr` once the app is
+   redeployed, so the en/fr screenshot sets match the Arabic one (the Arabic set is done).
 
-**TELL THE OWNER (blocking his submission, not ours):** his 2026-07-12 decision to offer
-account deletion ONLY on the website violates Play's account-deletion policy and Apple
-5.1.1(v). The in-app flow is now built and shipped anyway, since submission is impossible
-without it; he only needs to know the decision was reversed.
+**OWNER-GATED, do not start without a decision** (full list at the end of MANDATE_PLAN.md):
+full-screen-intent adhan, hard app-blocking (0c phase C), the «غض البصر» habit, the custom
+domain, and the store submissions themselves (Play $25 / Apple $99 + a Mac). The Mac-only
+iOS steps are in docs/IOS_PARITY_SETUP.md: the WidgetKit files and adhan sound EXIST in the
+repo but belong to no Xcode target yet, so an ipa built today silently omits them.
+
+**TELL THE OWNER:** his 2026-07-12 decision to offer account deletion ONLY on the website
+violates Play's account-deletion policy and Apple 5.1.1(v). The in-app flow is built and
+shipped anyway, since submission is impossible without it; he only needs to know it was
+reversed.
 
 ## 0.5-OLD HANDOFF 2026-07-18 (superseded - kept for the round's technical details)
 
@@ -530,12 +538,18 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
    and `kotlin.incremental=false` (Windows .tab cache-close failures on rebuild). If an APK
    build fails on `:device_info_plus:compileDebugKotlin` cache, delete `app/build/<plugin>` dirs.
    Feeding sdkmanager `--licenses` needs bash `< yes.txt` stdin redirect (PowerShell piping does NOT reach its stdin).
-4. **CanvasKit preview limit (NOT a bug).** The Claude desktop Electron preview has webgl1=false
-   and CANNOT screenshot the Flutter CanvasKit canvas (`preview_screenshot` times out), and a
-   reused/wedged preview instance may fail to mount the glass-pane. A FRESH preview instance
-   mounts fine. Verify the app via `flutter analyze`/tests/build + glass-pane check on a fresh
-   instance; it renders correctly in a real browser. HTML pages (the Astro site) can also wedge
-   the screenshot if they use heavy GPU effects (feTurbulence grain, backdrop-filter) - avoided.
+4. **CanvasKit preview limit (NARROWER THAN IT LOOKED; corrected 2026-07-19).** The Claude
+   desktop Electron preview may fail to screenshot the Flutter CanvasKit canvas, and a
+   reused/wedged preview instance may fail to mount the glass-pane; a FRESH instance mounts
+   fine. **But the canvas IS screenshottable outside that preview**: `ops/shotgen/capture.mjs`
+   drives real Chrome via puppeteer-core and captures the running app perfectly at 1125x2436,
+   which is how the store screenshots are produced. Two traps learned there: (a) a build made
+   with `--base-href /app/` only renders when SERVED under `/app/` (serving it at root gives a
+   blank page and looks exactly like a CanvasKit failure), and (b) a cold load can take longer
+   than any fixed sleep, so wait for readiness (the splash PNG is tiny, a real screen is
+   hundreds of KB) or you silently capture a run of splash screens.
+   HTML pages (the Astro site) can still wedge the in-app preview screenshot if they use heavy
+   GPU effects (feTurbulence grain, backdrop-filter) - avoided.
 5. **Reveal animations must fail-open.** Never gate content visibility on opacity-0 + JS/IO
    reveal: if the compositor stalls, content stays invisible. Use transform-only reveal
    (content always opacity 1). The site uses a CSS-only transform reveal.
