@@ -773,7 +773,75 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ---
 
+## 13. Changelog
 
+- **2026-07-20 round 20 (final review: 13 defects fixed, several self-inflicted)** - The
+  review's verify agents died on the session limit, so the 14 raw findings were adjudicated
+  against the code by hand; 13 were real. WORST, and introduced in round 19: the SP9
+  "contextual" prompt gate `habits.any((h) => h.times.isNotEmpty)` is ALWAYS TRUE, because
+  Habit.times falls back to [reminderHour] (default 20) - dead code pretending to be a
+  decision. Worse, the OS-reconcile block ran before the user was ever asked, and a
+  NOT-YET-DETERMINED permission reads as "not enabled", so it could silently and permanently
+  set notificationsEnabled=false before any prompt existed. Fixed: the prompt is gated on
+  notifPromptShown alone (this shell only renders after onboarding WITH a habit, which is
+  already the contextual moment), the reconcile now requires notifPromptShown, and both are
+  kIsWeb-guarded so web stops persisting a bogus disable. DND CHANNEL, three real traps:
+  (a) ACCESS_NOTIFICATION_POLICY was never declared, so Awwad could never appear in the
+  DND-access list and the new tile led to a dead end; (b) the null-guard made the bypass flag
+  impossible to apply later, since setBypassDnd only sticks while the app HOLDS the access the
+  user grants afterwards - guard removed, channel re-created on every open and again right
+  after the grant; (c) upgrade and backup-restore users (adhanSound already true) never touch
+  the toggle, so flutter_local_notifications would create a plain channel first - creation
+  moved to every app open. Also: channel name/description now passed down LOCALIZED instead of
+  hardcoded Arabic, the dead awwad_adhan_v1 channel is deleted, tap listeners are removable
+  (HomeShell unmounts whenever the last habit is deleted, so they leaked and stacked), a stale
+  habit payload no longer yanks the user to a deleted habit, and repeated taps no longer stack
+  duplicate screens. analyze clean, 119/119.
+- **2026-07-20 round 19 (MANDATE_PLAN Round 4 finished: every plan item closed)** - N8 TAP
+  ROUTING: notifications carry a payload (kTapPrayer / kTapHabit+id / kTapReport) and
+  home_shell routes a tap to the prayer screen, that habit's log (switching the active habit),
+  or the monthly report. The launch-from-notification case is covered too, which the response
+  callback never receives: getNotificationAppLaunchDetails is read at init and replayed to the
+  UI once it registers. SP9: the OS notification request moved OFF the first-launch auth
+  screen (see round 20 for the correction to its gate). N7 SAFE HALF: awwad_adhan_v2 created
+  natively with setBypassDnd (the plugin cannot express it) plus a DND-access check and an
+  honest settings tile; the full-screen-intent version stays owner-gated.
+- **2026-07-19 round 18 (MANDATE_PLAN Round 6: verified scholar/expert videos for 13 habits)** -
+  A 5-agent search proposed 14 candidates with honest confidence levels; EVERY id was then
+  checked mechanically by ops/shotgen/verify_videos.mjs (oEmbed existence + embeddability +
+  true lengthSeconds). All 14 were real, and the durations written into kHabitVideos are
+  YouTube's, never the agent's claim. impulse_buying was DROPPED on the numbers: its only
+  candidate is 905s against the owner's 900s rule, and shipping nothing beats bending the
+  rule. 13 previously-uncovered habits gained a card: quit_smoking, quit_vaping,
+  caffeine_excess, hair_pulling, skin_picking, phone_addiction, excessive_gaming,
+  procrastination, oversleeping, late_nights, bad_language, anger, junk_food. Sources are
+  medical/psychological for the clinical habits (a psychiatry professor for the BFRBs) and a
+  scholar only where the topic is conduct. The now-dead YouTube SEARCH fallback
+  (habitVideoSearchUrl + kHabitVideoQuery, 17 entries) was deleted. analyze clean, 119/119.
+- **2026-07-19 round 17 (MANDATE_PLAN Round 10: 9 new articles, site LIVE at 139 pages)** -
+  The blog went 30 -> 39 posts via the write-blog-round10 workflow (9 write agents + 9
+  adversarial editor agents): ترك العادة السرية، كسر الإباحية وغض البصر، التحكم في الغضب،
+  إدمان مواقع التواصل، أفضل تطبيقات العادات للمسلمين، المحافظة على الصلاة، ورد الصلاة على
+  النبي، بر الوالدين، وخطة عادات رمضان. Each is a real trilingual piece (6 sections + 3 FAQ
+  per locale, not a translation of the Arabic), dignified on the sensitive topics, with NO
+  invented statistic, hadith or ruling (rulings point to islamweb per the values guideline).
+  Assembled programmatically with validation (unique slugs, exact section/FAQ counts, em-dash
+  strip) and dated on the existing 2-day cadence. Site rebuilt 112 -> 139 pages, 0 em-dashes,
+  each new post carrying Article + FAQPage + BreadcrumbList JSON-LD and the related-articles
+  block from Round 3. DEPLOYED (Pages c72f69a).
+- **2026-07-19 round 16 (prayer window to the id-scheme max + store screenshots unblocked)** -
+  N1 CLOSED: the Android prayer window went 6 -> kMaxPrayerWindowDays (10), the MAXIMUM the id
+  scheme allows (mains are base+d*10+i with the next base 100 ids away), locked by the new
+  test/prayer_window_test.dart (4 cases: base arithmetic, no duplicate ids across a full
+  window, everything inside the cancelled 4000-4299 range, all alarms in the future). iOS
+  stays at 2 days for the 64-request cap. A background re-arm is deliberately NOT built and
+  the reason is in the code: a native re-implementation of the astronomical engine could
+  compute WRONG prayer times, which is worse than a lapsed reminder for someone who has not
+  opened the app in ten days. SCREENSHOTS: gotcha #4 is OBSOLETE - the CanvasKit canvas
+  screenshots fine outside the Electron preview, so ops/shotgen/capture.mjs now drives the
+  live build in real Chrome and writes genuine 1125x2436 PNGs to assets/screenshots/ (the
+  empty folder was a hard Play blocker). ops/shotgen/verify_videos.mjs mechanically validates
+  candidate scholar videos against YouTube so a dead or over-long link can never ship.
 - **2026-07-19 round 15 (MANDATE_PLAN Round 5 complete: SOS outcome loop + weekly insight)** -
   SOS: the wave screen gained an honest third option «تعثّرت هذه المرة» beside «صمدت», which
   sets sosSlipPendingProvider and jumps to today's log with the slip answer PRESELECTED, so
