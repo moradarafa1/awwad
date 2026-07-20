@@ -14,6 +14,7 @@ import '../../core/audio/stream_player.dart';
 import '../../app/theme.dart';
 import '../../core/radio/radio_stations.dart';
 import '../../core/models.dart';
+import '../../core/audio/audio_session_config.dart';
 import '../../core/state/app_state.dart';
 
 class RadioPlayerScreen extends ConsumerStatefulWidget {
@@ -106,6 +107,9 @@ class _RadioPlayerScreenState extends ConsumerState<RadioPlayerScreen> {
       _listenedSeconds = 0;
     });
     try {
+      // See the Qur'an player: focus must be requested before the source
+      // is set, or the first station plays at notification volume.
+      await AwwadAudioSession.ensureConfigured();
       await _player.setUrl(s.url);
       await _player.play();
     } catch (_) {

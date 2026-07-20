@@ -13,6 +13,7 @@ import '../../core/audio/stream_player.dart';
 import '../../app/theme.dart';
 import '../../core/quran/quran_data.dart';
 import '../../core/models.dart';
+import '../../core/audio/audio_session_config.dart';
 import '../../core/state/app_state.dart';
 
 class QuranPlayerScreen extends ConsumerStatefulWidget {
@@ -129,6 +130,10 @@ class _QuranPlayerScreenState extends ConsumerState<QuranPlayerScreen> {
   Future<void> _load() async {
     if (_reciter == null) return;
     try {
+      // Request audio focus BEFORE the first source is set. Without a
+      // configured session Android routes this as a plain sound rather than
+      // media, which is why the owner heard it far too quietly.
+      await AwwadAudioSession.ensureConfigured();
       await _player.setUrl(surahUrl(_reciter!, _surah));
       await _persist();
     } catch (_) {
