@@ -21,7 +21,14 @@ export const PAGES = {
 export const CREDIT_URL = 'https://www.facebook.com/MoradArafaOfficial/';
 // The web version of the app (same product as the native app).
 // When the apex domain is purchased, point this at app.<domain> instead.
-export const WEB_APP_URL = 'https://moradarafa1.github.io/app/';
+//
+// Overridable for LOCAL REVIEW, so the site's «جرّب إصدار الويب» button opens
+// the build you just made instead of whatever is currently deployed. Without
+// this, reviewing a local site silently sends you to the LIVE app and you end
+// up testing yesterday's code (hit 2026-07-20).
+//   PUBLIC_WEB_APP_URL=http://localhost:8099/ npm --prefix web run build
+export const WEB_APP_URL =
+  import.meta.env.PUBLIC_WEB_APP_URL || 'https://moradarafa1.github.io/app/';
 // Recommended help channel for the secret-habit track (واعي on YouTube).
 export const WAAI_URL = 'https://www.youtube.com/channel/UCubgpaK2N08IKa1biOQPL1Q';
 // App store links. Flip androidLive/iosLive to true once each app is PUBLISHED

@@ -85,6 +85,12 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
 - **OWNER IS REVIEWING THE WEB APP FIRST, then approves, then the phone builds ship.** He
   asked explicitly for that order. Local review servers: site on :8090 (web/dist), web app on
   :8099 (app/build/web, built WITHOUT --base-href so it serves at root). NOTHING IS DEPLOYED.
+- LOCAL REVIEW TRAP FIXED: the site's «جرّب إصدار الويب» button points at WEB_APP_URL,
+  which is the LIVE deployed app. Reviewing a local site therefore sent the owner to
+  yesterday's code and he reported a bug that did not exist in the new build. WEB_APP_URL is
+  now overridable: .
+  **web/dist currently holds a REVIEW build with the localhost URL baked in. Rebuild without
+  the override before ANY deploy.**
 - **OPEN REQUEST, NOT STARTED: replace the EMOJI icons with a modern icon set**, benchmarked
   against the best competitors. Emoji live in `icon:` string fields in
   `core/catalog/habit_catalog.dart` (36 habits) and `core/catalog/badge_catalog.dart`, plus
