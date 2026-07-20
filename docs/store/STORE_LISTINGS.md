@@ -22,7 +22,7 @@
   `عوّاد: ترك العادات وبناؤها`
 - **الوصف المختصر** (74/80):
   `اترك عادة سيئة وابنِ عادة نافعة: تطبيق عربي مجاني لتطوير الذات بلا إعلانات`
-- **الوصف الكامل** (2234/4000):
+- **الوصف الكامل** (3093/4000):
 
 ```
 عوّاد رفيقك العربي لترك العادات السيئة وبناء العادات النافعة، بأسلوب علمي عملي وروح داعمة دافئة.
@@ -166,9 +166,9 @@ Privacy: https://moradarafa1.github.io/privacy/
 ### App Store (iOS)
 - **Name** (27/30): `Awwad: Muslim Habit Tracker`
 - **Subtitle** (27/30): `Quit smoking. Pray on time.`
-- **Keywords** (95/100):
+- **Keywords** (94/100):
   `adhan,prayer times,quran,fajr,adhkar,dhikr,salah,streak,islamic,screen time,focus,pomodoro,dua`
-- **Promotional text** (163/170):
+- **Promotional text** (166/170):
   `Break a bad habit or build a good one: 40 templates, prayer times with adhan, Quran and hadith audio, screen-time limits, streaks and a widget. Free, no ads, offline.`
 - **Description**: use the Play full description above, MINUS the phone-control
   section (usage monitoring, per-app limits, DNS shield). Those are Android-only by
@@ -183,7 +183,7 @@ Privacy: https://moradarafa1.github.io/privacy/
 - **Titre** (27/30): `Awwad : Tracker d'habitudes`
 - **Description courte** (79/80):
   `Brisez une mauvaise habitude, bâtissez une bonne. Gratuit, sans pub, hors ligne`
-- **Description complète** (2654/4000):
+- **Description complète** (2928/4000):
 
 ```
 Awwad (عوّاد) est votre compagnon gratuit pour changer vos habitudes, un jour à la fois. Rompez avec une mauvaise habitude ou construisez une bonne routine, avec une méthode claire et un accompagnement chaleureux, aligné sur les valeurs musulmanes.
