@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 /// One palette = every semantic color the app uses.
 class Palette {
@@ -88,10 +87,68 @@ class AppColors {
   static Color get hairline => _p.hairline;
 }
 
+/// The one type family, bundled in the app (see pubspec `fonts:`).
+/// Never fetched at runtime, so text renders the same offline as online.
+const String kFontFamily = 'IBM Plex Sans Arabic';
+
+/// Awwad type scale.
+///
+/// One family, four weights, three roles - exactly the model wabl.sa uses:
+/// large titles at w700, section titles at w600, everything else at w400 with
+/// w500 reserved for controls.
+///
+/// Three deliberate departures from the stock Material 3 scale:
+///  1. `letterSpacing` is 0 EVERYWHERE. Material ships positive tracking on
+///     the body and label styles (up to 0.5). Arabic is cursive: tracking
+///     pushes joined letterforms apart and reads as broken text.
+///  2. The display sizes are capped (57/45/36 -> 40/34/30). The stock values
+///     are desktop-poster sizes; on a 320dp phone an Arabic headline at 57
+///     clips. Shrinking can only ever reduce overflow, never cause it.
+///  3. Leading is raised to >= 1.45 on body text and the floor size is 12
+///     (Material's labelSmall is 11). Arabic ascenders, descenders and
+///     tashkeel need the extra room, and 11 is below the legible minimum.
+///
+/// Locked down by test/type_scale_test.dart and exercised at 320dp with a
+/// 1.3x system text scale by test/layout_overflow_test.dart.
+TextTheme _awwadTextTheme(TextTheme base) {
+  TextStyle t(double size, double height, FontWeight weight) => TextStyle(
+        fontFamily: kFontFamily,
+        fontSize: size,
+        height: height,
+        fontWeight: weight,
+        letterSpacing: 0,
+      );
+
+  return base.copyWith(
+    // Display + headline: the big titles. w700, tight-ish leading.
+    displayLarge: t(40, 1.30, FontWeight.w700),
+    displayMedium: t(34, 1.32, FontWeight.w700),
+    displaySmall: t(30, 1.34, FontWeight.w700),
+    headlineLarge: t(28, 1.36, FontWeight.w700),
+    headlineMedium: t(24, 1.38, FontWeight.w700),
+    headlineSmall: t(21, 1.40, FontWeight.w700),
+    // Title: section headers and card titles. w600.
+    titleLarge: t(20, 1.45, FontWeight.w600),
+    titleMedium: t(16, 1.45, FontWeight.w600),
+    titleSmall: t(14, 1.45, FontWeight.w600),
+    // Body: reading text. w400, generous leading.
+    bodyLarge: t(16, 1.55, FontWeight.w400),
+    bodyMedium: t(14, 1.50, FontWeight.w400),
+    bodySmall: t(12, 1.50, FontWeight.w400),
+    // Label: buttons, chips, captions. w500, never below 12.
+    labelLarge: t(14, 1.35, FontWeight.w500),
+    labelMedium: t(12, 1.35, FontWeight.w500),
+    labelSmall: t(12, 1.35, FontWeight.w500),
+  );
+}
+
 ThemeData buildAwwadTheme({bool dark = true}) {
   AppColors.apply(dark: dark);
   final base = ThemeData(
     useMaterial3: true,
+    // Catches the widgets that build a TextStyle from scratch instead of
+    // reading the text theme (some Cupertino/Material internals do).
+    fontFamily: kFontFamily,
     brightness: dark ? Brightness.dark : Brightness.light,
     scaffoldBackgroundColor: AppColors.bg,
     colorScheme: (dark ? const ColorScheme.dark() : const ColorScheme.light())
@@ -107,7 +164,7 @@ ThemeData buildAwwadTheme({bool dark = true}) {
   );
 
   return base.copyWith(
-    textTheme: GoogleFonts.cairoTextTheme(base.textTheme).apply(
+    textTheme: _awwadTextTheme(base.textTheme).apply(
       bodyColor: AppColors.text,
       displayColor: AppColors.heading,
     ),

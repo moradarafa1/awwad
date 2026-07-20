@@ -33,7 +33,10 @@ dependencies:
   collection: ^1.19.0
 
   # UI
-  google_fonts: ^6.2.1
+  # NOTE: google_fonts was removed on 2026-07-20. It fetched Cairo over HTTP on
+  # first launch, so a first run with no connection fell back to the platform
+  # font - a direct breach of the offline-first rule. The type family is now
+  # BUNDLED under assets/fonts (see the `fonts:` block below).
   fl_chart: ^0.69.2
   confetti: ^0.8.0
 
@@ -77,6 +80,42 @@ flutter:
     - assets/data/cities.json
     - assets/data/reciters.json
     - assets/data/scholar_videos.json
+
+  # Type family. IBM Plex Sans Arabic (IBM Corp. + Bold Monday + Khajag
+  # Apelian + Wael Morcos), SIL Open Font License 1.1 - free for commercial
+  # use and for embedding in an app; see assets/fonts/OFL.txt. It is the same
+  # family wabl.sa uses for both its large titles and its sublines (verified
+  # 2026-07-20 from the live computed styles, not from a guess).
+  # BUNDLED, never fetched at runtime: the app must render identically with
+  # the radio off.
+  fonts:
+    - family: IBM Plex Sans Arabic
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700
+    # Deliberate alias, not a copy-paste slip. On web, the Flutter engine
+    # downloads Roboto from fonts.gstatic.com at boot whenever no family named
+    # `Roboto` is registered. That is a third-party request the site half of
+    # this project explicitly does not make, and it fails offline. Registering
+    # the name here makes the engine use our own bundled face instead and the
+    # gstatic request disappears (verified 2026-07-20 over the resource log,
+    # not assumed).
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700
 
 flutter_launcher_icons:
   android: true

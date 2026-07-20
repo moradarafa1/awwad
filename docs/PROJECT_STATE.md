@@ -76,9 +76,26 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
    exercise the app for real. This closes the standing caveat: notification tap routing,
    DND bypass and the widget quick-log are verified by tests and reasoning, NOT on hardware.
 
+**PROGRESS 2026-07-20 round 1 (this session):**
+- **Item 5 FONTS: DONE and verified.** wabl.sa uses ONE family, not two: **IBM Plex Sans
+  Arabic**, big title at w700 and subline at w400 (read off the live computed styles of
+  /projects/wabl-11-nada: h1 = 48px/700, p = 18px/400; `document.fonts` shows Beiruti and
+  Tajawal never even download - Beiruti is scoped to their internal `.crm-scope` and Tajawal
+  is only a fallback). SIL OFL 1.1, free for commercial use and app embedding, so nothing to
+  buy. Wired into app + site + a real type scale. Details in §7. Also fixed two things found
+  on the way: `google_fonts` fetched the face at runtime (offline-first breach) and the
+  Flutter web engine pulled Roboto from fonts.gstatic.com at boot (third-party request).
+- **Item 1 APP BLOCKING: policy research DONE, verdicts + sources written into §12 0c(3).**
+  Android = CONDITIONAL and buildable (6 hard conditions, of which the killer is: the user
+  must always be able to uninstall, so no true strict mode). iOS = CONDITIONAL but gated on
+  an Apple entitlement that needs the $99 account first, so not buildable this round.
+- **NOT started yet: items 2, 3, 4, 6, 7.** Next session starts at item 2 (adhan in the
+  background + notification actions), then 3, 4, 6, 7 in order.
+
 **STILL OWNER-GATED (money or accounts only):** Play Console ($25), Apple Developer ($99 +
 a Mac), the submissions themselves, and the custom domain. The «غض البصر» habit also still
-needs his approval (catalog + seed + live DB sync together).
+needs his approval (catalog + seed + live DB sync together). NEW: iOS app-blocking cannot
+start until the Apple account exists and the family-controls entitlement is granted.
 
 **MAC-GATED:** docs/IOS_PARITY_SETUP.md. The WidgetKit files and adhan sound exist in the
 repo but belong to no Xcode target, so an ipa built today silently omits them.
@@ -454,9 +471,30 @@ cd /d/Claude/awwad/web && npm install && npm run build   # -> web/dist (111 page
   (Arabic/Persian digits normalized) + research-only notice. Writes to Supabase profiles.
 - **UI:** dark theme, **iOS "liquid glass" translucent buttons** (`theme.dart`). Verified:
   analyze clean, 8 tests, web build OK.
+- **TYPE (since 2026-07-20, phase 0.6 item 5):** one family, **IBM Plex Sans Arabic**, SIL OFL
+  1.1, BUNDLED at `app/assets/fonts/` (+ `OFL.txt`). This is the family wabl.sa actually uses,
+  verified from its live computed styles. Scale lives in `_awwadTextTheme` in `theme.dart`:
+  headings w700, titles w600, body w400, labels w500, letterSpacing 0 EVERYWHERE (tracking
+  breaks cursive Arabic), floor size 12, display sizes capped at 40 (Material's 57 clips on a
+  320dp Arabic screen). Locked by `test/type_scale_test.dart` (15 tests).
+  `google_fonts` is REMOVED: it fetched Cairo over HTTP on first launch, so a first run with
+  no connection fell back to the platform font, breaking offline-first.
+  `pubspec` also registers the same faces under the family name **`Roboto`** on purpose: the
+  Flutter WEB engine downloads Roboto from fonts.gstatic.com at boot unless that name is
+  already registered. Verified over the resource log before/after: the gstatic request is gone
+  and every font request is now first-party.
 
 ### Website (Astro) — redesigned + MSA + blog
-- Distinctive design (Reem Kufi headings, single teal accent #2dd4bf, ambient gradient, hover-lift cards, transform-only reveal). 111 pages. 0 em-dashes site-wide.
+- Distinctive design (single teal accent #2dd4bf, ambient gradient, hover-lift cards, transform-only reveal). 139 pages. 0 em-dashes site-wide.
+- **TYPE (since 2026-07-20):** same single family as the app, **IBM Plex Sans Arabic**,
+  self-hosted woff2 in `web/public/fonts/` (12 files = 4 weights x arabic/latin/latin-ext,
+  284 KB total, but unicode-range means a French page never downloads the Arabic file).
+  Headings w700, body w400, letter-spacing 0. `@font-face` block is GENERATED, never hand
+  typed: `node ops/fontgen/fetch_fonts.mjs <css> web/public/fonts` writes
+  `ops/fontface.generated.css`; see `ops/fontgen/README.md`.
+  Cairo and Salma Arabic are retired (Salma was fine legally, OFL 1.1 per its own name table;
+  the OTFs are parked at `assets/brand/fonts/` in case the wordmark wants it back).
+  Verified in real Chrome: zero third-party requests, zero clipped text at a 320px viewport.
 - Pages: home, break-habit, build-habit, privacy, terms, delete-account, blog index + **30 blog articles × 3 langs** (each with Article + FAQPage JSON-LD). hreflang/OG/canonical/sitemap/robots.
 - "Volunteer effort" notice in footer. Verified: 101/101 routes return 200.
 
@@ -591,6 +629,22 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
    `unzip -l` shows a ~2.24MB `res/*.mp3`. ALSO: never run two gradle builds concurrently on
    one build dir - concurrent builds corrupt resource merging.
 
+12. **Git Bash rewrites `/app/` into a Windows path (hit 2026-07-20).** MSYS path conversion
+   turns `flutter build web --base-href /app/` into
+   `--base-href C:/Program Files/Git/app/`; flutter then errors out with "should start and end
+   with /" and the build NEVER RUNS. The trap is that the previous `build/web` is still
+   sitting there, so a careless check "sees" a build and believes it is fresh. Fix: run
+   `export MSYS_NO_PATHCONV=1` first (or build from PowerShell). Always confirm the build is
+   real afterwards, e.g. `grep '<base href=' app/build/web/index.html` plus the timestamps in
+   `app/build/web/assets/`.
+
+13. **The Flutter WEB engine downloads Roboto from fonts.gstatic.com (hit 2026-07-20).** It
+   fires at boot whenever no font family named `Roboto` is registered, regardless of what the
+   theme uses. That is a third-party request the site half of this project deliberately does
+   not make, and it fails offline. Fix: register the bundled faces a second time under
+   `family: Roboto` in `pubspec.yaml`. Verify by listing `performance.getEntriesByType(
+   'resource')` on the running app and confirming no `fonts.gstatic.com` entry.
+
 ---
 
 ## 11. Brand & content rules
@@ -633,13 +687,78 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
    (3) DONE phase A (2026-07-12 round 2): app-usage monitoring + per-app daily limits +
        on-open warnings. DONE phase B (2026-07-17): background overrun ALARMS via native
        UsageLimitWorker (15-min WorkManager periodic, notification the moment a limited app
-       crosses its budget, once/app/day, works with Awwad closed). REMAINING phase C
-       (OWNER-GATED, do not build without explicit approval): hard BLOCKING/password-locking
-       other apps requires an AccessibilityService or overlay - real Google Play rejection
-       risk for the whole app, extra review process, and it is fragile across OEMs. The
-       honest alternatives if wanted: (a) keep strong warnings (shipped), (b) Digital
-       Wellbeing-style repeated nag notifications, (c) accept the Play risk and build the
-       AccessibilityService blocker. Owner must choose before C starts.
+       crosses its budget, once/app/day, works with Awwad closed). PHASE C = hard BLOCKING.
+       Owner CONDITIONALLY approved it on 2026-07-20 (phase 0.6 item 1): build it only where
+       it cannot cause a store rejection, decided per platform. **POLICY RESEARCH DONE
+       2026-07-20, verdicts below. Both platforms are CONDITIONAL, neither is a flat no.**
+
+       **ANDROID: CONDITIONAL, BUILDABLE.** All 11 comparable apps (AppBlock, StayFree,
+       Forest, one sec, Opal, Freedom, ActionDash, ScreenZen, Stay Focused, Digitox, Digital
+       Detox) are live on Play as of 2026-07-20 and every one uses AccessibilityService. No
+       removal or rejection found 2023-2026. Conditions, all mandatory:
+        - Do NOT set `isAccessibilityTool`. Qualifying tools are screen readers, switch input,
+          voice input, Braille only; "monitoring apps" and "automation tools" are named as
+          NOT eligible. A false declaration is itself a violation and can terminate the
+          developer account.
+          Source: https://support.google.com/googleplay/android-developer/answer/10964491
+        - Complete the Play Console accessibility declaration (non-tool branch), which wants a
+          screen-recorded VIDEO of the in-app disclosure. Mandatory since 2021-11-03.
+        - Ship an in-app PROMINENT DISCLOSURE with affirmative consent, not buried in the
+          privacy policy and not bundled with any other consent.
+          Source: https://support.google.com/googleplay/android-developer/answer/16558241
+        - Keep the block DETERMINISTIC and user-configured ("if user-picked package X
+          foregrounds, show screen Y"). The 2025-10-30 policy update prohibits an app that
+          "autonomously initiates, plans, and executes actions".
+          Source: https://support.google.com/googleplay/android-developer/answer/16550159
+        - **The user must always be able to disable the service and uninstall Awwad.** The
+          "prevent uninstall" carve-out covers parental-control and enterprise apps ONLY, and
+          self-imposed adult blocking is NOT covered. So: friction and time-locks yes, true
+          lock-out no. This kills any "strict mode" that blocks uninstall.
+        - Do NOT request `QUERY_ALL_PACKAGES` (permitted uses are search, antivirus, file
+          managers, browsers - blockers are not listed). Use `<queries>` + MAIN/LAUNCHER.
+          Source: https://support.google.com/googleplay/android-developer/answer/10158779
+       Platform risks to design around, not policy but they decide whether it WORKS:
+        - Android 13+ restricted settings: a SIDELOADED app cannot be granted accessibility
+          without the user digging into Settings > Apps > Allow restricted settings.
+          Awwad currently ships from GitHub Pages, so today every user hits this. Argues for
+          Play distribution.
+        - Android 17 Advanced Protection "restricts accessibility services to verified
+          accessibility tools" (Google security blog 2026-05-12). Blockers cannot legally be
+          such a tool, so blocking BREAKS for users who enable it. Freedom documents exactly
+          this in its own help centre. Needs a UsageStats + overlay fallback path.
+        - Android 15+: SYSTEM_ALERT_WINDOW alone no longer lets you start a foreground service
+          from the background.
+       Two more findings that shape the design:
+        - Every REAL rejection found in this space was disclosure hygiene, never the API
+          itself: a stale declaration video, or disclosure wording judged too technical. So
+          the declaration video and the wording of the in-app disclosure ARE the review.
+        - The UsageStats + overlay fallback is genuinely weaker, not just less convenient.
+          Android 12 treats `TYPE_ACCESSIBILITY_OVERLAY` as trusted but caps
+          `TYPE_APPLICATION_OVERLAY` at 0.8 obscuring opacity, and `HIDE_OVERLAY_WINDOWS`
+          lets the target app hide it; `UsageStatsManager` also returns null on a locked
+          device since Android 11. Plan it as a degraded mode, not an equal path.
+
+       **iOS: CONDITIONAL, GATED ON AN APPLE APPROVAL WE CANNOT SELF-SERVE.** The only legal
+       route is FamilyControls + ManagedSettings + DeviceActivity. Development works with no
+       approval; DISTRIBUTION (incl. TestFlight) needs the `com.apple.developer.family-controls`
+       entitlement, requested by the ACCOUNT HOLDER at
+       https://developer.apple.com/contact/request/family-controls-distribution , **once per
+       bundle id** (main app + every extension; approval does not cascade). Apple's own WWDC22
+       session 110336 states iOS 16 individual authorization exists so the API can build "more
+       than just parental controls apps", and `.individual` auth needs no family group, so
+       adult self-control is a sanctioned use. Indie precedent is solid (Habit Doom, Bloka,
+       Faith Lock, one sec, Opal, ScreenZen). Across ~60 forum threads 2022-2026 only TWO
+       denials surfaced versus dozens of "no response" complaints; Apple DTS admitted a
+       backlog twice in April 2026. Budget 1 week best case, 4-8 weeks realistically.
+       Guideline 4.10 forbids monetizing Screen Time APIs, so blocking must stay one feature
+       of the habit product, never the paywalled product itself.
+       **NO legal alternative exists**: content filter and DNS proxy are supervised-devices
+       only, VPN needs organization enrollment (5.4), config profiles are swept into 5.5, the
+       iOS 26 URL filter cannot stop an app launching, and no API lets a third party set a
+       Focus mode. Verified against the Feb 2026 guidelines PDF, because the HTML page was
+       observed returning FABRICATED guideline text to an automated fetch.
+       => iOS blocking is BLOCKED ON THE OWNER: it needs the Apple Developer account ($99)
+       that is already owner-gated, and then a wait on Apple. Not buildable this round.
    (4) Home-screen widget (streak + quick log; home_widget package).
    (5) Auto prayer-times reminders for prayer habits (offline adhan calculation by location).
    (6) Late-night usage detection for `late_nights` (depends on (3)'s usage plumbing).
@@ -766,6 +885,27 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 phase 0.6 round 1 (fonts shipped + both blocking verdicts researched)** -
+  ITEM 5 DONE: wabl.sa turned out to use ONE family at two weights, not two fonts -
+  IBM Plex Sans Arabic w700 for the big title and w400 for the subline, read off the live
+  computed styles (Beiruti is scoped to their internal `.crm-scope`, Tajawal never downloads).
+  SIL OFL 1.1, so free for commercial use and app embedding, nothing to buy. Bundled in the
+  app (`assets/fonts/` + OFL.txt), self-hosted on the site (12 woff2 subsets, generated
+  `@font-face`), Cairo retired, Salma Arabic parked at `assets/brand/fonts/` (it is OFL too,
+  per its own name table - not a licence problem, just no longer part of the type system).
+  New `_awwadTextTheme` type scale: letterSpacing 0 everywhere (tracking breaks cursive
+  Arabic), size floor 12, display capped at 40, headings w700 / titles w600 / body w400.
+  TWO REAL DEFECTS FIXED ON THE WAY: (a) `google_fonts` downloaded the face at runtime, so a
+  first launch with no connection fell back to the platform font - removed, family now
+  bundled; (b) the Flutter WEB engine pulled Roboto from fonts.gstatic.com at boot - killed by
+  registering our own faces under the family name `Roboto`, verified gone from the resource
+  log. ITEM 1: policy research done for both stores, verdicts + sources in §12 0c(3). Android
+  CONDITIONAL and buildable (killer condition: uninstall must stay possible, so no true strict
+  mode); iOS CONDITIONAL but gated on an Apple entitlement that needs the $99 account first.
+  Verified: analyze clean, 134/134 tests (15 new in `type_scale_test.dart`), site 139 pages
+  with 0 em-dashes and 0 third-party requests, web app screenshotted in real Chrome.
+  NEW GOTCHA #12: in Git Bash, `flutter build web --base-href /app/` silently becomes
+  `C:/Program Files/Git/app/` - export `MSYS_NO_PATHCONV=1` or the build no-ops.
 - **2026-07-20 phase 0.6 opened (owner brief captured)** - Phase 0.5 closed at 44/44 and
   live. New owner order recorded verbatim in docs/PHASE_06_BRIEF.md: hard app-blocking
   conditionally approved (per-platform, only where it cannot cause a store rejection);
