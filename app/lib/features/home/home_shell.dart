@@ -299,7 +299,16 @@ class _HomeShellState extends ConsumerState<HomeShell>
       'en': 'Pomodoro',
       'fr': 'Pomodoro',
     }[Localizations.localeOf(context).languageCode] ?? 'Pomodoro';
-    return Scaffold(
+    // The tabs are an IndexedStack, not a Navigator stack, so without this the
+    // Android back button closes the app from any tab. Expected Android
+    // behaviour is: back returns to the first tab, and only leaves the app
+    // when you are already on it.
+    return PopScope(
+      canPop: index == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) ref.read(homeTabProvider.notifier).state = 0;
+      },
+      child: Scaffold(
       body: AmbientBackground(
         child: SafeArea(child: IndexedStack(index: index, children: _screens)),
       ),
@@ -329,6 +338,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
             ),
           ),
         ),
+      ),
       ),
     );
   }

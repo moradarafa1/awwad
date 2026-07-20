@@ -840,6 +840,28 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ---
 
+### Fonts and their licence basis (READ BEFORE CHANGING A FONT)
+
+- **FF Dusha Arabic** () - MAIN HEADINGS.
+  Supplied by the owner 2026-07-20. The file s own embedded licence string says
+  "free for personal use only ... for commercial use please buy it". That text was
+  shown to the owner verbatim and he confirmed he holds the rights to use it in this
+  project. Recorded here so the basis is not lost. If that ever changes, the swap is
+  one constant: kHeadingFamily in app/lib/app/theme.dart.
+  **HARD LIMIT, measured from its cmap: 180 glyphs. ZERO Latin letters, ZERO Western
+  digits.** Arabic coverage is complete (only U+063B..U+063F missing, unused in Arabic).
+  So kHeadingFallback -> IBM Plex Sans Arabic is MANDATORY, not cosmetic: without it
+  every English and French heading, and every Latin numeral inside an Arabic heading,
+  renders as empty boxes. Locked by test/type_scale_test.dart.
+- **Bodoni Moda Italic** () - PROMINENT NUMERALS only, via
+  numberStyle() in theme.dart. Owner-supplied. Latin digits only, no Arabic-Indic
+  digits and no Arabic letters, so it is never a theme default. This works because the
+  app s DYNAMIC numbers are Western digits (plain int interpolation); the Arabic-Indic
+  digits that appear in copy are inside sentences and correctly keep the text family.
+  Applied to: stat tiles, the tasbih counter, the pomodoro timer.
+- **IBM Plex Sans Arabic** - ALL body, labels, controls. SIL OFL 1.1.
+- **Tajawal** - kept bundled as the previous display face. SIL OFL 1.1.
+
 ## 12. Pending work / TODO
 
 > Top two are the owner's queued priorities (see §0).

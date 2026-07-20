@@ -390,9 +390,8 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen>
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(_fmt(exact.ceil()),
-                                      style: TextStyle(
-                                          fontSize: 56,
-                                          fontWeight: FontWeight.w800,
+                                      style: numberStyle(56,
+                                          weight: FontWeight.w800,
                                           color: AppColors.heading)),
                                   const SizedBox(height: 4),
                                   Text(phaseLabel,

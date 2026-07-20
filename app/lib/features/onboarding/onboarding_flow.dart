@@ -123,7 +123,16 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Scaffold(
+    // The steps are an INDEX, not a Navigator stack, so without this the
+    // Android back button skips the whole flow instead of stepping back one
+    // screen: it tries to pop OnboardingFlow itself, which is the root route.
+    // canPop is true only on the first step, where leaving really is correct.
+    return PopScope(
+      canPop: _step == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _prev();
+      },
+      child: Scaffold(
       body: AmbientBackground(
         child: SafeArea(
           child: Column(
@@ -139,6 +148,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

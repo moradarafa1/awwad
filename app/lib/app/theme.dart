@@ -93,12 +93,52 @@ class AppColors {
 const String kFontFamily = 'IBM Plex Sans Arabic';
 
 /// The DISPLAY family, for MAIN HEADINGS ONLY: screen titles and section
-/// titles. Owner instruction 2026-07-20, matching the wabl.sa brand artwork.
+/// titles. Owner-supplied face, set 2026-07-20.
 ///
 /// Deliberately NOT used for body, labels or small print. The whole point of
 /// a two-family system is the contrast; spreading the display face everywhere
 /// destroys it and hurts reading at small sizes.
-const String kHeadingFamily = 'Tajawal';
+const String kHeadingFamily = 'FF Dusha Arabic';
+
+/// MANDATORY companion to [kHeadingFamily], not an optional nicety.
+///
+/// FF Dusha Arabic carries 180 glyphs: Arabic and Arabic-Indic digits only,
+/// with NO Latin letters and NO Western digits. Every English and French
+/// heading, and every Latin numeral inside an Arabic heading, therefore has to
+/// fall through to the text family. Flutter resolves this per CHARACTER, so a
+/// heading like «أدوار وبل 13» renders the Arabic in Dusha and the 13 in Plex
+/// automatically. Drop this list and those headings become empty boxes.
+const List<String> kHeadingFallback = <String>[kFontFamily];
+
+/// Numerals. Owner-supplied Bodoni Moda Italic, for the prominent numbers
+/// (streak counts, stat tiles, timers, the tasbih counter).
+///
+/// Applied EXPLICITLY through [numberStyle], never as a theme default: the
+/// face has Latin digits only, so letting it near ordinary text would leave
+/// Arabic to a silent fallback for no reason. Note the app's DYNAMIC numbers
+/// are Western digits (plain int interpolation), which is exactly what this
+/// face covers; the few Arabic-Indic digits in the copy are inside sentences
+/// and correctly keep the text family.
+const String kNumberFamily = 'Bodoni Moda';
+
+/// Style for a prominent numeral. Italic because the supplied face IS the
+/// italic cut; asking for upright would make the engine fake it.
+TextStyle numberStyle(
+  double size, {
+  FontWeight weight = FontWeight.w700,
+  Color? color,
+  double? height,
+}) =>
+    TextStyle(
+      fontFamily: kNumberFamily,
+      fontStyle: FontStyle.italic,
+      fontFamilyFallback: const <String>[kFontFamily],
+      fontSize: size,
+      fontWeight: weight,
+      height: height,
+      letterSpacing: 0,
+      color: color,
+    );
 
 /// Style for a main heading. Prefer this over a hand-written TextStyle so the
 /// display family can never drift out of sync across screens.
@@ -113,6 +153,7 @@ TextStyle headingStyle(
 }) =>
     TextStyle(
       fontFamily: kHeadingFamily,
+      fontFamilyFallback: kHeadingFallback,
       fontSize: size,
       fontWeight: weight,
       height: height,
@@ -144,6 +185,9 @@ TextTheme _awwadTextTheme(TextTheme base) {
           {bool display = false}) =>
       TextStyle(
         fontFamily: display ? kHeadingFamily : kFontFamily,
+        // Latin headings have no glyphs in the display face; see
+        // [kHeadingFallback].
+        fontFamilyFallback: display ? kHeadingFallback : null,
         fontSize: size,
         height: height,
         fontWeight: weight,

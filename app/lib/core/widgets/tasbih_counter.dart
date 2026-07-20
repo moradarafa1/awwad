@@ -233,9 +233,7 @@ class _TasbihCounterState extends State<TasbihCounter> {
                       children: [
                         Text('$_count',
                             textDirection: TextDirection.ltr,
-                            style: TextStyle(
-                                fontSize: 34,
-                                fontWeight: FontWeight.w900,
+                            style: numberStyle(34,
                                 color: AppColors.heading)),
                         Text('/ ${widget.target}',
                             textDirection: TextDirection.ltr,

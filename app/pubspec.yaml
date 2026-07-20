@@ -99,8 +99,32 @@ flutter:
           weight: 600
         - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
           weight: 700
-    # The DISPLAY family, for main headings only (screen titles, section
-    # titles). Tajawal (Boutros Fonts), SIL OFL 1.1 - see assets/fonts/
+    # The DISPLAY family, for MAIN HEADINGS ONLY. FF Dusha Arabic, supplied by
+    # the owner on 2026-07-20. The file's embedded licence string reads
+    # "free for personal use only", and the owner was shown that text verbatim
+    # and confirmed he holds the rights to use it here. Recorded in
+    # PROJECT_STATE §11 so the basis is not lost.
+    #
+    # HARD LIMITS OF THIS FACE, measured from its cmap, not assumed:
+    # 180 glyphs total. Full Arabic coverage (the only gaps are U+063B..U+063F,
+    # extended letters unused in Arabic), Arabic-Indic digits, and ZERO Latin
+    # letters and ZERO Western digits. So English and French headings, and any
+    # Latin numeral inside an Arabic heading, MUST fall through to
+    # IBM Plex Sans Arabic. That fallback is wired in theme.dart via
+    # fontFamilyFallback; do not remove it or en/fr headings render as boxes.
+    - family: FF Dusha Arabic
+      fonts:
+        - asset: assets/fonts/FFDushaArabic-Regular.otf
+          weight: 400
+    # Numerals. Bodoni Moda Italic (variable), owner-supplied. Latin digits
+    # only: no Arabic-Indic digits and no Arabic letters, so it is applied
+    # EXPLICITLY to numeric displays via numberStyle(), never as a default.
+    - family: Bodoni Moda
+      fonts:
+        - asset: assets/fonts/BodoniModa-Italic.ttf
+          style: italic
+    # Kept as the previous display face and as a fallback weight source.
+    # Tajawal (Boutros Fonts), SIL OFL 1.1 - see assets/fonts/
     # OFL-Tajawal.txt. It is the face wabl.sa uses in its MARKETING ARTWORK,
     # identified on 2026-07-20 by matching the letterforms against the baked-in
     # title of the «فلل وبل 13» cover image (that text is part of the photo,

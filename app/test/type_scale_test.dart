@@ -57,6 +57,9 @@ void main() {
 
       test('the two families are actually different', () {
         expect(kHeadingFamily, isNot(kFontFamily));
+        // The display face has no Latin glyphs at all, so the fallback is what
+        // keeps en/fr headings from rendering as empty boxes.
+        expect(kHeadingFallback, contains(kFontFamily));
       });
 
       // Arabic is cursive. Positive tracking pushes joined letterforms apart

@@ -101,10 +101,7 @@ class StatTile extends StatelessWidget {
         child: Column(
           children: [
             Text(value,
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    color: color ?? AppColors.accent)),
+                style: numberStyle(24, color: color ?? AppColors.accent)),
             const SizedBox(height: 5),
             Text(label,
                 textAlign: TextAlign.center,
