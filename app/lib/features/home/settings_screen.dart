@@ -532,10 +532,18 @@ class SettingsScreen extends ConsumerWidget {
                       // Native OS share sheet (WhatsApp, Telegram, etc.).
                       await SharePlus.instance
                           .share(ShareParams(text: text));
+                      // Referral step of the funnel. The OS never tells us
+                      // whether the user actually completed the share or
+                      // dismissed the sheet, so this measures INTENT only,
+                      // which is why the name says shared rather than sent.
+                      AnalyticsService.instance
+                          .track('app_shared', {'method': 'sheet'});
                     } catch (_) {
                       // Fallback (e.g. desktop web browsers without the
                       // Web Share API): copy the message instead.
                       await Clipboard.setData(ClipboardData(text: text));
+                      AnalyticsService.instance
+                          .track('app_shared', {'method': 'clipboard'});
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text(_set('shareCopied', loc))));

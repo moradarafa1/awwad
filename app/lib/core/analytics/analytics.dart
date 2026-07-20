@@ -75,6 +75,9 @@ class AnalyticsService {
     // Release strips asserts, which is why it went unnoticed. Found by the
     // 2026-07-20 audit comparing events actually fired against the plan.
     'sos_slipped',
+    // Referral step of the funnel. Added 2026-07-20: the share button had
+    // existed in Settings since launch and fired nothing at all.
+    'app_shared',
     // Post-P1 additions (see docs/tracking-plan.md for the GA4/MMP mapping).
     'account_prompt_accepted',
     'account_prompt_declined',
