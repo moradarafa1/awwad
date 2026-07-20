@@ -92,12 +92,20 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
   `PUBLIC_WEB_APP_URL=http://localhost:8099/ npm --prefix web run build`
   **web/dist currently holds a REVIEW build with the localhost URL baked in. Rebuild without
   the override before ANY deploy.**
-- **OPEN REQUEST, NOT STARTED: replace the EMOJI icons with a modern icon set**, benchmarked
-  against the best competitors. Emoji live in `icon:` string fields in
-  `core/catalog/habit_catalog.dart` (36 habits) and `core/catalog/badge_catalog.dart`, plus
-  `web/src/content/site.js` (x3 locales). DO NOT change those data fields: the catalog is
-  synced to seed.sql AND the live DB, so the icon should be resolved client-side by habit key
-  to an IconData, keeping the emoji as the fallback for custom habits.
+- **ICONS DONE (2026-07-20).** Emoji replaced by **Material Symbols Rounded** on both app and
+  site. They ship inside Flutter (Apache 2.0): no package, no network, no licence question,
+  and the icon font is tree-shaken, so 40 habit icons cost 7 KB (16 KB -> 23 KB).
+  The catalog `icon:` field is DATA (mirrored in seed.sql and the live DB) and is UNTOUCHED.
+  The vector icon is a presentation map keyed by habit key in
+  `core/catalog/habit_icons.dart`, with the stored emoji as the fallback for custom habits.
+  Use the `HabitIcon` widget, never a raw `Text(h.icon)`. Locked by `habit_icons_test.dart`,
+  which fails if a new catalog habit has no icon.
+  Site: same family, INLINED as SVG in `web/src/components/Icon.astro` so the page stays
+  100% first-party. The path data is copied verbatim from the source SVGs; do NOT hand-write
+  it. Material Symbols use `viewBox="0 -960 960 960"`, not `0 0 24 24`.
+  STILL EMOJI, deliberately not converted yet: the BADGE icons (`badge_catalog.dart`, drawn in
+  badges_screen / badge_celebration / profile_screen) and a few decorative glyphs (💡 in tips,
+  📅 in history, 📊 in stats, ✅ in the radio player).
 
 **PROGRESS 2026-07-20 round 1:**
 - **Item 5 FONTS: DONE and verified.** wabl.sa uses ONE family, not two: **IBM Plex Sans
@@ -931,6 +939,21 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 phase 0.6 round 3 (icon system replaces the emoji)** - Owner: the icons must
+  look modern, benchmarked against the best competitors. Replaced the emoji with **Material
+  Symbols Rounded**, which ship inside Flutter (Apache 2.0), so no package, no network, no
+  licence question, and tree-shaking keeps 40 habit icons to 7 KB. Verified all 40 concepts
+  exist before committing to the set. The catalog `icon:` DATA field is untouched (it is
+  synced to seed.sql and the live DB); icons resolve client-side by habit key in
+  `habit_icons.dart` with the emoji as fallback. Site got the same family inlined as SVG.
+  Three defects caught by verifying instead of assuming: hand-written SVG paths rendered
+  unrecognisable shapes (now copied verbatim from source, and Material Symbols use
+  `viewBox="0 -960 960 960"`); the pill-width reserve modelled a text-scaled emoji advance
+  when an Icon has a fixed size; and the overflow test scrolled to `find.text('🚭')`, which
+  no longer exists. Also made WEB_APP_URL overridable via `PUBLIC_WEB_APP_URL` after the
+  owner reviewed a local site whose CTA sent him to the LIVE app, i.e. yesterday's code.
+  Verified: analyze clean, 145/145 tests, site 139 pages, 0 em-dashes, 0 third-party refs,
+  6 icons on each locale home page, app walk screenshotted in real Chrome.
 - **2026-07-20 phase 0.6 round 2 (two-family type system + guests skip the survey)** -
   Owner clarified the font brief after seeing round 1: MAIN HEADINGS should match the wabl
   brand face, everything else stays on the Awwad face. Investigating his reference screenshot
