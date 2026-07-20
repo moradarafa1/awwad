@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/catalog/badge_catalog.dart';
+import '../../core/catalog/habit_icons.dart';
 import '../../core/cloud/net_errors.dart';
 import '../../core/cloud/supabase_service.dart';
 import '../../core/cloud/sync_service.dart';
@@ -184,8 +185,9 @@ class ProfileScreen extends ConsumerWidget {
                         children: [
                           Opacity(
                               opacity: got ? 1 : 0.3,
-                              child: Text(b.icon,
-                                  style: const TextStyle(fontSize: 30))),
+                              child: BadgeIcon(
+                                  badgeKey: b.key, emoji: b.icon,
+                                  size: 30, color: color)),
                           const SizedBox(height: 6),
                           Text(b.t(loc),
                               textAlign: TextAlign.center,
@@ -385,7 +387,8 @@ class ProfileScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Text(top.icon, style: const TextStyle(fontSize: 46)),
+          BadgeIcon(
+              badgeKey: top.key, emoji: top.icon, size: 46, color: color),
           const SizedBox(width: 16),
           Expanded(
             child: Column(

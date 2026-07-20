@@ -4,6 +4,7 @@ import 'package:confetti/confetti.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/catalog/badge_catalog.dart';
+import '../../core/catalog/habit_icons.dart';
 
 Future<void> showBadgeCelebration(BuildContext context, BadgeDef def) {
   return showDialog(
@@ -55,7 +56,11 @@ class _BadgeCelebrationDialogState extends State<_BadgeCelebrationDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(widget.def.icon, style: const TextStyle(fontSize: 64)),
+                BadgeIcon(
+                    badgeKey: widget.def.key,
+                    emoji: widget.def.icon,
+                    size: 64,
+                    color: AppColors.accent3),
                 const SizedBox(height: 12),
                 Text(l10n.badgeCongrats,
                     style: TextStyle(

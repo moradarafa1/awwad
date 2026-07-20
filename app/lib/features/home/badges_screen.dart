@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/catalog/badge_catalog.dart';
+import '../../core/catalog/habit_icons.dart';
 import '../../core/state/app_state.dart';
 import 'habit_switcher.dart';
 
@@ -75,8 +76,9 @@ class BadgesScreen extends ConsumerWidget {
                       children: [
                         Opacity(
                           opacity: earned ? 1 : 0.3,
-                          child: Text(b.icon,
-                              style: const TextStyle(fontSize: 34)),
+                          child: BadgeIcon(
+                              badgeKey: b.key, emoji: b.icon,
+                              size: 34, color: color),
                         ),
                         const SizedBox(height: 6),
                         Text(b.t(locale),

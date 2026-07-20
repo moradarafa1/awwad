@@ -72,9 +72,55 @@ const Map<String, IconData> kHabitIcons = {
   'learn_skill': Icons.psychology_rounded,
 };
 
+/// Badge icons, same rules as [kHabitIcons]: `BadgeDef.icon` stays an emoji
+/// because it is synced data, and the vector icon is resolved by key here.
+///
+/// The tier reads through the icon itself, so a badge is recognisable before
+/// its label: a medal for silver, a laurel for gold, a gem for diamond.
+const Map<String, IconData> kBadgeIcons = {
+  'first_log': Icons.eco_rounded,
+  'streak_3': Icons.fitness_center_rounded,
+  'streak_7': Icons.star_rounded,
+  'streak_14': Icons.local_fire_department_rounded,
+  'streak_30_silver': Icons.military_tech_rounded,
+  'streak_60_gold': Icons.workspace_premium_rounded,
+  'streak_90_diamond': Icons.diamond_rounded,
+  'streak_180_diamond': Icons.auto_awesome_rounded,
+  'logged_30': Icons.trending_up_rounded,
+};
+
 /// The icon for a habit key, or null when there is none (custom habits, and
 /// any catalog key added later without a matching entry above).
 IconData? habitIcon(String? key) => key == null ? null : kHabitIcons[key];
+
+/// The icon for a badge key, or null when there is none.
+IconData? badgeIcon(String? key) => key == null ? null : kBadgeIcons[key];
+
+/// Renders a badge's icon: the vector one when known, otherwise the stored
+/// emoji. [color] usually carries the tier colour.
+class BadgeIcon extends StatelessWidget {
+  final String? badgeKey;
+  final String emoji;
+  final double size;
+  final Color? color;
+
+  const BadgeIcon({
+    super.key,
+    required this.badgeKey,
+    required this.emoji,
+    this.size = 24,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = badgeIcon(badgeKey);
+    if (icon == null) {
+      return Text(emoji, style: TextStyle(fontSize: size * 0.86));
+    }
+    return Icon(icon, size: size, color: color ?? IconTheme.of(context).color);
+  }
+}
 
 /// Renders a habit's icon: the vector one when known, otherwise the stored
 /// emoji. One place, so every screen shows the same thing for the same habit.

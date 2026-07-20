@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:awwad/core/catalog/badge_catalog.dart';
 import 'package:awwad/core/catalog/habit_catalog.dart';
 import 'package:awwad/core/catalog/habit_icons.dart';
 
@@ -37,6 +38,15 @@ void main() {
     final reused = counts.entries.where((e) => e.value > 1).length;
     expect(reused, lessThanOrEqualTo(2),
         reason: 'too many habits share the same icon');
+  });
+
+  test('every badge has a vector icon', () {
+    final missing = kBadges
+        .where((b) => badgeIcon(b.key) == null)
+        .map((b) => '${b.key} (${b.icon})')
+        .toList();
+    expect(missing, isEmpty,
+        reason: 'these badges would still render as emoji: $missing');
   });
 
   testWidgets('a custom habit with no key falls back to its emoji',
