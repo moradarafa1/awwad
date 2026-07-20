@@ -123,7 +123,7 @@ const main = async () => {
   await shot(page, '06-setup');
 
   await tap(page, fx(0.38), 0.95, 'start');
-  await sleep(1600);
+  await sleep(5200); // let the save snackbar expire off-screen
   await shot(page, '07-today');
 
   // Bottom nav: stats, badges, pomodoro, settings (5 slots).
