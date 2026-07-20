@@ -17,6 +17,7 @@ import '../../core/catalog/habit_stages.dart';
 import '../../core/catalog/motivation.dart';
 import '../../core/connectivity/online.dart';
 import '../../core/models.dart';
+import '../wird/wird_card.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
@@ -815,6 +816,15 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
           if (habit?.catalogKey == 'phone_addiction') ...[
             const SizedBox(height: 10),
             const UsageEntryButton(),
+          ],
+          // LISTENING WIRD, first thing on the page. Owner instruction
+          // 2026-07-20: for a habit completed by listening, the listen action
+          // must be the first thing the user sees, above the motivation line,
+          // not buried under the checklists where it used to sit. The point of
+          // opening this screen IS to listen.
+          if (isListeningHabit(habit?.catalogKey)) ...[
+            const SizedBox(height: 14),
+            WirdCard(habit: habit!),
           ],
           const SizedBox(height: 14),
           // Daily rotating line: deterministic per day, offline, and the

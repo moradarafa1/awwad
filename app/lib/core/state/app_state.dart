@@ -509,6 +509,20 @@ class AppController extends Notifier<AppState> {
   // ---------- multi-habit management ----------
   /// Adds a new habit (respecting the per-track cap) and focuses it.
   /// Returns false if the track is already at the cap.
+  /// Saves the listening-wird settings for one habit and reschedules its
+  /// reminders, since the wird times ARE reminder times.
+  Future<void> updateHabitWird(String habitId, WirdConfig cfg) async {
+    final habits = state.habits
+        .map((h) => h.id == habitId ? h.copyWith(wird: cfg) : h)
+        .toList();
+    state = state.copyWith(habits: habits);
+    await _store.saveHabits(habits);
+    // No explicit reschedule here on purpose: `Habit.times` folds the enabled
+    // wird hours into the habit's reminder times, so the existing schedule
+    // path (home_shell rebuilds it on every open) picks them up with nothing
+    // extra to keep in sync.
+  }
+
   Future<bool> addHabit(Habit habit) async {
     if (!state.canAddTrack(habit.track)) return false;
     final habits = [...state.habits, habit];

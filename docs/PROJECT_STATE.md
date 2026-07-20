@@ -98,6 +98,24 @@ The only work left is the iOS build (needs a Mac) and the store uploads themselv
   `system-images;android-35;google_apis;x86_64` left only an empty `.installer` stub).
   Diagnose that before claiming any of those work.
 
+**LISTENING WIRD (owner brief 2026-07-20, DONE):** for habits completed by listening
+(daily_quran, hadith_wird, listening_wird, surah_kahf, adhkar, salawat, dua - the set is
+kListeningHabits in core/models/wird_config.dart):
+- The wird card is the FIRST thing on the habit page, above the motivation line. The point
+  of opening that screen is to listen, so the listen button leads.
+- Per-habit WirdConfig: minutes per session (FLOOR 5, the owner rejected the old hardcoded
+  120s as too short), scheduled hours, autoPlay, sessionsPerDay.
+- ONE completed session logs the day, no matter how many the user targets.
+- The players auto-log against the USER'S configured length, read from the habit.
+- Wird hours fold into Habit.times, so the existing scheduling path picks them up and there
+  is exactly ONE place that decides when a habit notifies. No separate scheduler.
+- AUDIO: core/audio/audio_session_config.dart. audio_session was a dependency for months
+  with ZERO call sites, so the app never took audio focus. That is a real cause of the
+  quiet playback the owner reported, alongside the emulator being quiet. Configured for
+  speech-over-media with focus gain and ducking.
+- STILL TO DO: honour autoPlay (start playback at the scheduled hour) and verify volume on
+  real hardware, not the emulator.
+
 **PROGRESS 2026-07-20 round 2:**
 - TYPE SYSTEM SETTLED: Tajawal for main headings, IBM Plex Sans Arabic for everything else,
   on site + web app + phone app. See §7. The round-1 claim that wabl uses one family was

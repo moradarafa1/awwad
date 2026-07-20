@@ -1,6 +1,10 @@
 // Core data models for Awwad (P1 — local/offline).
 // Plain immutable classes with JSON (de)serialization, no codegen.
 
+import 'models/wird_config.dart';
+
+export 'models/wird_config.dart';
+
 class AppSettings {
   final String? locale; // null => follow device, choose in onboarding
   final bool showReligiousContent;
@@ -138,6 +142,11 @@ class Habit {
   final int? minutesPerDay;
   final DateTime createdAt;
 
+  /// Listening-wird settings, for habits whose daily goal is completed by
+  /// LISTENING (Qur'an, hadith and sunnah, du'a, adhkar). Null on every other
+  /// habit; see [isListeningHabit].
+  final WirdConfig? wird;
+
   const Habit({
     required this.id,
     required this.track,
@@ -154,11 +163,22 @@ class Habit {
     this.costPerDay,
     this.minutesPerDay,
     required this.createdAt,
+    this.wird,
   });
 
   /// The effective reminder times (falls back to the legacy single hour).
-  List<int> get times =>
-      reminderHours.isNotEmpty ? reminderHours : [reminderHour];
+  ///
+  /// An ENABLED listening wird contributes its own hours here rather than
+  /// through a separate scheduling path. The wird times ARE reminder times,
+  /// and folding them in means every existing call site that schedules from
+  /// `habit.times` picks them up with no change: there is exactly one place
+  /// that decides when a habit notifies.
+  List<int> get times {
+    final base = reminderHours.isNotEmpty ? reminderHours : [reminderHour];
+    final w = wird;
+    if (w == null || !w.enabled || w.times.isEmpty) return base;
+    return ({...base, ...w.times}.toList()..sort());
+  }
 
   Habit copyWith(
           {String? title,
@@ -166,7 +186,8 @@ class Habit {
           int? reminderHour,
           List<int>? reminderHours,
           String? customMetricPrimary,
-          String? customMetricSecondary}) =>
+          String? customMetricSecondary,
+          WirdConfig? wird}) =>
       Habit(
         id: id,
         track: track,
@@ -184,6 +205,7 @@ class Habit {
         costPerDay: costPerDay,
         minutesPerDay: minutesPerDay,
         createdAt: createdAt,
+        wird: wird ?? this.wird,
       );
 
   Map<String, dynamic> toJson() => {
@@ -202,6 +224,7 @@ class Habit {
         'costPerDay': costPerDay,
         'minutesPerDay': minutesPerDay,
         'createdAt': createdAt.toIso8601String(),
+        'wird': wird?.toJson(),
       };
 
   factory Habit.fromJson(Map<String, dynamic> j) => Habit(
@@ -222,6 +245,9 @@ class Habit {
         minutesPerDay: j['minutesPerDay'] as int?,
         createdAt:
             DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now(),
+        wird: j['wird'] is Map<String, dynamic>
+            ? WirdConfig.fromJson(j['wird'] as Map<String, dynamic>)
+            : null,
       );
 }
 

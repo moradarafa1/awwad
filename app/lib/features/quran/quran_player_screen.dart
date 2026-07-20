@@ -4,12 +4,14 @@
 
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../app/theme.dart';
 import '../../core/quran/quran_data.dart';
+import '../../core/models.dart';
 import '../../core/state/app_state.dart';
 
 class QuranPlayerScreen extends ConsumerStatefulWidget {
@@ -32,7 +34,18 @@ class _QuranPlayerScreenState extends ConsumerState<QuranPlayerScreen> {
   StreamSubscription<Duration>? _posSub;
   int _listenedSeconds = 0;
   bool _autoLogged = false;
-  static const _autoLogAfter = 120; // seconds of real listening
+  // Seconds of REAL listening that complete the wird. Comes from the
+  // habit the user is listening FOR, so it honours the length they chose
+  // in the wird settings; the old value was a hardcoded 120s, which the
+  // owner rejected on 2026-07-20 as too short to count as a wird.
+  // Falls back to the five-minute floor when the habit has no wird set.
+  int get _autoLogAfter {
+    final id = widget.habitId;
+    if (id == null) return WirdConfig.kMinWirdMinutes * 60;
+    final h = ref.read(appControllerProvider).habits
+        .where((x) => x.id == id).firstOrNull;
+    return (h?.wird ?? const WirdConfig()).secondsPerSession;
+  }
 
   @override
   void initState() {
