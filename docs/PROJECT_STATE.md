@@ -89,6 +89,38 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
   a review build (any `localhost` in dist), on any em-dash in a page, on any third-party host
   reference, on a missing llms.txt / robots.txt / sitemap, and on missing self-hosted fonts.
   Verified in BOTH directions: it fails the review build and passes the production build.
+- **ITEM 2 (ADHAN) DECISION MADE AND DOCUMENTED. The brief asked for a reasoned choice between
+  a normal notification with sound and a heads-up / full-screen popup. THE ANSWER IS: KEEP THE
+  CURRENT DESIGN, AND DO NOT ADD FULL-SCREEN INTENT.** Reasons, in order of weight:
+  1. Since Android 14, `USE_FULL_SCREEN_INTENT` is auto-granted ONLY to apps whose core
+     function is calling or alarms. Everything else must request it and justify it at review.
+     A habit app declaring it is a live rejection risk for the whole app, against phase 0.6's
+     first rule ("do not ship what causes a store rejection").
+  2. The owner CANCELLED the full-screen adhan himself on 2026-07-20. Adding the permission
+     back would buy a rejection risk for a feature nobody asked for.
+  3. The current design already delivers what he actually asked for. The adhan channel is
+     created natively in MainActivity.kt with `setBypassDnd(true)` and, crucially,
+     `AudioAttributes.USAGE_ALARM`. Alarm usage is why the sound is loud, survives Do Not
+     Disturb, and is governed by the ALARM volume rather than the notification volume.
+  **Item 2.1 (volume keys silence the SOUND only) is largely satisfied ALREADY by
+  USAGE_ALARM**: the volume keys act on the alarm stream during playback, and nothing about
+  pressing them dismisses the notification or records anything, which is exactly the
+  requirement. HONEST CAVEAT: the POWER button silencing is standard for system alarms and
+  incoming calls, NOT guaranteed for a notification sound. Needs hardware verification (item
+  7) before it is claimed as done.
+  **STILL TO BUILD for item 2 (this is the real remaining work):** the «تم» and «أمهلني»
+  notification ACTIONS. Nothing in the notification layer defines actions today (verified: no
+  `AndroidNotificationAction`, no `DarwinNotificationCategory` anywhere). It needs:
+  (a) `actions:` on AndroidNotificationDetails per notification type;
+  (b) Darwin categories registered at init, plus `categoryIdentifier` on the iOS details;
+  (c) a TOP-LEVEL `@pragma('vm:entry-point')` background handler wired to
+      `onDidReceiveBackgroundNotificationResponse`, because an action tap does NOT open the
+      app and therefore does not run in the UI isolate;
+  (d) snooze = reschedule the same id at +10 or +30 minutes, from a user setting;
+  (e) «تم» = auto-log. THIS IS THE HARD PART: the background isolate has no Riverpod state, so
+      it cannot call `quickLogHabit`. It must write to SharedPreferences directly and let the
+      UI reconcile on next open. Design that carefully; a naive call will silently no-op.
+  Do NOT claim any of this works until it has run on the emulator.
 - ITEM 4 (DATA LAYER) AUDITED, and the audit found real defects. The brief demanded that a
   documented event must actually be SENT. Comparing every `track()` call in lib/ against
   docs/tracking-plan.md found:
