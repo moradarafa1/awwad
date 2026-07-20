@@ -137,7 +137,8 @@ kListeningHabits in core/models/wird_config.dart):
   Reproduce with: adb shell dumpsys audio | grep awwad   (while audio is playing).
   VOLUME CONFIRMED FIXED by the owner 2026-07-20 ("الصوت بقا عالي").
   STUTTERING, reported next, diagnosed and answered: the emulator, not the app.
-    Evidence: logcat repeats  on [emu64xa, sdk_gphone64_x86_64], which is the emulated audio HAL
+    Evidence: logcat repeats "DefaultAudioSink: Spurious audio timestamp (frame position
+    mismatch)" on [emu64xa, sdk_gphone64_x86_64], which is the emulated audio HAL
     reporting an inconsistent clock. Guest CPU was 377/400 IDLE, so it was NOT CPU
     starvation (an earlier guess of mine that the data disproved). Guest RAM WAS at 94%
     with swap in use, which contributes.
