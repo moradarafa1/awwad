@@ -88,7 +88,8 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
 - LOCAL REVIEW TRAP FIXED: the site's «جرّب إصدار الويب» button points at WEB_APP_URL,
   which is the LIVE deployed app. Reviewing a local site therefore sent the owner to
   yesterday's code and he reported a bug that did not exist in the new build. WEB_APP_URL is
-  now overridable: .
+  now overridable:
+  `PUBLIC_WEB_APP_URL=http://localhost:8099/ npm --prefix web run build`
   **web/dist currently holds a REVIEW build with the localhost URL baked in. Rebuild without
   the override before ANY deploy.**
 - **OPEN REQUEST, NOT STARTED: replace the EMOJI icons with a modern icon set**, benchmarked

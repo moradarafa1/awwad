@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_icons.dart';
 import '../../core/models.dart';
 import '../../core/state/app_state.dart';
 import '../shield/dns_shield_screen.dart';
@@ -166,11 +167,11 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
-              _trackCard('🚭', _s(_kStr['breakTrack']!),
+              _trackCard(Icons.smoke_free_rounded, _s(_kStr['breakTrack']!),
                   '${s.trackCount('break')}/$kMaxHabitsPerTrack', 'break',
                   AppColors.danger, breakFull),
               const SizedBox(height: 10),
-              _trackCard('🌱', _s(_kStr['buildTrack']!),
+              _trackCard(Icons.eco_rounded, _s(_kStr['buildTrack']!),
                   '${s.trackCount('build')}/$kMaxHabitsPerTrack', 'build',
                   AppColors.success, buildFull),
               if (_track != null) ...[
@@ -277,7 +278,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
     );
   }
 
-  Widget _trackCard(String emoji, String title, String count, String track,
+  Widget _trackCard(IconData icon, String title, String count, String track,
       Color color, bool full) {
     final selected = _track == track;
     return Opacity(
@@ -305,7 +306,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
           ),
           child: Row(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 28)),
+              Icon(icon, size: 28, color: color),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(title,
@@ -345,10 +346,12 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
     // The Wrap gives each pill's inner Row UNBOUNDED width, so a bare label
     // Text can never wrap and would hard-overflow. Bound it explicitly to the
     // Wrap line (screen - 32 page padding) minus the pill's own chrome. The
-    // emoji Texts scale with the OS font setting, so measure them scaled.
-    final scaler = MediaQuery.textScalerOf(context);
-    final iconW = scaler.scale(16) * 1.3 + 8; // emoji advance + gap
-    final islamicW = scaler.scale(12) * 1.3 + 6;
+    // Since 2026-07-20 these are Icons, not emoji Texts. An Icon has a FIXED
+    // logical size and does not grow with the OS font setting, so the reserve
+    // is a constant. Kept a touch generous: over-reserving only makes the
+    // label wrap sooner, while under-reserving hard-overflows the Wrap line.
+    final iconW = 18 + 8.0; // icon + gap
+    final islamicW = 13 + 6.0; // mosque marker + gap
     double labelMaxWidth(bool isIslamic) =>
         (MediaQuery.sizeOf(context).width -
                 32 - // page padding
@@ -389,7 +392,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
             ),
             child: Row(
               children: [
-                const Text('✏️', style: TextStyle(fontSize: 18)),
+                Icon(Icons.edit_note_rounded, size: 22, color: AppColors.accent),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(_s(_kStr['custom']!),
@@ -442,7 +445,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(h.icon, style: const TextStyle(fontSize: 16)),
+                      HabitIcon(habitKey: h.key, emoji: h.icon, size: 18),
                       const SizedBox(width: 8),
                       ConstrainedBox(
                         constraints:
@@ -457,7 +460,8 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                       ),
                       if (h.isIslamic) ...[
                         const SizedBox(width: 6),
-                        const Text('🕌', style: TextStyle(fontSize: 12)),
+                        Icon(Icons.mosque_rounded,
+                            size: 13, color: AppColors.accent2),
                       ],
                     ],
                   ),

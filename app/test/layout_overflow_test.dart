@@ -260,11 +260,13 @@ void main() {
           await tester.pumpAndSettle();
         }
         // Land on the picker: pick the break track (the long fr titles live
-        // there). The track cards are emoji-labelled and sit below the fold on
-        // a 320x640 screen.
-        await tester.scrollUntilVisible(find.text('🚭'), 120,
+        // there). The track cards sit below the fold on a 320x640 screen.
+        // They were emoji-labelled until 2026-07-20 and are now vector icons,
+        // so the finder matches the icon, not a text glyph.
+        final breakTrack = find.byIcon(Icons.smoke_free_rounded).first;
+        await tester.scrollUntilVisible(breakTrack, 120,
             scrollable: find.byType(Scrollable).first);
-        await tester.tap(find.text('🚭'));
+        await tester.tap(breakTrack);
         await tester.pumpAndSettle();
         expect(find.byType(Wrap), findsWidgets); // the picker is showing
         expect(tester.takeException(), isNull);

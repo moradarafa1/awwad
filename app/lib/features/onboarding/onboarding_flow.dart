@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_icons.dart';
 import '../../core/catalog/countries.dart';
 import '../../core/cloud/supabase_service.dart';
 import '../../core/models.dart';
@@ -291,17 +292,17 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
         Text(l10n.chooseTrackTitle,
             style: headingStyle(20, weight: FontWeight.w800)),
         const SizedBox(height: 18),
-        _trackCard('🚭', l10n.trackBreak, l10n.trackBreakDesc, 'break',
+        _trackCard(Icons.smoke_free_rounded, l10n.trackBreak, l10n.trackBreakDesc, 'break',
             AppColors.danger),
         const SizedBox(height: 12),
-        _trackCard('🌱', l10n.trackBuild, l10n.trackBuildDesc, 'build',
+        _trackCard(Icons.eco_rounded, l10n.trackBuild, l10n.trackBuildDesc, 'build',
             AppColors.success),
       ],
     );
   }
 
   Widget _trackCard(
-      String emoji, String title, String desc, String track, Color color) {
+      IconData icon, String title, String desc, String track, Color color) {
     final selected = _track == track;
     return InkWell(
       onTap: () {
@@ -323,7 +324,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
         ),
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 34)),
+            Icon(icon, size: 34, color: color),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -556,11 +557,13 @@ class _HabitPickerState extends State<_HabitPicker> {
     }
     // Widest a chip label may be: the Wrap line (screen - 40 page padding)
     // minus the chip's own chrome (24 padding + 2 border + the icon and the
-    // optional islamic marker). The emoji Texts scale with the OS font
-    // setting, so they are measured scaled, not at their nominal size.
-    final scaler = MediaQuery.textScalerOf(context);
-    final iconW = scaler.scale(18) * 1.3 + 8; // emoji advance + gap
-    final islamicW = scaler.scale(12) * 1.3 + 6;
+    // optional islamic marker).
+    // Since 2026-07-20 these are Icons, not emoji Texts. An Icon has a FIXED
+    // logical size and does not grow with the OS font setting, so the reserve
+    // is a constant. Kept a touch generous: over-reserving only makes the
+    // label wrap sooner, while under-reserving hard-overflows the Wrap line.
+    final iconW = 19 + 8.0; // icon + gap
+    final islamicW = 13 + 6.0; // mosque marker + gap
     double labelMaxWidth(bool isIslamic) =>
         (MediaQuery.sizeOf(context).width -
                 40 - // page padding
@@ -620,7 +623,7 @@ class _HabitPickerState extends State<_HabitPicker> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(h.icon, style: const TextStyle(fontSize: 18)),
+                      HabitIcon(habitKey: h.key, emoji: h.icon, size: 19),
                       const SizedBox(width: 8),
                       // The Wrap hands this Row UNBOUNDED width, so a bare Text
                       // (and a Flexible) can never wrap: long titles (e.g. fr
@@ -639,7 +642,8 @@ class _HabitPickerState extends State<_HabitPicker> {
                       ),
                       if (h.isIslamic) ...[
                         const SizedBox(width: 6),
-                        const Text('🕌', style: TextStyle(fontSize: 12)),
+                        Icon(Icons.mosque_rounded,
+                            size: 13, color: AppColors.accent2),
                       ],
                     ],
                   ),
@@ -673,7 +677,7 @@ class _HabitPickerState extends State<_HabitPicker> {
             ),
             child: Row(
               children: [
-                const Text('✏️', style: TextStyle(fontSize: 20)),
+                Icon(Icons.edit_note_rounded, size: 24, color: AppColors.accent),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(

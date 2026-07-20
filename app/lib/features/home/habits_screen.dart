@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_icons.dart';
 import '../../core/cloud/supabase_service.dart';
 import '../../core/cloud/sync_service.dart';
 import '../../core/content/dhikr.dart';
@@ -43,11 +44,13 @@ class HabitsScreen extends ConsumerWidget {
                 style: TextStyle(
                     color: AppColors.muted, fontSize: 13, height: 1.6)),
             const SizedBox(height: 18),
-            _section(context, ref, loc, '🚭', _s(_kStr['breakTrack']!, loc),
+            _section(context, ref, loc, Icons.smoke_free_rounded,
+                _s(_kStr['breakTrack']!, loc),
                 breakHabits, s.activeHabitId, 'break', s.canAddTrack('break'),
                 canDelete),
             const SizedBox(height: 18),
-            _section(context, ref, loc, '🌱', _s(_kStr['buildTrack']!, loc),
+            _section(context, ref, loc, Icons.eco_rounded,
+                _s(_kStr['buildTrack']!, loc),
                 buildHabits, s.activeHabitId, 'build', s.canAddTrack('build'),
                 canDelete),
           ],
@@ -60,7 +63,7 @@ class HabitsScreen extends ConsumerWidget {
       BuildContext context,
       WidgetRef ref,
       String loc,
-      String emoji,
+      IconData icon,
       String title,
       List<Habit> habits,
       String? activeId,
@@ -72,7 +75,7 @@ class HabitsScreen extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 18)),
+            Icon(icon, size: 20, color: AppColors.muted),
             const SizedBox(width: 8),
             // Expanded (not Text + Spacer): the French section titles alone
             // overflow this row at the DEFAULT font scale.
@@ -124,14 +127,14 @@ class HabitsScreen extends ConsumerWidget {
   Widget _habitTile(BuildContext context, WidgetRef ref, String loc, Habit h,
       String? activeId, bool canDelete) {
     final cat = h.catalogKey == null ? null : catalogByKey(h.catalogKey!);
-    final icon = cat?.icon ?? (h.track == 'break' ? '🚭' : '🌱');
+    final emoji = cat?.icon ?? (h.track == 'break' ? '🚭' : '🌱');
     final active = h.id == activeId;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       child: SectionCard(
         child: Row(
           children: [
-            Text(icon, style: const TextStyle(fontSize: 20)),
+            HabitIcon(habitKey: h.catalogKey, emoji: emoji, size: 22),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_icons.dart';
 import '../../core/report/monthly_report.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
@@ -54,7 +55,7 @@ class MonthlyReportScreen extends ConsumerWidget {
     final cat = r.habit.catalogKey == null
         ? null
         : catalogByKey(r.habit.catalogKey!);
-    final icon = cat?.icon ?? (r.habit.track == 'break' ? '🚭' : '🌱');
+    final emoji = cat?.icon ?? (r.habit.track == 'break' ? '🚭' : '🌱');
     final isBreak = r.habit.track == 'break';
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -63,7 +64,7 @@ class MonthlyReportScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              Text(icon, style: const TextStyle(fontSize: 20)),
+              HabitIcon(habitKey: r.habit.catalogKey, emoji: emoji, size: 22),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(r.habit.title,

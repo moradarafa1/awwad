@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
 import { t, LOCALES, PAGES, WEB_APP_URL } from '../content/site.js';
 import { POSTS, postsForLocale } from '../content/posts.js';
 
@@ -128,7 +129,7 @@ const faqLd = isPost && post.faq[lang]?.length ? {
       <div class="cards">
         {page.tracks.map((tr) => (
           <a class="card" href={`${blogPfx}/${tr.href}/`}>
-            <div class="icon">{tr.icon}</div>
+            <div class="icon"><Icon name={tr.icon} size={30} /></div>
             <h3>{tr.title}</h3>
             <p>{tr.desc}</p>
           </a>
@@ -138,7 +139,7 @@ const faqLd = isPost && post.faq[lang]?.length ? {
       <div class="features">
         {page.features.map((f) => (
           <div class="feature">
-            <span class="icon">{f.icon}</span>
+            <span class="icon"><Icon name={f.icon} size={22} /></span>
             <div><h3>{f.h}</h3><p>{f.p}</p></div>
           </div>
         ))}

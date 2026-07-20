@@ -1,0 +1,107 @@
+import 'package:flutter/material.dart';
+
+/// Vector icons for the catalog, resolved by habit key.
+///
+/// WHY A SEPARATE MAP INSTEAD OF CHANGING THE CATALOG
+/// The `icon` field on CatalogHabit holds an emoji, and that field is DATA: it
+/// is mirrored in supabase/seed.sql and in the live database. Changing it would
+/// mean a three-way migration for what is purely a presentation choice. So the
+/// emoji stays as the stored value and the fallback, and the app draws a vector
+/// icon whenever it knows one for the key.
+///
+/// WHY MATERIAL SYMBOLS ROUNDED
+/// They ship inside Flutter (Apache 2.0), need no package, work offline, and
+/// the icon font is tree-shaken to ~16 KB at build time, so the 40 icons below
+/// cost almost nothing. The `_rounded` variants match the app's rounded,
+/// glassy surfaces; the default filled variants read as dated next to them.
+///
+/// A custom habit has no key and correctly falls through to its emoji.
+const Map<String, IconData> kHabitIcons = {
+  // ---- break: health ----
+  'quit_smoking': Icons.smoke_free_rounded,
+  'quit_vaping': Icons.air_rounded,
+  'junk_food': Icons.no_food_rounded,
+  'oversleeping': Icons.bedtime_off_rounded,
+  'caffeine_excess': Icons.coffee_rounded,
+  'late_nights': Icons.nights_stay_rounded,
+
+  // ---- break: mind ----
+  'nail_biting': Icons.back_hand_rounded,
+  'hair_pulling': Icons.content_cut_rounded,
+  'skin_picking': Icons.pan_tool_rounded,
+  'secret_habit': Icons.lock_rounded,
+  'anger': Icons.mood_bad_rounded,
+  'break_porn': Icons.shield_rounded,
+
+  // ---- break: productivity ----
+  'phone_addiction': Icons.smartphone_rounded,
+  'excessive_gaming': Icons.videogame_asset_rounded,
+  'procrastination': Icons.hourglass_empty_rounded,
+  'binge_watching': Icons.tv_rounded,
+  'impulse_buying': Icons.shopping_bag_rounded,
+
+  // ---- break: social ----
+  'gossip': Icons.record_voice_over_rounded,
+  'bad_language': Icons.volume_off_rounded,
+
+  // ---- build: worship ----
+  'pray_on_time': Icons.mosque_rounded,
+  'daily_quran': Icons.menu_book_rounded,
+  'adhkar': Icons.spa_rounded,
+  'voluntary_fasting': Icons.brightness_3_rounded,
+  'qiyam': Icons.mode_night_rounded,
+  'istighfar': Icons.front_hand_rounded,
+  'salawat': Icons.local_florist_rounded,
+  'surah_kahf': Icons.auto_stories_rounded,
+  'wake_fajr': Icons.wb_twilight_rounded,
+  'listening_wird': Icons.headphones_rounded,
+  'hadith_wird': Icons.radio_rounded,
+  'dua': Icons.volunteer_activism_rounded,
+
+  // ---- build: character ----
+  'keeping_ties': Icons.handshake_rounded,
+  'daily_charity': Icons.favorite_rounded,
+  'honor_parents': Icons.elderly_rounded,
+  'gratitude': Icons.waving_hand_rounded,
+
+  // ---- build: self ----
+  'exercise': Icons.directions_run_rounded,
+  'drink_water': Icons.water_drop_rounded,
+  'read_books': Icons.local_library_rounded,
+  'sleep_early': Icons.bedtime_rounded,
+  'learn_skill': Icons.psychology_rounded,
+};
+
+/// The icon for a habit key, or null when there is none (custom habits, and
+/// any catalog key added later without a matching entry above).
+IconData? habitIcon(String? key) => key == null ? null : kHabitIcons[key];
+
+/// Renders a habit's icon: the vector one when known, otherwise the stored
+/// emoji. One place, so every screen shows the same thing for the same habit.
+///
+/// [size] is the icon's optical size; the emoji fallback is drawn slightly
+/// smaller because emoji glyphs carry their own padding and otherwise look
+/// oversized next to a vector icon.
+class HabitIcon extends StatelessWidget {
+  final String? habitKey;
+  final String emoji;
+  final double size;
+  final Color? color;
+
+  const HabitIcon({
+    super.key,
+    required this.habitKey,
+    required this.emoji,
+    this.size = 22,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = habitIcon(habitKey);
+    if (icon == null) {
+      return Text(emoji, style: TextStyle(fontSize: size * 0.86));
+    }
+    return Icon(icon, size: size, color: color ?? IconTheme.of(context).color);
+  }
+}

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_icons.dart';
 import '../../core/models.dart';
 import '../../core/state/app_state.dart';
 import 'add_habit_screen.dart';
@@ -96,7 +97,7 @@ class _HabitChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cat = habit.catalogKey == null ? null : catalogByKey(habit.catalogKey!);
-    final icon = cat?.icon ?? (habit.track == 'break' ? '🚭' : '🌱');
+    final emoji = cat?.icon ?? (habit.track == 'break' ? '🚭' : '🌱');
     final accent =
         habit.track == 'break' ? AppColors.danger : AppColors.success;
     return GestureDetector(
@@ -116,7 +117,7 @@ class _HabitChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(icon, style: const TextStyle(fontSize: 15)),
+            HabitIcon(habitKey: habit.catalogKey, emoji: emoji, size: 17),
             const SizedBox(width: 6),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 130),
