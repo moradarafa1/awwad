@@ -63,6 +63,16 @@ const Map<String, Map<String, String>> _kSet = {
     'fr': 'Rappel quotidien et félicitations'
   },
   'dhikr': {'ar': 'ذكر الصباح اليومي', 'en': 'Daily morning dhikr', 'fr': 'Dhikr du matin'},
+  'snooze': {
+    'ar': 'مدة «أمهلني»',
+    'en': 'Snooze length',
+    'fr': 'Durée du report'
+  },
+  'snoozeSub': {
+    'ar': 'كم يتأخر التذكير حين تضغط «أمهلني» في الإشعار',
+    'en': 'How long the reminder waits when you press Snooze',
+    'fr': "Délai du rappel lorsque vous appuyez sur Reporter"
+  },
   'dhikrSub': {
     'ar': 'الصلاة الإبراهيمية كما في صحيح مسلم',
     'en': 'The Ibrahimic prayer as in Sahih Muslim',
@@ -290,6 +300,42 @@ class SettingsScreen extends ConsumerWidget {
                     await _applySchedule(ref, loc);
                   },
                 ),
+                // The snooze length only matters where notifications carry
+                // action buttons, i.e. never on web.
+                if (!kIsWeb) ...[
+                  const Divider(),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(_set('snooze', loc),
+                        style: const TextStyle(fontSize: 13)),
+                    subtitle: Text(_set('snoozeSub', loc),
+                        style:
+                            TextStyle(fontSize: 11, color: AppColors.muted)),
+                    trailing: SegmentedButton<int>(
+                      showSelectedIcon: false,
+                      segments: [
+                        for (final m in const [10, 30])
+                          ButtonSegment<int>(
+                            value: m,
+                            // Digits only: «10 د» reads fine in Arabic and
+                            // keeps the segment narrow enough at 320dp.
+                            label: Text(loc == 'ar' ? '$m د' : '$m min',
+                                style: const TextStyle(fontSize: 12)),
+                          ),
+                      ],
+                      selected: {
+                        // An older stored value outside the two offered
+                        // options must still select something, or the button
+                        // throws. Snap it to the nearest offered value.
+                        s.settings.snoozeMinutes <= 20 ? 10 : 30
+                      },
+                      onSelectionChanged: (sel) async {
+                        await ctrl.setSnoozeMinutes(sel.first);
+                        await _applySchedule(ref, loc);
+                      },
+                    ),
+                  ),
+                ],
                 const Divider(),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
@@ -702,6 +748,8 @@ class SettingsScreen extends ConsumerWidget {
       showReligious: st.showReligiousContent,
       dhikrHour: st.dhikrHour,
       dhikrTitle: kDhikrTitle[loc] ?? kDhikrTitle['ar']!,
+      locale: loc,
+      snoozeMinutes: st.snoozeMinutes,
     );
   }
 

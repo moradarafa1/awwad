@@ -76,10 +76,22 @@ class _HomeShellState extends ConsumerState<HomeShell>
     });
   }
 
-  /// `prayer` opens prayer settings, `habit:<id>` opens that habit's log,
-  /// `report` opens the monthly report. Unknown payloads are ignored.
+  /// `prayer` / `prayer:<key>` opens prayer settings, `habit:<id>` opens that
+  /// habit's log, `report` opens the monthly report, `refresh` only re-reads
+  /// the store. Unknown payloads are ignored.
   void _handleNotificationTap(String payload) {
     if (!mounted) return;
+    // An action button («تم» / «أمهلني») pressed while the app is open wrote
+    // straight to SharedPreferences from the notification layer, so this
+    // isolate's AppState is stale. Reconcile, and do NOT navigate: the user
+    // deliberately answered from the shade instead of coming in.
+    if (payload == kTapRefresh) {
+      Future(() async {
+        await ref.read(appControllerProvider.notifier).refreshFromStore();
+        if (mounted) HomeWidgetSync.push(ref.read(appControllerProvider));
+      });
+      return;
+    }
     // Two taps in a row must not stack two identical screens, so anything
     // pushed by a previous tap is popped back to this shell first.
     void pushOnce(Widget Function() build) {
@@ -88,7 +100,10 @@ class _HomeShellState extends ConsumerState<HomeShell>
       nav.push(MaterialPageRoute(builder: (_) => build()));
     }
 
-    if (payload == kTapPrayer) {
+    // Prayer payloads now carry the prayer key (`prayer:fajr`) so a snooze can
+    // name what it defers; older scheduled notifications still say plain
+    // `prayer`. Both must route, hence the prefix test rather than equality.
+    if (payload == kTapPrayer || payload.startsWith('$kTapPrayer:')) {
       pushOnce(() => const PrayerSettingsScreen());
       return;
     }
@@ -218,6 +233,8 @@ class _HomeShellState extends ConsumerState<HomeShell>
       showReligious: s.settings.showReligiousContent,
       dhikrHour: s.settings.dhikrHour,
       dhikrTitle: kDhikrTitle[loc] ?? kDhikrTitle['ar']!,
+      locale: loc,
+      snoozeMinutes: s.settings.snoozeMinutes,
     );
     // Prayer times shift every day: rebuild the 2-day prayer/adhkar window on
     // each open (no-op until the user configures a location).

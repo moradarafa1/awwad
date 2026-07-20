@@ -63,6 +63,11 @@ class AnalyticsService {
     'popup_shown',
     'popup_cta_clicked',
     'notification_opened',
+    // A notification ACTION button («تم» / «أمهلني»). Distinct from
+    // notification_opened: the user acted WITHOUT opening the app, so it is a
+    // usefulness signal, not a return-to-app one.
+    'notification_action',
+    'snooze_minutes_set',
     'login_succeeded',
     'signup_succeeded',
     'otp_sent',

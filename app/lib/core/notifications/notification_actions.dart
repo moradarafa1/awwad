@@ -12,6 +12,7 @@
 // (core/widget/widget_sync.dart), and the foreground app reconciles from disk
 // on its next open. A naive `ref.read(...)` here would silently no-op.
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,7 +20,6 @@ import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../data/local_store.dart';
-import '../models.dart';
 import '../state/app_state.dart' show buildQuickEntry, dayKey;
 
 /// Action ids. STABLE STRINGS: an already-scheduled notification can outlive
@@ -218,48 +218,67 @@ void notificationActionBackgroundHandler(NotificationResponse response) {
   // Sync signature (the plugin's), async body: fire and forget, with every
   // failure swallowed. An exception escaping here crashes the isolate and the
   // user's tap does nothing at all.
-  () async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.reload(); // this isolate's cache predates the app's writes
-      final store = LocalStore(prefs);
-      final result = await resolveNotificationAction(
-        store: store,
-        actionId: response.actionId,
-        payload: response.payload,
-        notificationId: response.id ?? 0,
-      );
-      await applyActionResult(result);
-    } catch (e) {
-      debugPrint('awwad notif: background action failed: $e');
-    }
-  }();
+  handleNotificationActionResponse(response, initializePlugin: true);
+}
+
+/// The shared implementation, used by BOTH the background isolate and the
+/// foreground callback so the two can never diverge.
+///
+/// [initializePlugin] must be true only in the background isolate, which
+/// starts with an uninitialized plugin. In the FOREGROUND the app has already
+/// called initialize() with its tap callbacks attached; initializing a second
+/// instance there re-registers on the same platform channel and would drop
+/// `onDidReceiveNotificationResponse`, silently killing tap routing for the
+/// rest of the session.
+Future<void> handleNotificationActionResponse(
+  NotificationResponse response, {
+  required bool initializePlugin,
+}) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload(); // this isolate's cache predates the app's writes
+    final store = LocalStore(prefs);
+    final result = await resolveNotificationAction(
+      store: store,
+      actionId: response.actionId,
+      payload: response.payload,
+      notificationId: response.id ?? 0,
+    );
+    await applyActionResult(result, initializePlugin: initializePlugin);
+  } catch (e) {
+    debugPrint('awwad notif: action failed: $e');
+  }
 }
 
 /// Performs the plugin half of a resolved action: re-arming the snooze. Split
 /// from [resolveNotificationAction] so the decision logic stays testable
 /// without a plugin binding.
 ///
-/// The plugin must be re-initialized in THIS isolate; the foreground app's
-/// initialize() does not carry over. Timezones likewise, which is why the
-/// snooze is scheduled from a plain local DateTime via `AndroidScheduleMode`
-/// rather than through the foreground `_safeZoned` helper.
-Future<void> applyActionResult(NotificationActionResult r) async {
+/// In the BACKGROUND isolate the plugin must be initialized here; the
+/// foreground app's initialize() does not carry over. In the foreground it
+/// must NOT be (see handleNotificationActionResponse). Timezones are handled
+/// by [_localFrom] for the same reason.
+Future<void> applyActionResult(
+  NotificationActionResult r, {
+  bool initializePlugin = true,
+}) async {
   final id = r.snoozedId;
   final when = r.snoozeAt;
   if (id == null || when == null) return;
   try {
     final plugin = FlutterLocalNotificationsPlugin();
-    await plugin.initialize(
-      const InitializationSettings(
-        android: AndroidInitializationSettings('ic_stat_awwad'),
-        iOS: DarwinInitializationSettings(
-          requestAlertPermission: false,
-          requestBadgePermission: false,
-          requestSoundPermission: false,
+    if (initializePlugin) {
+      await plugin.initialize(
+        const InitializationSettings(
+          android: AndroidInitializationSettings('ic_stat_awwad'),
+          iOS: DarwinInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false,
+          ),
         ),
-      ),
-    );
+      );
+    }
     await scheduleSnoozeNotification(
       plugin: plugin,
       id: id,

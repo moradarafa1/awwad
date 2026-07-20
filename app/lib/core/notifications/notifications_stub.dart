@@ -28,10 +28,12 @@ Future<void> sendTestNotifications(
 enum PrayerChannel { main, preAlert, adhkar }
 
 Future<void> scheduleAt(int id, DateTime when, String title, String body,
-    {PrayerChannel channel = PrayerChannel.main}) async {}
+    {PrayerChannel channel = PrayerChannel.main, String? prayerKey}) async {}
 
-Future<void> scheduleAdhan(
-    int id, DateTime when, String title, String body) async {}
+Future<void> scheduleAdhan(int id, DateTime when, String title, String body,
+    {String? prayerKey}) async {}
+
+void configureNotificationActions({String? locale, int? snoozeMinutes}) {}
 
 Future<void> cancelIdRange(int from, int to) async {}
 
@@ -61,6 +63,7 @@ Future<void> cancelAllNotifications() async {}
 const String kTapPrayer = 'prayer';
 const String kTapHabit = 'habit:';
 const String kTapReport = 'report';
+const String kTapRefresh = 'refresh';
 
 void onNotificationTap(void Function(String payload) listener) {}
 

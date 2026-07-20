@@ -32,6 +32,7 @@ import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../analytics/analytics.dart';
+import 'notification_actions.dart';
 
 final FlutterLocalNotificationsPlugin _plugin =
     FlutterLocalNotificationsPlugin();
@@ -78,6 +79,57 @@ const _habitReminderMax = 60;
 
 bool _ready = false;
 
+// --- Action-button configuration -------------------------------------------
+// Button LABELS are baked into a notification when it is scheduled, so the
+// locale and the snooze length have to be known in this layer. They are pushed
+// down from the settings layer rather than read here, keeping this file free
+// of any store or provider dependency.
+//
+// iOS CAVEAT, stated plainly: Darwin categories (which carry the iOS button
+// titles) are registered ONCE at initialize() and cannot be re-registered
+// afterwards. So on iOS the labels follow whatever was configured before the
+// first notification call, and a mid-session locale change is reflected only
+// after a restart. Android rebuilds its actions per notification and has no
+// such limit. Not worked around, because iOS cannot be built or verified at
+// all until the Apple account exists (PROJECT_STATE MAC-GATED).
+String _actionLocale = 'ar';
+int _actionSnoozeMinutes = 10;
+
+/// Sets the locale and snooze length used for notification action buttons.
+/// Call BEFORE the first schedule (main() does, then Settings on any change).
+void configureNotificationActions({String? locale, int? snoozeMinutes}) {
+  if (locale != null && locale.isNotEmpty) _actionLocale = locale;
+  if (snoozeMinutes != null && snoozeMinutes > 0) {
+    _actionSnoozeMinutes = snoozeMinutes;
+  }
+}
+
+String _doneLabel() =>
+    kActionDoneLabel[_actionLocale] ?? kActionDoneLabel['ar']!;
+
+String _snoozeLabel() {
+  final m = kActionSnoozeLabel(_actionSnoozeMinutes);
+  return m[_actionLocale] ?? m['ar']!;
+}
+
+/// «تم» + «أمهلني» for a habit reminder. `showsUserInterface: false` is what
+/// keeps the tap in the background isolate instead of launching the app, and
+/// `cancelNotification: true` clears the shade entry the user just answered.
+List<AndroidNotificationAction> _habitActions() => [
+      AndroidNotificationAction(kActionDone, _doneLabel(),
+          showsUserInterface: false, cancelNotification: true),
+      AndroidNotificationAction(kActionSnooze, _snoozeLabel(),
+          showsUserInterface: false, cancelNotification: true),
+    ];
+
+/// Prayer alerts get the snooze only. «تم» is omitted deliberately: there is
+/// nothing to log (see resolveNotificationAction), and a dead button that
+/// merely dismisses would read as a claim that the prayer was recorded.
+List<AndroidNotificationAction> _prayerActions() => [
+      AndroidNotificationAction(kActionSnooze, _snoozeLabel(),
+          showsUserInterface: false, cancelNotification: true),
+    ];
+
 /// Brand accent applied to every Android notification (icon tint).
 const Color _kBrandColor = Color(0xFF4F8EF7);
 
@@ -110,15 +162,40 @@ Future<void> initNotifications() async {
   // from the official sprout): colored launcher icons render as a grey blob
   // in the status bar. Kept by keep.xml against the release shrinker.
   const android = AndroidInitializationSettings('ic_stat_awwad');
-  const ios = DarwinInitializationSettings(
+  // iOS shows action buttons only for a category registered here, matched by
+  // the categoryIdentifier set on each notification's DarwinNotificationDetails.
+  final ios = DarwinInitializationSettings(
     requestAlertPermission: false,
     requestBadgePermission: false,
     requestSoundPermission: false,
+    notificationCategories: [
+      DarwinNotificationCategory(
+        kCategoryHabit,
+        actions: [
+          DarwinNotificationAction.plain(kActionDone, _doneLabel()),
+          DarwinNotificationAction.plain(kActionSnooze, _snoozeLabel()),
+        ],
+        options: {DarwinNotificationCategoryOption.hiddenPreviewShowTitle},
+      ),
+      DarwinNotificationCategory(
+        kCategoryPrayer,
+        actions: [
+          DarwinNotificationAction.plain(kActionSnooze, _snoozeLabel()),
+        ],
+        options: {DarwinNotificationCategoryOption.hiddenPreviewShowTitle},
+      ),
+    ],
   );
   try {
     await _plugin.initialize(
-      const InitializationSettings(android: android, iOS: ios),
-      onDidReceiveNotificationResponse: (r) => _routeTap(r.payload),
+      InitializationSettings(android: android, iOS: ios),
+      onDidReceiveNotificationResponse: _onForegroundResponse,
+      // An ACTION tap does not launch the app, so it never reaches the
+      // callback above. Without this second entry point every button would be
+      // a silent no-op whenever the app is not already running, which is the
+      // normal case for a reminder.
+      onDidReceiveBackgroundNotificationResponse:
+          notificationActionBackgroundHandler,
     );
     // A notification that LAUNCHED the app is not delivered to the callback
     // above, so it has to be read separately or the tap silently does nothing.
@@ -351,7 +428,11 @@ Future<void> scheduleHabitReminder(
     int slot, int hour, String title, String body, [String? habitId]) async {
   if (slot < 0 || slot >= _habitReminderMax) return;
   await initNotifications();
-  const details = NotificationDetails(
+  // Action buttons only where they can DO something: «تم» needs a habit id to
+  // log against, so a reminder scheduled without one gets a plain notification
+  // rather than a button that would silently no-op.
+  final withActions = habitId != null;
+  final details = NotificationDetails(
     android: AndroidNotificationDetails(
       color: _kBrandColor,
       _habitChannelId,
@@ -359,8 +440,11 @@ Future<void> scheduleHabitReminder(
       channelDescription: 'Daily habit reminder',
       importance: Importance.high,
       priority: Priority.high,
+      actions: withActions ? _habitActions() : null,
     ),
-    iOS: DarwinNotificationDetails(),
+    iOS: DarwinNotificationDetails(
+      categoryIdentifier: withActions ? kCategoryHabit : null,
+    ),
   );
   await _safeZoned(_habitReminderBase + slot, title, body,
       _nextInstanceOfHour(hour), details,
@@ -470,7 +554,7 @@ Future<void> cancelPomodoroDone() async {
 enum PrayerChannel { main, preAlert, adhkar }
 
 Future<void> scheduleAt(int id, DateTime when, String title, String body,
-    {PrayerChannel channel = PrayerChannel.main}) async {
+    {PrayerChannel channel = PrayerChannel.main, String? prayerKey}) async {
   await initNotifications();
   final (chId, chName, chDesc) = switch (channel) {
     PrayerChannel.main => (
@@ -498,16 +582,23 @@ Future<void> scheduleAt(int id, DateTime when, String title, String body,
       importance: Importance.high,
       priority: Priority.high,
       styleInformation: BigTextStyleInformation(body),
+      actions: _prayerActions(),
     ),
     // timeSensitive = the iOS twin of Android exactness: without it Focus
     // modes / Scheduled Summary may defer the prayer alert. Needs the Time
     // Sensitive capability once in Xcode (docs/IOS_PARITY_SETUP.md);
     // until then iOS silently treats it as a normal alert.
     iOS: const DarwinNotificationDetails(
-        interruptionLevel: InterruptionLevel.timeSensitive),
+      interruptionLevel: InterruptionLevel.timeSensitive,
+      categoryIdentifier: kCategoryPrayer,
+    ),
   );
+  // The payload carries the prayer KEY so a snooze can name the prayer it is
+  // deferring. `prayer:` stays the first segment, so tap routing is unchanged
+  // and a payload written by an older build still routes correctly.
   await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details,
-      exact: true, payload: kTapPrayer); // minute-accurate, opens prayer screen
+      exact: true,
+      payload: prayerKey == null ? kTapPrayer : '$kTapPrayer:$prayerKey');
 }
 
 /// A prayer notification that plays the ADHAN sound (Android). The sound is the
@@ -521,8 +612,8 @@ Future<void> scheduleAt(int id, DateTime when, String title, String body,
 /// false until the file ships and iOS keeps its default sound meanwhile.
 const bool kIOSAdhanSoundBundled = false;
 
-Future<void> scheduleAdhan(
-    int id, DateTime when, String title, String body) async {
+Future<void> scheduleAdhan(int id, DateTime when, String title, String body,
+    {String? prayerKey}) async {
   await initNotifications();
   final details = NotificationDetails(
     android: AndroidNotificationDetails(
@@ -535,15 +626,22 @@ Future<void> scheduleAdhan(
       sound: const RawResourceAndroidNotificationSound('adhan'),
       audioAttributesUsage: AudioAttributesUsage.alarm,
       styleInformation: BigTextStyleInformation(body),
+      // «أمهلني» here also STOPS THE ADHAN: dismissing the notification stops
+      // its sound, which is the owner's «تم يوقفه» requirement met without a
+      // media session. The volume keys already act on the alarm stream because
+      // the channel uses AudioAttributesUsage.alarm.
+      actions: _prayerActions(),
     ),
     iOS: DarwinNotificationDetails(
       presentSound: true,
       sound: kIOSAdhanSoundBundled ? 'adhan30.caf' : null,
       interruptionLevel: InterruptionLevel.timeSensitive,
+      categoryIdentifier: kCategoryPrayer,
     ),
   );
   await _safeZoned(id, title, body, tz.TZDateTime.from(when, tz.local), details,
-      exact: true, payload: kTapPrayer); // must play AT prayer time
+      exact: true, // must play AT prayer time
+      payload: prayerKey == null ? kTapPrayer : '$kTapPrayer:$prayerKey');
 }
 
 /// Cancels an inclusive id range (used for the 4000-4299 prayer window).
@@ -656,6 +754,11 @@ const String kTapPrayer = 'prayer';
 const String kTapHabit = 'habit:'; // + habit id
 const String kTapReport = 'report';
 
+/// Not a real notification payload: the signal an in-foreground action tap
+/// sends so the UI re-reads the store the background handler just wrote to.
+/// Listeners must NOT navigate on it.
+const String kTapRefresh = 'refresh';
+
 final List<void Function(String)> _tapListeners = [];
 String? _pendingTap;
 
@@ -679,6 +782,28 @@ void removeNotificationTapListener(void Function(String payload) listener) {
   _tapListeners.remove(listener);
 }
 
+/// Handles every response delivered while this isolate is alive. A response
+/// carrying an `actionId` is a BUTTON tap, not a body tap: it must run the
+/// action (the background handler is bypassed when the app is already up) and
+/// must NOT navigate, because the user chose to stay out of the app.
+void _onForegroundResponse(NotificationResponse r) {
+  if (r.actionId == null || r.actionId!.isEmpty) {
+    _routeTap(r.payload);
+    return;
+  }
+  AnalyticsService.instance.track('notification_action', {
+    'action': r.actionId, // aw_done / aw_snooze, never an id
+    'kind': parsePayload(r.payload).$1,
+  });
+  // Same code path as the background isolate, so the two can never diverge,
+  // but WITHOUT re-initializing the plugin: this isolate already did that, and
+  // a second initialize() would drop the tap callback registered above.
+  // It writes through SharedPreferences, which leaves this isolate's in-memory
+  // AppState stale, hence the refresh signal below.
+  handleNotificationActionResponse(r, initializePlugin: false)
+      .whenComplete(() => _routeTap(kTapRefresh));
+}
+
 void _routeTap(String? payload) {
   if (payload == null || payload.isEmpty) return;
   // RETENTION signal, and the only one the app has: it is the difference
@@ -688,9 +813,14 @@ void _routeTap(String? payload) {
   //
   // The payload carries an id and a kind, never anything about the user, so
   // only the KIND is sent (prayer / habit reminder / dhikr / badge).
-  AnalyticsService.instance.track('notification_opened', {
-    'kind': payload.split(':').first,
-  });
+  // kTapRefresh is an internal UI signal, not an opened notification: counting
+  // it would inflate the ONLY retention metric the app has with events where
+  // nobody came back (the user was already in the app).
+  if (payload != kTapRefresh) {
+    AnalyticsService.instance.track('notification_opened', {
+      'kind': payload.split(':').first,
+    });
+  }
   if (_tapListeners.isEmpty) {
     _pendingTap = payload; // replayed as soon as the UI registers
     return;

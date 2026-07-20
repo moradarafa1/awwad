@@ -144,10 +144,11 @@ Future<void> applyPrayerSchedule({
         // The adhan SOUND plays only on the actual prayer-time notification,
         // never on the 5-minute pre-alert.
         if (cfg.adhanSound && !a.pre) {
-          await scheduleAdhan(a.id, a.when, title, body);
+          await scheduleAdhan(a.id, a.when, title, body, prayerKey: a.prayer);
         } else {
           await scheduleAt(a.id, a.when, title, body,
-              channel: a.pre ? PrayerChannel.preAlert : PrayerChannel.main);
+              channel: a.pre ? PrayerChannel.preAlert : PrayerChannel.main,
+              prayerKey: a.prayer);
         }
     }
   }

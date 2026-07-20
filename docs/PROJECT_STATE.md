@@ -115,19 +115,17 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
   requirement. HONEST CAVEAT: the POWER button silencing is standard for system alarms and
   incoming calls, NOT guaranteed for a notification sound. Needs hardware verification (item
   7) before it is claimed as done.
-  **STILL TO BUILD for item 2 (this is the real remaining work):** the «تم» and «أمهلني»
-  notification ACTIONS. Nothing in the notification layer defines actions today (verified: no
-  `AndroidNotificationAction`, no `DarwinNotificationCategory` anywhere). It needs:
-  (a) `actions:` on AndroidNotificationDetails per notification type;
-  (b) Darwin categories registered at init, plus `categoryIdentifier` on the iOS details;
-  (c) a TOP-LEVEL `@pragma('vm:entry-point')` background handler wired to
-      `onDidReceiveBackgroundNotificationResponse`, because an action tap does NOT open the
-      app and therefore does not run in the UI isolate;
-  (d) snooze = reschedule the same id at +10 or +30 minutes, from a user setting;
-  (e) «تم» = auto-log. THIS IS THE HARD PART: the background isolate has no Riverpod state, so
-      it cannot call `quickLogHabit`. It must write to SharedPreferences directly and let the
-      UI reconcile on next open. Design that carefully; a naive call will silently no-op.
-  Do NOT claim any of this works until it has run on the emulator.
+  **ITEM 2 NOTIFICATION ACTIONS: BUILT 2026-07-20 round 4.** All of (a)-(e) below are done;
+  full design notes are in §7 under «Notification ACTION buttons». Correction to (d) as it
+  was written here: rescheduling THE SAME id is a BUG, not the design. Habit reminders repeat
+  daily via matchDateTimeComponents.time, so reusing the id overwrites the repeat and destroys
+  the user's daily reminder. Snooze uses a derived id (+100000) instead; a test locks it.
+  (e) turned out to be the EASY part, not the hard one: `widget_sync.dart` had already solved
+  the no-Riverpod-in-a-background-isolate problem for the home-screen widget, so the action
+  handler reuses that exact pattern (LocalStore + SharedPreferences, UI reconciles after).
+  **NOT VERIFIED ON HARDWARE. No button has ever been pressed on a device.** Analyze clean,
+  165/165 tests, release APK compiles. Verifying it is item 7 (emulator), and until then
+  nothing here should be described to the owner as working.
 - ITEM 4 (DATA LAYER) AUDITED, and the audit found real defects. The brief demanded that a
   documented event must actually be SENT. Comparing every `track()` call in lib/ against
   docs/tracking-plan.md found:
@@ -187,6 +185,10 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
   an Apple entitlement that needs the $99 account first, so not buildable this round.
 - **NOT started yet: items 2, 3, 4, 6, 7.** Next session starts at item 2 (adhan in the
   background + notification actions), then 3, 4, 6, 7 in order.
+  (Superseded by round 4: item 2 is now BUILT but unverified on hardware. **NEXT STEP =
+  item 7, install the official Android emulator**, because item 2, the adhan timing, the
+  power-button silencing, tap routing, DND bypass and the widget quick-log are ALL now
+  blocked on the same thing: nothing has ever run on a device. After item 7, items 3 and 6.)
 
 **STILL OWNER-GATED (money or accounts only):** Play Console ($25), Apple Developer ($99 +
 a Mac), the submissions themselves, and the custom domain. The «غض البصر» habit also still
@@ -566,6 +568,34 @@ cd /d/Claude/awwad/web && npm install && npm run build   # -> web/dist (111 page
 - **Notifications (local, mobile only; web no-op):** per-habit per-time reminders (ids 3000+),
   daily Ibrahimic-prayer **dhikr** (verified Sahih Muslim 405, `core/content/dhikr.dart`),
   badge-earned congrats, one-off 3-day sign-up re-engage. Toggles in Settings.
+- **Notification ACTION buttons (phase 0.6 item 2, since 2026-07-20):**
+  `core/notifications/notification_actions.dart`. Habit reminders carry «تم» + «أمهلني»;
+  prayer + adhan alerts carry «أمهلني» only. Snooze length = 10 or 30 min, a SegmentedButton
+  in Settings, stored as `AppSettings.snoozeMinutes` (persisted because the handler reads it
+  from DISK, not memory). Four things that are load-bearing and easy to break:
+  1. `notificationActionBackgroundHandler` is TOP-LEVEL + `@pragma('vm:entry-point')` and is
+     passed to `onDidReceiveBackgroundNotificationResponse`. An action tap does NOT launch the
+     app, so without it every button is a silent no-op whenever the app is closed, which is
+     the normal case for a reminder. The pragma is what stops the DART tree shaker (not R8)
+     from removing it in release.
+  2. The handler runs in an isolate with NO Riverpod: it writes through `LocalStore` +
+     SharedPreferences, exactly like the widget quick-log (`widget_sync.dart`), and the UI
+     reconciles via `refreshFromStore()`. A `ref.read` there would silently do nothing.
+  3. **Snooze re-arms under a DERIVED id (`+kSnoozeIdOffset`, 100000), never the original.**
+     Habit reminders repeat daily via `matchDateTimeComponents.time`; rescheduling their own
+     id would overwrite the repeat and destroy the user's daily reminder. Locked by a test.
+  4. Foreground taps go through the SAME code path but with `initializePlugin: false`. A
+     second `initialize()` in the live isolate re-registers on the platform channel and drops
+     `onDidReceiveNotificationResponse`, killing tap routing for the rest of the session.
+  Prayer payloads are now `prayer:<key>` (was bare `prayer`) so a snooze can NAME the prayer;
+  tap routing accepts both, since a pre-update notification can still sit in the OS queue.
+  A snoozed prayer gets its own copy («تذكير: صلاة المغرب»), NOT a replay of «حان وقت صلاة»,
+  which would be a false statement ten minutes late.
+  «تم» auto-logs ONLY on a habit reminder. On a prayer alert it is deliberately absent:
+  one of five prayers is not the daily pray-on-time habit, and logging it off the Fajr alert
+  would credit a day with four prayers still ahead of it.
+  **NOT VERIFIED ON HARDWARE.** Analyze clean, 165 tests green, release APK compiles, but no
+  button has ever been pressed on a device. That is item 7 (emulator).
 - **Phone-usage toolkit (Android only, fail-open elsewhere):** «استخدام الهاتف» screen shows
   per-app screen time + per-app OPEN COUNTS (queryEvents ACTIVITY_RESUMED, consecutive-dedup;
   since 2026-07-18) + per-app daily limits; background `UsageLimitWorker` warns over-budget
@@ -1004,6 +1034,21 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 phase 0.6 round 4 (item 2: «تم» + «أمهلني» notification actions)** - Habit
+  reminders gained a done + snooze button, prayer and adhan alerts a snooze button, handled in
+  a top-level `@pragma('vm:entry-point')` background isolate (an action tap does not launch
+  the app, so the ordinary tap callback never sees it). «تم» auto-logs through LocalStore,
+  reusing the pattern `widget_sync.dart` already proved for the home-screen widget quick-log.
+  Snooze length 10/30 min, persisted in `AppSettings.snoozeMinutes` because the handler reads
+  it from disk. Three defects avoided by design rather than found late, each locked by a test:
+  snooze must NOT reuse the original id (habit reminders repeat daily; reusing it would erase
+  the repeat), the foreground path must NOT re-initialize the plugin (it would drop the tap
+  callback), and a snoozed prayer must not replay «حان وقت صلاة» ten minutes after the fact.
+  Prayer payloads now carry the prayer key; tap routing still accepts the old bare `prayer`.
+  Also fixed: `notification_opened` no longer counts the internal refresh signal, which would
+  have inflated the only retention metric the app has. Verified: analyze clean, 165/165 tests
+  (the derived-id test confirmed to FAIL when the logic is broken), web build + release APK
+  both compile. **NOT verified on hardware: no button has been pressed on a device. Item 7.**
 - **2026-07-20 phase 0.6 round 3 (icon system replaces the emoji)** - Owner: the icons must
   look modern, benchmarked against the best competitors. Replaced the emoji with **Material
   Symbols Rounded**, which ship inside Flutter (Apache 2.0), so no package, no network, no

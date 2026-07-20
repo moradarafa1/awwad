@@ -908,6 +908,16 @@ class AppController extends Notifier<AppState> {
     await _store.saveSettings(s);
     AnalyticsService.instance.track('dhikr_toggled', {'enabled': on});
   }
+
+  /// How long the notification «أمهلني» button defers a reminder. Persisted
+  /// because the background isolate that handles the tap reads it from disk.
+  Future<void> setSnoozeMinutes(int minutes) async {
+    if (minutes <= 0) return; // a non-positive snooze would fire in the past
+    final s = state.settings.copyWith(snoozeMinutes: minutes);
+    state = state.copyWith(settings: s);
+    await _store.saveSettings(s);
+    AnalyticsService.instance.track('snooze_minutes_set', {'minutes': minutes});
+  }
 }
 
 final appControllerProvider =

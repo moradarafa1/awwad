@@ -232,6 +232,8 @@ class HabitsScreen extends ConsumerWidget {
       showReligious: st.settings.showReligiousContent,
       dhikrHour: st.settings.dhikrHour,
       dhikrTitle: kDhikrTitle[loc] ?? kDhikrTitle['ar']!,
+      locale: loc,
+      snoozeMinutes: st.settings.snoozeMinutes,
     );
   }
 

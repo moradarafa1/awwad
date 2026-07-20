@@ -38,7 +38,13 @@ Future<void> applyNotificationSchedule({
   required bool showReligious,
   required int dhikrHour,
   required String dhikrTitle,
+  String locale = 'ar',
+  int snoozeMinutes = 10,
 }) async {
+  // Action-button labels are baked in at schedule time, so the locale and the
+  // snooze length must be pushed down BEFORE anything is scheduled. This is
+  // the single choke point every (re)schedule goes through.
+  configureNotificationActions(locale: locale, snoozeMinutes: snoozeMinutes);
   await cancelHabitReminders(); // clear old set before (re)scheduling
   if (!enabled) {
     await cancelDhikr();
