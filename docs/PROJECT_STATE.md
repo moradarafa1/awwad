@@ -853,7 +853,7 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
   So kHeadingFallback -> IBM Plex Sans Arabic is MANDATORY, not cosmetic: without it
   every English and French heading, and every Latin numeral inside an Arabic heading,
   renders as empty boxes. Locked by test/type_scale_test.dart.
-- **Bodoni Moda Italic** () - PROMINENT NUMERALS only, via
+- **Bodoni Moda Italic** (`app/assets/fonts/BodoniModa-Italic.ttf`) - PROMINENT NUMERALS only, via
   numberStyle() in theme.dart. Owner-supplied. Latin digits only, no Arabic-Indic
   digits and no Arabic letters, so it is never a theme default. This works because the
   app s DYNAMIC numbers are Western digits (plain int interpolation); the Arabic-Indic
