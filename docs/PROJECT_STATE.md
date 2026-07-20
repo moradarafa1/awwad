@@ -51,6 +51,9 @@ byte-verified. Release APK on the owner Desktop (Awwad-1.0.0-final.apk), AAB bes
 correct URLs, and every console answer pre-written in docs/store/SUBMISSION_GUIDE.md §5.
 In-app account deletion ships (it was a hard blocker on BOTH stores).
 
+For the full story of phase 0.5 (what was ordered, what shipped, the defects the reviews
+caught incl. my own, and what was deliberately refused) read docs/SESSION_SUMMARY_0.5.md.
+
 **PHASE 0.6 IS THE ACTIVE BRIEF: read docs/PHASE_06_BRIEF.md.** It carries the owner order
 of 2026-07-20 verbatim, split into executable items. Summary of what changed:
 1. HARD APP-BLOCKING is now CONDITIONALLY approved: build it ONLY where it cannot cause a
