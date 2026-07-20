@@ -15,10 +15,19 @@ import '../../core/models.dart';
 import '../../core/state/app_state.dart';
 
 class QuranPlayerScreen extends ConsumerStatefulWidget {
-  const QuranPlayerScreen({super.key, this.habitId});
+  const QuranPlayerScreen({
+    super.key,
+    this.habitId,
+    this.autoStart = false,
+  });
 
-  /// When set, listening for a couple of minutes auto-logs this habit's day.
+  /// When set, listening for the habit's configured wird length auto-logs its
+  /// day. The length comes from the habit, not a constant.
   final String? habitId;
+
+  /// Start playing as soon as the screen opens. Set when the user asked for an
+  /// auto-play wird and arrived here from its reminder.
+  final bool autoStart;
 
   @override
   ConsumerState<QuranPlayerScreen> createState() => _QuranPlayerScreenState();
@@ -88,6 +97,14 @@ class _QuranPlayerScreenState extends ConsumerState<QuranPlayerScreen> {
       _error = 'load';
     }
     if (mounted) setState(() => _loading = false);
+    // Auto-play wird: the user asked for it to start on its own at this hour
+    // and arrived here from that reminder. Started from the FOREGROUND on a
+    // screen they just opened, never from the background: Android restricts
+    // unattended background audio, and audio that starts with no visible
+    // cause is hostile even where it is technically allowed.
+    if (widget.autoStart && mounted && _error == null) {
+      await _toggle();
+    }
   }
 
   @override

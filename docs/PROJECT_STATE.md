@@ -113,8 +113,12 @@ kListeningHabits in core/models/wird_config.dart):
   with ZERO call sites, so the app never took audio focus. That is a real cause of the
   quiet playback the owner reported, alongside the emulator being quiet. Configured for
   speech-over-media with focus gain and ducking.
-- STILL TO DO: honour autoPlay (start playback at the scheduled hour) and verify volume on
-  real hardware, not the emulator.
+- AUTO-PLAY: DONE. The wird reminder fires at the scheduled hour; tapping it routes straight
+  into the player which starts playing on open (autoStart). Deliberately NOT unattended
+  background audio: Android restricts starting playback from the background, and sound with
+  no visible cause is hostile and store-risky. The reminder is the cause, the tap is the
+  consent. 12 tests in test/wird_config_test.dart.
+- STILL TO DO: verify VOLUME on real hardware, not the emulator.
 
 **PROGRESS 2026-07-20 round 2:**
 - TYPE SYSTEM SETTLED: Tajawal for main headings, IBM Plex Sans Arabic for everything else,

@@ -20,9 +20,13 @@ class RadioPlayerScreen extends ConsumerStatefulWidget {
     super.key,
     required this.category, // 'hadith' | 'quran'
     this.habitId, // when set, listening auto-logs this habit
+    /// Start playing as soon as the screen opens. Set when the user asked
+    /// for an auto-play wird and arrived here from its reminder.
+    this.autoStart = false,
   });
   final String category;
   final String? habitId;
+  final bool autoStart;
 
   @override
   ConsumerState<RadioPlayerScreen> createState() => _RadioPlayerScreenState();
@@ -61,6 +65,15 @@ class _RadioPlayerScreenState extends ConsumerState<RadioPlayerScreen> {
         if (_listenedSeconds >= _autoLogAfter) _autoLog();
       }
     });
+    // Auto-play wird: the user asked for it to start on its own at this time,
+    // and arrived here by tapping that reminder. Playback is started from the
+    // FOREGROUND, on a screen the user just opened, never from the background:
+    // Android restricts unattended background audio, and audio that starts
+    // with no visible cause is hostile even where it is technically allowed.
+    if (widget.autoStart && _station != null) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _play(_station!));
+    }
   }
 
   @override

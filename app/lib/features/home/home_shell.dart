@@ -7,6 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:awwad/l10n/app_localizations.dart';
+import '../quran/quran_player_screen.dart';
+import '../radio/radio_player_screen.dart';
+import '../../core/models.dart';
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
 import '../../core/cloud/supabase_service.dart';
@@ -120,6 +123,28 @@ class _HomeShellState extends ConsumerState<HomeShell>
       if (!s.habits.any((h) => h.id == id)) return;
       ref.read(appControllerProvider.notifier).setActiveHabit(id);
       ref.read(homeTabProvider.notifier).state = 0; // Today
+
+      // AUTO-PLAY WIRD: the user turned on "start by itself at its time", so
+      // arriving from that reminder should land them IN the audio, not on a
+      // screen where they still have to find the play button.
+      //
+      // Deliberately NOT unattended background playback: Android restricts
+      // starting audio from the background, and sound with no visible cause is
+      // hostile anyway. The reminder is the cause, the tap is the consent, and
+      // playback starts on a screen the user just opened.
+      final habit = s.habits.firstWhere((h) => h.id == id);
+      final wird = habit.wird;
+      if (isListeningHabit(habit.catalogKey) &&
+          wird != null &&
+          wird.enabled &&
+          wird.autoPlay) {
+        final isHadith = habit.catalogKey == 'hadith_wird' ||
+            habit.catalogKey == 'listening_wird';
+        pushOnce(() => isHadith
+            ? RadioPlayerScreen(
+                category: 'hadith', habitId: habit.id, autoStart: true)
+            : QuranPlayerScreen(habitId: habit.id, autoStart: true));
+      }
     }
   }
 
