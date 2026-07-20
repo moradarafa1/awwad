@@ -89,6 +89,13 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
   a review build (any `localhost` in dist), on any em-dash in a page, on any third-party host
   reference, on a missing llms.txt / robots.txt / sitemap, and on missing self-hosted fonts.
   Verified in BOTH directions: it fails the review build and passes the production build.
+- MARKETING KIT v2 SHIPPED (owner request 2026-07-20): docs/marketing/Awwad_Marketing_Kit_v2_50_posts.pdf,
+  23 pages, 50 posts across 10 NEW angle families, all built on features that shipped AFTER the
+  first kit (2026-07-14). The first kit is untouched, as instructed. Regenerate with
+  node ops/marketing/build_pdf_v2.mjs ; the copy lives in ops/marketing/posts_v2.js so it can
+  be edited without touching layout. The builder ASSERTS 50 posts, no orphan angle and no
+  em-dash, so a short or malformed deck fails loudly instead of shipping quietly. Every CTA
+  points at the WEB version because the stores are not live yet. Also copied to the Desktop.
 - **ITEM 2 (ADHAN) DECISION MADE AND DOCUMENTED. The brief asked for a reasoned choice between
   a normal notification with sound and a heads-up / full-screen popup. THE ANSWER IS: KEEP THE
   CURRENT DESIGN, AND DO NOT ADD FULL-SCREEN INTENT.** Reasons, in order of weight:

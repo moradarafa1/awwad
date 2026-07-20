@@ -14,6 +14,12 @@ class AppSettings {
   final bool dhikrEnabled; // daily Ibrahimic-prayer dhikr notification
   final int dhikrHour; // when the daily dhikr fires
   final bool darkMode; // dark (default) vs light theme
+  /// How long the notification «أمهلني» action defers a reminder. The owner
+  /// asked for 10 or 30 minutes; those are the only values the UI offers, but
+  /// any positive int is honored so an older stored value never breaks.
+  /// Read from the BACKGROUND isolate (an action tap does not open the app),
+  /// which is why it lives in settings rather than in memory.
+  final int snoozeMinutes;
 
   const AppSettings({
     this.locale,
@@ -28,6 +34,7 @@ class AppSettings {
     this.dhikrEnabled = true,
     this.dhikrHour = 8,
     this.darkMode = true,
+    this.snoozeMinutes = 10,
   });
 
   AppSettings copyWith({
@@ -44,6 +51,7 @@ class AppSettings {
     bool? dhikrEnabled,
     int? dhikrHour,
     bool? darkMode,
+    int? snoozeMinutes,
   }) =>
       AppSettings(
         locale: locale ?? this.locale,
@@ -59,6 +67,7 @@ class AppSettings {
         dhikrEnabled: dhikrEnabled ?? this.dhikrEnabled,
         dhikrHour: dhikrHour ?? this.dhikrHour,
         darkMode: darkMode ?? this.darkMode,
+        snoozeMinutes: snoozeMinutes ?? this.snoozeMinutes,
       );
 
   Map<String, dynamic> toJson() => {
@@ -74,6 +83,7 @@ class AppSettings {
         'dhikrEnabled': dhikrEnabled,
         'dhikrHour': dhikrHour,
         'darkMode': darkMode,
+        'snoozeMinutes': snoozeMinutes,
       };
 
   factory AppSettings.fromJson(Map<String, dynamic> j) => AppSettings(
@@ -89,6 +99,12 @@ class AppSettings {
         dhikrEnabled: j['dhikrEnabled'] as bool? ?? true,
         dhikrHour: j['dhikrHour'] as int? ?? 8,
         darkMode: j['darkMode'] as bool? ?? true,
+        // A stored 0 or a negative would make the snooze fire in the past,
+        // i.e. immediately and forever. Clamp to the default instead.
+        snoozeMinutes: switch (j['snoozeMinutes']) {
+          final int m when m > 0 => m,
+          _ => 10,
+        },
       );
 }
 
