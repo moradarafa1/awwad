@@ -42,49 +42,49 @@ context or dropping anything:
 
 ---
 
-## 0.5 HANDOFF 2026-07-20 (RESUME HERE)
+## 0.6 HANDOFF 2026-07-20 (RESUME HERE)
 
-**THE OWNER MANDATE IS COMPLETE.** docs/MANDATE_PLAN.md: 44 items, 0 open, 0 partial.
-Rounds 1-10 all delivered, reviewed adversarially, built, deployed and byte-verified.
-The standing order behind it (competitive UX, organic search, notification perfection,
-store-policy compliance, Android features must reach iPhone) is satisfied to the limit of
-what can be done without the owner-gated items below.
+**PHASE 0.5 IS COMPLETE AND LIVE.** docs/MANDATE_PLAN.md: 44 items, 0 open. Site
+https://moradarafa1.github.io (139 pages, 39 articles) and app /app/ both live and
+byte-verified. Release APK on the owner Desktop (Awwad-1.0.0-final.apk), AAB beside it.
+119 tests, analyze clean. Store kit ready: 33 real screenshots (ar/en/fr), listings with
+correct URLs, and every console answer pre-written in docs/store/SUBMISSION_GUIDE.md §5.
+In-app account deletion ships (it was a hard blocker on BOTH stores).
 
-**LIVE RIGHT NOW:** site https://moradarafa1.github.io (139 pages, 39 articles, full SEO)
-and app https://moradarafa1.github.io/app/ (byte-verified against the local build).
-Release APK on the owner Desktop as Awwad-1.0.0-final.apk; AAB beside it in
-app/build/app/outputs/bundle/release/. 119 tests, analyze clean.
+**PHASE 0.6 IS THE ACTIVE BRIEF: read docs/PHASE_06_BRIEF.md.** It carries the owner order
+of 2026-07-20 verbatim, split into executable items. Summary of what changed:
+1. HARD APP-BLOCKING is now CONDITIONALLY approved: build it ONLY where it cannot cause a
+   store rejection, decided PER PLATFORM after documented policy research. If it would get
+   the app rejected on a store, it is not built for that store.
+2. FULL-SCREEN adhan is CANCELLED by the owner. What he wants instead: the adhan SOUND
+   firing on time with the app closed and offline, a normal notification in the shade, and
+   the safest option that best matches store policy.
+3. NOTIFICATION ACTIONS: volume/power keys silence the SOUND ONLY (alarm-clock behaviour);
+   a «تم» action stops it and AUTO-LOGS the habit where that fits; a snooze action re-fires
+   after 10 or 30 minutes. For prayers, wake-up, and manual-log habit reminders.
+4. SEO/GEO/ASO: verify what shipped, and add AI-search (GEO) visibility.
+5. DATA LAYER: full acquisition/activation/retention event coverage across site, web app and
+   app, GA4/MMP-compatible naming, ready for GTM + Adjust/AppsFlyer later.
+6. FONTS from https://wabl.sa (see the owner screenshot of «أدوار وبل 11»): identify BOTH
+   fonts with certainty, VERIFY THE LICENCE before use, then wire heading + body roles with
+   a proper type scale (no clipped or undersized text at 320dp and 1.3x).
+7. Apply any Claude design/taste skill that improves the visual identity.
+8. Run every test including adversarial, and INSTALL THE OFFICIAL ANDROID EMULATOR to
+   exercise the app for real. This closes the standing caveat: notification tap routing,
+   DND bypass and the widget quick-log are verified by tests and reasoning, NOT on hardware.
 
-**READY FOR SUBMISSION, waiting only on the owner:**
-- assets/screenshots/{ar,en,fr}/ has 33 REAL 1125x2436 captures (Play needs 2 minimum).
-- docs/store/STORE_LISTINGS.md: listings for the shipped product, correct URLs, verified
-  field lengths, and the recommended Play upload order.
-- docs/store/SUBMISSION_GUIDE.md section 5: every console answer pre-written (Data safety,
-  Apple privacy labels, PACKAGE_USAGE_STATS and exact-alarm justifications, IARC, Health
-  declaration, and the DO-NOT rules).
-- In-app account deletion ships, which was a hard blocker on BOTH stores.
+**STILL OWNER-GATED (money or accounts only):** Play Console ($25), Apple Developer ($99 +
+a Mac), the submissions themselves, and the custom domain. The «غض البصر» habit also still
+needs his approval (catalog + seed + live DB sync together).
 
-**OWNER-GATED, nothing starts without a decision** (full list at the end of MANDATE_PLAN.md):
-Play Console (5) and Apple Developer (9 + a Mac) accounts and the submissions themselves;
-the custom domain; full-screen-intent adhan (Play FSI declaration); hard app-blocking
-(AccessibilityService, real rejection risk); the «غض البصر» habit.
+**MAC-GATED:** docs/IOS_PARITY_SETUP.md. The WidgetKit files and adhan sound exist in the
+repo but belong to no Xcode target, so an ipa built today silently omits them.
 
-**MAC-GATED (code is in the repo, targets are not):** docs/IOS_PARITY_SETUP.md. The WidgetKit
-files and the adhan sound EXIST but belong to no Xcode target, so an ipa built today silently
-omits them. Also needs the Time Sensitive capability and the adhan30.caf conversion.
-
-**TOOLING worth knowing before you touch anything:**
-- ops/shotgen/capture.mjs regenerates store screenshots from the LIVE build in real Chrome.
-  GOTCHA #4 IS OBSOLETE: the CanvasKit canvas screenshots fine outside the Electron preview.
-- ops/shotgen/verify_videos.mjs must gate ANY new scholar video (existence, embeddability,
-  true duration). An agent-claimed duration is not evidence.
-- Two traps that cost real time here: a --base-href /app/ build only renders when SERVED
-  under /app/, and never edit Dart while a Gradle build is running.
-
-**IF THE OWNER ASKS FOR MORE WORK,** the honest next candidates are: the deferred
-MANDATE_PLAN owner-gated items, a real-device pass on the notification stack (tap routing,
-DND bypass and the widget quick-log are verified by reasoning and tests, not on hardware),
-and iOS once a Mac exists.
+**TOOLING:** ops/shotgen/capture.mjs regenerates store screenshots from the live build in
+real Chrome (GOTCHA #4 IS OBSOLETE, the canvas screenshots fine outside the Electron
+preview). ops/shotgen/verify_videos.mjs must gate ANY new scholar video. Two traps that cost
+real time: a --base-href /app/ build only renders when SERVED under /app/, and never edit
+Dart while a Gradle build is running.
 
 ## 0.5-OLD HANDOFF 2026-07-18 (superseded - kept for the round's technical details)
 
@@ -763,6 +763,15 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 phase 0.6 opened (owner brief captured)** - Phase 0.5 closed at 44/44 and
+  live. New owner order recorded verbatim in docs/PHASE_06_BRIEF.md: hard app-blocking
+  conditionally approved (per-platform, only where it cannot cause a store rejection);
+  full-screen adhan CANCELLED in favour of background sound + shade notification; snooze and
+  «تم» notification actions with volume/power silencing the sound only; SEO/GEO/ASO
+  verification incl. AI-search visibility; full data-layer coverage for GTM and MMP;
+  the two wabl.sa fonts identified, LICENCE-CHECKED and wired as heading/body with a proper
+  type scale; design-taste pass; and the official Android emulator installed so the
+  notification stack is finally exercised on a real runtime rather than by reasoning.
 - **2026-07-20 round 21 (FINAL DELIVERY: everything built, verified, deployed)** - Release
   built from 1d84a22 with every aapt check green, including the two new ones:
   ACCESS_NOTIFICATION_POLICY present (without it the DND-bypass tile was a dead end) and
