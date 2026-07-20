@@ -3,3 +3,7 @@ Allow: /
 
 # The Flutter web app runs on the app.* subdomain and is intentionally noindex.
 Sitemap: https://moradarafa1.github.io/sitemap-index.xml
+
+# Structured summary for AI assistants (the llms.txt convention).
+# Generated at build time from the same content the pages render from.
+LLM-Content: https://moradarafa1.github.io/llms.txt

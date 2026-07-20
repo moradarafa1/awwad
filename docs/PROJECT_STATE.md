@@ -85,6 +85,14 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
 - **OWNER IS REVIEWING THE WEB APP FIRST, then approves, then the phone builds ship.** He
   asked explicitly for that order. Local review servers: site on :8090 (web/dist), web app on
   :8099 (app/build/web, built WITHOUT --base-href so it serves at root). NOTHING IS DEPLOYED.
+- **PRE-DEPLOY GATE ADDED: run `node ops/verify-dist.mjs` BEFORE every deploy.** It fails on
+  a review build (any `localhost` in dist), on any em-dash in a page, on any third-party host
+  reference, on a missing llms.txt / robots.txt / sitemap, and on missing self-hosted fonts.
+  Verified in BOTH directions: it fails the review build and passes the production build.
+- ITEM 3 (GEO / AI-search) STARTED: `/llms.txt` now ships, GENERATED at build time by
+  `web/src/pages/llms.txt.js` from site.js + posts.js so it cannot drift. robots.txt points
+  at it. Still to do for item 3: verify the round-3/8 SEO work is still live, and the ASO
+  pass on both store listings.
 - LOCAL REVIEW TRAP FIXED: the site's «جرّب إصدار الويب» button points at WEB_APP_URL,
   which is the LIVE deployed app. Reviewing a local site therefore sent the owner to
   yesterday's code and he reported a bug that did not exist in the new build. WEB_APP_URL is
