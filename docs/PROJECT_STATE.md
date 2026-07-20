@@ -118,7 +118,19 @@ kListeningHabits in core/models/wird_config.dart):
   background audio: Android restricts starting playback from the background, and sound with
   no visible cause is hostile and store-risky. The reminder is the cause, the tap is the
   consent. 12 tests in test/wird_config_test.dart.
-- STILL TO DO: verify VOLUME on real hardware, not the emulator.
+- VOLUME, INVESTIGATED AND CLOSED on the app side (2026-07-20). The owner reported very low
+  playback. Two causes, and only one was ours:
+  1. OURS, FIXED: audio_session had been a dependency for months with ZERO call sites, so the
+     app never requested audio focus. Fixed in core/audio/audio_session_config.dart.
+  2. NOT OURS: the emulator media volume was at 5/15, i.e. one third.
+  PROVEN from the system audio dump while playing, not inferred:
+     pack: com.awwad.awwad -- gain: GAIN -- attr: usage=USAGE_MEDIA
+     AudioPlaybackConfiguration state:started usage=USAGE_MEDIA
+       content=CONTENT_TYPE_MUSIC sampleRate=44100
+  So the app takes focus and plays on the MEDIA stream (the loud one, the one the volume
+  rocker controls). There is nothing further to fix in the app.
+  Reproduce with: adb shell dumpsys audio | grep awwad   (while audio is playing).
+  REMAINING, OWNER-ONLY: listen on a real handset. No emulator can answer that.
 
 **PROGRESS 2026-07-20 round 2:**
 - TYPE SYSTEM SETTLED: Tajawal for main headings, IBM Plex Sans Arabic for everything else,
