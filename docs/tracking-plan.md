@@ -50,9 +50,9 @@
 | `app_opened` | فتح التطبيق/الموقع | `is_first_open: bool` |
 | `onboarding_started` | بدء الأونبوردنج | — |
 | `language_selected` | اختيار اللغة | `locale: ar\|en\|fr` |
-| `survey_shown` | ظهور الاستبيان الاختياري | — |
+| ~~`survey_shown`~~ | **غير مُرسَل.** الاستبيان صار يظهر للمسجَّلين فقط منذ 2026-07-20، والزائر لا يراه إطلاقاً | — |
 | `survey_completed` | إكمال الاستبيان | `consent: bool`, `fields_count: int` |
-| `survey_skipped` | تخطّي الاستبيان | — |
+| ~~`survey_skipped`~~ | **غير مُرسَل.** لا يوجد زرّ تخطٍّ في المسار الحالي | — |
 | `track_selected` | اختيار المسار | `track: break\|build` |
 | `habit_selected` | اختيار عادة من الكتالوج | `catalog_key: string`, `category: string`, `is_islamic: bool` |
 | `habit_custom_created` | إنشاء عادة مخصّصة | `track: break\|build`, `category: string` |
@@ -61,20 +61,21 @@
 | `login_succeeded` | تسجيل دخول ناجح | `otp_required: bool`, `trusted_device: bool` |
 | `otp_sent` | إرسال كود OTP | — |
 | `otp_verified` | تأكيد كود OTP | `success: bool` |
-| `device_trusted` | توثيق جهاز | — |
+| ~~`device_trusted`~~ | **غير مُرسَل ولم يُبنَ.** لا توجد ميزة أجهزة موثوقة في التطبيق | — |
 | `sos_opened` | فتح شاشة «لحظة ضعف» | — |
 | `sos_won` | إنهاء لحظة الضعف بنجاح (زر انتصرت) | — |
+| `sos_slipped` | الإقرار بالتعثّر في لحظة الضعف. كان يُرسَل بلا توثيق، ووُثِّق في 2026-07-20. لا يُستخدم للحكم على المستخدم، بل لقياس نسبة الصمود مقابل التعثّر | — |
 | `entry_saved` | حفظ تسجيل يومي | `did_slip: bool`, `urge: int`, `resistance: int`, `events_count: int` |
-| `streak_milestone` | بلوغ حدّ ستريك | `days: int` |
+| ~~`streak_milestone`~~ | **غير مُرسَل، ومغطّى بغيره.** كل حدّ ستريك له درع، فـ`badge_earned` يحمل النتيجة نفسها مع `badge_key` | `days: int` |
 | `badge_earned` | فتح درع | `badge_key: string`, `tier: string` |
 | `badge_celebrated` | مشاهدة احتفال الدرع | `badge_key: string` |
 | `custom_field_added` | إضافة حقل مخصّص | `group: string` |
 | `reminder_set` | ضبط تذكير | `hour: int` |
-| `notification_opened` | فتح إشعار | `type: daily\|streak_risk\|badge\|winback` |
+| `notification_opened` | فتح إشعار. **يُرسَل فعلاً منذ 2026-07-20** من `_routeTap` في notifications_mobile، أي قبل جاهزية الواجهة، فلا يضيع النقر | `kind: prayer\|habit\|report` |
 | `popup_shown` | ظهور Pop-up | `type: string` |
 | `popup_cta_clicked` | الضغط على CTA في Pop-up | `type: string` |
 | `data_exported` | تصدير البيانات | `format: json\|text` |
-| `account_deletion_requested` | طلب حذف الحساب | `source: in_app\|web` |
+| `account_deletion_requested` | طلب حذف الحساب. **يُرسَل فعلاً منذ 2026-07-20**، قبل نداء الحذف مباشرةً لأن الحساب يختفي بعده | — |
 | `religious_content_toggled` | إظهار/إخفاء المحتوى الديني | `visible: bool` |
 | `auth_choice` | شاشة الفتح الأولى (حساب أم ضيف) | `guest: bool` |
 | `account_prompt_accepted` | قبول اقتراح إنشاء حساب بعد أول تسجيل | — |

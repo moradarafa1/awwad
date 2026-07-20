@@ -89,6 +89,24 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
   a review build (any `localhost` in dist), on any em-dash in a page, on any third-party host
   reference, on a missing llms.txt / robots.txt / sitemap, and on missing self-hosted fonts.
   Verified in BOTH directions: it fails the review build and passes the production build.
+- ITEM 4 (DATA LAYER) AUDITED, and the audit found real defects. The brief demanded that a
+  documented event must actually be SENT. Comparing every `track()` call in lib/ against
+  docs/tracking-plan.md found:
+  (a) `sos_slipped` was fired from sos_screen but was NOT in the analytics allow-list, so the
+      assert would have CRASHED a debug build the moment a user tapped «تعثرت». Release
+      strips asserts, which is why it survived. Fixed, and `test/analytics_allowlist_test.dart`
+      now reads the source and fails if any fired event is missing from the list. Verified the
+      test actually catches it by removing the entry and watching it fail.
+  (b) `notification_opened` and `account_deletion_requested` were documented but never fired.
+      Both now fire for real. `notification_opened` is the ONLY retention signal the app has
+      (reminder sent vs reminder brought someone back) and is tracked in `_routeTap`, before
+      the UI is ready, so a cold-start tap is not lost. It sends only the payload KIND
+      (prayer/habit/report), never an id.
+  (c) `survey_shown`, `survey_skipped`, `device_trusted`, `streak_milestone` are documented but
+      genuinely do not exist. Marked struck-through in the plan with the reason, instead of
+      being left to look implemented.
+  NOTE: a first pass at this audit was WRONG because the grep was line-based and `track(` is
+  sometimes split across two lines. Use a multiline match.
 - ITEM 3 (GEO / AI-search) STARTED: `/llms.txt` now ships, GENERATED at build time by
   `web/src/pages/llms.txt.js` from site.js + posts.js so it cannot drift. robots.txt points
   at it. Still to do for item 3: verify the round-3/8 SEO work is still live, and the ASO

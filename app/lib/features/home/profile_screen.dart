@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/catalog/badge_catalog.dart';
+import '../../core/analytics/analytics.dart';
 import '../../core/catalog/habit_icons.dart';
 import '../../core/cloud/net_errors.dart';
 import '../../core/cloud/supabase_service.dart';
@@ -333,6 +334,9 @@ class ProfileScreen extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     try {
+      // Churn signal. Fired BEFORE the call, because the account row (and the
+      // ability to attribute anything to it) is gone a moment later.
+      AnalyticsService.instance.track('account_deletion_requested');
       await SupabaseService.deleteAccount();
       // The cloud rows are gone; the local copy must go too, otherwise the
       // next sign-in would push the deleted data straight back up.

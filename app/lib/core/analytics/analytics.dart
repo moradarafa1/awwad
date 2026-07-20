@@ -70,6 +70,11 @@ class AnalyticsService {
     'device_trusted',
     'sos_opened',
     'sos_won',
+    // Was fired from sos_screen but never allow-listed, so the assert below
+    // would have crashed a DEBUG build the moment a user tapped «تعثرت».
+    // Release strips asserts, which is why it went unnoticed. Found by the
+    // 2026-07-20 audit comparing events actually fired against the plan.
+    'sos_slipped',
     // Post-P1 additions (see docs/tracking-plan.md for the GA4/MMP mapping).
     'account_prompt_accepted',
     'account_prompt_declined',

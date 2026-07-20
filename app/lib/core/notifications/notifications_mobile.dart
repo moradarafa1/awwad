@@ -31,6 +31,8 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../analytics/analytics.dart';
+
 final FlutterLocalNotificationsPlugin _plugin =
     FlutterLocalNotificationsPlugin();
 
@@ -679,6 +681,16 @@ void removeNotificationTapListener(void Function(String payload) listener) {
 
 void _routeTap(String? payload) {
   if (payload == null || payload.isEmpty) return;
+  // RETENTION signal, and the only one the app has: it is the difference
+  // between "we sent a reminder" and "the reminder brought someone back".
+  // Tracked HERE rather than in the listeners, so a tap still counts when the
+  // UI is not mounted yet and the payload is replayed later.
+  //
+  // The payload carries an id and a kind, never anything about the user, so
+  // only the KIND is sent (prayer / habit reminder / dhikr / badge).
+  AnalyticsService.instance.track('notification_opened', {
+    'kind': payload.split(':').first,
+  });
   if (_tapListeners.isEmpty) {
     _pendingTap = payload; // replayed as soon as the UI registers
     return;
