@@ -76,7 +76,29 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
    exercise the app for real. This closes the standing caveat: notification tap routing,
    DND bypass and the widget quick-log are verified by tests and reasoning, NOT on hardware.
 
-**PROGRESS 2026-07-20 round 2 (latest):**
+**READY-TO-SHIP STATE, 2026-07-20 end of session. Everything below is BUILT AND VERIFIED.
+The only work left is the iOS build (needs a Mac) and the store uploads themselves (owner).**
+- Android artefacts on the owner Desktop: `Awwad-1.0.0-final.apk` (65 MB) and
+  `Awwad-1.0.0-store.aab` (64 MB), both built from this commit. Verified inside BOTH:
+  the owner's adhan mp3 at 2188 KB and `raw/adhan` present (gotcha #11 regression check),
+  8 bundled font files, the font families registered, INTERNET + POST_NOTIFICATIONS.
+  NOTE: an older `Awwad-1.0.0-notifications-fixed.apk` (60 MB) is also on the Desktop from a
+  previous session. It is STALE. Do not upload it.
+- Store screenshots REGENERATED from this build: 10 per locale, ar/en/fr, 1125x2436.
+- Store listings verified: `node ops/verify-listings.mjs` passes 20/20 fields.
+- Site: `npm --prefix web run build` then `node ops/verify-dist.mjs` passes.
+- App: analyze clean, 165/165 tests.
+- Marketing kit v2 (50 posts) on the Desktop and in docs/marketing/.
+- NOTE: web/dist currently holds a PRODUCTION build (deploy-ready). To go back to local
+  review, rebuild with `PUBLIC_WEB_APP_URL=http://localhost:8099/ npm --prefix web run build`.
+- **NOT deployed. Nothing was pushed. Both are owner decisions.**
+- STILL UNVERIFIED ON HARDWARE: the adhan firing with the app closed, the power-button
+  silencing, and the «تم» / «أمهلني» action buttons. The emulator system image failed to
+  download twice (the `emulator` package installed, 973 MB, but
+  `system-images;android-35;google_apis;x86_64` left only an empty `.installer` stub).
+  Diagnose that before claiming any of those work.
+
+**PROGRESS 2026-07-20 round 2:**
 - TYPE SYSTEM SETTLED: Tajawal for main headings, IBM Plex Sans Arabic for everything else,
   on site + web app + phone app. See §7. The round-1 claim that wabl uses one family was
   right about their WEBSITE and wrong about their BRAND ARTWORK; both faces are now used, by
