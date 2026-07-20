@@ -4,8 +4,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// usage: node fetch_fonts.mjs <google-fonts.css> <outDir> <Family Name> <slug>
+// The family MUST be passed in. It used to be hardcoded, and running the
+// script for a second family silently overwrote the first family's files with
+// the second family's bytes under the first family's names (hit 2026-07-20).
 const cssPath = process.argv[2];
 const outDir = process.argv[3];
+const family = process.argv[4];
+const slug = process.argv[5];
+if (!family || !slug) {
+  console.error('usage: fetch_fonts.mjs <css> <outDir> "<Family Name>" <file-slug>');
+  process.exit(1);
+}
 const css = fs.readFileSync(cssPath, 'utf8');
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -18,7 +28,7 @@ for (const [, subset, body] of blocks) {
   const w = /font-weight: (\d+)/.exec(body)[1];
   const url = /url\((\S+?)\)/.exec(body)[1];
   const ur = /unicode-range: ([^;]+);/.exec(body)[1];
-  const name = `ibmplexsansarabic-${subset}-${w}.woff2`;
+  const name = `${slug}-${subset}-${w}.woff2`;
   const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 Chrome/126' } });
   if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
   const buf = Buffer.from(await res.arrayBuffer());
@@ -32,12 +42,12 @@ for (const [, subset, body] of blocks) {
 console.log(`TOTAL ${total} bytes across ${local.length} files`);
 
 const cssOut = local.map(({ w, name, ur }) => `      @font-face {
-        font-family: 'IBM Plex Sans Arabic';
+        font-family: '${family}';
         font-style: normal;
         font-weight: ${w};
         font-display: swap;
         src: url('/fonts/${name}') format('woff2');
         unicode-range: ${ur};
       }`).join('\n');
-fs.writeFileSync(path.join(outDir, '..', '..', '..', 'ops', 'fontface.generated.css'), cssOut);
+fs.writeFileSync(path.join(outDir, '..', '..', '..', 'ops', `fontface.${slug}.generated.css`), cssOut);
 console.log('wrote ops/fontface.generated.css');

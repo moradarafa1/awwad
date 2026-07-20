@@ -573,10 +573,7 @@ class SettingsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(l10n.appName,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.heading)),
+                    style: headingStyle(18, weight: FontWeight.w800)),
                 Text(l10n.slogan,
                     style: TextStyle(
                         color: AppColors.accent2, fontSize: 12)),

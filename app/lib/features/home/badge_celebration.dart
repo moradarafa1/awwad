@@ -65,10 +65,7 @@ class _BadgeCelebrationDialogState extends State<_BadgeCelebrationDialog> {
                 const SizedBox(height: 6),
                 Text(widget.def.t(locale),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.heading)),
+                    style: headingStyle(20, weight: FontWeight.w800)),
                 const SizedBox(height: 8),
                 Text(widget.def.d(locale),
                     textAlign: TextAlign.center,

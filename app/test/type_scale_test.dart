@@ -36,12 +36,27 @@ void main() {
         'labelSmall': t.labelSmall,
       };
 
-      test('every style uses the bundled family', () {
+      // TWO families on purpose (owner instruction 2026-07-20): the display
+      // face on main headings only, the text face on everything else. If the
+      // display face ever leaks into body or labels, the contrast that makes
+      // the pairing worth having is gone.
+      const displayRoles = {
+        'displayLarge', 'displayMedium', 'displaySmall',
+        'headlineLarge', 'headlineMedium', 'headlineSmall',
+      };
+
+      test('headings use the display family, everything else the text family',
+          () {
         expect(theme.textTheme.bodyMedium?.fontFamily, kFontFamily);
         all.forEach((key, style) {
           expect(style, isNotNull, reason: '$key is missing');
-          expect(style!.fontFamily, kFontFamily, reason: '$key lost the family');
+          final want = displayRoles.contains(key) ? kHeadingFamily : kFontFamily;
+          expect(style!.fontFamily, want, reason: '$key has the wrong family');
         });
+      });
+
+      test('the two families are actually different', () {
+        expect(kHeadingFamily, isNot(kFontFamily));
       });
 
       // Arabic is cursive. Positive tracking pushes joined letterforms apart
@@ -85,8 +100,10 @@ void main() {
         ]) {
           expect(all[key]!.fontWeight, FontWeight.w700, reason: '$key');
         }
+        // Titles are w700 too since 2026-07-20: the owner wants the big-title
+        // treatment on every heading, not just the top of the scale.
         for (final key in ['titleLarge', 'titleMedium', 'titleSmall']) {
-          expect(all[key]!.fontWeight, FontWeight.w600, reason: '$key');
+          expect(all[key]!.fontWeight, FontWeight.w700, reason: '$key');
         }
         for (final key in ['bodyLarge', 'bodyMedium', 'bodySmall']) {
           expect(all[key]!.fontWeight, FontWeight.w400, reason: '$key');

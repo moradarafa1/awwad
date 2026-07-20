@@ -6,12 +6,21 @@ import 'package:awwad/l10n/app_localizations.dart';
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
 import '../../core/catalog/countries.dart';
+import '../../core/cloud/supabase_service.dart';
 import '../../core/models.dart';
 import '../../core/state/app_state.dart';
 import '../../core/analytics/analytics.dart';
 import '../../core/widgets/ambient_background.dart';
 import '../../core/widgets/common.dart';
 import '../../core/widgets/reminder_times_picker.dart';
+
+/// The onboarding steps, in order.
+///
+/// [survey] is deliberately conditional. It collects ACCOUNT data (gender,
+/// age range, country, research consent), so a guest never sees it: there is
+/// no account to attach it to, and asking a guest for it is a barrier that
+/// buys nothing. Owner instruction, 2026-07-20.
+enum _Step { survey, track, habit, setup }
 
 class OnboardingFlow extends ConsumerStatefulWidget {
   const OnboardingFlow({super.key});
@@ -20,7 +29,20 @@ class OnboardingFlow extends ConsumerStatefulWidget {
 }
 
 class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
+  /// Index into [_steps], NOT a fixed step id: the list length varies.
   int _step = 0;
+
+  /// Resolved once, on entry. A user who signs up mid-flow would otherwise see
+  /// the step list change under them.
+  late final List<_Step> _steps = [
+    if (SupabaseService.signedIn) _Step.survey,
+    _Step.track,
+    _Step.habit,
+    _Step.setup,
+  ];
+
+  _Step get _current => _steps[_step];
+  bool get _isLastStep => _step >= _steps.length - 1;
 
   // collected data
   String? _ageRange, _gender, _country;
@@ -124,7 +146,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
-        children: List.generate(4, (i) {
+        children: List.generate(_steps.length, (i) {
           final active = i <= _step;
           return Expanded(
             child: Container(
@@ -142,14 +164,14 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   }
 
   Widget _buildStep(AppLocalizations l10n) {
-    switch (_step) {
-      case 0:
+    switch (_current) {
+      case _Step.survey:
         return _surveyStep(l10n);
-      case 1:
+      case _Step.track:
         return _trackStep(l10n);
-      case 2:
+      case _Step.habit:
         return _habitStep(l10n);
-      default:
+      case _Step.setup:
         return _setupStep(l10n);
     }
   }
@@ -166,7 +188,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       children: [
         const SizedBox(height: 8),
         Text(l10n.surveyTitle,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+            style: headingStyle(20, weight: FontWeight.w800)),
         const SizedBox(height: 18),
         // Gender — mandatory.
         _surveyField('${l10n.gender} *', [l10n.genderMale, l10n.genderFemale],
@@ -267,7 +289,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       children: [
         const SizedBox(height: 8),
         Text(l10n.chooseTrackTitle,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+            style: headingStyle(20, weight: FontWeight.w800)),
         const SizedBox(height: 18),
         _trackCard('🚭', l10n.trackBreak, l10n.trackBreakDesc, 'break',
             AppColors.danger),
@@ -365,7 +387,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       children: [
         const SizedBox(height: 8),
         Text(l10n.habitSetupTitle,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+            style: headingStyle(20, weight: FontWeight.w800)),
         const SizedBox(height: 18),
         Text(l10n.habitNameLabel,
             style: TextStyle(
@@ -426,7 +448,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
           Expanded(
             child: FilledButton(
               onPressed: () => _onNext(l10n),
-              child: Text(_step >= 3 ? l10n.startJourney : l10n.next),
+              child: Text(_isLastStep ? l10n.startJourney : l10n.next),
             ),
           ),
         ],
@@ -443,14 +465,14 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       ));
       return;
     }
-    if (_step == 0) {
+    if (_current == _Step.survey) {
       AnalyticsService.instance.track('survey_completed', {
         'has_gender': _gender != null,
         'has_age': _ageRange != null,
         'has_country': _country != null,
       });
     }
-    if (_step >= 3) {
+    if (_isLastStep) {
       _finish();
     } else {
       _next();
@@ -459,19 +481,17 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
 
   // Localized reason the current step can't advance, or null when it can.
   String? _stepError() {
-    switch (_step) {
-      case 0:
+    switch (_current) {
+      case _Step.survey:
         return _gender == null ? _msg('gender') : null;
-      case 1:
+      case _Step.track:
         return _track == null ? _msg('track') : null;
-      case 2:
+      case _Step.habit:
         return (_custom ? _nameCtrl.text.trim().isEmpty : _picked == null)
             ? _msg('habit')
             : null;
-      case 3:
+      case _Step.setup:
         return _nameCtrl.text.trim().isEmpty ? _msg('habit') : null;
-      default:
-        return null;
     }
   }
 
@@ -555,7 +575,7 @@ class _HabitPickerState extends State<_HabitPicker> {
       children: [
         const SizedBox(height: 8),
         Text(l10n.chooseHabitTitle,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+            style: headingStyle(20, weight: FontWeight.w800)),
         const SizedBox(height: 14),
         TextField(
           decoration: InputDecoration(

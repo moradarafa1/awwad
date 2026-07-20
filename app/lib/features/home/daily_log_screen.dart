@@ -760,10 +760,7 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
         children: [
           // header
           Text(habit?.title ?? l10n.appName,
-              style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.heading)),
+              style: headingStyle(22, weight: FontWeight.w800)),
           const SizedBox(height: 2),
           Text(l10n.slogan,
               style: TextStyle(color: AppColors.accent2, fontSize: 12)),

@@ -76,7 +76,23 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
    exercise the app for real. This closes the standing caveat: notification tap routing,
    DND bypass and the widget quick-log are verified by tests and reasoning, NOT on hardware.
 
-**PROGRESS 2026-07-20 round 1 (this session):**
+**PROGRESS 2026-07-20 round 2 (latest):**
+- TYPE SYSTEM SETTLED: Tajawal for main headings, IBM Plex Sans Arabic for everything else,
+  on site + web app + phone app. See §7. The round-1 claim that wabl uses one family was
+  right about their WEBSITE and wrong about their BRAND ARTWORK; both faces are now used, by
+  role, exactly as the owner asked.
+- GUESTS SKIP THE ONBOARDING SURVEY (§7).
+- **OWNER IS REVIEWING THE WEB APP FIRST, then approves, then the phone builds ship.** He
+  asked explicitly for that order. Local review servers: site on :8090 (web/dist), web app on
+  :8099 (app/build/web, built WITHOUT --base-href so it serves at root). NOTHING IS DEPLOYED.
+- **OPEN REQUEST, NOT STARTED: replace the EMOJI icons with a modern icon set**, benchmarked
+  against the best competitors. Emoji live in `icon:` string fields in
+  `core/catalog/habit_catalog.dart` (36 habits) and `core/catalog/badge_catalog.dart`, plus
+  `web/src/content/site.js` (x3 locales). DO NOT change those data fields: the catalog is
+  synced to seed.sql AND the live DB, so the icon should be resolved client-side by habit key
+  to an IconData, keeping the emoji as the fallback for custom habits.
+
+**PROGRESS 2026-07-20 round 1:**
 - **Item 5 FONTS: DONE and verified.** wabl.sa uses ONE family, not two: **IBM Plex Sans
   Arabic**, big title at w700 and subline at w400 (read off the live computed styles of
   /projects/wabl-11-nada: h1 = 48px/700, p = 18px/400; `document.fonts` shows Beiruti and
@@ -446,8 +462,15 @@ cd /d/Claude/awwad/web && npm install && npm run build   # -> web/dist (111 page
 - **Auth flows (since 2026-07-11):** sign-up = `auth.signUp` + emailed Arabic verification code
   -> `verifyOTP(type: signup)`; sign-in = password (+ «نسيت كلمة المرور؟» -> emailed code ->
   `verifyOTP(type: recovery)` -> new password). All emails via Brevo SMTP. No passwordless login.
-- **Onboarding:** welcome+language → optional survey → track → habit pick (36-habit catalog +
-  custom, hides already-owned) → setup (name/why + **multi-time `ReminderTimesPicker`**).
+- **Onboarding:** welcome+language → [survey, SIGNED-IN ONLY] → track → habit pick (36-habit
+  catalog + custom, hides already-owned) → setup (name/why + **multi-time
+  `ReminderTimesPicker`**).
+  **GUESTS SKIP THE SURVEY** (owner instruction 2026-07-20). It collects account data (gender,
+  age, country, research consent); with no account there is nothing to attach it to, so it is
+  a pure barrier. Implemented as a dynamic `_steps` list in `onboarding_flow.dart` keyed on
+  `SupabaseService.signedIn`, resolved once on entry so the list cannot change under the user.
+  The progress bar, the Next/Start label and the per-step validation all derive from that list,
+  so a guest sees 3 segments, not 4. Locked by `test/onboarding_guest_test.dart`.
 - **Multi-habit:** `AppState.habits` list (cap 3 break + 3 build, `kMaxHabitsPerTrack`),
   `HabitSwitcher` chips on Today/Stats/History/Badges, Settings→**العادات** add/delete (can't
   delete the last), per-habit reminder times editable (alarm icon → reschedule). All stats/
@@ -471,12 +494,28 @@ cd /d/Claude/awwad/web && npm install && npm run build   # -> web/dist (111 page
   (Arabic/Persian digits normalized) + research-only notice. Writes to Supabase profiles.
 - **UI:** dark theme, **iOS "liquid glass" translucent buttons** (`theme.dart`). Verified:
   analyze clean, 8 tests, web build OK.
-- **TYPE (since 2026-07-20, phase 0.6 item 5):** one family, **IBM Plex Sans Arabic**, SIL OFL
-  1.1, BUNDLED at `app/assets/fonts/` (+ `OFL.txt`). This is the family wabl.sa actually uses,
-  verified from its live computed styles. Scale lives in `_awwadTextTheme` in `theme.dart`:
-  headings w700, titles w600, body w400, labels w500, letterSpacing 0 EVERYWHERE (tracking
-  breaks cursive Arabic), floor size 12, display sizes capped at 40 (Material's 57 clips on a
-  320dp Arabic screen). Locked by `test/type_scale_test.dart` (15 tests).
+- **TYPE (since 2026-07-20, phase 0.6 item 5): TWO families, by role.**
+  - `kHeadingFamily` = **Tajawal** (Boutros Fonts, SIL OFL 1.1) for MAIN HEADINGS ONLY.
+  - `kFontFamily` = **IBM Plex Sans Arabic** (SIL OFL 1.1) for everything else.
+  Both BUNDLED at `app/assets/fonts/` with their OFL copies. Owner instruction: main headings
+  match the wabl brand face, all other text stays on the Awwad face.
+  **How Tajawal was identified (do not redo this the hard way):** the owner's reference is the
+  «فلل وبل 13» cover image, and that title is BAKED INTO THE PHOTO, not web text, so it cannot
+  be read from CSS (that is why the numeral is italic). It was matched by rendering the same
+  phrase in every free Arabic candidate and comparing letterforms; Tajawal won, corroborated by
+  wabl.sa loading Tajawal in its own font link while never rendering it.
+  CAUTION: the site's own body/heading CSS really is IBM Plex Sans Arabic at w700/w400. The
+  brand artwork and the website use DIFFERENT faces. Both facts are true.
+  **The app does NOT use the Material text-theme roles** (zero uses of headlineSmall/titleLarge
+  across lib/features); every widget writes its own TextStyle. So the display family is applied
+  through `headingStyle()` in `theme.dart`, and the heading sites were converted from the two
+  house idioms (`fontSize + w900 + AppColors.heading`, and the onboarding `fontSize: 20 + w800`).
+  Tajawal stops at ExtraBold 800, so w900 maps to w800 to avoid synthetic bolding.
+  Scale in `_awwadTextTheme`: display/headline w700 in Tajawal, titles w700, body w400, labels
+  w500, letterSpacing 0 EVERYWHERE (tracking breaks cursive Arabic), floor size 12, display
+  capped at 40 (Material's 57 clips on a 320dp Arabic screen).
+  Locked by `test/type_scale_test.dart`, which asserts the display face never leaks into body
+  or label roles.
   `google_fonts` is REMOVED: it fetched Cairo over HTTP on first launch, so a first run with
   no connection fell back to the platform font, breaking offline-first.
   `pubspec` also registers the same faces under the family name **`Roboto`** on purpose: the
@@ -885,6 +924,25 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 phase 0.6 round 2 (two-family type system + guests skip the survey)** -
+  Owner clarified the font brief after seeing round 1: MAIN HEADINGS should match the wabl
+  brand face, everything else stays on the Awwad face. Investigating his reference screenshot
+  produced the key correction to round 1: «فلل وبل 13» is TEXT BAKED INTO A PHOTO, not web
+  text, so the brand face is NOT the site's CSS face. Matched it by rendering the phrase in
+  every free Arabic candidate: **Tajawal** (OFL, Boutros Fonts), corroborated by wabl.sa
+  loading Tajawal in its font link while never rendering it. Wired as `kHeadingFamily` +
+  `headingStyle()`; 10 heading sites converted from the two house idioms; site h1/h2/.brand/
+  .section-title/.hero-title on Tajawal, h3 and all body on IBM Plex. Tajawal is tiny: 60 KB
+  per weight bundled, 77 KB of woff2 total for the site.
+  Also this round: headings strengthened everywhere (site hero h1 had been shrunk to 19px muted
+  grey by a stray `.sub` class, so the home page effectively had no headline; app title roles
+  went w600 -> w700, sizes up one step), and **guests no longer see the onboarding survey**.
+  NEW GOTCHA #14: `ops/fontgen/fetch_fonts.mjs` had the family name HARDCODED, so running it
+  for a second family silently overwrote the first family's files with the second family's
+  bytes under the first family's names. Caught by a size check (42 KB -> 8 KB); the family and
+  file slug are now required arguments.
+  Verified: analyze clean, 140/140 tests, site 139 pages 0 em-dashes, guest walk screenshotted
+  in real Chrome (lands on the track step, 3 progress segments, headings in Tajawal).
 - **2026-07-20 phase 0.6 round 1 (fonts shipped + both blocking verdicts researched)** -
   ITEM 5 DONE: wabl.sa turned out to use ONE family at two weights, not two fonts -
   IBM Plex Sans Arabic w700 for the big title and w400 for the subline, read off the live

@@ -87,9 +87,38 @@ class AppColors {
   static Color get hairline => _p.hairline;
 }
 
-/// The one type family, bundled in the app (see pubspec `fonts:`).
-/// Never fetched at runtime, so text renders the same offline as online.
+/// The TEXT family: body copy, labels, controls, everything that is not a
+/// main heading. Bundled in the app (see pubspec `fonts:`) and never fetched
+/// at runtime, so text renders the same offline as online.
 const String kFontFamily = 'IBM Plex Sans Arabic';
+
+/// The DISPLAY family, for MAIN HEADINGS ONLY: screen titles and section
+/// titles. Owner instruction 2026-07-20, matching the wabl.sa brand artwork.
+///
+/// Deliberately NOT used for body, labels or small print. The whole point of
+/// a two-family system is the contrast; spreading the display face everywhere
+/// destroys it and hurts reading at small sizes.
+const String kHeadingFamily = 'Tajawal';
+
+/// Style for a main heading. Prefer this over a hand-written TextStyle so the
+/// display family can never drift out of sync across screens.
+///
+/// [size] stays explicit because this codebase sets sizes per widget rather
+/// than leaning on the Material text-theme roles.
+TextStyle headingStyle(
+  double size, {
+  FontWeight weight = FontWeight.w700,
+  Color? color,
+  double height = 1.35,
+}) =>
+    TextStyle(
+      fontFamily: kHeadingFamily,
+      fontSize: size,
+      fontWeight: weight,
+      height: height,
+      letterSpacing: 0,
+      color: color ?? AppColors.heading,
+    );
 
 /// Awwad type scale.
 ///
@@ -111,8 +140,10 @@ const String kFontFamily = 'IBM Plex Sans Arabic';
 /// Locked down by test/type_scale_test.dart and exercised at 320dp with a
 /// 1.3x system text scale by test/layout_overflow_test.dart.
 TextTheme _awwadTextTheme(TextTheme base) {
-  TextStyle t(double size, double height, FontWeight weight) => TextStyle(
-        fontFamily: kFontFamily,
+  TextStyle t(double size, double height, FontWeight weight,
+          {bool display = false}) =>
+      TextStyle(
+        fontFamily: display ? kHeadingFamily : kFontFamily,
         fontSize: size,
         height: height,
         fontWeight: weight,
@@ -120,17 +151,20 @@ TextTheme _awwadTextTheme(TextTheme base) {
       );
 
   return base.copyWith(
-    // Display + headline: the big titles. w700, tight-ish leading.
-    displayLarge: t(40, 1.30, FontWeight.w700),
-    displayMedium: t(34, 1.32, FontWeight.w700),
-    displaySmall: t(30, 1.34, FontWeight.w700),
-    headlineLarge: t(28, 1.36, FontWeight.w700),
-    headlineMedium: t(24, 1.38, FontWeight.w700),
-    headlineSmall: t(21, 1.40, FontWeight.w700),
-    // Title: section headers and card titles. w600.
-    titleLarge: t(20, 1.45, FontWeight.w600),
-    titleMedium: t(16, 1.45, FontWeight.w600),
-    titleSmall: t(14, 1.45, FontWeight.w600),
+    // Display + headline: the big titles, in the DISPLAY family.
+    displayLarge: t(40, 1.30, FontWeight.w700, display: true),
+    displayMedium: t(34, 1.32, FontWeight.w700, display: true),
+    displaySmall: t(30, 1.34, FontWeight.w700, display: true),
+    headlineLarge: t(28, 1.36, FontWeight.w700, display: true),
+    headlineMedium: t(24, 1.38, FontWeight.w700, display: true),
+    headlineSmall: t(21, 1.40, FontWeight.w700, display: true),
+    // Title: section headers and card titles. ALSO w700 since 2026-07-20, on
+    // the owner's instruction to carry the big-title treatment through EVERY
+    // heading rather than only the top of the scale. Sizes nudged up one step
+    // so a section header reads as a header, not as emphasised body text.
+    titleLarge: t(22, 1.42, FontWeight.w700),
+    titleMedium: t(17, 1.42, FontWeight.w700),
+    titleSmall: t(15, 1.42, FontWeight.w700),
     // Body: reading text. w400, generous leading.
     bodyLarge: t(16, 1.55, FontWeight.w400),
     bodyMedium: t(14, 1.50, FontWeight.w400),

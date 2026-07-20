@@ -59,10 +59,7 @@ class _AuthChoiceScreenState extends ConsumerState<AuthChoiceScreen> {
               const SizedBox(height: 14),
               Text(l10n.appName,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.heading)),
+                  style: headingStyle(34, weight: FontWeight.w800)),
               const SizedBox(height: 6),
               Text(l10n.slogan,
                   textAlign: TextAlign.center,

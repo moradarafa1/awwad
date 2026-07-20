@@ -99,6 +99,23 @@ flutter:
           weight: 600
         - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
           weight: 700
+    # The DISPLAY family, for main headings only (screen titles, section
+    # titles). Tajawal (Boutros Fonts), SIL OFL 1.1 - see assets/fonts/
+    # OFL-Tajawal.txt. It is the face wabl.sa uses in its MARKETING ARTWORK,
+    # identified on 2026-07-20 by matching the letterforms against the baked-in
+    # title of the «فلل وبل 13» cover image (that text is part of the photo,
+    # not web text, so it cannot be read from CSS). Corroborated by wabl.sa
+    # loading Tajawal in its own font link while never rendering it.
+    - family: Tajawal
+      fonts:
+        - asset: assets/fonts/Tajawal-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Tajawal-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Tajawal-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Tajawal-ExtraBold.ttf
+          weight: 800
     # Deliberate alias, not a copy-paste slip. On web, the Flutter engine
     # downloads Roboto from fonts.gstatic.com at boot whenever no family named
     # `Roboto` is registered. That is a third-party request the site half of

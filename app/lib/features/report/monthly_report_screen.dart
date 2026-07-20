@@ -37,10 +37,7 @@ class MonthlyReportScreen extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
               children: [
                 Text('$monthName ${report.year}',
-                    style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.heading)),
+                    style: headingStyle(22, weight: FontWeight.w800)),
                 const SizedBox(height: 4),
                 Text(_s('subtitle', loc),
                     style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
