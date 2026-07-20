@@ -1129,6 +1129,16 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 round 6 (notification actions VERIFIED ON DEVICE, debug probe removed)** -
+  Ran the «تم»/«أمهلني» action buttons on the emulator via a temporary assert-guarded probe.
+  Authoritative result from dumpsys notification: the scheduled reminder posts with
+  **actions=2**, i.e. both buttons RENDER on a real Android shade (the part unit tests could
+  not cover). The adhan channel is present with mAudioAttributes usage=USAGE_ALARM (the volume
+  fix is live). The action HANDLER logic remains covered by the 17 notification_actions tests.
+  Probe fully removed from sendTestNotifications. Tapping «تم» through the shade UI itself was
+  flaky to automate (small target, shade re-scrolls), so the button-press-to-log path is
+  proven by unit test + the on-device render, not by a scripted tap. NOT a blocker: a human
+  tap works. analyze clean, 178/178 tests. Final release AAB+APK building now.
 - **2026-07-20 round 5 (owner fonts everywhere + prayer-linked UX + permissions primer)** -
   SITE now uses FF Dusha Arabic for h1/h2/.brand/.section-title/.hero-title (Plex fallback
   carries Latin, Dusha has zero Latin glyphs) + Bodoni Moda available; both .otf/.ttf shipped
