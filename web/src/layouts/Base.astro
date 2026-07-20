@@ -252,6 +252,16 @@ const appLd = {
         src: url('/fonts/tajawal-latin-800.woff2') format('woff2');
         unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
       }
+      @font-face {
+        font-family: 'FF Dusha Arabic';
+        src: url('/fonts/FFDushaArabic-Regular.otf') format('opentype');
+        font-weight: 400 800; font-style: normal; font-display: swap;
+      }
+      @font-face {
+        font-family: 'Bodoni Moda';
+        src: url('/fonts/BodoniModa-Italic.ttf') format('truetype');
+        font-style: italic; font-display: swap;
+      }
     </style>
 
     <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
@@ -415,7 +425,7 @@ const appLd = {
          letter-spacing stays 0 in both: Arabic is cursive and tracking pulls
          joined letterforms apart. */
       h1, h2, .brand, .section-title, .hero-title {
-        font-family: 'Tajawal', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+        font-family: 'FF Dusha Arabic', 'IBM Plex Sans Arabic', system-ui, sans-serif;
         color: var(--heading); letter-spacing: 0; line-height: 1.5;
       }
       h3 {

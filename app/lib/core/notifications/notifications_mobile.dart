@@ -514,6 +514,34 @@ Future<void> sendTestNotifications(
   } catch (e) {
     debugPrint('awwad notif: test show failed: $e');
   }
+  // DEBUG-ONLY on-device probe for the notification ACTION handler. The plain
+  // self-test above cannot exercise «تم»/«أمهلني»; this fires a real habit
+  // reminder (actions + habit payload) 15s out so the buttons can be tapped on
+  // a device. Guarded by kDebugMode so it never ships. REMOVE after verifying.
+  assert(() {
+    () async {
+      final actionDetails = NotificationDetails(
+        android: AndroidNotificationDetails(
+          color: _kBrandColor,
+          _habitChannelId,
+          _habitChannelName,
+          importance: Importance.high,
+          priority: Priority.high,
+          actions: _habitActions(),
+        ),
+        iOS: const DarwinNotificationDetails(
+            categoryIdentifier: kCategoryHabit),
+      );
+      await _safeZoned(
+          1997,
+          title,
+          'DEBUG action probe: tap تم or أمهلني',
+          tz.TZDateTime.now(tz.local).add(const Duration(seconds: 15)),
+          actionDetails,
+          payload: '${kTapHabit}__probe__');
+    }();
+    return true;
+  }());
   await _safeZoned(_testLaterId, title, laterBody,
       tz.TZDateTime.now(tz.local).add(const Duration(seconds: 60)), details);
 }

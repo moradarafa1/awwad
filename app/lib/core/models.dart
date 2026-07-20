@@ -14,6 +14,7 @@ class AppSettings {
   final String? activeHabitId; // which habit the Today/Stats/History tabs show
   final bool authChoiceMade; // first-open: sign-in vs continue-as-guest answered
   final bool firstLogPromptShown; // the "create an account" popup shown once
+  final bool permPrimerShown; // one-time permissions sheet on first home arrival
   final bool notifPromptShown; // notification-permission rationale shown once
   final bool dhikrEnabled; // daily Ibrahimic-prayer dhikr notification
   final int dhikrHour; // when the daily dhikr fires
@@ -34,6 +35,7 @@ class AppSettings {
     this.activeHabitId,
     this.authChoiceMade = false,
     this.firstLogPromptShown = false,
+    this.permPrimerShown = false,
     this.notifPromptShown = false,
     this.dhikrEnabled = true,
     this.dhikrHour = 8,
@@ -51,6 +53,7 @@ class AppSettings {
     bool clearActiveHabit = false,
     bool? authChoiceMade,
     bool? firstLogPromptShown,
+    bool? permPrimerShown,
     bool? notifPromptShown,
     bool? dhikrEnabled,
     int? dhikrHour,
@@ -67,6 +70,7 @@ class AppSettings {
             clearActiveHabit ? null : (activeHabitId ?? this.activeHabitId),
         authChoiceMade: authChoiceMade ?? this.authChoiceMade,
         firstLogPromptShown: firstLogPromptShown ?? this.firstLogPromptShown,
+        permPrimerShown: permPrimerShown ?? this.permPrimerShown,
         notifPromptShown: notifPromptShown ?? this.notifPromptShown,
         dhikrEnabled: dhikrEnabled ?? this.dhikrEnabled,
         dhikrHour: dhikrHour ?? this.dhikrHour,
@@ -83,6 +87,7 @@ class AppSettings {
         'activeHabitId': activeHabitId,
         'authChoiceMade': authChoiceMade,
         'firstLogPromptShown': firstLogPromptShown,
+        'permPrimerShown': permPrimerShown,
         'notifPromptShown': notifPromptShown,
         'dhikrEnabled': dhikrEnabled,
         'dhikrHour': dhikrHour,
@@ -99,6 +104,7 @@ class AppSettings {
         activeHabitId: j['activeHabitId'] as String?,
         authChoiceMade: j['authChoiceMade'] as bool? ?? false,
         firstLogPromptShown: j['firstLogPromptShown'] as bool? ?? false,
+        permPrimerShown: j['permPrimerShown'] as bool? ?? false,
         notifPromptShown: j['notifPromptShown'] as bool? ?? false,
         dhikrEnabled: j['dhikrEnabled'] as bool? ?? true,
         dhikrHour: j['dhikrHour'] as int? ?? 8,

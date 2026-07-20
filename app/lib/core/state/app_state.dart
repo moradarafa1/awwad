@@ -897,6 +897,12 @@ class AppController extends Notifier<AppState> {
     AnalyticsService.instance.track('auth_choice', {'guest': guest});
   }
 
+  Future<void> markPermPrimerShown() async {
+    final s = state.settings.copyWith(permPrimerShown: true);
+    state = state.copyWith(settings: s);
+    await _store.saveSettings(s);
+  }
+
   Future<void> markFirstLogPromptShown() async {
     final s = state.settings.copyWith(firstLogPromptShown: true);
     state = state.copyWith(settings: s);

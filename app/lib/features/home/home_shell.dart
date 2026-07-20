@@ -23,6 +23,7 @@ import '../../core/state/app_state.dart';
 import '../../core/widget/widget_sync.dart';
 import '../../core/widgets/ambient_background.dart';
 import 'daily_log_screen.dart';
+import 'permissions_primer.dart';
 import 'stats_screen.dart';
 import 'badges_screen.dart';
 import 'settings_screen.dart';
@@ -65,6 +66,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowPrimer());
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _maybeNudge();
@@ -309,6 +311,14 @@ class _HomeShellState extends ConsumerState<HomeShell>
         ),
       ),
     );
+  }
+
+  Future<void> _maybeShowPrimer() async {
+    final c = ref.read(appControllerProvider.notifier);
+    final st = ref.read(appControllerProvider);
+    if (st.settings.permPrimerShown || !mounted) return;
+    await c.markPermPrimerShown();
+    if (mounted) await PermissionsPrimer.show(context);
   }
 
   @override

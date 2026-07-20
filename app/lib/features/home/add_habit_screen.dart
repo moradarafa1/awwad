@@ -8,6 +8,8 @@ import '../../core/catalog/habit_catalog.dart';
 import '../../core/catalog/habit_icons.dart';
 import '../../core/models.dart';
 import '../../core/state/app_state.dart';
+import '../../core/prayer/prayer_engine.dart';
+import '../prayer/prayer_settings_screen.dart';
 import '../shield/dns_shield_screen.dart';
 import '../../core/widgets/reminder_times_picker.dart';
 
@@ -116,6 +118,21 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
     Navigator.of(context).pop();
     // The porn-break habit opens the DNS content shield immediately, since
     // cutting off access is step one of recovery.
+    // Prayer-linked habits are POWERED by the location: with no location the
+    // scheduler silently no-ops and the user gets a habit with none of the
+    // five adhan-time reminders (or the fajr/asr adhkar) they just asked for.
+    // So adding one opens prayer settings when no location is set yet. Owner
+    // instruction 2026-07-20. Same precedent as break_porn -> DNS shield.
+    const prayerLinked = {'pray_on_time', 'wake_fajr', 'adhkar'};
+    if (prayerLinked.contains(habit.catalogKey) && mounted) {
+      final raw = ref.read(localStoreProvider).loadPrayer();
+      final cfg = raw != null ? PrayerConfig.fromJson(raw) : const PrayerConfig();
+      if (!cfg.configured) {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => const PrayerSettingsScreen()));
+        return;
+      }
+    }
     if (habit.catalogKey == 'break_porn' && mounted) {
       Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const DnsShieldScreen()));

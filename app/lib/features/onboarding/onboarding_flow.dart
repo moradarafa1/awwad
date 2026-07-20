@@ -13,7 +13,9 @@ import '../../core/state/app_state.dart';
 import '../../core/analytics/analytics.dart';
 import '../../core/widgets/ambient_background.dart';
 import '../../core/widgets/common.dart';
+import '../../core/prayer/prayer_engine.dart';
 import '../../core/widgets/reminder_times_picker.dart';
+import '../prayer/prayer_settings_screen.dart';
 
 /// The onboarding steps, in order.
 ///
@@ -117,6 +119,19 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.entrySaved)),
       );
+      // A prayer-linked first habit needs a location or its adhan-time
+      // reminders never fire (the scheduler silently no-ops). Owner
+      // instruction 2026-07-20: ask right away, not buried in Settings.
+      const prayerLinked = {'pray_on_time', 'wake_fajr', 'adhkar'};
+      if (prayerLinked.contains(habit.catalogKey)) {
+        final raw = ref.read(localStoreProvider).loadPrayer();
+        final cfg =
+            raw != null ? PrayerConfig.fromJson(raw) : const PrayerConfig();
+        if (!cfg.configured) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => const PrayerSettingsScreen()));
+        }
+      }
     }
   }
 

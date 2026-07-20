@@ -1129,6 +1129,25 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 round 5 (owner fonts everywhere + prayer-linked UX + permissions primer)** -
+  SITE now uses FF Dusha Arabic for h1/h2/.brand/.section-title/.hero-title (Plex fallback
+  carries Latin, Dusha has zero Latin glyphs) + Bodoni Moda available; both .otf/.ttf shipped
+  in web/public/fonts and DEPLOYED (Pages d65ec00, verified live in the bundled CSS + font
+  file 200). MSA sweep: removed «بصراحة» from dns_shield notesTitle; repo greps clean of the
+  common colloquialisms. PRAYER-LINKED HABITS: adding pray_on_time / wake_fajr / adhkar with
+  no prayer location now opens PrayerSettingsScreen immediately (add_habit + onboarding, same
+  precedent as break_porn -> DNS shield); the scheduler already fires the 5 adhan-time mains
+  + adhkar fajr+30/asr+30 once location exists. PERMISSIONS PRIMER: one-time bottom sheet on
+  first home arrival (features/home/permissions_primer.dart, flag settings.permPrimerShown):
+  notifications + location runtime dialogs in place, battery exemption via settings; usage
+  access stays lazily asked in the usage screen ON PURPOSE (a Settings deep-dive before the
+  feature is seen reads as spyware); no contacts/camera/mic ever. Hard app-closing per owner:
+  only if trouble-free, and policy research says strict-mode uninstall-blocking is NOT
+  trouble-free, so not built. analyze clean, 178/178 tests.
+  STILL OPEN: tap-test «تم»/«أمهلني» on the emulator via the DEBUG-ONLY probe (id 1997,
+  assert-guarded in notifications_mobile.dart sendTestNotifications; REMOVE after the test);
+  Android release rebuild AFTER everything settles (owner: web ships per update, Android at
+  the very end).
 - **2026-07-20 (store copy)** - Owner asked to have the latest store AAB on the D: partition
   in project files (not just OneDrive Desktop). Copied
   `C:\Users\morad\OneDrive\Desktop\Awwad-1.0.0-store.aab` to `D:\Claude\awwad\release\` (SHA256
