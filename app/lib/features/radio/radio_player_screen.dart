@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../core/audio/stream_player.dart';
 import '../../app/theme.dart';
 import '../../core/radio/radio_stations.dart';
 import '../../core/models.dart';
@@ -33,7 +34,7 @@ class RadioPlayerScreen extends ConsumerStatefulWidget {
 }
 
 class _RadioPlayerScreenState extends ConsumerState<RadioPlayerScreen> {
-  final _player = AudioPlayer();
+  final _player = buildStreamPlayer();
   late List<RadioStation> _stations;
   RadioStation? _station;
   StreamSubscription<Duration>? _posSub;

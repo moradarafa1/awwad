@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../core/audio/stream_player.dart';
 import '../../app/theme.dart';
 import '../../core/quran/quran_data.dart';
 import '../../core/models.dart';
@@ -34,7 +35,7 @@ class QuranPlayerScreen extends ConsumerStatefulWidget {
 }
 
 class _QuranPlayerScreenState extends ConsumerState<QuranPlayerScreen> {
-  final _player = AudioPlayer();
+  final _player = buildStreamPlayer();
   List<Reciter> _reciters = [];
   Reciter? _reciter;
   int _surah = 18; // default to Al-Kahf

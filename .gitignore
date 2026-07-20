@@ -46,6 +46,9 @@ supabase/.temp/
 .netlify/
 **/.netlify/
 
+# ===== Local build artefact mirror =====
+release/
+
 # ===== OS / Editor =====
 .DS_Store
 Thumbs.db

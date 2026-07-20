@@ -41,8 +41,18 @@ if ($running) {
     throw "AVD '$Avd' does not exist. Available: $($avds -join ', ')"
   }
   Write-Host "starting $Avd ..."
+  # -gpu host: hardware rendering. swiftshader_indirect (software) was the
+  # first choice here for reliability, but it renders on the CPU and there is
+  # no reason to pay that on a machine with a working GPU.
+  # -memory 4096: the AVD default left the guest at ~94% RAM with the swap file
+  # in use while streaming audio, which is its own source of stutter.
+  # AUDIO NOTE: choppy playback on the emulator is usually NOT the app. The
+  # emulated audio HAL reports inconsistent timestamps, which shows up as
+  # `DefaultAudioSink: Spurious audio timestamp` in logcat and is audible as
+  # stuttering. Confirm audio issues on real hardware before chasing them here.
   Start-Process -FilePath $emulator `
-    -ArgumentList @('-avd', $Avd, '-no-snapshot-save', '-gpu', 'swiftshader_indirect') `
+    -ArgumentList @('-avd', $Avd, '-no-snapshot-save', '-gpu', 'host',
+                    '-memory', '4096') `
     -WindowStyle Normal
 }
 

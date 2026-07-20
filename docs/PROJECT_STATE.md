@@ -78,12 +78,17 @@ of 2026-07-20 verbatim, split into executable items. Summary of what changed:
 
 **READY-TO-SHIP STATE, 2026-07-20 end of session. Everything below is BUILT AND VERIFIED.
 The only work left is the iOS build (needs a Mac) and the store uploads themselves (owner).**
-- Android artefacts on the owner Desktop: `Awwad-1.0.0-final.apk` (65 MB) and
-  `Awwad-1.0.0-store.aab` (64 MB), both built from this commit. Verified inside BOTH:
-  the owner's adhan mp3 at 2188 KB and `raw/adhan` present (gotcha #11 regression check),
-  8 bundled font files, the font families registered, INTERNET + POST_NOTIFICATIONS.
+- Android artefacts on the owner Desktop (`C:\Users\morad\OneDrive\Desktop`, OneDrive-synced,
+  NOT on D:): `Awwad-1.0.0-final.apk` (65 MB) and `Awwad-1.0.0-store.aab` (64 MB), both built
+  from this commit. Verified inside BOTH: the owner's adhan mp3 at 2188 KB and `raw/adhan`
+  present (gotcha #11 regression check), 8 bundled font files, the font families registered,
+  INTERNET + POST_NOTIFICATIONS.
   NOTE: an older `Awwad-1.0.0-notifications-fixed.apk` (60 MB) is also on the Desktop from a
   previous session. It is STALE. Do not upload it.
+  NOTE (2026-07-20): the AAB is also mirrored into the project at
+  `D:\Claude\awwad\release\Awwad-1.0.0-store.aab` (owner wanted a copy on the D: partition,
+  hash-verified identical). This `release/` folder is gitignore-worthy (large binary); if it
+  ever needs re-syncing after a rebuild, just re-copy from the Desktop path above.
 - Store screenshots REGENERATED from this build: 10 per locale, ar/en/fr, 1125x2436.
 - Store listings verified: `node ops/verify-listings.mjs` passes 20/20 fields.
 - Site: `npm --prefix web run build` then `node ops/verify-dist.mjs` passes.
@@ -130,7 +135,18 @@ kListeningHabits in core/models/wird_config.dart):
   So the app takes focus and plays on the MEDIA stream (the loud one, the one the volume
   rocker controls). There is nothing further to fix in the app.
   Reproduce with: adb shell dumpsys audio | grep awwad   (while audio is playing).
-  REMAINING, OWNER-ONLY: listen on a real handset. No emulator can answer that.
+  VOLUME CONFIRMED FIXED by the owner 2026-07-20 ("الصوت بقا عالي").
+  STUTTERING, reported next, diagnosed and answered: the emulator, not the app.
+    Evidence: logcat repeats  on [emu64xa, sdk_gphone64_x86_64], which is the emulated audio HAL
+    reporting an inconsistent clock. Guest CPU was 377/400 IDLE, so it was NOT CPU
+    starvation (an earlier guess of mine that the data disproved). Guest RAM WAS at 94%
+    with swap in use, which contributes.
+    Fixed anyway, because it helps REAL devices on weak mobile data:
+    core/audio/stream_player.dart raises the streaming buffers (3s to start, 8s after a
+    rebuffer, 30-90s ahead) for both the Qur'an and radio players. Both sources stream
+    over the network and the defaults are tuned for short local media.
+    ops/emulator.ps1 also switched to -gpu host and -memory 4096.
+  REMAINING, OWNER-ONLY: confirm on a real handset. No emulator can answer that.
 
 **PROGRESS 2026-07-20 round 2:**
 - TYPE SYSTEM SETTLED: Tajawal for main headings, IBM Plex Sans Arabic for everything else,
@@ -1112,6 +1128,11 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 (store copy)** - Owner asked to have the latest store AAB on the D: partition
+  in project files (not just OneDrive Desktop). Copied
+  `C:\Users\morad\OneDrive\Desktop\Awwad-1.0.0-store.aab` to `D:\Claude\awwad\release\` (SHA256
+  hash-verified identical). Added `release/` to `.gitignore` (large binary, local mirror only,
+  never commit). Re-copy from the Desktop path after any future rebuild to keep it in sync.
 - **2026-07-20 phase 0.6 round 4 (item 2: «تم» + «أمهلني» notification actions)** - Habit
   reminders gained a done + snooze button, prayer and adhan alerts a snooze button, handled in
   a top-level `@pragma('vm:entry-point')` background isolate (an action tap does not launch
