@@ -100,6 +100,29 @@ const breadcrumbLd = isPost ? {
     { '@type': 'ListItem', position: 2, name: page.h1 },
   ],
 } : null;
+// HowTo for the two method hubs. Both pages already describe a numbered
+// process (HRT's four stages; the four habit-building steps) in `blocks`, but
+// nothing told a search engine or an assistant that it WAS a process. This is
+// the schema that answers "how do I quit X" / "how do I build a habit", which
+// is exactly the query shape this product should surface for.
+// Built from the same `blocks` the page renders, so the steps can never
+// disagree with the visible text.
+const howToLd = hubCategory ? {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: page.h1,
+  description: page.intro,
+  inLanguage: lang,
+  totalTime: 'P56D', // the HRT template runs eight weeks
+  step: page.blocks.map((b, i) => ({
+    '@type': 'HowToStep',
+    position: i + 1,
+    name: b.h,
+    text: b.p,
+    url: `${site}${blogPfx}/${PAGES[pageKey]}/#step-${i + 1}`,
+  })),
+} : null;
+
 const faqLd = isPost && post.faq[lang]?.length ? {
   '@context': 'https://schema.org', '@type': 'FAQPage',
   mainEntity: post.faq[lang].map((f) => ({
@@ -162,6 +185,7 @@ const faqLd = isPost && post.faq[lang]?.length ? {
 
   {isMarketing && (
     <article class="prose">
+      {howToLd && <script type="application/ld+json" set:html={JSON.stringify(howToLd)} />}
       <h1>{page.h1}</h1>
       <p class="sub" style="color:var(--muted);font-size:17px;margin-top:10px">{page.intro}</p>
       {page.blocks.map((b) => (<><h2>{b.h}</h2><p>{b.p}</p></>))}

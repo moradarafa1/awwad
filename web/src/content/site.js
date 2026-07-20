@@ -27,8 +27,11 @@ export const CREDIT_URL = 'https://www.facebook.com/MoradArafaOfficial/';
 // this, reviewing a local site silently sends you to the LIVE app and you end
 // up testing yesterday's code (hit 2026-07-20).
 //   PUBLIC_WEB_APP_URL=http://localhost:8099/ npm --prefix web run build
+// The `?.` matters: `import.meta.env` is undefined outside Astro/Vite, so a
+// plain `node -e "import ..."` against this file would throw. Scripts in ops/
+// legitimately read this module.
 export const WEB_APP_URL =
-  import.meta.env.PUBLIC_WEB_APP_URL || 'https://moradarafa1.github.io/app/';
+  import.meta.env?.PUBLIC_WEB_APP_URL || 'https://moradarafa1.github.io/app/';
 // Recommended help channel for the secret-habit track (واعي on YouTube).
 export const WAAI_URL = 'https://www.youtube.com/channel/UCubgpaK2N08IKa1biOQPL1Q';
 // App store links. Flip androidLive/iosLive to true once each app is PUBLISHED
