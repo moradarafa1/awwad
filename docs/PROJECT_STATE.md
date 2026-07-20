@@ -842,7 +842,7 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ### Fonts and their licence basis (READ BEFORE CHANGING A FONT)
 
-- **FF Dusha Arabic** () - MAIN HEADINGS.
+- **FF Dusha Arabic** (`app/assets/fonts/FFDushaArabic-Regular.otf`) - MAIN HEADINGS.
   Supplied by the owner 2026-07-20. The file s own embedded licence string says
   "free for personal use only ... for commercial use please buy it". That text was
   shown to the owner verbatim and he confirmed he holds the rights to use it in this
