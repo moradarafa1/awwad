@@ -42,61 +42,49 @@ context or dropping anything:
 
 ---
 
-## 0.5 HANDOFF 2026-07-19 late (RESUME HERE)
+## 0.5 HANDOFF 2026-07-20 (RESUME HERE)
 
-**OWNER MANDATE (standing order):** (a) competitive features + per-habit UX polish; (b) organic
-search: site SEO + store ASO; (c) perfect all notifications/alarms/permissions; (d) Play +
-App Store policy compliance; (e) **whatever ships on Android must ship on iPhone wherever iOS
-allows**; (f) if the 5h limit pauses work, resume when it renews. The execution plan is
-**docs/MANDATE_PLAN.md**: 39 of 44 items done, 2 partial, 3 open (all in Round 4).
+**THE OWNER MANDATE IS COMPLETE.** docs/MANDATE_PLAN.md: 44 items, 0 open, 0 partial.
+Rounds 1-10 all delivered, reviewed adversarially, built, deployed and byte-verified.
+The standing order behind it (competitive UX, organic search, notification perfection,
+store-policy compliance, Android features must reach iPhone) is satisfied to the limit of
+what can be done without the owner-gated items below.
 
-**EVERYTHING BELOW IS COMMITTED, PUSHED AND (where noted) LIVE.** Rounds 1,2,3,5,6,7,8,10 are
-complete; see §13 for the per-round detail. Highlights: per-app open counts; home-screen widget
-(Android + the full iOS WidgetKit twin in-repo); exact prayer alarms + the iOS timeSensitive
-twin; the notification-reliability core; prayer window at the id-scheme maximum (10 days
-Android / 2 iOS) with prayer_window_test locking it; separate notification channels so muting
-habit nudges cannot silence prayers; per-habit content for the 3 newest build habits + WEEKLY
-streak semantics for surah_kahf; tasbih counter; habit-strength score; SOS outcome loop;
-weekly insight card; IN-APP ACCOUNT DELETION (the hard store blocker); store metadata +
-ready-to-paste console answers; site SEO round DEPLOYED; 9 new articles (blog 30 -> 39, site
-LIVE at 139 pages); 13 habits gained mechanically-verified videos.
+**LIVE RIGHT NOW:** site https://moradarafa1.github.io (139 pages, 39 articles, full SEO)
+and app https://moradarafa1.github.io/app/ (byte-verified against the local build).
+Release APK on the owner Desktop as Awwad-1.0.0-final.apk; AAB beside it in
+app/build/app/outputs/bundle/release/. 119 tests, analyze clean.
 
-**NEW TOOLING (both under ops/shotgen/, both used already):**
-- `capture.mjs` drives the LIVE web build in real Chrome and writes genuine 1125x2436 store
-  screenshots to assets/screenshots/<locale>/. **GOTCHA #4 IS OBSOLETE**: the CanvasKit canvas
-  screenshots fine outside the Electron preview. The Arabic set (11 shots) is committed; the
-  en/fr runs need the boot-wait fix that is now in the script (a cold load can exceed the old
-  fixed sleep and silently captured splash screens).
-- `verify_videos.mjs` checks any candidate video id against YouTube (existence,
-  embeddability, true duration) before it may enter kHabitVideos. Never add a video without it.
+**READY FOR SUBMISSION, waiting only on the owner:**
+- assets/screenshots/{ar,en,fr}/ has 33 REAL 1125x2436 captures (Play needs 2 minimum).
+- docs/store/STORE_LISTINGS.md: listings for the shipped product, correct URLs, verified
+  field lengths, and the recommended Play upload order.
+- docs/store/SUBMISSION_GUIDE.md section 5: every console answer pre-written (Data safety,
+  Apple privacy labels, PACKAGE_USAGE_STATS and exact-alarm justifications, IARC, Health
+  declaration, and the DO-NOT rules).
+- In-app account deletion ships, which was a hard blocker on BOTH stores.
 
-**EXECUTE NEXT, in order:**
-1. Finish the delivery in flight: build task b3xuwsfsn (web+APK+AAB) -> §6 aapt checks (3
-   perms incl. SCHEDULE_EXACT_ALARM, NO ACCESS_FINE_LOCATION, 4 receivers, background
-   receiver exported=false, raw/adhan=1 + res mp3, ic_stat_awwad, 5 widget resources) ->
-   APK to the Desktop -> Pages /app/ redeploy + byte-verify -> push.
-2. The 3 open MANDATE_PLAN items, all Round 4 notifications:
-   - **N8** tap routing: wire onDidReceiveNotificationResponse + payloads on both platforms so
-     a prayer notification opens the prayer screen and a habit reminder opens that habit's log.
-   - **SP9** move the OS notification prompt out of first launch into context (when the user
-     sets reminder times or enables prayer alerts). Raises grant rates and removes a known
-     Apple soft-rejection flag.
-   - **N7 partial** adhan vs DND: a new awwad_adhan_v2 channel created natively with
-     setBypassDnd (the plugin does not expose it) + an honest note in prayer settings. The
-     full-screen-intent version stays OWNER-GATED.
-3. Re-run `node ops/shotgen/capture.mjs --locale en` and `--locale fr` once the app is
-   redeployed, so the en/fr screenshot sets match the Arabic one (the Arabic set is done).
+**OWNER-GATED, nothing starts without a decision** (full list at the end of MANDATE_PLAN.md):
+Play Console (5) and Apple Developer (9 + a Mac) accounts and the submissions themselves;
+the custom domain; full-screen-intent adhan (Play FSI declaration); hard app-blocking
+(AccessibilityService, real rejection risk); the «غض البصر» habit.
 
-**OWNER-GATED, do not start without a decision** (full list at the end of MANDATE_PLAN.md):
-full-screen-intent adhan, hard app-blocking (0c phase C), the «غض البصر» habit, the custom
-domain, and the store submissions themselves (Play $25 / Apple $99 + a Mac). The Mac-only
-iOS steps are in docs/IOS_PARITY_SETUP.md: the WidgetKit files and adhan sound EXIST in the
-repo but belong to no Xcode target yet, so an ipa built today silently omits them.
+**MAC-GATED (code is in the repo, targets are not):** docs/IOS_PARITY_SETUP.md. The WidgetKit
+files and the adhan sound EXIST but belong to no Xcode target, so an ipa built today silently
+omits them. Also needs the Time Sensitive capability and the adhan30.caf conversion.
 
-**TELL THE OWNER:** his 2026-07-12 decision to offer account deletion ONLY on the website
-violates Play's account-deletion policy and Apple 5.1.1(v). The in-app flow is built and
-shipped anyway, since submission is impossible without it; he only needs to know it was
-reversed.
+**TOOLING worth knowing before you touch anything:**
+- ops/shotgen/capture.mjs regenerates store screenshots from the LIVE build in real Chrome.
+  GOTCHA #4 IS OBSOLETE: the CanvasKit canvas screenshots fine outside the Electron preview.
+- ops/shotgen/verify_videos.mjs must gate ANY new scholar video (existence, embeddability,
+  true duration). An agent-claimed duration is not evidence.
+- Two traps that cost real time here: a --base-href /app/ build only renders when SERVED
+  under /app/, and never edit Dart while a Gradle build is running.
+
+**IF THE OWNER ASKS FOR MORE WORK,** the honest next candidates are: the deferred
+MANDATE_PLAN owner-gated items, a real-device pass on the notification stack (tap routing,
+DND bypass and the widget quick-log are verified by reasoning and tests, not on hardware),
+and iOS once a Mac exists.
 
 ## 0.5-OLD HANDOFF 2026-07-18 (superseded - kept for the round's technical details)
 
@@ -775,6 +763,14 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 round 21 (FINAL DELIVERY: everything built, verified, deployed)** - Release
+  built from 1d84a22 with every aapt check green, including the two new ones:
+  ACCESS_NOTIFICATION_POLICY present (without it the DND-bypass tile was a dead end) and
+  ACCESS_FINE_LOCATION absent (coarse only). APK on the Desktop as Awwad-1.0.0-final.apk
+  (md5 fb0d9a9b...). Pages deploy 602ed4f: app byte-verified live against the local build,
+  site serving 139 pages with the 9 new articles returning 200 in ar and fr. SCREENSHOTS:
+  33 real captures committed (11 per locale at 1125x2436), the walk now waiting out the save
+  snackbar so the Today shot is clean. MANDATE_PLAN: 44 items, 0 open.
 - **2026-07-20 round 20 (final review: 13 defects fixed, several self-inflicted)** - The
   review's verify agents died on the session limit, so the 14 raw findings were adjudicated
   against the code by hand; 13 were real. WORST, and introduced in round 19: the SP9
