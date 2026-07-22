@@ -142,6 +142,14 @@ class AppState {
   /// transparent: it neither counts nor breaks. Null for daily habits.
   int? get _weeklyWeekday => weeklyWeekdayFor(activeHabit?.catalogKey);
 
+  /// True when [d] falls outside the active habit's weekday schedule.
+  /// Such a day is TRANSPARENT to streaks and strength: it neither counts
+  /// nor breaks, exactly like the weekly-habit off-days below. Rule (owner
+  /// spec 2026-07-20): schedule edits are never retroactive, so an entry
+  /// logged on a now-off day still counts wherever it already appears.
+  bool _unscheduled(DateTime d) =>
+      !(activeHabit?.isScheduledOn(d.weekday) ?? true);
+
   int get currentStreak {
     final byDay = {for (final e in activeEntries) e.date: e};
     if (byDay.isEmpty) return 0;
@@ -166,7 +174,7 @@ class AppState {
     }
     while (true) {
       final e = byDay[dayKey(d)];
-      if (weekly != null && d.weekday != weekly) {
+      if ((weekly != null && d.weekday != weekly) || _unscheduled(d)) {
         d = _minusDays(d, 1); // off-day: transparent
         continue;
       }
@@ -207,7 +215,7 @@ class AppState {
     final weekly = _weeklyWeekday;
     var longest = 0, run = 0;
     while (!d.isAfter(end)) {
-      if (weekly != null && d.weekday != weekly) {
+      if ((weekly != null && d.weekday != weekly) || _unscheduled(d)) {
         d = DateTime(d.year, d.month, d.day + 1); // off-day: transparent
         continue;
       }
@@ -247,7 +255,7 @@ class AppState {
     for (var i = 0; i < windowDays; i++, d = _minusDays(d, 1)) {
       if (floor != null && d.isBefore(floor)) break;
       // A weekly habit is only measured on its own weekday.
-      if (weekly != null && d.weekday != weekly) continue;
+      if ((weekly != null && d.weekday != weekly) || _unscheduled(d)) continue;
       final e = byDay[dayKey(d)];
       if (e != null && e.isSkip) continue; // excused: transparent
       // Today counts only once logged, so an unfinished day never drags
@@ -521,6 +529,17 @@ class AppController extends Notifier<AppState> {
     // wird hours into the habit's reminder times, so the existing schedule
     // path (home_shell rebuilds it on every open) picks them up with nothing
     // extra to keep in sync.
+  }
+
+  /// Applies a user edit to one habit (title, why, icon, color, schedule).
+  /// Same persistence path as [updateHabitWird]; reminders reschedule on the
+  /// next app open through the single schedule pass in home_shell.
+  Future<void> updateHabit(Habit updated) async {
+    final habits = state.habits
+        .map((h) => h.id == updated.id ? updated : h)
+        .toList();
+    state = state.copyWith(habits: habits);
+    await _store.saveHabits(habits);
   }
 
   Future<bool> addHabit(Habit habit) async {

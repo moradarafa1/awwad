@@ -8,7 +8,7 @@ Future<bool> ensureNotificationPermission() async => false;
 Future<void> scheduleDailyReminder(int hour, String title, String body) async {}
 
 Future<void> scheduleHabitReminder(int slot, int hour, String title,
-    String body, [String? habitId]) async {}
+    String body, [String? habitId, int? weekday]) async {}
 
 Future<void> cancelHabitReminders() async {}
 

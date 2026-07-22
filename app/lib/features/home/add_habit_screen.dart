@@ -11,6 +11,7 @@ import '../../core/state/app_state.dart';
 import '../../core/prayer/prayer_engine.dart';
 import '../prayer/prayer_settings_screen.dart';
 import '../shield/dns_shield_screen.dart';
+import 'habit_customizer.dart';
 import '../../core/widgets/reminder_times_picker.dart';
 
 /// Flow for adding an extra habit after onboarding. Reachable from the habit
@@ -35,6 +36,9 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
   final _costCtrl = TextEditingController();
   List<int> _reminderHours = [20];
   String _query = '';
+  String? _iconName;
+  String? _accentColor;
+  Set<int> _days = {1, 2, 3, 4, 5, 6, 7};
   bool _advisoryShown = false;
 
   String get _loc => Localizations.localeOf(context).languageCode;
@@ -106,6 +110,11 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
           ? double.tryParse(_costCtrl.text.trim())
           : null,
       createdAt: DateTime.now(),
+      iconName: _custom ? _iconName : null,
+      accentColor: _accentColor,
+      // Full week means daily, stored as null so the habit stays a plain
+      // daily habit with zero schedule machinery attached.
+      scheduleDays: _days.length >= 7 ? null : (_days.toList()..sort()),
     );
     final ok = await ref.read(appControllerProvider.notifier).addHabit(habit);
     if (!mounted) return;
@@ -251,7 +260,36 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                         hintText: _s(_kStr['metricSHint']!),
                         counterText: ''),
                   ),
+                  const SizedBox(height: 14),
+                  Text(tr(context, kLblIcon),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.muted)),
+                  const SizedBox(height: 8),
+                  IconGridPicker(
+                      selected: _iconName,
+                      onChanged: (v) => setState(() => _iconName = v)),
                 ],
+                const SizedBox(height: 14),
+                Text(tr(context, kLblColor),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700, color: AppColors.muted)),
+                const SizedBox(height: 8),
+                AccentColorRow(
+                    selected: _accentColor,
+                    onChanged: (v) => setState(() => _accentColor = v)),
+                const SizedBox(height: 14),
+                Text(tr(context, kLblDays),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700, color: AppColors.muted)),
+                const SizedBox(height: 4),
+                Text(tr(context, kLblDaysSub),
+                    style: TextStyle(
+                        fontSize: 11.5, color: AppColors.muted, height: 1.6)),
+                const SizedBox(height: 8),
+                WeekdayChips(
+                    selected: _days,
+                    onChanged: (v) => setState(() => _days = v)),
                 if (_track == 'break') ...[
                   const SizedBox(height: 14),
                   Text(_s(_kStr['savingsTitle']!),

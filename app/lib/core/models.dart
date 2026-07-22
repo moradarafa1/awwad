@@ -153,6 +153,19 @@ class Habit {
   /// habit; see [isListeningHabit].
   final WirdConfig? wird;
 
+  /// PRO CUSTOMIZATION (2026-07-20, owner brief "everything customizable").
+  /// All three are optional and default-off, so every stored habit from any
+  /// earlier version parses unchanged (same precedent as [wird]).
+  /// Vector icon key into kCustomHabitIcons (custom habits; catalog habits
+  /// keep their identity icon unless the user overrides).
+  final String? iconName;
+  /// Accent hex like '#60a5fa'. Null = the track default (danger/success).
+  final String? accentColor;
+  /// ISO weekdays 1(Mon)..7(Sun) the habit is scheduled on. Null or all 7 =
+  /// daily. A non-scheduled day is TRANSPARENT to streaks/strength (it
+  /// neither counts nor breaks), mirroring the weekly-habit mechanism.
+  final List<int>? scheduleDays;
+
   const Habit({
     required this.id,
     required this.track,
@@ -170,6 +183,9 @@ class Habit {
     this.minutesPerDay,
     required this.createdAt,
     this.wird,
+    this.iconName,
+    this.accentColor,
+    this.scheduleDays,
   });
 
   /// The effective reminder times (falls back to the legacy single hour).
@@ -186,6 +202,14 @@ class Habit {
     return ({...base, ...w.times}.toList()..sort());
   }
 
+  /// Whether this habit is scheduled on [weekday] (ISO 1-7). Daily habits
+  /// (null or full-week schedule) are scheduled every day.
+  bool isScheduledOn(int weekday) {
+    final d = scheduleDays;
+    if (d == null || d.isEmpty || d.length >= 7) return true;
+    return d.contains(weekday);
+  }
+
   Habit copyWith(
           {String? title,
           String? reason,
@@ -193,7 +217,10 @@ class Habit {
           List<int>? reminderHours,
           String? customMetricPrimary,
           String? customMetricSecondary,
-          WirdConfig? wird}) =>
+          WirdConfig? wird,
+          String? iconName,
+          String? accentColor,
+          List<int>? scheduleDays}) =>
       Habit(
         id: id,
         track: track,
@@ -212,6 +239,9 @@ class Habit {
         minutesPerDay: minutesPerDay,
         createdAt: createdAt,
         wird: wird ?? this.wird,
+        iconName: iconName ?? this.iconName,
+        accentColor: accentColor ?? this.accentColor,
+        scheduleDays: scheduleDays ?? this.scheduleDays,
       );
 
   Map<String, dynamic> toJson() => {
@@ -231,6 +261,9 @@ class Habit {
         'minutesPerDay': minutesPerDay,
         'createdAt': createdAt.toIso8601String(),
         'wird': wird?.toJson(),
+        'iconName': iconName,
+        'accentColor': accentColor,
+        'scheduleDays': scheduleDays,
       };
 
   factory Habit.fromJson(Map<String, dynamic> j) => Habit(
@@ -254,6 +287,9 @@ class Habit {
         wird: j['wird'] is Map<String, dynamic>
             ? WirdConfig.fromJson(j['wird'] as Map<String, dynamic>)
             : null,
+        iconName: j['iconName'] as String?,
+        accentColor: j['accentColor'] as String?,
+        scheduleDays: (j['scheduleDays'] as List<dynamic>?)?.cast<int>(),
       );
 }
 

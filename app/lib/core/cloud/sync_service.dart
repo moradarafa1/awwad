@@ -81,6 +81,13 @@ class SyncService {
             if (habit.costPerDay != null) 'cost_per_day': habit.costPerDay,
             if (habit.minutesPerDay != null)
               'minutes_per_day': habit.minutesPerDay,
+            // PRO customization (2026-07-20). Inside config on purpose: jsonb
+            // needs no Supabase schema migration, and older clients ignore
+            // unknown keys (same precedent as every key above).
+            if (habit.iconName != null) 'icon_name': habit.iconName,
+            if (habit.accentColor != null) 'accent_color': habit.accentColor,
+            if (habit.scheduleDays != null)
+              'schedule_days': habit.scheduleDays,
           },
         }
     ]);
@@ -169,6 +176,12 @@ class SyncService {
                   ((h['config'] as Map?)?['cost_per_day'] as num?)?.toDouble(),
               minutesPerDay:
                   ((h['config'] as Map?)?['minutes_per_day'] as num?)?.toInt(),
+              iconName: (h['config'] as Map?)?['icon_name'] as String?,
+              accentColor: (h['config'] as Map?)?['accent_color'] as String?,
+              scheduleDays: ((h['config'] as Map?)?['schedule_days'] as List?)
+                  ?.whereType<num>()
+                  .map((n) => n.toInt())
+                  .toList(),
               isCustom: h['is_custom'] as bool? ?? false,
               title: h['title'] as String? ?? '',
               reason: h['reason'] as String?,

@@ -16,7 +16,10 @@ class HabitReminderSpec {
   final String body;
   /// The habit this reminder belongs to, so tapping it can open that habit.
   final String habitId;
-  const HabitReminderSpec(this.hour, this.title, this.body, this.habitId);
+  /// ISO weekday 1-7 for a weekday-scheduled habit; null repeats daily.
+  final int? weekday;
+  const HabitReminderSpec(this.hour, this.title, this.body, this.habitId,
+      {this.weekday});
 }
 
 /// Build the reminder list for all habits at all their chosen times.
@@ -24,8 +27,19 @@ List<HabitReminderSpec> habitRemindersFor(List<Habit> habits, String loc) {
   final body = _kReminderBody[loc] ?? _kReminderBody['ar']!;
   final out = <HabitReminderSpec>[];
   for (final h in habits) {
+    // A weekday-scheduled habit gets one WEEKLY notification per chosen day
+    // per time, so no reminder ever fires on an off-day (owner rule
+    // 2026-07-20). Daily habits keep the single repeat-daily slot per time,
+    // which is why days stays [null] for them: expanding those to 7 weekly
+    // slots would exhaust the 30/60 slot budget for nothing.
+    final sched = h.scheduleDays;
+    final days = (sched == null || sched.isEmpty || sched.length >= 7)
+        ? const <int?>[null]
+        : (sched.toSet().toList()..sort());
     for (final hour in h.times) {
-      out.add(HabitReminderSpec(hour, h.title, body, h.id));
+      for (final day in days) {
+        out.add(HabitReminderSpec(hour, h.title, body, h.id, weekday: day));
+      }
     }
   }
   return out;
@@ -60,7 +74,8 @@ Future<void> applyNotificationSchedule({
   var slot = 0;
   for (final r in habitReminders) {
     if (slot >= maxSlots) break;
-    await scheduleHabitReminder(slot++, r.hour, r.title, r.body, r.habitId);
+    await scheduleHabitReminder(
+        slot++, r.hour, r.title, r.body, r.habitId, r.weekday);
   }
   if (dhikrEnabled && showReligious) {
     await scheduleDhikrReminder(dhikrHour, dhikrTitle, kIbrahimicPrayer);

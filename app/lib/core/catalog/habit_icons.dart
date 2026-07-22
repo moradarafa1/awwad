@@ -89,10 +89,57 @@ const Map<String, IconData> kBadgeIcons = {
   'logged_30': Icons.trending_up_rounded,
 };
 
+/// User-pickable icons for CUSTOM habits (and overrides), keyed by a stable
+/// string stored on Habit.iconName. 24 concepts spanning worship, sport,
+/// study, food, sleep, money, family, work, art and nature; every name was
+/// verified to exist in Flutter's bundled Material Symbols before listing.
+const Map<String, IconData> kCustomHabitIcons = {
+  'self_improvement': Icons.self_improvement_rounded,
+  'mosque': Icons.mosque_rounded,
+  'menu_book': Icons.menu_book_rounded,
+  'volunteer': Icons.volunteer_activism_rounded,
+  'fitness': Icons.fitness_center_rounded,
+  'run': Icons.directions_run_rounded,
+  'spa': Icons.spa_rounded,
+  'school': Icons.school_rounded,
+  'translate': Icons.translate_rounded,
+  'edit_note': Icons.edit_note_rounded,
+  'psychology': Icons.psychology_rounded,
+  'restaurant': Icons.restaurant_rounded,
+  'water': Icons.water_drop_rounded,
+  'coffee': Icons.coffee_rounded,
+  'no_food': Icons.no_food_rounded,
+  'bedtime': Icons.bedtime_rounded,
+  'savings': Icons.savings_rounded,
+  'family': Icons.family_restroom_rounded,
+  'favorite': Icons.favorite_rounded,
+  'work': Icons.work_rounded,
+  'brush': Icons.brush_rounded,
+  'park': Icons.park_rounded,
+  'smoke_free': Icons.smoke_free_rounded,
+  'smartphone': Icons.smartphone_rounded,
+};
+
+/// User-pickable accent colors. Chosen to read on the dark surface and to
+/// stay distinct from the status colors (danger red, success green are still
+/// present but as deliberate choices).
+const List<String> kHabitAccentChoices = [
+  '#60a5fa', '#a78bfa', '#e879f9', '#f472b6',
+  '#f87171', '#fb923c', '#facc15', '#4ade80',
+];
+
+/// Parses '#rrggbb' into a Color; null on anything malformed, so a corrupted
+/// stored value degrades to the track default instead of throwing.
+Color? habitAccentColor(String? hex) {
+  if (hex == null) return null;
+  final ok = RegExp('^#[0-9a-fA-F]{6}' r'$').hasMatch(hex);
+  if (!ok) return null;
+  return Color(0xFF000000 | int.parse(hex.substring(1), radix: 16));
+}
+
 /// The icon for a habit key, or null when there is none (custom habits, and
 /// any catalog key added later without a matching entry above).
 IconData? habitIcon(String? key) => key == null ? null : kHabitIcons[key];
-
 /// The icon for a badge key, or null when there is none.
 IconData? badgeIcon(String? key) => key == null ? null : kBadgeIcons[key];
 
@@ -130,6 +177,8 @@ class BadgeIcon extends StatelessWidget {
 /// oversized next to a vector icon.
 class HabitIcon extends StatelessWidget {
   final String? habitKey;
+  /// A user-chosen icon key (Habit.iconName); wins over the catalog icon.
+  final String? iconName;
   final String emoji;
   final double size;
   final Color? color;
@@ -137,6 +186,7 @@ class HabitIcon extends StatelessWidget {
   const HabitIcon({
     super.key,
     required this.habitKey,
+    this.iconName,
     required this.emoji,
     this.size = 22,
     this.color,
@@ -144,7 +194,7 @@ class HabitIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icon = habitIcon(habitKey);
+    final icon = kCustomHabitIcons[iconName] ?? habitIcon(habitKey);
     if (icon == null) {
       return Text(emoji, style: TextStyle(fontSize: size * 0.86));
     }

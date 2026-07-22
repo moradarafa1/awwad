@@ -270,6 +270,13 @@ class _MonthHeatmapCardState extends State<MonthHeatmapCard> {
       ink = AppColors.isDark ? AppColors.bg : Colors.white;
     } else if (isFuture) {
       ink = AppColors.muted.withValues(alpha: 0.4);
+    } else if (!widget.habit.isScheduledOn(
+        DateTime(_shown.year, _shown.month, day).weekday)) {
+      // Unscheduled weekday with no entry: transparent to the streak, so it
+      // must not read as a miss. Same dim ink as a future day, no border.
+      // A logged entry on an off-day (schedule edited later) took the normal
+      // branches above: logs are never retroactively demoted.
+      ink = AppColors.muted.withValues(alpha: 0.4);
     } else {
       ink = AppColors.muted;
       border = Border.all(color: AppColors.border);

@@ -98,8 +98,8 @@ class _HabitChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final cat = habit.catalogKey == null ? null : catalogByKey(habit.catalogKey!);
     final emoji = cat?.icon ?? (habit.track == 'break' ? '🚭' : '🌱');
-    final accent =
-        habit.track == 'break' ? AppColors.danger : AppColors.success;
+    final accent = habitAccentColor(habit.accentColor) ??
+        (habit.track == 'break' ? AppColors.danger : AppColors.success);
     return GestureDetector(
       onTap: onTap,
       onLongPress: onRemove,
@@ -117,7 +117,12 @@ class _HabitChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            HabitIcon(habitKey: habit.catalogKey, emoji: emoji, size: 17),
+            HabitIcon(
+                habitKey: habit.catalogKey,
+                iconName: habit.iconName,
+                emoji: emoji,
+                size: 17,
+                color: accent),
             const SizedBox(width: 6),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 130),

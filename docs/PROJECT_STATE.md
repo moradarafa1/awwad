@@ -1129,6 +1129,27 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 round 7 (PRO habit customization)** - Owner brief: professional, everything
+  customizable. Habit gained iconName (24-icon picker, kCustomHabitIcons), accentColor (8 hex
+  swatches, habitAccentColor parser fails null on malformed) and scheduleDays (ISO 1-7; null,
+  empty or full week = daily). New shared controls in features/home/habit_customizer.dart used
+  by BOTH the add flow and the new tap-to-edit sheet in habits_screen (title, why, icon for
+  custom habits, color, schedule; saves via new AppController.updateHabit). UNSCHEDULED DAYS
+  ARE TRANSPARENT to currentStreak/longestStreak/habitStrength (generalized the weekly-habit
+  mechanism via _unscheduled at the three walkers) and render dim (not missed) in the month
+  heatmap; entries logged on a now-off day still count (never retroactive). Reminders expand
+  to WEEKLY slots per chosen day (HabitReminderSpec.weekday, dayOfWeekAndTime) so nothing
+  fires on an off-day; daily habits keep repeat-daily slots to spare the 30/60 budget. Synced
+  through the config jsonb (icon_name/accent_color/schedule_days) both directions, no schema
+  migration. Old stored habits parse unchanged (wird precedent). 7 new tests in
+  custom_habit_test.dart; 185/185, analyze clean.
+  DEFERRED (documented, next round candidates from the design spec): numeric dailyTarget +
+  unitLabel + targetDirection (needs a DailyEntry change), timeOfDay grouping, difficulty
+  weighting, startDate, isArchived.
+  GOTCHA #15: a JS string.replace whose REPLACEMENT contains a dollar sign spliced the file
+  (dollar-quote is a special pattern in JS replace): habit_icons.dart got a duplicated tail
+  and a bisected function. When editing via node, either use a replacer FUNCTION or verify
+  with a duplicate-definition grep afterwards.
 - **2026-07-20 round 6 (notification actions VERIFIED ON DEVICE, debug probe removed)** -
   Ran the «تم»/«أمهلني» action buttons on the emulator via a temporary assert-guarded probe.
   Authoritative result from dumpsys notification: the scheduled reminder posts with

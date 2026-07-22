@@ -425,7 +425,8 @@ Future<void> showBadgeNotification(int slot, String title, String body) async {
 
 /// One per-habit, per-time daily reminder ([slot] 0.._habitReminderMax-1).
 Future<void> scheduleHabitReminder(
-    int slot, int hour, String title, String body, [String? habitId]) async {
+    int slot, int hour, String title, String body,
+    [String? habitId, int? weekday]) async {
   if (slot < 0 || slot >= _habitReminderMax) return;
   await initNotifications();
   // Action buttons only where they can DO something: «تم» needs a habit id to
