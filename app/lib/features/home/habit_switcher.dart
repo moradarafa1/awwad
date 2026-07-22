@@ -98,8 +98,8 @@ class _HabitChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final cat = habit.catalogKey == null ? null : catalogByKey(habit.catalogKey!);
     final emoji = cat?.icon ?? (habit.track == 'break' ? '🚭' : '🌱');
-    final accent = habitAccentColor(habit.accentColor) ??
-        (habit.track == 'break' ? AppColors.danger : AppColors.success);
+    final accent =
+        habit.track == 'break' ? AppColors.danger : AppColors.success;
     return GestureDetector(
       onTap: onTap,
       onLongPress: onRemove,

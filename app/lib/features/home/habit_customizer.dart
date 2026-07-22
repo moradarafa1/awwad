@@ -16,11 +16,6 @@ String tr(BuildContext c, Map<String, String> m) =>
     m[_loc(c)] ?? m['ar'] ?? '';
 
 const kLblIcon = {'ar': 'الأيقونة', 'en': 'Icon', 'fr': 'Icône'};
-const kLblColor = {
-  'ar': 'اللون المميز',
-  'en': 'Accent color',
-  'fr': "Couleur d'accent"
-};
 const kLblDays = {
   'ar': 'أيام العادة في الأسبوع',
   'en': 'Days of the week',
@@ -75,44 +70,6 @@ class IconGridPicker extends StatelessWidget {
               child: Icon(kCustomHabitIcons[k],
                   size: 22,
                   color: k == selected ? AppColors.accent : AppColors.text),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class AccentColorRow extends StatelessWidget {
-  final String? selected;
-  final ValueChanged<String?> onChanged;
-  const AccentColorRow(
-      {super.key, required this.selected, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: [
-        for (final hex in kHabitAccentChoices)
-          InkWell(
-            onTap: () => onChanged(hex == selected ? null : hex),
-            borderRadius: BorderRadius.circular(999),
-            child: Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: habitAccentColor(hex),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: hex == selected ? Colors.white : AppColors.border,
-                  width: hex == selected ? 2.5 : 1,
-                ),
-              ),
-              child: hex == selected
-                  ? const Icon(Icons.check_rounded,
-                      size: 18, color: Colors.white)
-                  : null,
             ),
           ),
       ],

@@ -1129,6 +1129,13 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-20 round 8 (color picker REMOVED on owner order)** - The accent-color choice is
+  gone from the add flow, the edit sheet and rendering (switcher/tiles back to track colors).
+  Habit.accentColor STAYS in the model and sync for backward compatibility (stored values
+  parse, nothing renders them). Icon picker + weekday schedule remain. Owner also ruled: NO
+  new feature unless proven at leading competitors. Deferred list unchanged (dailyTarget+unit
+  is Loop/Streaks-proven and is the first candidate when work resumes). 185/185, analyze
+  clean, web deployed, final Android artefacts rebuilt.
 - **2026-07-20 round 7 (PRO habit customization)** - Owner brief: professional, everything
   customizable. Habit gained iconName (24-icon picker, kCustomHabitIcons), accentColor (8 hex
   swatches, habitAccentColor parser fails null on malformed) and scheduleDays (ISO 1-7; null,

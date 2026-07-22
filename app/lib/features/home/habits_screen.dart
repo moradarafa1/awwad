@@ -143,7 +143,7 @@ class HabitsScreen extends ConsumerWidget {
                 iconName: h.iconName,
                 emoji: emoji,
                 size: 22,
-                color: habitAccentColor(h.accentColor)),
+                color: null),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -214,7 +214,6 @@ class HabitsScreen extends ConsumerWidget {
     final nameCtrl = TextEditingController(text: h.title);
     final whyCtrl = TextEditingController(text: h.reason ?? '');
     String? icon = h.iconName;
-    String? color = h.accentColor;
     Set<int> days = (h.scheduleDays == null || h.scheduleDays!.length >= 7)
         ? {1, 2, 3, 4, 5, 6, 7}
         : h.scheduleDays!.toSet();
@@ -263,15 +262,6 @@ class HabitsScreen extends ConsumerWidget {
                         onChanged: (v) => setSheet(() => icon = v)),
                   ],
                   const SizedBox(height: 14),
-                  Text(tr(ctx, kLblColor),
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.muted)),
-                  const SizedBox(height: 8),
-                  AccentColorRow(
-                      selected: color,
-                      onChanged: (v) => setSheet(() => color = v)),
-                  const SizedBox(height: 14),
                   Text(tr(ctx, kLblDays),
                       style: TextStyle(
                           fontWeight: FontWeight.w700,
@@ -313,7 +303,6 @@ class HabitsScreen extends ConsumerWidget {
           title: title.isEmpty ? h.title : title,
           reason: whyCtrl.text.trim().isEmpty ? h.reason : whyCtrl.text.trim(),
           iconName: icon,
-          accentColor: color,
           scheduleDays: days.length >= 7
               ? const [1, 2, 3, 4, 5, 6, 7]
               : (days.toList()..sort()),
