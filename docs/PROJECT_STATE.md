@@ -44,6 +44,9 @@ context or dropping anything:
 
 ## 0.6 HANDOFF 2026-07-20 (RESUME HERE)
 
+**READ FIRST: an OPEN adhan-30-minutes-late bug from the owner's real phone is at the top of
+the Changelog (2026-07-21 entry) with the diagnosis plan. Start there.**
+
 **PHASE 0.5 IS COMPLETE AND LIVE.** docs/MANDATE_PLAN.md: 44 items, 0 open. Site
 https://moradarafa1.github.io (139 pages, 39 articles) and app /app/ both live and
 byte-verified. Release APK on the owner Desktop (Awwad-1.0.0-final.apk), AAB beside it.
@@ -1129,6 +1132,24 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-07-21 OPEN BUG, TOP PRIORITY NEXT SESSION: adhan fired ~30 MINUTES LATE on the
+  owner's real phone** (app under test, prayer habit). Reported by the owner; no diagnosis
+  done yet. THREE lead theories, check in this order:
+  (1) CALCULATION METHOD: engine picks method by country (core/prayer/prayer_engine.dart).
+      A ~30-min flat error smells like the wrong method for his location (Egypt = Egyptian
+      General Authority) or GPS/city mismatch. Compare the app's shown time vs a trusted
+      local source for the SAME prayer + city first; if the SHOWN time is wrong, it is the
+      engine/method, not scheduling.
+  (2) INEXACT ALARM DEFERRAL: if the shown time is right but the SOUND came late, Android
+      deferred the notification. Check whether _safeZoned schedules exactAllowWhileIdle and
+      whether SCHEDULE_EXACT_ALARM / USE_EXACT_ALARM is declared + granted (emulator dump
+      showed awwad uid requesting it with op=default). Doze/battery optimization on his
+      device is the same family.
+  (3) STALE WINDOW: the 10-day prayer window rebuilds on app open; if his config/offsets
+      changed after scheduling, old alarms keep old times until the next open.
+  ASK THE OWNER: which prayer, expected vs actual clock time, his city + method + per-prayer
+  offset settings, phone brand, and whether the TIME DISPLAYED in the prayer screen matched
+  the mosque. That one answer splits theory 1 from 2.
 - **2026-07-20 round 8 (color picker REMOVED on owner order)** - The accent-color choice is
   gone from the add flow, the edit sheet and rendering (switcher/tiles back to track colors).
   Habit.accentColor STAYS in the model and sync for backward compatibility (stored values
