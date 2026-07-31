@@ -60,3 +60,4 @@ Thumbs.db
 # Stray personal file dropped in the repo root; never commit it.
 "فاتورة 1 مارتك بتوين (1).pdf"
 فاتورة*.pdf
+app/android/build/
