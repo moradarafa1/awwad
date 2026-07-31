@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_display.dart';
 import '../../core/catalog/habit_icons.dart';
 import '../../core/models.dart';
 import '../../core/state/app_state.dart';
@@ -61,7 +62,8 @@ class HabitSwitcher extends ConsumerWidget {
         backgroundColor: AppColors.surface,
         title: Text(tr(_kRemoveTitle),
             style: TextStyle(color: AppColors.heading)),
-        content: Text('${tr(_kRemoveBody)}\n\n"${h.title}"',
+        content: Text(
+            '${tr(_kRemoveBody)}\n\n"${habitDisplayTitle(h, Localizations.localeOf(context).languageCode)}"',
             style: TextStyle(color: AppColors.text)),
         actions: [
           TextButton(
@@ -119,7 +121,6 @@ class _HabitChip extends StatelessWidget {
           children: [
             HabitIcon(
                 habitKey: habit.catalogKey,
-                iconName: habit.iconName,
                 emoji: emoji,
                 size: 17,
                 color: accent),
@@ -127,7 +128,8 @@ class _HabitChip extends StatelessWidget {
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 130),
               child: Text(
-                habit.title,
+                habitDisplayTitle(
+                    habit, Localizations.localeOf(context).languageCode),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(

@@ -7,6 +7,7 @@ import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.os.Process
 import android.provider.Settings
 import java.util.Calendar
@@ -15,8 +16,66 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+
+    companion object {
+        /** Intent extra the native adhan notification puts its tap payload in. */
+        const val EXTRA_ADHAN_TAP = "awwad_adhan_tap"
+
+        /** Held until the Dart side asks for it (survives a cold start). */
+        @Volatile
+        private var pendingAdhanTap: String? = null
+    }
+
+    private fun captureAdhanTap(intent: Intent?) {
+        val p = intent?.getStringExtra(EXTRA_ADHAN_TAP)
+        if (!p.isNullOrBlank()) pendingAdhanTap = p
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        captureAdhanTap(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        captureAdhanTap(intent)
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+
+        // Native adhan chain (see AdhanScheduler): Dart writes the table to
+        // SharedPreferences then calls rearm; taps on the native notification
+        // are polled by the Dart side and routed like plugin taps.
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            "awwad/adhan"
+        ).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "rearm" -> {
+                    try {
+                        AdhanScheduler.rearm(this)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.success(false)
+                    }
+                }
+                "stopSound" -> {
+                    try {
+                        AdhanService.stopPlayback(this)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.success(false)
+                    }
+                }
+                "pendingTap" -> {
+                    val p = pendingAdhanTap
+                    pendingAdhanTap = null
+                    result.success(p)
+                }
+                else -> result.notImplemented()
+            }
+        }
 
         // Usage-limit guard: a 15-minute periodic check that posts a warning
         // the moment a limited app crosses its daily screen-time budget, even

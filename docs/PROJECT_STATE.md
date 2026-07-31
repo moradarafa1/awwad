@@ -1132,7 +1132,117 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
-- **2026-07-21 OPEN BUG, TOP PRIORITY NEXT SESSION: adhan fired ~30 MINUTES LATE on the
+- **2026-07-31 (IN PROGRESS this session): owner bug triage + native adhan chain + onboarding
+  location + icon picker removed.** Owner reported from his real Android phone: (1) adhan
+  sometimes ~30 min late, (2) NON-prayer habit reminders "playing the adhan", (3) the adhan
+  sound not stopping on hardware button presses. DIAGNOSIS (verified against code + official
+  docs, sources in the research notes): all three share one root cause chain. SCHEDULE_EXACT_ALARM
+  is DENIED BY DEFAULT on Android 14+; _safeZoned silently degrades to inexactAllowWhileIdle;
+  inexact alarms are deferred (docs: up to 1 hour) and delivered BATCHED with other pending
+  notifications, so the deferred adhan lands at the same instant as a habit reminder and reads
+  as "the reminder played the adhan". (3) is a design limit: a channel sound is played by the
+  system and cannot be stopped programmatically at all.
+  FIX SHIPPED (this session, being verified):
+  a. NATIVE ADHAN CHAIN (Android): Dart's prayer engine writes a 30-day table
+     (flutter.adhan_native_v1, built by buildAdhanTableJson in prayer_scheduler.dart, 5 new
+     tests) -> AdhanScheduler.kt arms ONE setExactAndAllowWhileIdle alarm ->
+     AdhanAlarmReceiver re-arms the next entry FIRST, then applies a LATENESS GUARD
+     (<=5 min late: AdhanService plays the adhan; 5-30 min: silent «تذكير: صلاة X»
+     notification; >30 min: nothing) -> AdhanService (FGS type mediaPlayback) plays the
+     owner's adhan mp3 on USAGE_ALARM and STOPS ON ANY HARDWARE BUTTON: MediaSession +
+     VolumeProvider intercepts volume keys (public API, no max-volume dead zone) +
+     VOLUME_CHANGED_ACTION receiver fallback + SCREEN_ON/OFF for the power key; stop keeps
+     the notification (alarm-clock contract). Boot/update/time-change/exact-grant receivers
+     re-arm. FLN no longer schedules the Android adhan mains (double-notify guard);
+     iOS keeps the FLN path. FGS-from-background rides the exact-alarm exemption and is
+     gated on canScheduleExactAlarms (research-verified); no grant -> channel-sound fallback
+     (old behaviour). Tap on the native notification routes via MainActivity extra ->
+     awwad/adhan.pendingTap -> home_shell (counts notification_opened).
+  b. EXACT-ALARM GRANT PUSH: new row in the permissions primer + a once-per-open
+     MaterialBanner on Home for users PAST the primer with adhan/prayer habits and no grant
+     (the owner's exact case). Play-safe: SCHEDULE_EXACT_ALARM needs no Play declaration
+     (USE_EXACT_ALARM is the restricted one; never swap).
+  c. ADHAN IN MAIN SETTINGS (core feature, owner order): _AdhanSettingsTile master switch in
+     settings_screen (religious section, mobile only); no location -> walks into
+     PrayerSettingsScreen first. The prayer-screen toggle stays.
+  d. ONBOARDING LOCATION STEP (last step, skippable): country -> nearest city (searchable
+     sheets from cities.json) + GPS auto-attempt on step entry (permission dialog in
+     context); saves PrayerConfig with adhanSound default ON (mobile); guest-flow test
+     updated 3->4 steps.
+  e. ICON PICKER (24 icons) REMOVED everywhere (web + phones), accent-color precedent:
+     model field + sync stay for backward compat, nothing renders or sets iconName.
+  STATUS: analyze clean, 190/190 tests. Play Console note for the store submission:
+  FGS mediaPlayback now requires the console declaration (description + demo video).
+  NOT YET: emulator hardware verification of the chain (next), deploy, Android artifacts.
+- **2026-08-01 ADVERSARIAL REVIEW ROUND (4 dimensions, refute-verify): 22 raw findings,
+  12 confirmed (3 major), 3 refuted, the limit-killed verifications adjudicated by hand
+  (round-20 precedent). ALL 12 FIXED:**
+  MAJOR: (1) the adhan now follows Settings + location ALONE, never the habit list
+  (applyPrayerSchedule: adhanWanted = cfg.adhanSound; adhan-only users get mains via the
+  native chain on Android / FLN adhan on iOS; pre-alerts and silent mains stay habit-gated)
+  - before this, the Settings switch promised an adhan that never fired without a prayer
+  habit; (2) settings _applySchedule now ALSO runs applyPrayerSchedule, so turning
+  notifications/religious content off actually disarms the native chain (it kept sounding),
+  and snooze-length + language changes resync the native table; (3) _AdhanSettingsTile no
+  longer caches PrayerConfig (stale copy could wipe prayer-screen edits on toggle) - reads
+  fresh from the store every build/toggle.
+  MINOR: AdhanService re-entrancy (teardownPlayback + finished reset at onStartCommand top:
+  a backward clock set could re-fire into a live instance and orphan the first player,
+  unstoppable); onStartCommand catch keeps the notification (fail-open: sound failure must
+  not erase the prayer notification; the receiver fallback cannot cover it); native channel
+  names localized via new table keys chName/chDesc (were hardcoded "Adhan" in English;
+  ensureSilentChannel re-creates each fire so a language switch relabels), v2 safety-net
+  name too; syncNativeAdhan returns bool and the scheduler falls back to FLN adhan mains
+  when the native sync fails (silent-prayer hole closed); DST-safe day iteration in
+  buildAdhanTableJson (date-component arithmetic, Egypt has DST); primer exact-alarm row
+  gated to Android (was a dead button on iOS); onboarding + prayer-settings pickers search
+  case-insensitively; PrayerAutoReminderNote "next step" wording only inside onboarding
+  (new inOnboarding flag); catalog en description aligned with seed+live DB ("five daily
+  prayers"); notifications_mobile id/channel header updated (6100 + fg/snooze channels);
+  stray personal PDF in repo root added to .gitignore (never commit it).
+  REFUTED (no change): mediaPlayback FGS policy risk (declaration guide already written),
+  header staleness as a defect (updated anyway), seed en drift user impact (aligned anyway).
+  NEW GUARDS: test/arb_parity_test.dart (arb key parity + no-device-locale-in-code scan).
+  analyze clean, 199/199 tests.
+- **2026-07-31 LANGUAGE AUDIT (owner report: switching ar -> en left parts Arabic).**
+  Audited all three layers. CLEAN: the 3 .arb files are key-identical (118 each), and
+  every inline locale-keyed map is complete and key-identical (verified with a real
+  lexer-based scan, scratchpad scan2.js; a first regex scan produced 11 false alarms).
+  THREE REAL DEFECTS FOUND AND FIXED:
+  (1) HABIT TITLES stored in the creation language never followed the app language (the
+      main visible mixing). New core/catalog/habit_display.dart: habitDisplayTitle renders
+      the catalog title in the CURRENT language whenever the stored title is a catalog
+      default in any of the 3 languages (or a legacy default, e.g. the old pray_on_time
+      name); a user-typed name is never touched. Applied at ALL render sites: daily log
+      header, habit switcher chip + remove dialog, habits list + reminders dialog + delete
+      dialog, SOS picker, monthly report, reminder notification titles (notif_scheduler),
+      snoozed-reminder titles (notification_actions), home-screen widget name. Storage,
+      sync and the edit sheet still read/write h.title untouched. 4 tests incl. a full
+      9-direction round-trip over EVERY catalog habit.
+  (2) permissions_primer read the DEVICE locale (platformDispatcher) instead of the app
+      locale: wrong-language primer for anyone whose app language differs from the phone.
+  (3) Switching language did NOT reschedule: queued reminders/dhikr/prayer window/native
+      adhan table stayed in the old language until the next open. The Settings language
+      chip now rebuilds applyNotificationSchedule + applyPrayerSchedule immediately.
+  Also re-checked the 07-17 "FR accents stripped" note: habit_content.dart French is
+  accented now (matches were false positives inside larger words); nothing to fix.
+  analyze clean, 197/197 tests.
+- **2026-07-31 mid-session owner orders (both handled):**
+  (1) «أين زر تسجيل الدخول؟» - RESOLVED AS NOT A CODE BUG: auth_choice_screen shows the
+  create/sign-in buttons only when SupabaseService.configured (build carries the
+  dart-define keys). The screenshot that triggered the question came from a keyless DEBUG
+  test build; VERIFIED the Desktop Awwad-1.0.0-final.apk (libapp.so contains the Supabase
+  URL, 6 hits) and the live web app main.dart.js (1 hit) both carry keys, so production
+  builds show all three buttons. RULE REAFFIRMED: every build, including debug test
+  builds, must pass the dart-defines (gotcha #8).
+  (2) pray_on_time: renamed «الصلاة على وقتها» in catalog + seed.sql + LIVE DB (verified
+  RETURNING row; also fixed an em-dash hiding in the seed's description - catalog/seed
+  drift). Read-side title migration in LocalStore.loadHabits (only the exact old default
+  migrates; custom names sacred). Its reminders are now AUTOMATIC: habitRemindersFor
+  skips it (the prayer-window mains at the five exact per-location times ARE its
+  reminders), and the manual hour picker is replaced by PrayerAutoReminderNote (shows
+  today's five computed times once located) in onboarding setup + add-habit +
+  habits_screen edit-reminders. 3 new tests (193/193 total), analyze clean.
   owner's real phone** (app under test, prayer habit). Reported by the owner; no diagnosis
   done yet. THREE lead theories, check in this order:
   (1) CALCULATION METHOD: engine picks method by country (core/prayer/prayer_engine.dart).

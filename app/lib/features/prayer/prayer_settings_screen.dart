@@ -105,9 +105,12 @@ class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen>
         }
         return;
       }
+      // medium (balanced), not low: with only the COARSE permission the fix is
+      // km-coarsened anyway, but low restricts to the network provider, which
+      // fails on devices without network location (and on the emulator).
       final pos = await Geolocator.getCurrentPosition(
         locationSettings:
-            const LocationSettings(accuracy: LocationAccuracy.low),
+            const LocationSettings(accuracy: LocationAccuracy.medium),
       ).timeout(const Duration(seconds: 20));
       final cities = await loadCities();
       final near = nearestCity(cities, pos.latitude, pos.longitude);
@@ -175,9 +178,11 @@ class _PrayerSettingsScreenState extends ConsumerState<PrayerSettingsScreen>
       backgroundColor: AppColors.surface,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheet) {
+          // Case-insensitive: 'egypt' must find 'Egypt' (Arabic is unaffected).
+          final q = query.toLowerCase();
           final filtered = [
             for (final i in items)
-              if (query.isEmpty || i.contains(query)) i
+              if (q.isEmpty || i.toLowerCase().contains(q)) i
           ];
           return SafeArea(
             child: Padding(
@@ -550,7 +555,7 @@ const Map<String, Map<String, String>> _kStr = {
   },
   'note': {
     'ar':
-        'التذكيرات تصل لأصحاب عادة «المحافظة على الصلاة في وقتها» أو «الاستيقاظ للفجر»، وأذكار الصباح والمساء لأصحاب عادة الأذكار: بعد الفجر بنصف ساعة وبعد العصر بنصف ساعة. الحساب فلكي على جهازك ولا يحتاج إنترنت.',
+        'التذكيرات تصل لأصحاب عادة «الصلاة على وقتها» أو «الاستيقاظ للفجر»، وأذكار الصباح والمساء لأصحاب عادة الأذكار: بعد الفجر بنصف ساعة وبعد العصر بنصف ساعة. الحساب فلكي على جهازك ولا يحتاج إنترنت.',
     'en':
         'Prayer reminders arrive for the pray-on-time or wake-for-Fajr habits; morning and evening adhkar arrive 30 minutes after Fajr and Asr for the adhkar habit. Everything is computed on-device, offline.',
     'fr':

@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart'
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../catalog/habit_display.dart';
 import '../data/local_store.dart';
 import '../state/app_state.dart';
 
@@ -95,7 +96,8 @@ class HomeWidgetSync {
       final logged = habit != null &&
           s.entries.any(
               (e) => e.habitId == habit.id && e.date == today && !e.isSkip);
-      await HomeWidget.saveWidgetData<String>('aw_name', habit?.title ?? 'عوّاد');
+      await HomeWidget.saveWidgetData<String>('aw_name',
+          habit == null ? 'عوّاد' : habitDisplayTitle(habit, locale));
       await HomeWidget.saveWidgetData<String>(
           'aw_streak',
           habit == null

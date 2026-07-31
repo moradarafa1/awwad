@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
-import '../../core/catalog/habit_icons.dart';
 
-/// The three PRO-customization controls (icon, accent color, weekday
-/// schedule), shared VERBATIM between the add-habit flow and the edit sheet
-/// so the two can never drift apart. Owner brief 2026-07-20: everything about
-/// a habit should be customizable, professionally.
+/// The weekday-schedule control, shared VERBATIM between the add-habit flow
+/// and the edit sheet so the two can never drift apart.
+///
+/// HISTORY: this file once also held the accent-color picker (removed on
+/// owner order 2026-07-20 round 8) and the 24-icon picker (removed on owner
+/// order 2026-07-31, web + phones alike). Habit.iconName/accentColor stay on
+/// the model so stored values keep parsing; nothing renders or sets them.
 ///
 /// All controls are stateless and callback-driven; the parent owns the values.
 
@@ -15,7 +17,6 @@ String _loc(BuildContext c) => Localizations.localeOf(c).languageCode;
 String tr(BuildContext c, Map<String, String> m) =>
     m[_loc(c)] ?? m['ar'] ?? '';
 
-const kLblIcon = {'ar': 'الأيقونة', 'en': 'Icon', 'fr': 'Icône'};
 const kLblDays = {
   'ar': 'أيام العادة في الأسبوع',
   'en': 'Days of the week',
@@ -37,45 +38,6 @@ const Map<String, List<String>> _dayInitials = {
 
 List<int> weekdayDisplayOrder(String locale) =>
     locale == 'ar' ? const [6, 7, 1, 2, 3, 4, 5] : const [1, 2, 3, 4, 5, 6, 7];
-
-class IconGridPicker extends StatelessWidget {
-  final String? selected;
-  final ValueChanged<String?> onChanged;
-  const IconGridPicker(
-      {super.key, required this.selected, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    final keys = kCustomHabitIcons.keys.toList();
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final k in keys)
-          InkWell(
-            onTap: () => onChanged(k == selected ? null : k),
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: k == selected
-                    ? AppColors.accent.withValues(alpha: 0.18)
-                    : AppColors.surface2,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                    color:
-                        k == selected ? AppColors.accent : AppColors.border),
-              ),
-              child: Icon(kCustomHabitIcons[k],
-                  size: 22,
-                  color: k == selected ? AppColors.accent : AppColors.text),
-            ),
-          ),
-      ],
-    );
-  }
-}
 
 class WeekdayChips extends StatelessWidget {
   /// ISO weekdays currently selected. Empty or full set = daily.

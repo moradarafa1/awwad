@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_display.dart';
 import '../../core/catalog/habit_icons.dart';
 import '../../core/cloud/supabase_service.dart';
 import '../../core/cloud/sync_service.dart';
@@ -14,6 +15,7 @@ import '../../core/notifications/notif_scheduler.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import '../../core/widgets/reminder_times_picker.dart';
+import '../prayer/prayer_auto_note.dart';
 import 'add_habit_screen.dart';
 import 'habit_customizer.dart';
 
@@ -140,7 +142,6 @@ class HabitsScreen extends ConsumerWidget {
           children: [
             HabitIcon(
                 habitKey: h.catalogKey,
-                iconName: h.iconName,
                 emoji: emoji,
                 size: 22,
                 color: null),
@@ -149,7 +150,7 @@ class HabitsScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(h.title,
+                  Text(habitDisplayTitle(h, loc),
                       style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: AppColors.heading)),
@@ -204,16 +205,16 @@ class HabitsScreen extends ConsumerWidget {
     );
   }
 
-  /// Full edit sheet: name, why, icon (custom habits), accent color and the
-  /// weekday schedule. One sheet for everything, so customization is not
-  /// scattered (owner brief 2026-07-20). Saves through updateHabit; the
-  /// reminder schedule rebuilds on the next app open via the single pass in
-  /// home_shell.
+  /// Full edit sheet: name, why and the weekday schedule. One sheet for
+  /// everything, so customization is not scattered (owner brief 2026-07-20).
+  /// The icon and accent-color pickers were REMOVED on owner order (icons
+  /// 2026-07-31, colors 2026-07-20 round 8); stored values still parse.
+  /// Saves through updateHabit; the reminder schedule rebuilds on the next
+  /// app open via the single pass in home_shell.
   Future<void> _editHabit(
       BuildContext context, WidgetRef ref, String loc, Habit h) async {
     final nameCtrl = TextEditingController(text: h.title);
     final whyCtrl = TextEditingController(text: h.reason ?? '');
-    String? icon = h.iconName;
     Set<int> days = (h.scheduleDays == null || h.scheduleDays!.length >= 7)
         ? {1, 2, 3, 4, 5, 6, 7}
         : h.scheduleDays!.toSet();
@@ -250,17 +251,6 @@ class HabitsScreen extends ConsumerWidget {
                     decoration: InputDecoration(
                         labelText: _s(_kStr['editWhy']!, loc)),
                   ),
-                  if (h.isCustom) ...[
-                    const SizedBox(height: 14),
-                    Text(tr(ctx, kLblIcon),
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.muted)),
-                    const SizedBox(height: 8),
-                    IconGridPicker(
-                        selected: icon,
-                        onChanged: (v) => setSheet(() => icon = v)),
-                  ],
                   const SizedBox(height: 14),
                   Text(tr(ctx, kLblDays),
                       style: TextStyle(
@@ -302,7 +292,6 @@ class HabitsScreen extends ConsumerWidget {
     await ref.read(appControllerProvider.notifier).updateHabit(h.copyWith(
           title: title.isEmpty ? h.title : title,
           reason: whyCtrl.text.trim().isEmpty ? h.reason : whyCtrl.text.trim(),
-          iconName: icon,
           scheduleDays: days.length >= 7
               ? const [1, 2, 3, 4, 5, 6, 7]
               : (days.toList()..sort()),
@@ -311,13 +300,32 @@ class HabitsScreen extends ConsumerWidget {
 
   Future<void> _editReminders(
       BuildContext context, WidgetRef ref, String loc, Habit h) async {
+    // pray_on_time (owner order 2026-07-31): reminders are the five exact
+    // prayer times per location; there is no manual hour to edit, so show
+    // the explanatory note instead of an editor that would mean nothing.
+    if (h.catalogKey == 'pray_on_time') {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          content: const PrayerAutoReminderNote(),
+          actions: [
+            FilledButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(_s(_kStr['gotIt']!, loc))),
+          ],
+        ),
+      );
+      return;
+    }
     var hours = [...h.times];
     final saved = await showDialog<List<int>>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) => AlertDialog(
           backgroundColor: AppColors.surface,
-          title: Text('${_s(_kStr['reminders']!, loc)} - ${h.title}',
+          title: Text(
+              '${_s(_kStr['reminders']!, loc)} - ${habitDisplayTitle(h, loc)}',
               style: TextStyle(color: AppColors.heading, fontSize: 16)),
           content: ReminderTimesPicker(
             hours: hours,
@@ -360,7 +368,8 @@ class HabitsScreen extends ConsumerWidget {
         backgroundColor: AppColors.surface,
         title: Text(_s(_kStr['delTitle']!, loc),
             style: TextStyle(color: AppColors.heading)),
-        content: Text('${_s(_kStr['delBody']!, loc)}\n\n"${h.title}"',
+        content: Text(
+            '${_s(_kStr['delBody']!, loc)}\n\n"${habitDisplayTitle(h, loc)}"',
             style: TextStyle(color: AppColors.text)),
         actions: [
           TextButton(
@@ -411,6 +420,7 @@ const Map<String, Map<String, String>> _kStr = {
     'fr': 'Cet objectif et tous ses journaux et badges seront supprimés. Irréversible.'
   },
   'cancel': {'ar': 'إلغاء', 'en': 'Cancel', 'fr': 'Annuler'},
+  'gotIt': {'ar': 'حسناً', 'en': 'Got it', 'fr': 'Compris'},
   'delete': {'ar': 'حذف', 'en': 'Delete', 'fr': 'Supprimer'},
   'save': {'ar': 'حفظ', 'en': 'Save', 'fr': 'Enregistrer'},
   'reminders': {'ar': 'أوقات تذكيرك بتسجيل التقدم', 'en': 'Progress reminder times', 'fr': 'Heures de rappel de progrès'},

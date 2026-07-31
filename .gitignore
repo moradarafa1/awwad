@@ -56,3 +56,7 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 *.log
+
+# Stray personal file dropped in the repo root; never commit it.
+"فاتورة 1 مارتك بتوين (1).pdf"
+فاتورة*.pdf

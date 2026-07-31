@@ -10,6 +10,7 @@ import '../../core/analytics/analytics.dart';
 import '../../core/catalog/badge_catalog.dart';
 import '../../core/catalog/default_fields.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_display.dart';
 import '../../core/widgets/tasbih_counter.dart';
 import '../../core/catalog/habit_content.dart';
 import '../../core/catalog/habit_daily_content.dart';
@@ -760,7 +761,10 @@ class _DailyLogScreenState extends ConsumerState<DailyLogScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // header
-          Text(habit?.title ?? l10n.appName,
+          Text(habit == null
+              ? l10n.appName
+              : habitDisplayTitle(habit,
+                  Localizations.localeOf(context).languageCode),
               style: headingStyle(22, weight: FontWeight.w800)),
           const SizedBox(height: 2),
           Text(l10n.slogan,

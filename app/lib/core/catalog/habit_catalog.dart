@@ -295,8 +295,8 @@ const List<CatalogHabit> kHabitCatalog = [
 
   // ---------- BUILD ----------
   CatalogHabit(key: 'pray_on_time', track: 'build', category: 'worship', icon: '🕌', isIslamic: true, islamwebRef: 'https://www.islamweb.net/ar/fatwa/13619/', metrics: kPrayerMetrics,
-    title: {'ar': 'المحافظة على الصلاة في وقتها', 'en': 'Pray on time', 'fr': 'Prier à l\'heure'},
-    description: {'ar': 'عماد الدين حافظ على صلواتك الخمس', 'en': 'Keep the five prayers on time.', 'fr': 'Les cinq prières à l\'heure.'}),
+    title: {'ar': 'الصلاة على وقتها', 'en': 'Pray on time', 'fr': 'Prier à l\'heure'},
+    description: {'ar': 'عماد الدين حافظ على صلواتك الخمس', 'en': 'Keep the five daily prayers on time.', 'fr': 'Les cinq prières à l\'heure.'}),
   CatalogHabit(key: 'daily_quran', track: 'build', category: 'worship', icon: '📖', isIslamic: true,
     title: {'ar': 'وِرد القرآن اليومي', 'en': 'Daily Qur\'an', 'fr': 'Coran quotidien'},
     description: {'ar': 'اجعل لك وِرداً ثابتاً من كتاب الله', 'en': 'A steady daily portion.', 'fr': 'Une portion quotidienne.'}),

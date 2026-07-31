@@ -46,7 +46,22 @@ class LocalStore {
     final raw = _prefs.getString(_kHabits);
     if (raw == null) return const [];
     final list = jsonDecode(raw) as List<dynamic>;
-    return list.map((e) => Habit.fromJson(e as Map<String, dynamic>)).toList();
+    return list
+        .map((e) => _migrateTitle(Habit.fromJson(e as Map<String, dynamic>)))
+        .toList();
+  }
+
+  /// Read-side title normalization. The catalog renamed pray_on_time to
+  /// «الصلاة على وقتها» (owner order 2026-07-31); a habit stored under the OLD
+  /// default title is shown under the new one. Only the exact old default is
+  /// touched, so a user-edited custom name is never overwritten. Persisted
+  /// naturally on the next save.
+  static Habit _migrateTitle(Habit h) {
+    if (h.catalogKey == 'pray_on_time' &&
+        h.title == 'المحافظة على الصلاة في وقتها') {
+      return h.copyWith(title: 'الصلاة على وقتها');
+    }
+    return h;
   }
 
   Future<void> saveHabits(List<Habit> habits) => _prefs.setString(

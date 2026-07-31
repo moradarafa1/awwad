@@ -33,6 +33,14 @@
          LocationAccuracy.low. Requesting FINE would be an unjustifiable
          precise-location declaration at store review. Do not add it back. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- Native adhan playback (AdhanService): the app plays the adhan itself
+         in a mediaPlayback foreground service started by an exact alarm, so
+         a hardware button press can stop the sound (a system-played channel
+         sound cannot be stopped programmatically). WAKE_LOCK keeps playback
+         alive with the screen off (MediaPlayer.setWakeMode). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:label="عوّاد"
@@ -84,6 +92,29 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- Native adhan chain: exact alarm -> AdhanAlarmReceiver ->
+             AdhanService plays the owner's adhan mp3 on the ALARM stream and
+             stops on any hardware button. The boot receiver only RE-ARMS the
+             alarm after reboot/update (starting an FGS from BOOT_COMPLETED is
+             restricted on Android 15; scheduling an alarm is not). -->
+        <service android:name=".AdhanService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"/>
+        <receiver android:name=".AdhanAlarmReceiver"
+            android:exported="false"/>
+        <receiver android:name=".AdhanBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>

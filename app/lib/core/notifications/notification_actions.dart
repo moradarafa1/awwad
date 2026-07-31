@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../catalog/habit_display.dart';
 import '../data/local_store.dart';
 import '../state/app_state.dart' show buildQuickEntry, dayKey;
 
@@ -165,7 +166,10 @@ Future<NotificationActionResult> resolveNotificationAction({
         if (habit == null) return NotificationActionResult.none;
         return NotificationActionResult(
           snoozedId: id,
-          snoozeTitle: habit.title,
+          // Follows the app language like every other habit-title render
+          // (language audit 2026-07-31). Catalog import = const data only,
+          // an acceptable cost in the background isolate.
+          snoozeTitle: habitDisplayTitle(habit, loc),
           snoozeBody: _t(_kSnoozedHabitBody, loc),
           snoozeAt: when,
         );

@@ -177,6 +177,31 @@
 فقط، ويجب التأكد بعد كل بناء:
 `aapt dump permissions app-release.apk | grep SCHEDULE_EXACT_ALARM`.
 
+### 5.3.1 إقرار الخدمة الأمامية Foreground Service (جديد 2026-07-31)
+
+منذ هذا التاريخ يشغّل التطبيق الأذان بنفسه عبر خدمة أمامية من نوع
+`mediaPlayback` (هي ما يجعل أزرار الهاتف توقف الصوت فوراً). متجر Play يطلب
+إقراراً لكل نوع خدمة أمامية في:
+**Play Console → Policy → App content → Foreground service permissions**
+
+أجوبة النموذج الجاهزة:
+
+- **النوع المعلَن:** Media Playback.
+- **حالة الاستخدام (اختر من القائمة):** «Media Playback: Continue audio or
+  video playback from the background».
+- **الوصف المقترح (انسخه):**
+  «At the prayer times the user configured, the app plays the ~3-minute
+  Islamic call to prayer (adhan) audio clip. Playback starts from an exact
+  alarm while the app may be closed, shows a notification, and stops
+  immediately when the user presses any hardware button or the in-notification
+  stop action. The service runs only for the duration of the clip.»
+- **فيديو توضيحي:** يطلب النموذج رابط فيديو قصير يُظهر الميزة. سجّل شاشة
+  الهاتف: فعّل الأذان، انتظر دخول الوقت (أو قرّب الساعة)، أظهر الإشعار
+  والصوت ثم أوقفه بزر الصوت. ارفعه على YouTube غير مدرج والصق الرابط.
+- **تأكيد بعد كل بناء:**
+  `aapt dump permissions app-release.apk | grep FOREGROUND_SERVICE`
+  يجب أن يُظهر `FOREGROUND_SERVICE` و`FOREGROUND_SERVICE_MEDIA_PLAYBACK`.
+
 ### 5.4 الفئة العمرية وتصنيف المحتوى
 
 - **الجمهور المستهدف: 13+ (ويفضّل 16+/17+).** لا تختر أي فئة أطفال إطلاقاً؛

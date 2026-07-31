@@ -9,6 +9,7 @@ import '../../core/catalog/habit_icons.dart';
 import '../../core/models.dart';
 import '../../core/state/app_state.dart';
 import '../../core/prayer/prayer_engine.dart';
+import '../prayer/prayer_auto_note.dart';
 import '../prayer/prayer_settings_screen.dart';
 import '../shield/dns_shield_screen.dart';
 import 'habit_customizer.dart';
@@ -36,7 +37,6 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
   final _costCtrl = TextEditingController();
   List<int> _reminderHours = [20];
   String _query = '';
-  String? _iconName;
   Set<int> _days = {1, 2, 3, 4, 5, 6, 7};
   bool _advisoryShown = false;
 
@@ -109,7 +109,9 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
           ? double.tryParse(_costCtrl.text.trim())
           : null,
       createdAt: DateTime.now(),
-      iconName: _custom ? _iconName : null,
+      // iconName is no longer set anywhere: the 24-icon picker was removed on
+      // owner order 2026-07-31 (same precedent as the accent-color removal).
+      // The field stays on the model so old stored values keep parsing.
       // Full week means daily, stored as null so the habit stays a plain
       // daily habit with zero schedule machinery attached.
       scheduleDays: _days.length >= 7 ? null : (_days.toList()..sort()),
@@ -258,15 +260,6 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                         hintText: _s(_kStr['metricSHint']!),
                         counterText: ''),
                   ),
-                  const SizedBox(height: 14),
-                  Text(tr(context, kLblIcon),
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.muted)),
-                  const SizedBox(height: 8),
-                  IconGridPicker(
-                      selected: _iconName,
-                      onChanged: (v) => setState(() => _iconName = v)),
                 ],
                 const SizedBox(height: 14),
                 Text(tr(context, kLblDays),
@@ -301,14 +294,21 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                   ),
                 ],
                 const SizedBox(height: 14),
-                Text(_s(_kStr['reminder']!),
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700, color: AppColors.muted)),
-                const SizedBox(height: 8),
-                ReminderTimesPicker(
-                  hours: _reminderHours,
-                  onChanged: (v) => setState(() => _reminderHours = v),
-                ),
+                // pray_on_time (owner order 2026-07-31): reminders are the
+                // five prayer times per location, never a manual hour.
+                if (!_custom && _picked?.key == 'pray_on_time')
+                  const PrayerAutoReminderNote()
+                else ...[
+                  Text(_s(_kStr['reminder']!),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.muted)),
+                  const SizedBox(height: 8),
+                  ReminderTimesPicker(
+                    hours: _reminderHours,
+                    onChanged: (v) => setState(() => _reminderHours = v),
+                  ),
+                ],
               ],
               const SizedBox(height: 24),
               FilledButton.icon(

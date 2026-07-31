@@ -113,8 +113,8 @@ insert into public.habit_catalog (key, track, category, title, description, icon
 -- BUILD track
 insert into public.habit_catalog (key, track, category, title, description, icon, default_template_key, is_islamic, islamweb_ref, popularity, sort_order) values
 ('pray_on_time','build','worship',
-  '{"ar":"المحافظة على الصلاة في وقتها","en":"Pray on time","fr":"Prier à l''heure"}',
-  '{"ar":"عماد الدين — حافظ على صلواتك الخمس","en":"Keep the five daily prayers on time.","fr":"Les cinq prières à l''heure."}',
+  '{"ar":"الصلاة على وقتها","en":"Pray on time","fr":"Prier à l''heure"}',
+  '{"ar":"عماد الدين حافظ على صلواتك الخمس","en":"Keep the five daily prayers on time.","fr":"Les cinq prières à l''heure."}',
   '🕌','generic',true,'https://www.islamweb.net/ar/fatwa/13619/', 100, 20),
 ('daily_quran','build','worship',
   '{"ar":"وِرد القرآن اليومي","en":"Daily Qur''an","fr":"Coran quotidien"}',

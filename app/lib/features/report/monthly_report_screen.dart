@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/catalog/habit_catalog.dart';
+import '../../core/catalog/habit_display.dart';
 import '../../core/catalog/habit_icons.dart';
 import '../../core/report/monthly_report.dart';
 import '../../core/state/app_state.dart';
@@ -67,7 +68,9 @@ class MonthlyReportScreen extends ConsumerWidget {
               HabitIcon(habitKey: r.habit.catalogKey, emoji: emoji, size: 22),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(r.habit.title,
+                child: Text(
+                    habitDisplayTitle(r.habit,
+                        Localizations.localeOf(context).languageCode),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -43,9 +44,27 @@ class _PermissionsPrimerState extends State<PermissionsPrimer> {
   bool _notif = false;
   bool _loc = false;
   bool _batteryOpened = false;
+  bool _exact = false;
+  // Only rendered when Android actually lacks the grant (always granted
+  // below Android 12, and on 12-13 by default; denied by default on 14+).
+  bool _exactNeeded = false;
 
-  String get _l =>
-      WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+  @override
+  void initState() {
+    super.initState();
+    Future(() async {
+      // ANDROID ONLY: iOS has no exact-alarm grant, and canUseExactAlarms
+      // returns false there, which would render a permanently dead row.
+      if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+      final ok = await canUseExactAlarms();
+      if (mounted) setState(() => _exactNeeded = !ok);
+    });
+  }
+
+  // The APP language, never the device language (language audit 2026-07-31):
+  // reading platformDispatcher.locale here made the primer ignore the in-app
+  // language switch, one of the "half Arabic, half English" mixing sources.
+  String get _l => Localizations.localeOf(context).languageCode;
 
   String _s(String key) => const {
         'title': {
@@ -83,6 +102,19 @@ class _PermissionsPrimerState extends State<PermissionsPrimer> {
               'Computes prayer times on your device. Used once, never leaves your phone; you can pick a city manually instead.',
           'fr':
               'Calcule les horaires de prière sur votre appareil. Jamais transmis; ville choisissable manuellement.'
+        },
+        'exact': {
+          'ar': 'المنبهات والتذكيرات',
+          'en': 'Alarms and reminders',
+          'fr': 'Alarmes et rappels'
+        },
+        'exactWhy': {
+          'ar':
+              'يجعل الأذان وتنبيهات الصلاة تصل في دقيقتها تماماً. بدونه قد يؤخرها النظام حتى نصف ساعة.',
+          'en':
+              'Delivers the adhan and prayer alerts at the exact minute. Without it the system may delay them by up to half an hour.',
+          'fr':
+              "Livre l'adhan et les alertes de prière à la minute exacte. Sans lui, le système peut les retarder d'une demi-heure."
         },
         'battery': {
           'ar': 'استثناء توفير البطارية',
@@ -127,6 +159,12 @@ class _PermissionsPrimerState extends State<PermissionsPrimer> {
   Future<void> _openBattery() async {
     await openBatterySettings();
     if (mounted) setState(() => _batteryOpened = true);
+  }
+
+  Future<void> _askExact() async {
+    await requestExactAlarmsPermission();
+    final ok = await canUseExactAlarms();
+    if (mounted) setState(() => _exact = ok);
   }
 
   Widget _row(String title, String why, bool granted, String action,
@@ -187,6 +225,9 @@ class _PermissionsPrimerState extends State<PermissionsPrimer> {
                     fontSize: 12.5, height: 1.6, color: AppColors.muted)),
             const SizedBox(height: 18),
             _row(_s('notif'), _s('notifWhy'), _notif, _s('grant'), _askNotif),
+            if (!kIsWeb && _exactNeeded)
+              _row(_s('exact'), _s('exactWhy'), _exact, _s('grant'),
+                  _askExact),
             _row(_s('loc'), _s('locWhy'), _loc, _s('grant'), _askLocation),
             if (!kIsWeb)
               _row(_s('battery'), _s('batteryWhy'), _batteryOpened, _s('open'),

@@ -5,6 +5,7 @@
 import 'package:flutter/foundation.dart'
     show TargetPlatform, defaultTargetPlatform, kIsWeb;
 
+import '../catalog/habit_display.dart';
 import '../content/dhikr.dart';
 import '../models.dart';
 import 'notifications.dart';
@@ -27,6 +28,11 @@ List<HabitReminderSpec> habitRemindersFor(List<Habit> habits, String loc) {
   final body = _kReminderBody[loc] ?? _kReminderBody['ar']!;
   final out = <HabitReminderSpec>[];
   for (final h in habits) {
+    // pray_on_time (owner order 2026-07-31): its reminders ARE the five
+    // exact prayer-time notifications from the prayer window, per the user's
+    // location. A generic fixed-hour nudge on top would double-notify every
+    // day and carry no information, so this habit gets no slot here.
+    if (h.catalogKey == 'pray_on_time') continue;
     // A weekday-scheduled habit gets one WEEKLY notification per chosen day
     // per time, so no reminder ever fires on an off-day (owner rule
     // 2026-07-20). Daily habits keep the single repeat-daily slot per time,
@@ -38,7 +44,9 @@ List<HabitReminderSpec> habitRemindersFor(List<Habit> habits, String loc) {
         : (sched.toSet().toList()..sort());
     for (final hour in h.times) {
       for (final day in days) {
-        out.add(HabitReminderSpec(hour, h.title, body, h.id, weekday: day));
+        out.add(HabitReminderSpec(
+            hour, habitDisplayTitle(h, loc), body, h.id,
+            weekday: day));
       }
     }
   }

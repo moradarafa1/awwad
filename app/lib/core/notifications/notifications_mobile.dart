@@ -14,14 +14,19 @@
 //   3000-3059  per-habit per-time reminders (60 slots; 30 on iOS, 64-cap)
 //   4000-4299  prayer window: mains, 5-min pre-alerts, adhkar (rebuilt daily)
 //   4300       weekly Surah Al-Kahf (Friday, outside the rebuilt window)
+//   6100       NATIVE adhan notification (AdhanService.NOTIFICATION_ID,
+//              posted by the native chain, never by this plugin; the Android
+//              adhan mains live there since 2026-07-31, see adhan_native.dart)
 //
 // Channels (an Android channel's sound/importance is FIXED at creation, so
 // changing behavior requires a NEW id, never an edit): awwad_daily,
 // awwad_dhikr, awwad_account, awwad_badges, awwad_adhan_v1, awwad_prayer_v1,
 // awwad_prayer_pre_v1, awwad_adhkar_v1, awwad_kahf_v1, awwad_pomodoro_v1,
-// awwad_adhan_v2 (created natively in MainActivity with setBypassDnd),
-// awwad_report_v1, plus awwad_usage_guard created natively in
-// UsageLimitWorker.kt.
+// awwad_adhan_v2 (created natively in MainActivity with setBypassDnd; also
+// the channel-sound FALLBACK when the native chain cannot start its service),
+// awwad_adhan_fg_v1 (native AdhanService, silent: the service plays the
+// sound itself), awwad_snooze_v1, awwad_report_v1, plus awwad_usage_guard
+// created natively in UsageLimitWorker.kt.
 
 import 'dart:ui' show Color;
 

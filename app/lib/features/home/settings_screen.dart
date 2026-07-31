@@ -16,6 +16,8 @@ import '../../core/content/dhikr.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/notifications/notif_scheduler.dart';
 import '../../core/platform/reliability.dart';
+import '../../core/prayer/prayer_engine.dart';
+import '../../core/prayer/prayer_scheduler.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widgets/common.dart';
 import '../auth/auth_screen.dart';
@@ -228,9 +230,9 @@ class SettingsScreen extends ConsumerWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _lang('العربية', 'ar', s.settings.locale, ctrl),
-                    _lang('English', 'en', s.settings.locale, ctrl),
-                    _lang('Français', 'fr', s.settings.locale, ctrl),
+                    _lang('العربية', 'ar', s.settings.locale, ctrl, ref),
+                    _lang('English', 'en', s.settings.locale, ctrl, ref),
+                    _lang('Français', 'fr', s.settings.locale, ctrl, ref),
                   ],
                 ),
               ],
@@ -472,6 +474,11 @@ class SettingsScreen extends ConsumerWidget {
             child: Column(
               children: [
                 if (s.settings.showReligiousContent) ...[
+                  // The adhan is a CORE feature (owner order 2026-07-31):
+                  // its master switch lives HERE in the main settings, and
+                  // the same toggle stays available inside the prayer screen
+                  // under the pray-on-time habit. Both write PrayerConfig.
+                  if (!kIsWeb) const _AdhanSettingsTile(),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.mosque_outlined,
@@ -751,17 +758,35 @@ class SettingsScreen extends ConsumerWidget {
       locale: loc,
       snoozeMinutes: st.snoozeMinutes,
     );
+    // The prayer window + the NATIVE adhan chain follow the same toggles
+    // (adversarial review 2026-08-01: without this, turning notifications or
+    // religious content off left the native adhan armed and sounding, and a
+    // snooze-length change kept the old label inside the native table).
+    await applyPrayerSchedule(
+      store: ref.read(localStoreProvider),
+      habits: state.habits,
+      notificationsEnabled: st.notificationsEnabled,
+      showReligious: st.showReligiousContent,
+      locale: loc,
+    );
   }
 
-  Widget _lang(
-      String label, String code, String? current, AppController ctrl) {
+  Widget _lang(String label, String code, String? current, AppController ctrl,
+      WidgetRef ref) {
     final sel = current == code;
     // Intrinsic width (no Expanded): the chip sizes to its own label inside
     // the Wrap above.
     return ChoiceChipTile(
       label: label,
       selected: sel,
-      onTap: () => ctrl.setLocale(code),
+      onTap: () async {
+        await ctrl.setLocale(code);
+        // Language audit 2026-07-31: everything ALREADY SCHEDULED (habit
+        // reminders, dhikr, prayer window, the native adhan table) was baked
+        // in the previous language and would keep arriving in it until the
+        // next app open. _applySchedule rebuilds it all, prayers included.
+        await _applySchedule(ref, code);
+      },
     );
   }
 
@@ -858,3 +883,101 @@ const Map<String, Map<String, String>> _kSyncErr = {
     'fr': 'Vos données (JSON) ont été copiées dans le presse-papiers ✅',
   },
 };
+
+/// The adhan master switch in the MAIN settings (core feature). Reads and
+/// writes PrayerConfig directly; with no location configured the switch
+/// walks the user to the prayer screen first, because an adhan with no
+/// coordinates has nothing to fire from.
+class _AdhanSettingsTile extends ConsumerStatefulWidget {
+  const _AdhanSettingsTile();
+  @override
+  ConsumerState<_AdhanSettingsTile> createState() =>
+      _AdhanSettingsTileState();
+}
+
+class _AdhanSettingsTileState extends ConsumerState<_AdhanSettingsTile> {
+  // NO cached PrayerConfig (adversarial review 2026-08-01): a cached copy
+  // went stale when the prayer screen edited the config, and toggling from
+  // the stale copy silently wiped those edits. Reads are synchronous prefs
+  // lookups, so the config is loaded fresh on every build and every toggle.
+  PrayerConfig get _cfg {
+    final raw = ref.read(localStoreProvider).loadPrayer();
+    return raw != null ? PrayerConfig.fromJson(raw) : const PrayerConfig();
+  }
+
+  static const _kAdhanStr = {
+    'title': {
+      'ar': 'الأذان عند كل صلاة',
+      'en': 'Adhan at every prayer',
+      'fr': 'Adhan à chaque prière'
+    },
+    'onSub': {
+      'ar': 'يصدح الأذان في وقت كل صلاة، حتى والتطبيق مغلق وبلا إنترنت.',
+      'en': 'The adhan sounds at each prayer time, even with the app closed and offline.',
+      'fr': "L'adhan retentit à chaque heure de prière, même app fermée et hors ligne."
+    },
+    'offSub': {
+      'ar': 'مغلق حالياً. فعّله ليصدح الأذان في وقت كل صلاة.',
+      'en': 'Currently off. Turn it on to hear the adhan at each prayer time.',
+      'fr': "Désactivé. Activez-le pour entendre l'adhan à chaque prière."
+    },
+    'needLoc': {
+      'ar': 'يحتاج تحديد موقعك أولاً لحساب المواقيت. اضغط للتحديد.',
+      'en': 'Needs your location first to compute the times. Tap to set it.',
+      'fr': "Votre position est requise pour calculer les horaires. Touchez pour la définir."
+    },
+  };
+
+  String _a(String k, String loc) =>
+      _kAdhanStr[k]?[loc] ?? _kAdhanStr[k]?['ar'] ?? '';
+
+  Future<void> _apply(PrayerConfig next) async {
+    await ref.read(localStoreProvider).savePrayer(next.toJson());
+    final s = ref.read(appControllerProvider);
+    if (!mounted) return;
+    await applyPrayerSchedule(
+      store: ref.read(localStoreProvider),
+      habits: s.habits,
+      notificationsEnabled: s.settings.notificationsEnabled,
+      showReligious: s.settings.showReligiousContent,
+      locale: Localizations.localeOf(context).languageCode,
+    );
+  }
+
+  Future<void> _toggle(bool v) async {
+    // Re-read INSIDE the tap (never a cached copy): the prayer screen may
+    // have edited offsets/city since this tile was built.
+    final cfg = _cfg;
+    if (!cfg.configured) {
+      // No coordinates yet: the prayer screen owns the GPS/city pickers.
+      await Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const PrayerSettingsScreen()));
+      if (mounted) setState(() {}); // re-render from the fresh store state
+      return;
+    }
+    await _apply(cfg.copyWith(adhanSound: v));
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = Localizations.localeOf(context).languageCode;
+    final cfg = _cfg; // fresh from the store on every rebuild
+    final sub = !cfg.configured
+        ? _a('needLoc', loc)
+        : (cfg.adhanSound ? _a('onSub', loc) : _a('offSub', loc));
+    return Column(children: [
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        value: cfg.configured && cfg.adhanSound,
+        activeThumbColor: AppColors.accent,
+        secondary: Icon(Icons.campaign_outlined, color: AppColors.accent2),
+        title: Text(_a('title', loc), style: const TextStyle(fontSize: 13)),
+        subtitle: Text(sub,
+            style: TextStyle(fontSize: 11, color: AppColors.muted)),
+        onChanged: _toggle,
+      ),
+      const Divider(),
+    ]);
+  }
+}

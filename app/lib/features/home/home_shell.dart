@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:awwad/l10n/app_localizations.dart';
 import '../quran/quran_player_screen.dart';
 import '../radio/radio_player_screen.dart';
+import '../../core/catalog/habit_display.dart';
 import '../../core/models.dart';
 import '../../app/theme.dart';
 import '../../core/analytics/analytics.dart';
@@ -18,6 +19,8 @@ import '../../core/content/dhikr.dart';
 import '../../core/notifications/notifications.dart';
 import '../../core/notifications/notif_scheduler.dart';
 import '../../core/platform/reliability.dart';
+import '../../core/prayer/adhan_native.dart';
+import '../../core/prayer/prayer_engine.dart';
 import '../../core/prayer/prayer_scheduler.dart';
 import '../../core/state/app_state.dart';
 import '../../core/widget/widget_sync.dart';
@@ -71,6 +74,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _maybeNudge();
       _setupNotifications();
+      _maybeWarnExactAlarm();
       _autoSync();
       // Seed the home-screen widget with the current state on every open.
       HomeWidgetSync.push(ref.read(appControllerProvider));
@@ -78,7 +82,22 @@ class _HomeShellState extends ConsumerState<HomeShell>
       // here because this shell owns the tabs; a tap that arrived before this
       // (app launched BY the notification) is replayed on registration.
       onNotificationTap(_handleNotificationTap);
+      _consumeNativeAdhanTap();
     });
+  }
+
+  // The NATIVE adhan notification (AdhanService) opens the app with an intent
+  // extra instead of the plugin callback; poll it on launch and on resume and
+  // route it exactly like a plugin prayer tap. Also the retention signal: a
+  // plugin tap is counted inside _routeTap, a native tap must count here or
+  // adhan taps vanish from the only retention metric the app has.
+  Future<void> _consumeNativeAdhanTap() async {
+    final payload = await consumeNativeAdhanTap();
+    if (payload == null || payload.isEmpty || !mounted) return;
+    AnalyticsService.instance.track('notification_opened', {
+      'kind': payload.split(':').first,
+    });
+    _handleNotificationTap(payload);
   }
 
   /// `prayer` / `prayer:<key>` opens prayer settings, `habit:<id>` opens that
@@ -170,6 +189,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
     Future(() async {
       await ref.read(appControllerProvider.notifier).refreshFromStore();
       if (mounted) HomeWidgetSync.push(ref.read(appControllerProvider));
+      if (mounted) await _consumeNativeAdhanTap();
     });
   }
 
@@ -321,6 +341,78 @@ class _HomeShellState extends ConsumerState<HomeShell>
     if (mounted) await PermissionsPrimer.show(context);
   }
 
+  bool _exactWarned = false;
+
+  /// THE fix for the owner-reported "adhan fired half an hour late": on
+  /// Android 14+ the «Alarms and reminders» grant is denied by default, the
+  /// schedule silently degrades to inexact, and Doze defers it by up to an
+  /// hour - delivering it batched with other notifications, which also
+  /// produced the "habit reminder played the adhan" report. The primer now
+  /// asks for it on first run; this banner reaches everyone who is PAST the
+  /// primer (upgrades) and uses the adhan or prayer alerts. Once per open,
+  /// only while the problem is real.
+  Future<void> _maybeWarnExactAlarm() async {
+    if (_exactWarned ||
+        kIsWeb ||
+        defaultTargetPlatform != TargetPlatform.android) {
+      return;
+    }
+    final s = ref.read(appControllerProvider);
+    if (!s.settings.notificationsEnabled || !s.settings.permPrimerShown) {
+      return;
+    }
+    final raw = ref.read(localStoreProvider).loadPrayer();
+    final cfg = raw != null ? PrayerConfig.fromJson(raw) : const PrayerConfig();
+    const prayerLinked = {'pray_on_time', 'wake_fajr', 'adhkar'};
+    final relevant = cfg.adhanSound ||
+        s.habits.any((h) => prayerLinked.contains(h.catalogKey));
+    if (!relevant) return;
+    if (await canUseExactAlarms()) return;
+    if (!mounted) return;
+    _exactWarned = true;
+    final loc = Localizations.localeOf(context).languageCode;
+    const kTitle = {
+      'ar': 'قد يتأخر الأذان عن وقته',
+      'en': 'The adhan may arrive late',
+      'fr': "L'adhan peut arriver en retard",
+    };
+    const kBody = {
+      'ar':
+          'امنح عوّاد إذن «المنبهات والتذكيرات» ليصل الأذان وتنبيهات الصلاة في دقيقتها تماماً.',
+      'en':
+          'Grant Awwad the "Alarms and reminders" permission so the adhan and prayer alerts arrive at the exact minute.',
+      'fr':
+          "Accordez à Awwad l'autorisation « Alarmes et rappels » pour un adhan à la minute exacte.",
+    };
+    const kEnable = {'ar': 'تفعيل الآن', 'en': 'Enable now', 'fr': 'Activer'};
+    const kLater = {'ar': 'لاحقاً', 'en': 'Later', 'fr': 'Plus tard'};
+    String t(Map<String, String> m) => m[loc] ?? m['ar']!;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showMaterialBanner(MaterialBanner(
+      backgroundColor: AppColors.surface,
+      leading: Icon(Icons.alarm_on, color: AppColors.accent2),
+      content: Text('${t(kTitle)}\n${t(kBody)}',
+          style: TextStyle(fontSize: 12.5, height: 1.55, color: AppColors.text)),
+      actions: [
+        TextButton(
+          onPressed: () async {
+            messenger.hideCurrentMaterialBanner();
+            await requestExactAlarmsPermission();
+            // Upgrade the queued schedule the moment the grant lands.
+            if (mounted) await _setupNotifications();
+          },
+          child: Text(t(kEnable),
+              style: TextStyle(
+                  color: AppColors.accent, fontWeight: FontWeight.w700)),
+        ),
+        TextButton(
+          onPressed: messenger.hideCurrentMaterialBanner,
+          child: Text(t(kLater), style: TextStyle(color: AppColors.muted)),
+        ),
+      ],
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     // Mirror every state change (save, habit switch, locale...) to the
@@ -435,7 +527,9 @@ class _HomeShellState extends ConsumerState<HomeShell>
                 ListTile(
                   leading: Icon(Icons.health_and_safety_outlined,
                       color: AppColors.danger),
-                  title: Text(h.title,
+                  title: Text(
+                      habitDisplayTitle(h,
+                          Localizations.localeOf(context).languageCode),
                       style: TextStyle(color: AppColors.text)),
                   onTap: () => Navigator.pop(ctx, h.id),
                 ),

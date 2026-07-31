@@ -65,22 +65,23 @@ void main() {
     });
   }
 
-  testWidgets('the guest flow is three steps, and the progress bar agrees',
+  testWidgets('the guest flow is four steps, and the progress bar agrees',
       (tester) async {
     await pumpOnboarding(tester, const Locale('ar'));
     final l10n = await AppLocalizations.delegate.load(const Locale('ar'));
 
-    // One segment per step. Four segments would mean the survey is still
-    // counted even though it never renders.
+    // One segment per step: track, habit, setup, location (the location step
+    // was added 2026-07-31 - country, nearest city, GPS). Five segments would
+    // mean the skipped survey is still counted even though it never renders.
     final segments = tester
         .widgetList<Expanded>(find.descendant(
           of: find.byType(Row).first,
           matching: find.byType(Expanded),
         ))
         .length;
-    expect(segments, 3, reason: 'progress bar still counts the skipped step');
+    expect(segments, 4, reason: 'progress bar disagrees with the step list');
 
-    // Step 1 of 3 is the track step, so the button still says «التالي».
+    // Step 1 of 4 is the track step, so the button still says «التالي».
     expect(find.text(l10n.next), findsOneWidget);
     expect(find.text(l10n.startJourney), findsNothing);
   });
