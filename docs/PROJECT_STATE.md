@@ -42,10 +42,34 @@ context or dropping anything:
 
 ---
 
-## 0.6 HANDOFF 2026-07-20 (RESUME HERE)
+## 0.6 HANDOFF 2026-08-01 (RESUME HERE)
 
-**READ FIRST: an OPEN adhan-30-minutes-late bug from the owner's real phone is at the top of
-the Changelog (2026-07-21 entry) with the diagnosis plan. Start there.**
+**THE 2026-07-21 ADHAN-LATE BUG IS CLOSED.** Root cause: SCHEDULE_EXACT_ALARM denied by
+default on Android 14+ -> silent inexact degrade -> Doze deferral (up to 1h, batched with
+other notifications, which also explained "habit reminders play the adhan"). Fixed by the
+NATIVE ADHAN CHAIN (2026-07-31/08-01 changelog entries: exact AlarmManager alarm re-armed
+natively for 30 days -> AdhanService plays the owner's mp3, ANY hardware button stops it,
+lateness guard shows an honest late reminder instead of a stale adhan) + exact-alarm grant
+UX (primer row + Home banner). VERIFIED ON THE EMULATOR END TO END: fired at 16:38:00.015
+exact, FGS allowed from background, full clip played, volume-key stop worked, 10-min-late
+fire rendered silent «تذكير: صلاة العشاء», chain self-re-armed asr->maghrib->isha->fajr and
+across an app UPDATE without opening the app. Evidence: session scratchpad screenshots +
+dumpsys/logcat traces quoted in the changelog.
+
+Also this session (all live in source, commit 6a93278 + 4c8b889): adhan is a CORE Settings
+feature (works with location alone, no prayer habit needed), onboarding location step
+(country -> nearest city + GPS, optional), pray_on_time renamed «الصلاة على وقتها» with
+AUTOMATIC five-time reminders (no manual hour), icon picker removed, language-independence
+fixes (habitDisplayTitle everywhere + reschedule-on-switch + app-locale primer), and an
+adversarial review round fixing 12 confirmed findings. 199/199 tests, analyze clean.
+
+STILL OPEN / NEXT: (a) deploy verification below this block reflects the 2026-08-01 deploy;
+(b) hardware confirmation on the OWNER'S OWN PHONE (install the new APK, watch one real
+adhan: on time, button-stop, no adhan on habit reminders); (c) Play Console: the new FGS
+mediaPlayback declaration answers are pre-written in SUBMISSION_GUIDE §5.3.1; (d) iOS build
+on a Mac from current main (IOS_PARITY_SETUP.md §2.1 documents the iOS adhan limits).
+
+## 0.6-OLD HANDOFF 2026-07-20 (superseded by the block above)
 
 **PHASE 0.5 IS COMPLETE AND LIVE.** docs/MANDATE_PLAN.md: 44 items, 0 open. Site
 https://moradarafa1.github.io (139 pages, 39 articles) and app /app/ both live and
@@ -1174,6 +1198,26 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
   STATUS: analyze clean, 190/190 tests. Play Console note for the store submission:
   FGS mediaPlayback now requires the console declaration (description + demo video).
   NOT YET: emulator hardware verification of the chain (next), deploy, Android artifacts.
+- **2026-08-01 FINAL ANDROID ARTIFACTS BUILT + VERIFIED + COPIED.** From source 4c8b889:
+  `Awwad-1.0.0-adhan.apk` (69.4MB) + `Awwad-1.0.0-adhan-store.aab` (67.7MB) on the owner
+  Desktop (C:\Users\morad\OneDrive\Desktop) AND mirrored to D:\Claude\awwad\release\ (md5
+  ed7894f8... identical everywhere). aapt-verified inside the APK: INTERNET,
+  POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM, ACCESS_NOTIFICATION_POLICY, COARSE (no FINE),
+  FOREGROUND_SERVICE + _MEDIA_PLAYBACK, WAKE_LOCK; AdhanService/AdhanAlarmReceiver/
+  AdhanBootReceiver + FLN receivers declared; the owner's adhan mp3 (2,241,376 bytes,
+  shrinker-renamed res/Z7.mp3, raw/adhan resource = 1); Supabase keys in libapp.so (auth
+  buttons show). The OLDER Desktop files (Awwad-1.0.0-final.apk / -store.aab, 2026-07-20)
+  are now SUPERSEDED - upload/install the -adhan ones.
+- **2026-08-01 DEPLOYED + PUSHED.** Source pushed: 6a93278 (the whole session) + 4c8b889
+  (build-artifact cleanup; android build dir now gitignored). Pages deploy f220714: site
+  (139 pages, verify-dist PASS) at root + web app (built from the reviewed code, keys
+  verified inside, base /app/) at /app/. LIVE BYTE-VERIFIED: main.dart.js md5
+  4581f27260961942cc12011eeba5e25e identical local vs https://moradarafa1.github.io/app/,
+  home page 200. The iOS builder can now pull current main and get EVERYTHING (native
+  adhan chain, customization, language fixes). EMULATOR RE-VERIFIED post-review-fixes on
+  the upgraded install: MY_PACKAGE_REPLACED re-armed the adhan alarm (fajr 04:36 exact)
+  BEFORE any app open, table now carries localized chName/chDesc («الأذان»), prayer screen
+  shows Cairo + the same five times the live fire test used. Release APK/AAB build next.
 - **2026-08-01 ADVERSARIAL REVIEW ROUND (4 dimensions, refute-verify): 22 raw findings,
   12 confirmed (3 major), 3 refuted, the limit-killed verifications adjudicated by hand
   (round-20 precedent). ALL 12 FIXED:**
