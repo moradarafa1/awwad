@@ -24,8 +24,13 @@ class AdhanBootReceiver : BroadcastReceiver() {
             // alarm to exact right away (docs: handle like BOOT_COMPLETED).
             "android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED",
             "android.intent.action.QUICKBOOT_POWERON",
-            "com.htc.intent.action.QUICKBOOT_POWERON" ->
+            "com.htc.intent.action.QUICKBOOT_POWERON" -> {
                 AdhanScheduler.rearm(ctx)
+                // The prayer widget's own refresh alarm died with the reboot
+                // too, and its card is now showing a countdown to a prayer
+                // that may already have passed.
+                PrayerWidgetProvider.refresh(ctx)
+            }
         }
     }
 }

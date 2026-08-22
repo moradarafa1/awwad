@@ -59,6 +59,11 @@ class AdhanAlarmReceiver : BroadcastReceiver() {
         // passed. Re-arm the NEXT one before anything else can fail.
         val due = latestDue(table, now)
         AdhanScheduler.rearm(ctx)
+        // The prayer widget must roll its countdown over to the next prayer
+        // the moment this one enters. This EXACT alarm is the most accurate
+        // trigger in the app, so the widget rides it rather than relying on
+        // its own inexact refresh (which Doze may defer by minutes).
+        PrayerWidgetProvider.refresh(ctx)
         due ?: return
         val late = now - due.optLong("at", now)
         val fresh = late <= 5 * 60_000L

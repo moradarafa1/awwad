@@ -1,5 +1,7 @@
+import 'dart:async' show StreamSubscription;
 import 'dart:ui';
 
+import 'package:home_widget/home_widget.dart';
 import 'package:flutter/foundation.dart'
     show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
@@ -55,6 +57,9 @@ class _HomeShellState extends ConsumerState<HomeShell>
     with WidgetsBindingObserver {
   bool _nudged = false;
 
+  /// Warm-launch taps on a home-screen widget arrive on this stream.
+  StreamSubscription<Uri?>? _widgetTapSub;
+
   // Nav index 3 is the «هُدنة» ACTION (opens the truce flow), not a screen,
   // so its stack slot is an unused placeholder that is never displayed.
   static const _screens = [
@@ -83,7 +88,28 @@ class _HomeShellState extends ConsumerState<HomeShell>
       // (app launched BY the notification) is replayed on registration.
       onNotificationTap(_handleNotificationTap);
       _consumeNativeAdhanTap();
+      _consumeWidgetLaunch();
     });
+  }
+
+  /// A tap on the PRAYER widget launches the app with `awwad://prayer`; route
+  /// it exactly like a prayer notification tap, so the card lands where it
+  /// promises instead of on whatever tab was last open. Two paths because the
+  /// plugin splits them: a COLD launch is only in
+  /// initiallyLaunchedFromHomeWidget, a warm one only on widgetClicked.
+  Future<void> _consumeWidgetLaunch() async {
+    if (kIsWeb) return;
+    try {
+      _widgetTapSub ??= HomeWidget.widgetClicked.listen(_routeWidgetUri);
+      _routeWidgetUri(await HomeWidget.initiallyLaunchedFromHomeWidget());
+    } catch (_) {
+      // Fail-open: the widget still opens the app, just not on this screen.
+    }
+  }
+
+  void _routeWidgetUri(Uri? uri) {
+    if (uri?.host != 'prayer' || !mounted) return;
+    _handleNotificationTap(kTapPrayer);
   }
 
   // The NATIVE adhan notification (AdhanService) opens the app with an intent
@@ -176,6 +202,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
     // gate falls back to onboarding), so an un-removed listener would retain
     // the disposed State and stack up another one on the next mount.
     removeNotificationTapListener(_handleNotificationTap);
+    _widgetTapSub?.cancel();
     super.dispose();
   }
 

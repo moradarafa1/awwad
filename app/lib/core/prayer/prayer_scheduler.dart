@@ -11,19 +11,15 @@ import 'package:flutter/foundation.dart'
 import '../data/local_store.dart';
 import '../models.dart';
 import '../notifications/notifications.dart';
+import '../widget/prayer_widget_sync.dart';
 import 'adhan_native.dart';
 import 'prayer_engine.dart';
 
-const _kPrayerNames = {
-  'fajr': {'ar': 'الفجر', 'en': 'Fajr', 'fr': 'Fajr'},
-  'dhuhr': {'ar': 'الظهر', 'en': 'Dhuhr', 'fr': 'Dhouhr'},
-  'asr': {'ar': 'العصر', 'en': 'Asr', 'fr': 'Asr'},
-  'maghrib': {'ar': 'المغرب', 'en': 'Maghrib', 'fr': 'Maghreb'},
-  'isha': {'ar': 'العشاء', 'en': 'Isha', 'fr': 'Icha'},
-};
-
-String prayerName(String key, String loc) =>
-    _kPrayerNames[key]?[loc] ?? _kPrayerNames[key]?['ar'] ?? key;
+// prayerName moved to prayer_engine.dart (the pure, plugin-free layer) so the
+// home-screen prayer widget can use it without importing this file's
+// notification stack. Re-exported so every existing `import
+// 'prayer_scheduler.dart' show prayerName` keeps compiling.
+export 'prayer_engine.dart' show prayerName;
 
 const _kMain = {
   'ar': 'حان وقت صلاة {p}',
@@ -178,6 +174,17 @@ Future<void> applyPrayerSchedule({
   required bool showReligious,
   required String locale,
 }) async {
+  final raw = store.loadPrayer();
+  final cfg = raw != null ? PrayerConfig.fromJson(raw) : const PrayerConfig();
+  // THE PRAYER WIDGET IS NOT A NOTIFICATION. It shows times, not alerts, so it
+  // must stay correct even with notifications off, religious content hidden or
+  // no prayer habit picked - every one of which returns early below. Hence the
+  // push happens FIRST, before any gate. This function is also the single
+  // funnel for "the prayer configuration may have changed" (app open, prayer
+  // settings, general settings, onboarding location step), which is exactly
+  // when the widget needs a fresh 30-day table.
+  await PrayerWidgetSync.push(cfg, locale: locale);
+
   await cancelIdRange(4000, 4299);
   await cancelIdRange(_kKahfId, _kKahfId);
   if (!notificationsEnabled || !showReligious) {
@@ -186,8 +193,6 @@ Future<void> applyPrayerSchedule({
   }
 
   final keys = habits.map((h) => h.catalogKey).whereType<String>().toSet();
-  final raw = store.loadPrayer();
-  final cfg = raw != null ? PrayerConfig.fromJson(raw) : const PrayerConfig();
 
   // Surah Al-Kahf is INDEPENDENT of the prayer location: weekly on Friday, at
   // the computed dhuhr+1h when a location exists, else a sensible 13:30.

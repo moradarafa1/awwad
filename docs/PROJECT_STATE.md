@@ -92,10 +92,18 @@ BUILDABLE NOW - this is the real next step for an autonomous session:
     accessibility can be granted, so the feature must degrade gracefully and it argues for
     Play distribution. iOS blocking stays owner-gated (Apple family-controls entitlement):
     ANDROID ONLY this round.
-(f) After (e), the rest of the §12 backlog is unblocked and already ordered there: 0c(4)
-    home-screen widget, 0c(6) late-night usage detection, 0c(7) shareable monthly report
-    image, 0c(8) the «غض البصر» catalog habit, and 0a the deep per-habit appropriateness
-    review.
+(f) **0c(9) PRAYER WIDGET: ANDROID SHIPPED 2026-08-22** (owner-requested the same day).
+    Next prayer + live Chronometer countdown + Umm al-Qura Hijri date + today's five times,
+    in a 4x2 resizable card that survives 30 days with the app never opened. Full detail in
+    §12 0c(9). What is left on it, in order: (1) the ANDROID LOCK-SCREEN surface, which must
+    be an ongoing silent notification (the phone fleet has no lock-screen widget API) and is
+    NOT built; (2) the Hijri +-1 day adjustment (Umm al-Qura is the Saudi calendar, Egypt
+    often differs by a day) - the first "the date is off by one" report is this, not a bug;
+    (3) the iOS twin exists in-repo with the real lock-screen accessory families, Mac-gated
+    like all iOS work.
+(g) After (e) and (f), the rest of the §12 backlog is unblocked and already ordered there:
+    0c(6) late-night usage detection, 0c(7) shareable monthly report image, 0c(8) the
+    «غض البصر» catalog habit, and 0a the deep per-habit appropriateness review.
 
 ## 0.6-OLD HANDOFF 2026-07-20 (superseded by the block above)
 
@@ -724,6 +732,17 @@ cd /d/Claude/awwad/web && npm install && npm run build   # -> web/dist (111 page
   would credit a day with four prayers still ahead of it.
   **NOT VERIFIED ON HARDWARE.** Analyze clean, 165 tests green, release APK compiles, but no
   button has ever been pressed on a device. That is item 7 (emulator).
+- **Home-screen widgets (Android live, iOS twins in-repo and Mac-gated):** TWO separate
+  widgets. (1) HABIT card (`AwwadWidgetProvider`, 2026-07-18): active habit + streak + a
+  quick-log button that writes through a background isolate with the app closed. (2) PRAYER
+  card (`PrayerWidgetProvider`, 2026-08-22): Hijri date + city, «الصلاة القادمة: المغرب
+  18:42», a live Chronometer countdown, and today's five times with the next in teal; tap
+  opens the prayer screen. Both are fed pre-localized strings from Dart
+  (`core/widget/{widget_sync,prayer_widget_sync}.dart`) because a widget inherits the DEVICE
+  locale while its content must follow the APP language. The prayer card carries a 30-day
+  table so it stays correct with the app never opened, and refreshes off three layers: its
+  own inexact Doze-piercing alarm, the native adhan chain, and the OS 30-minute period.
+  Details and the remaining work (Android lock screen, Hijri +-1 adjustment) in §12 0c(9).
 - **Phone-usage toolkit (Android only, fail-open elsewhere):** «استخدام الهاتف» screen shows
   per-app screen time + per-app OPEN COUNTS (queryEvents ACTIVITY_RESUMED, consecutive-dedup;
   since 2026-07-18) + per-app daily limits; background `UsageLimitWorker` warns over-budget
@@ -1058,12 +1077,63 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
        observed returning FABRICATED guideline text to an automated fetch.
        => iOS blocking is BLOCKED ON THE OWNER: it needs the Apple Developer account ($99)
        that is already owner-gated, and then a wait on Apple. Not buildable this round.
-   (4) Home-screen widget (streak + quick log; home_widget package).
-   (5) Auto prayer-times reminders for prayer habits (offline adhan calculation by location).
+   (4) DONE 2026-07-18 round 3: Home-screen widget (HABIT streak + quick log; home_widget
+       package). Android native RemoteViews (AwwadWidgetProvider.kt + res/layout/
+       awwad_widget.xml) + iOS WidgetKit twin in-repo (ios/AwwadWidget/, Mac-gated).
+       It shows habit name / streak / log-today button ONLY. NOT prayers, see (9).
+   (5) DONE (engine 2026-07-14 phase A, native adhan chain 2026-08-01): Auto prayer-times
+       reminders (offline adhan calculation by location).
    (6) Late-night usage detection for `late_nights` (depends on (3)'s usage plumbing).
    (7) Shareable monthly report image (calendar + streaks).
    (8) NEW catalog habit «غض البصر» (lower-gaze, break track) wired to the DNS shield + SOS
        (needs catalog + seed + live DB sync, all three together).
+   (9) **PRAYER WIDGET + HIJRI DATE. ANDROID SHIPPED 2026-08-22** (owner-requested the same
+       day: "like the competitors' adhan apps, with the countdown"). A SECOND widget,
+       unrelated to (4)'s habit widget. What is live on Android: `PrayerWidgetProvider.kt` +
+       `res/layout/prayer_widget.xml` + `res/xml/prayer_widget_info.xml` (4x2 resizable),
+       fed by `core/widget/prayer_widget_sync.dart` from `applyPrayerSchedule` (the single
+       funnel, pushed BEFORE every gate so the card works with notifications off). Card =
+       Hijri date + city, «الصلاة القادمة: المغرب 18:42», a live Chronometer countdown, and
+       today's five times with the next one in teal. Tap opens the app on the prayer screen
+       (`awwad://prayer`, routed in home_shell). 13 tests in `test/prayer_widget_test.dart`.
+       STILL OPEN on this item: (a) iOS is written (`ios/AwwadWidget/PrayerWidget.swift`,
+       incl. the lock-screen accessory families) but Mac-gated like all iOS work;
+       (b) an ANDROID lock-screen surface, which must be the ongoing silent notification
+       described below, is NOT built; (c) the Hijri date exists only in the widget, not in
+       the app UI, and there is NO +-1 day adjustment anywhere (not pushed, not read, no
+       settings row). Umm al-Qura is the SAUDI official calendar and Egypt's announced date
+       often differs by a day, so the first owner report of "the Hijri date is off by one"
+       is THIS item, not a bug: add `hijriAdjust` to PrayerConfig, push it, shift the date
+       by it on both platforms, and add a -1/0/+1 row to prayer settings.
+       The feasibility read that produced the design:
+       - DATA IS FREE ALREADY: `timesFor(cfg, day)` (core/prayer/prayer_engine.dart) returns
+         the five times from lat/lng with per-prayer offsets; config persists via
+         localStore.loadPrayer(); the native exact-alarm chain (AdhanReceiver/AdhanService)
+         already fires at every prayer, so widget refresh piggybacks on it - no new alarms,
+         no polling, no battery cost. Push the strings from Dart exactly like
+         HomeWidgetSync.push does today (pre-localized, RemoteViews-safe).
+       - LIVE COUNTDOWN INSIDE AN ANDROID WIDGET: RemoteViews cannot tick, and
+         updatePeriodMillis has a 30-minute floor. Use a `Chronometer` view with
+         setChronometerCountDown(true) + setBase(SystemClock.elapsedRealtime() + msLeft) +
+         setChronometer(started) - the system process ticks it, the widget never wakes.
+         Re-arm the widget at each prayer entry from the existing adhan alarm chain, plus a
+         midnight re-arm for the Hijri rollover.
+       - HIJRI DATE DOES NOT EXIST ANYWHERE in the app (verified: zero matches for
+         hijri/هجري/umalqura across app/lib, and no hijri package in pubspec). Add it as
+         core data (package `hijri` or an Umm al-Qura calculation), trilingual month names,
+         with a manual +-1 day adjustment setting: local sighting differs and a wrong date
+         on a religious app is a credibility bug, not a cosmetic one.
+       - LOCK SCREEN, ANDROID: there is no general lock-screen widget API for the phone
+         fleet (killed after Android 4.4; returned for tablets in 14 and only recently for
+         phones), so do NOT design around it. The path that works on every phone is an
+         ONGOING SILENT notification on a low-importance channel (setOngoing, setShowWhen
+         false, setUsesChronometer + setChronometerCountDown for the live countdown) showing
+         next prayer + time left + Hijri date. That is what mainstream prayer apps ship.
+         Must be a user toggle, and must not collide with the adhan channel.
+       - LOCK SCREEN, iOS: WidgetKit accessoryRectangular/accessoryCircular/accessoryInline
+         (iOS 16+) are the real thing there, and `Text(date, style: .timer)` gives the
+         countdown for free. ios/AwwadWidget/AwwadWidget.swift currently declares only
+         .systemSmall/.systemMedium. Mac + Apple-account gated like all iOS work.
    REJECTED as infeasible (documented for the owner): system-wide realtime blur of
    opposite-gender faces/bodies over other apps - requires continuous screen capture + on-device
    ML + overlay; battery/latency/accuracy prohibitive, Play-rejection risk for the whole app,
@@ -1183,6 +1253,56 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 ---
 
 ## 13. Changelog
+
+- **2026-08-22 PRAYER WIDGET SHIPPED (Android): next prayer, LIVE countdown, Hijri date, the
+  five times.** Owner order the same day: "build it the way the competitors' adhan apps build
+  it, with the countdown, on Android, then push to GitHub so the Mac session can do iOS
+  identically". NEW: `android/.../PrayerWidgetProvider.kt`, `res/layout/prayer_widget.xml`,
+  `res/xml/prayer_widget_info.xml` (4x2 resizable, label «مواقيت الصلاة · عوّاد»),
+  `lib/core/widget/prayer_widget_sync.dart`, `ios/AwwadWidget/PrayerWidget.swift` (twin, with
+  the lock-screen accessory families), `test/prayer_widget_test.dart` (13 tests).
+  DESIGN DECISIONS, each forced by a platform limit:
+  (1) COUNTDOWN = a `Chronometer` in countdown mode (`setChronometerCountDown`), ticked by
+  the SYSTEM process. RemoteViews cannot tick and `updatePeriodMillis` floors at 30 minutes,
+  so any pushed "01:12 left" string would be a lie within a minute. Zero battery cost.
+  (2) A 30-DAY TABLE is pushed, not "today's times": `pw_times` = `epoch|key|HH:mm` entries
+  (150 of them), and the native side picks the next one at render time, so the card stays
+  correct for a month with the app never opened. Date-component arithmetic, not
+  `add(Duration(days:))`, or a DST day would duplicate/skip (locked by a test).
+  (3) HIJRI is converted natively (`android.icu` ISLAMIC_UMALQURA, minSdk is 24; Foundation
+  `.islamicUmmAlQura` on iOS) because a pushed date string goes stale at midnight. Only the
+  twelve month NAMES are pushed, so nothing native hardcodes a language.
+  (4) REFRESH is layered: the widget's own inexact `setAndAllowWhileIdle` alarm at
+  min(next prayer +2s, midnight +5s) - deliberately NOT exact, the adhan owns the app's one
+  exact alarm and Play restricts SCHEDULE_EXACT_ALARM - plus a free ride on the adhan chain
+  (`AdhanAlarmReceiver` and `AdhanBootReceiver` now call `PrayerWidgetProvider.refresh`),
+  plus the OS 30-minute period as a last net.
+  (5) The five-times row is `layoutDirection="ltr"` LOCKED with the display order pushed from
+  Dart (reversed for Arabic): a widget inherits the DEVICE locale while its content follows
+  the APP language, and the two can disagree. The next-prayer line is composed as ONE string
+  so the bidi algorithm places an Arabic name right and a Latin name left by itself.
+  (6) The push happens FIRST in `applyPrayerSchedule`, before every early return: the widget
+  shows TIMES, not alerts, so notifications-off or no-prayer-habit must not blank it.
+  Also: `prayerName` moved from prayer_scheduler.dart to prayer_engine.dart (the pure layer)
+  and is re-exported, so the widget does not drag flutter_local_notifications in; tapping the
+  card opens the prayer screen (`awwad://prayer`, consumed in home_shell via
+  `initiallyLaunchedFromHomeWidget` + `widgetClicked`). analyze clean, 212/212 tests.
+  NOT built and NOT claimed: an Android lock-screen surface (no such API on phones - it must
+  be an ongoing silent notification), the Hijri +-1 day adjustment, and any iOS verification.
+
+- **2026-08-22 owner question answered + new backlog item 0c(9) (docs only, no code).** Owner
+  asked whether the app already has a lock-screen surface with the next prayer and the Hijri
+  date, and a home-screen widget with the next prayer plus a countdown to the adhan. Answer,
+  verified against the tree: NO. The shipped widget is the HABIT one (0c(4), streak + quick
+  log, Android RemoteViews + iOS twin), the prayer ENGINE and the native adhan chain exist, and
+  the Hijri date exists nowhere (zero matches for hijri/هجري/umalqura in app/lib, no hijri
+  package in pubspec); no countdown UI anywhere, no lock-screen surface. Recorded the request
+  as §12 0c(9) with the full feasibility read (Chronometer countdown mode for the Android
+  widget since RemoteViews cannot tick and updatePeriodMillis floors at 30 min; ongoing silent
+  notification as the Android lock-screen path because the phone fleet has no lock-screen
+  widget API; WidgetKit accessory families for the real iOS lock-screen widget, Mac-gated;
+  Umm al-Qura Hijri with a +-1 day adjustment). Also corrected §12 0c(4) and 0c(5), which
+  still read as pending although both shipped, and rewrote §0.6 (f)/(g) accordingly.
 
 - **2026-07-31 (IN PROGRESS this session): owner bug triage + native adhan chain + onboarding
   location + icon picker removed.** Owner reported from his real Android phone: (1) adhan

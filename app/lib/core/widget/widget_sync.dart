@@ -67,29 +67,33 @@ String widgetEmptyLabel(String locale) {
 /// capability added to BOTH Runner and the extension (docs/IOS_PARITY_SETUP.md).
 const String kAwwadAppGroup = 'group.com.awwad.awwad';
 
+/// Whether native home-screen widgets exist on this platform. Shared with
+/// prayer_widget_sync.dart so both widgets answer the question identically.
+bool get homeWidgetsSupported =>
+    !kIsWeb &&
+    (defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS);
+
+bool _iosGroupSet = false;
+
+/// iOS reads widget data from the shared app group, and the id must be set
+/// before ANY write. Idempotent, and a no-op off iOS.
+Future<void> ensureWidgetAppGroup() async {
+  if (defaultTargetPlatform != TargetPlatform.iOS || _iosGroupSet) return;
+  await HomeWidget.setAppGroupId(kAwwadAppGroup);
+  _iosGroupSet = true;
+}
+
 class HomeWidgetSync {
   HomeWidgetSync._();
-
-  static bool get _supported =>
-      !kIsWeb &&
-      (defaultTargetPlatform == TargetPlatform.android ||
-          defaultTargetPlatform == TargetPlatform.iOS);
-
-  static bool _iosGroupSet = false;
-
-  static Future<void> _ensureIosGroup() async {
-    if (defaultTargetPlatform != TargetPlatform.iOS || _iosGroupSet) return;
-    await HomeWidget.setAppGroupId(kAwwadAppGroup);
-    _iosGroupSet = true;
-  }
 
   /// Pushes the active habit's name / streak / logged-today state to the
   /// widget and asks Android to re-render it. Cheap; safe to call after
   /// every state change.
   static Future<void> push(AppState s) async {
-    if (!_supported) return;
+    if (!homeWidgetsSupported) return;
     try {
-      await _ensureIosGroup();
+      await ensureWidgetAppGroup();
       final locale = s.settings.locale ?? 'ar';
       final habit = s.activeHabit;
       final today = dayKey(DateTime.now());
@@ -121,9 +125,9 @@ class HomeWidgetSync {
   /// broadcast; iOS 17 interactive-widget AppIntent). Call once per app open
   /// (idempotent); the handle persists across restarts.
   static Future<void> registerCallback() async {
-    if (!_supported) return;
+    if (!homeWidgetsSupported) return;
     try {
-      await _ensureIosGroup();
+      await ensureWidgetAppGroup();
       await HomeWidget.registerInteractivityCallback(
           homeWidgetBackgroundCallback);
     } catch (_) {

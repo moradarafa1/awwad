@@ -14,5 +14,8 @@ import WidgetKit
 struct AwwadWidgetBundle: WidgetBundle {
   var body: some Widget {
     AwwadWidget()
+    // Prayer card: next prayer + live countdown + Hijri date, and the only
+    // widget with lock-screen (accessory) families.
+    PrayerWidget()
   }
 }

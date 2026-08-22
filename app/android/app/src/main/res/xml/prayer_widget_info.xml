@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 4x2 resizable prayer card. updatePeriodMillis (30 min, the OS minimum) is
+     only a safety net: the card is redrawn at the exact moments it stops
+     being true by PrayerWidgetProvider's own alarm (next prayer, midnight)
+     and by the native adhan chain at every prayer. The countdown itself needs
+     no updates at all, it is a Chronometer ticked by the system. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/prayer_widget"
+    android:previewLayout="@layout/prayer_widget"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen" />

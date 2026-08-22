@@ -133,6 +133,27 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/awwad_widget_info"/>
         </receiver>
+        <!-- PRAYER widget: next prayer + live countdown + Hijri date + the
+             five times. The extra actions are what keep it honest without the
+             app: PRAYER_WIDGET_TICK is its own refresh alarm (next prayer /
+             midnight), and the date-time-locale broadcasts are the system
+             telling us the card just went stale. All four are on the
+             implicit-broadcast exception list, so a manifest receiver still
+             gets them on Android 8+. -->
+        <receiver android:name=".PrayerWidgetProvider"
+            android:exported="true"
+            android:label="مواقيت الصلاة · عوّاد">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.awwad.awwad.PRAYER_WIDGET_TICK"/>
+                <action android:name="android.intent.action.DATE_CHANGED"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+                <action android:name="android.intent.action.LOCALE_CHANGED"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/prayer_widget_info"/>
+        </receiver>
         <!-- exported=false ON PURPOSE (differs from the plugin example): the
              widget button's PendingIntent is same-UID so it still reaches a
              non-exported receiver, while a co-installed app can no longer

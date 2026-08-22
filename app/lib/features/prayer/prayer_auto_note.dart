@@ -9,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/prayer/prayer_engine.dart';
-import '../../core/prayer/prayer_scheduler.dart';
 import '../../core/state/app_state.dart';
 
 const _kAuto = {

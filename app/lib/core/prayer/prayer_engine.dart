@@ -15,6 +15,22 @@ import 'package:flutter/services.dart' show rootBundle;
 /// The five prayers, in day order. Names are catalog keys, not UI strings.
 const kPrayerKeys = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 
+const _kPrayerNames = {
+  'fajr': {'ar': 'الفجر', 'en': 'Fajr', 'fr': 'Fajr'},
+  'dhuhr': {'ar': 'الظهر', 'en': 'Dhuhr', 'fr': 'Dhouhr'},
+  'asr': {'ar': 'العصر', 'en': 'Asr', 'fr': 'Asr'},
+  'maghrib': {'ar': 'المغرب', 'en': 'Maghrib', 'fr': 'Maghreb'},
+  'isha': {'ar': 'العشاء', 'en': 'Isha', 'fr': 'Icha'},
+};
+
+/// The ONE display name of a prayer, in the APP's language. It lives in the
+/// engine (not the scheduler) because three consumers now need it without
+/// dragging flutter_local_notifications in: the scheduler's copy, the prayer
+/// screens, and the home-screen prayer widget. `prayer_scheduler.dart`
+/// re-exports it, so every existing import keeps working.
+String prayerName(String key, String loc) =>
+    _kPrayerNames[key]?[loc] ?? _kPrayerNames[key]?['ar'] ?? key;
+
 class PrayerConfig {
   final double? lat;
   final double? lng;
