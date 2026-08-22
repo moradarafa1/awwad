@@ -63,11 +63,39 @@ AUTOMATIC five-time reminders (no manual hour), icon picker removed, language-in
 fixes (habitDisplayTitle everywhere + reschedule-on-switch + app-locale primer), and an
 adversarial review round fixing 12 confirmed findings. 199/199 tests, analyze clean.
 
-STILL OPEN / NEXT: (a) deploy verification below this block reflects the 2026-08-01 deploy;
+STILL OPEN / NEXT, split by who can actually do it (corrected 2026-08-22 by the usage-limit
+watchdog: the previous version of this block listed ONLY the owner-gated items, which read as
+"nothing left to build" and was wrong).
+
+OWNER-GATED (no autonomous session can close these):
+(a) deploy verification below this block reflects the 2026-08-01 deploy - DONE, nothing owed.
 (b) hardware confirmation on the OWNER'S OWN PHONE (install the new APK, watch one real
-adhan: on time, button-stop, no adhan on habit reminders); (c) Play Console: the new FGS
-mediaPlayback declaration answers are pre-written in SUBMISSION_GUIDE §5.3.1; (d) iOS build
-on a Mac from current main (IOS_PARITY_SETUP.md §2.1 documents the iOS adhan limits).
+    adhan: on time, button-stop, no adhan on habit reminders).
+(c) Play Console: the new FGS mediaPlayback declaration answers are pre-written in
+    SUBMISSION_GUIDE §5.3.1 - needs the owner's console session.
+(d) iOS build on a Mac from current main (IOS_PARITY_SETUP.md §2.1 documents the iOS adhan
+    limits) - needs a Mac plus the $99 Apple Developer account, both owner-gated.
+
+BUILDABLE NOW - this is the real next step for an autonomous session:
+(e) **PHASE 0.6 ITEM 1, ANDROID HARD APP-BLOCKING (power feature 0c phase C), WAS NEVER
+    BUILT.** Verified 2026-08-22: no AccessibilityService anywhere under app/android/ and no
+    accessibility entry in AndroidManifest.xml. The owner CONDITIONALLY approved this on
+    2026-07-20 and the policy research in §12 (0c, phase C) returned
+    "ANDROID: CONDITIONAL, BUILDABLE" with five mandatory conditions and four platform risks.
+    Read §12 phase C IN FULL before writing a line: do NOT set isAccessibilityTool, do NOT
+    request QUERY_ALL_PACKAGES (use <queries> plus MAIN/LAUNCHER), ship a standalone prominent
+    disclosure with affirmative consent, keep the block deterministic and user-configured, and
+    NEVER prevent uninstalling Awwad or disabling the service. Build the UsageStats plus
+    overlay fallback as an explicitly DEGRADED mode, not an equal path. Distribution reality
+    to design around: Awwad ships from GitHub Pages today, and Android 13+ restricted settings
+    force sideloaded users through Settings > Apps > Allow restricted settings before
+    accessibility can be granted, so the feature must degrade gracefully and it argues for
+    Play distribution. iOS blocking stays owner-gated (Apple family-controls entitlement):
+    ANDROID ONLY this round.
+(f) After (e), the rest of the §12 backlog is unblocked and already ordered there: 0c(4)
+    home-screen widget, 0c(6) late-night usage detection, 0c(7) shareable monthly report
+    image, 0c(8) the «غض البصر» catalog habit, and 0a the deep per-habit appropriateness
+    review.
 
 ## 0.6-OLD HANDOFF 2026-07-20 (superseded by the block above)
 
