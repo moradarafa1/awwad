@@ -69,8 +69,15 @@ watchdog: the previous version of this block listed ONLY the owner-gated items, 
 
 OWNER-GATED (no autonomous session can close these):
 (a) deploy verification below this block reflects the 2026-08-01 deploy - DONE, nothing owed.
-(b) hardware confirmation on the OWNER'S OWN PHONE (install the new APK, watch one real
-    adhan: on time, button-stop, no adhan on habit reminders).
+    NOTE: the 2026-08-22 prayer widget is COMMITTED AND PUSHED (`7161e9b`) but the web app on
+    Pages was NOT redeployed for it, deliberately: a home-screen widget does not exist on web
+    and nothing user-visible changed there. The next deploy round picks it up.
+(b) hardware confirmation on the OWNER'S OWN PHONE, now TWO things in one install of
+    `Desktop/Awwad-1.0.0-prayer-widget.apk`: (1) one real adhan (on time, button-stop, no
+    adhan on habit reminders); (2) the NEW prayer widget - long-press the home screen, add
+    «مواقيت الصلاة · عوّاد», confirm the countdown ticks every second, the Hijri date is
+    right (if it is off by one day see §12 0c(9): that is the missing adjustment, not a bug),
+    and the card rolls over to the next prayer when the adhan sounds.
 (c) Play Console: the new FGS mediaPlayback declaration answers are pre-written in
     SUBMISSION_GUIDE §5.3.1 - needs the owner's console session.
 (d) iOS build on a Mac from current main (IOS_PARITY_SETUP.md §2.1 documents the iOS adhan
@@ -1289,6 +1296,16 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
   `initiallyLaunchedFromHomeWidget` + `widgetClicked`). analyze clean, 212/212 tests.
   NOT built and NOT claimed: an Android lock-screen surface (no such API on phones - it must
   be an ongoing silent notification), the Hijri +-1 day adjustment, and any iOS verification.
+  SHIPPED: commit `7161e9b`, PUSHED to origin/main the same session so the Mac/iOS session can
+  work from the repo. Release APK built and verified against the PACKAGED file: the receiver
+  `com.awwad.awwad.PrayerWidgetProvider` is in the manifest, `layout/prayer_widget` and
+  `xml/prayer_widget_info` are packaged, `raw/adhan` still survives resource shrinking
+  (gotcha #11) with the 2.24MB mp3 present, and INTERNET/POST_NOTIFICATIONS/
+  SCHEDULE_EXACT_ALARM are all there. APK copied to
+  `C:/Users/morad/OneDrive/Desktop/Awwad-1.0.0-prayer-widget.apk` (66.2MB).
+  NOT VERIFIED ON HARDWARE: no one has placed this widget on a real home screen yet. The
+  owner check is: add «مواقيت الصلاة · عوّاد», confirm the countdown ticks every second, the
+  Hijri date matches, and the card rolls to the next prayer at the adhan.
 
 - **2026-08-22 owner question answered + new backlog item 0c(9) (docs only, no code).** Owner
   asked whether the app already has a lock-screen surface with the next prayer and the Hijri
