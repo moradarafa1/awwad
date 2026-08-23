@@ -37,16 +37,28 @@ const String kPrayerWidgetIos = 'PrayerWidget';
 /// native adhan chain, for the same reason: the app may never be opened.
 const int kPrayerWidgetDays = 30;
 
+/// Carries its own separator: French puts a space before a colon and the
+/// native side must not invent punctuation for a language it does not know.
 const _kNextLabel = {
-  'ar': 'الصلاة القادمة',
-  'en': 'Next prayer',
-  'fr': 'Prochaine prière',
+  'ar': 'الصلاة القادمة:',
+  'en': 'Next prayer:',
+  'fr': 'Prochaine prière :',
 };
 
+/// No location yet: the user can fix this.
 const _kEmpty = {
   'ar': 'حدّد موقعك من إعدادات الصلاة',
   'en': 'Set your location in prayer settings',
-  'fr': 'Definissez votre lieu dans les reglages',
+  'fr': 'Définissez votre position dans les réglages de prière',
+};
+
+/// A location EXISTS but the 30-day table has run out (the app was not opened
+/// for a month). Telling this user to "set your location" would be a lie and
+/// would send them to a screen that is already correct.
+const _kStale = {
+  'ar': 'افتح التطبيق لتحديث المواقيت',
+  'en': 'Open the app to refresh the times',
+  'fr': "Ouvrez l'application pour actualiser les heures",
 };
 
 /// Hijri month names, index 0 = Muharram. The native side only produces the
@@ -101,12 +113,17 @@ const _kHijriSuffix = {'ar': 'هـ', 'en': 'AH', 'fr': 'AH'};
 
 String _t(Map<String, String> m, String loc) => m[loc] ?? m['ar']!;
 
-String _two(int n) => n.toString().padLeft(2, '0');
-
-/// The widget's time table: `epochMillis|key|HH:mm` entries, comma-joined,
-/// for [days] days starting with [now]'s date. ALL five times of every day
-/// are included (not only future ones): the native side needs today's full
-/// set to draw the five-times row, and picks the next entry itself.
+/// The widget's time table: `epochMillis|key` entries, comma-joined, for
+/// [days] days starting with [now]'s date. ALL five times of every day are
+/// included (not only future ones): the native side needs a full day to draw
+/// the five-times row, and picks the next entry itself.
+///
+/// The clock string is NOT pushed. It would be text formatted in the timezone
+/// that happened to be active at push time, and a user who then travels (or
+/// whose device changes zone) would read wrong times off the card for up to a
+/// month. The epoch is absolute, so the native side formats it in the CURRENT
+/// zone at render time. Nothing is lost: the app writes 24-hour zero-padded
+/// digits in every language, so the clock is arithmetic, not translation.
 ///
 /// Date-component arithmetic, NOT `.add(Duration(days: d))`: a Duration is 24
 /// wall-clock hours, so a 23/25-hour DST day would duplicate or skip a
@@ -125,7 +142,7 @@ String encodePrayerWidgetTimes(
     for (final key in kPrayerKeys) {
       final t = times[key];
       if (t == null) continue;
-      out.add('${t.millisecondsSinceEpoch}|$key|${_two(t.hour)}:${_two(t.minute)}');
+      out.add('${t.millisecondsSinceEpoch}|$key');
     }
   }
   return out.join(',');
@@ -146,6 +163,15 @@ String encodePrayerNames(String locale) =>
 /// The twelve Hijri month names, pipe-joined, index 0 = Muharram.
 String hijriMonthNames(String locale) =>
     (_kHijriMonths[locale] ?? _kHijriMonths['ar']!).join('|');
+
+/// «الصلاة القادمة:» including its own separator (see [_kNextLabel]).
+String prayerWidgetNextLabel(String locale) => _t(_kNextLabel, locale);
+
+/// Shown when no location is set yet.
+String prayerWidgetEmptyLabel(String locale) => _t(_kEmpty, locale);
+
+/// Shown when a location EXISTS but the 30-day table has run out.
+String prayerWidgetStaleLabel(String locale) => _t(_kStale, locale);
 
 /// The city line shown next to the Hijri date, empty when unknown.
 String prayerWidgetCity(PrayerConfig cfg, String locale) =>
@@ -174,8 +200,11 @@ class PrayerWidgetSync {
       await HomeWidget.saveWidgetData<String>(
           'pw_order', prayerRowOrder(locale));
       await HomeWidget.saveWidgetData<String>(
-          'pw_next', _t(_kNextLabel, locale));
-      await HomeWidget.saveWidgetData<String>('pw_empty', _t(_kEmpty, locale));
+          'pw_next', prayerWidgetNextLabel(locale));
+      await HomeWidget.saveWidgetData<String>(
+          'pw_empty', prayerWidgetEmptyLabel(locale));
+      await HomeWidget.saveWidgetData<String>(
+          'pw_stale', prayerWidgetStaleLabel(locale));
       await HomeWidget.saveWidgetData<String>(
           'pw_hmonths', hijriMonthNames(locale));
       await HomeWidget.saveWidgetData<String>(

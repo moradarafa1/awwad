@@ -134,18 +134,18 @@
                 android:resource="@xml/awwad_widget_info"/>
         </receiver>
         <!-- PRAYER widget: next prayer + live countdown + Hijri date + the
-             five times. The extra actions are what keep it honest without the
-             app: PRAYER_WIDGET_TICK is its own refresh alarm (next prayer /
-             midnight), and the date-time-locale broadcasts are the system
-             telling us the card just went stale. All four are on the
-             implicit-broadcast exception list, so a manifest receiver still
-             gets them on Android 8+. -->
+             five times. The date/time/locale actions are the system telling
+             us the card went stale; they are PROTECTED broadcasts, so only
+             the OS can send them. The widget's own refresh alarm
+             (PRAYER_WIDGET_TICK) is deliberately NOT listed: its PendingIntent
+             is an explicit component intent and needs no filter, while a
+             filter entry would let any installed app broadcast it and spin
+             our refreshes (same reasoning as the exported=false below). -->
         <receiver android:name=".PrayerWidgetProvider"
             android:exported="true"
             android:label="مواقيت الصلاة · عوّاد">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-                <action android:name="com.awwad.awwad.PRAYER_WIDGET_TICK"/>
                 <action android:name="android.intent.action.DATE_CHANGED"/>
                 <action android:name="android.intent.action.TIME_SET"/>
                 <action android:name="android.intent.action.TIMEZONE_CHANGED"/>

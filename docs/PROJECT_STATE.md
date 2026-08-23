@@ -1261,6 +1261,41 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 
 ## 13. Changelog
 
+- **2026-08-23 PRAYER WIDGET, adversarial review round: 5 real defects fixed, 4 limits
+  documented instead of hidden.** METHOD NOTE, important for whoever reads the run: the review
+  workflow's VERIFY agents all died on the session limit, so its `confirmed: []` /
+  `refuted: [...]` output proved NOTHING (a dead verifier makes a finding look refuted). Every
+  one of the 21 raw claims was triaged BY HAND against the code instead. FIXED:
+  (1) The clock string is no longer pushed. `pw_times` is now `epoch|key`, and both native
+  sides format the absolute epoch at render time (Locale.US / en_US_POSIX, Western digits).
+  A pushed "18:42" was text formatted in the timezone active at push time, so a traveller
+  would have read wrong times off the card for up to a month.
+  (2) The five-times row now follows the day the NEXT prayer belongs to, not "today".
+  Between isha and midnight the header shows tomorrow's fajr while the row showed today's:
+  two different times for one prayer.
+  (3) A table that has RUN OUT now gets its own line (`pw_stale`, «افتح التطبيق لتحديث
+  المواقيت»). It previously told a user who HAS a location to go set one, and sent them to a
+  screen that was already correct.
+  (4) The refresh alarm now uses `setExactAndAllowWhileIdle` WHEN THE APP ALREADY HOLDS the
+  exact-alarm grant (the adhan asks for it; nothing new is requested and Play sees no new
+  declaration), falling back to inexact otherwise. A Chronometer keeps counting past its base,
+  so a deferred refresh showed a NEGATIVE countdown right after every prayer.
+  (5) `PRAYER_WIDGET_TICK` removed from the exported receiver's intent-filter: the alarm's
+  PendingIntent is an explicit component intent and needs no filter, while the filter let any
+  installed app broadcast it and spin our refreshes. Same reasoning as the deliberate
+  `exported=false` on HomeWidgetBackgroundReceiver.
+  Also: the French empty-state string was unaccented and dropped a word; the next-prayer label
+  now carries its OWN separator so the native side never invents punctuation (French puts a
+  space before a colon); IOS_PARITY_SETUP §1.1 claimed the Swift file holds no single-language
+  text, which was false (gallery name/description are deliberately Arabic).
+  ACCEPTED AND DOCUMENTED, not fixed: the Hijri date rolls at civil midnight like every system
+  calendar, not at maghrib; the Chronometer's digits follow the DEVICE locale (RemoteViews
+  exposes no way to set it, so an Arabic-locale phone may show Arabic-Indic digits in the
+  countdown while the row shows Western ones); there is no `previewImage`, so the widget picker
+  falls back to the app icon below API 31 (`previewLayout` is 31+), exactly like the habit
+  widget; and the iOS lock-screen accessory alignment follows the device language.
+  analyze clean, 214/214 tests (2 new label tests).
+
 - **2026-08-22 PRAYER WIDGET SHIPPED (Android): next prayer, LIVE countdown, Hijri date, the
   five times.** Owner order the same day: "build it the way the competitors' adhan apps build
   it, with the countdown, on Android, then push to GitHub so the Mac session can do iOS
@@ -1273,7 +1308,8 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
   the SYSTEM process. RemoteViews cannot tick and `updatePeriodMillis` floors at 30 minutes,
   so any pushed "01:12 left" string would be a lie within a minute. Zero battery cost.
   (2) A 30-DAY TABLE is pushed, not "today's times": `pw_times` = `epoch|key|HH:mm` entries
-  (150 of them), and the native side picks the next one at render time, so the card stays
+  (150 of them; the HH:mm field was DROPPED the next day, see the 2026-08-23 entry above),
+  and the native side picks the next one at render time, so the card stays
   correct for a month with the app never opened. Date-component arithmetic, not
   `add(Duration(days:))`, or a DST day would duplicate/skip (locked by a test).
   (3) HIJRI is converted natively (`android.icu` ISLAMIC_UMALQURA, minSdk is 24; Foundation

@@ -35,17 +35,15 @@ void main() {
       var previous = 0;
       for (final p in parts) {
         final f = p.split('|');
-        expect(f.length, 3, reason: 'entry must be epoch|key|HH:mm: $p');
+        // epoch|key ONLY: no clock string is pushed, because it would be text
+        // formatted in the timezone active at push time and a traveller would
+        // read wrong times off the card for up to a month. The native side
+        // formats the absolute epoch at render time.
+        expect(f.length, 2, reason: 'entry must be epoch|key: $p');
         final at = int.parse(f[0]);
         expect(at, greaterThan(previous), reason: 'entries must ascend');
         previous = at;
         expect(kPrayerKeys, contains(f[1]));
-        expect(f[2], matches(RegExp(r'^\d{2}:\d{2}$')));
-        // The clock string must be the same moment as the epoch, or the row
-        // and the countdown would disagree.
-        final t = DateTime.fromMillisecondsSinceEpoch(at);
-        expect(f[2],
-            '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}');
       }
     });
 
@@ -66,7 +64,27 @@ void main() {
       final raw = encodePrayerWidgetTimes(_cairo, days: 2);
       expect(raw.contains('='), isFalse);
       for (final p in raw.split(',')) {
-        expect('|'.allMatches(p).length, 2);
+        expect('|'.allMatches(p).length, 1);
+      }
+    });
+  });
+
+  group('pushed labels', () {
+    test('the next-prayer label carries its own punctuation', () {
+      // The native side must never invent punctuation for a language it does
+      // not know: French puts a space before a colon, Arabic and English do
+      // not. So the separator ships INSIDE the pushed label.
+      expect(prayerWidgetNextLabel('ar'), 'الصلاة القادمة:');
+      expect(prayerWidgetNextLabel('en'), 'Next prayer:');
+      expect(prayerWidgetNextLabel('fr'), 'Prochaine prière :');
+    });
+
+    test('an exhausted table gets its own line, not the no-location one', () {
+      // A user whose 30-day table ran out HAS a location; telling them to go
+      // set one would be a lie and would send them to a correct screen.
+      for (final loc in ['ar', 'en', 'fr']) {
+        expect(prayerWidgetStaleLabel(loc), isNotEmpty);
+        expect(prayerWidgetStaleLabel(loc), isNot(prayerWidgetEmptyLabel(loc)));
       }
     });
   });

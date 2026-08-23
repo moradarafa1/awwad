@@ -15,14 +15,15 @@ import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 import java.util.Calendar
 import java.util.GregorianCalendar
+import java.util.Locale
 
 /**
  * PRAYER home-screen widget: the next prayer, a LIVE countdown to the adhan,
- * the Hijri date and today's five times.
+ * the Hijri date and the five times of the day the next prayer belongs to.
  *
  * Every user-visible STRING is pushed pre-localized by the Dart side
  * (PrayerWidgetSync.push) because the widget must follow the APP language,
- * which can differ from the device's. Two things are computed here instead,
+ * which can differ from the device's. Three things are computed here instead,
  * and only because they cannot be pushed:
  *
  *  1. The COUNTDOWN. A RemoteViews tree cannot tick and the widget update
@@ -34,6 +35,13 @@ import java.util.GregorianCalendar
  *     conversion runs here at render time (android.icu, API 24+, minSdk is
  *     24). ICU carries the official Umm al-Qura tables, so this matches the
  *     Saudi calendar rather than an arithmetic approximation of it.
+ *     KNOWN AND DELIBERATE: it rolls over at civil midnight, like every
+ *     system calendar, not at maghrib.
+ *  3. The CLOCK STRINGS. Only absolute epochs are pushed. A pushed "18:42"
+ *     would be text formatted in whatever timezone was active at push time,
+ *     and a traveller would read wrong times off the card for up to a month.
+ *     Formatting is arithmetic here (Locale.US, so the digits stay Western
+ *     like the rest of the app in every language).
  *
  * The card is redrawn at the exact moments it stops being true: every prayer
  * entry (the countdown must roll to the next prayer) and every midnight (the
@@ -52,12 +60,16 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
         val names = parseNames(widgetData.getString("pw_names", null))
         val order = (widgetData.getString("pw_order", null) ?: "")
             .split(",").map { it.trim() }.filter { it.isNotEmpty() }
-        // The pushed table covers 30 days; running past its end is the same
-        // "no data" case as never having configured a location.
+        val configured = widgetData.getBoolean("pw_has", false)
+        // The pushed table covers 30 days. Running past its end is NOT the
+        // same as never having set a location: that user's settings are fine
+        // and all they must do is open the app, so they get their own line.
         val next = entries.firstOrNull { it.at > now }
-        val has = widgetData.getBoolean("pw_has", false) && next != null
         val hijri = hijriLine(widgetData)
-        val today = timesToday(entries, now)
+        // The row follows the day the NEXT prayer belongs to, not "today":
+        // between isha and midnight the header shows tomorrow's fajr, and a
+        // row still showing today's would state two times for one prayer.
+        val dayTimes = if (next == null) emptyMap() else timesOnDayOf(entries, next.at)
 
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.prayer_widget).apply {
@@ -75,14 +87,15 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
                     setViewVisibility(R.id.pw_hijri, View.VISIBLE)
                     setTextViewText(R.id.pw_hijri, hijri)
                 }
-                if (!has || next == null) {
+                if (next == null) {
                     setViewVisibility(R.id.pw_next, View.GONE)
                     setViewVisibility(R.id.pw_countdown, View.GONE)
                     setViewVisibility(R.id.pw_row, View.GONE)
                     setViewVisibility(R.id.pw_empty, View.VISIBLE)
+                    val key = if (configured) "pw_stale" else "pw_empty"
                     setTextViewText(
                         R.id.pw_empty,
-                        widgetData.getString("pw_empty", null)
+                        widgetData.getString(key, null)
                             ?: "حدّد موقعك من إعدادات الصلاة"
                     )
                 } else {
@@ -90,15 +103,17 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
                     setViewVisibility(R.id.pw_next, View.VISIBLE)
                     setViewVisibility(R.id.pw_countdown, View.VISIBLE)
                     setViewVisibility(R.id.pw_row, View.VISIBLE)
+                    // The label arrives WITH its own punctuation (French puts
+                    // a space before the colon); nothing is invented here.
                     val label = widgetData.getString("pw_next", null) ?: ""
                     val name = names[next.key] ?: next.key
+                    val time = hhmm(next.at)
                     // ONE string on purpose: Android's bidi algorithm then
                     // puts an Arabic name on the right and a Latin one on the
                     // left by itself, with no locale-dependent layout switch.
                     setTextViewText(
                         R.id.pw_next,
-                        if (label.isBlank()) "$name  ${next.hhmm}"
-                        else "$label: $name  ${next.hhmm}"
+                        if (label.isBlank()) "$name  $time" else "$label $name  $time"
                     )
                     setChronometerCountDown(R.id.pw_countdown, true)
                     setChronometer(
@@ -109,7 +124,7 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
                         null,
                         true,
                     )
-                    fillRow(this, order, today, names, next.key)
+                    fillRow(this, order, dayTimes, names, next.key)
                 }
             }
             appWidgetManager.updateAppWidget(widgetId, views)
@@ -152,7 +167,7 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
     private fun fillRow(
         v: RemoteViews,
         order: List<String>,
-        today: Map<String, String>,
+        dayTimes: Map<String, String>,
         names: Map<String, String>,
         nextKey: String,
     ) {
@@ -161,7 +176,7 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
             val k = keys[i]
             val isNext = k == nextKey
             v.setTextViewText(NAME_IDS[i], names[k] ?: k)
-            v.setTextViewText(TIME_IDS[i], today[k] ?: "--:--")
+            v.setTextViewText(TIME_IDS[i], dayTimes[k] ?: "--:--")
             v.setTextColor(NAME_IDS[i], if (isNext) TEAL else MUTED)
             v.setTextColor(TIME_IDS[i], if (isNext) TEAL else DIM)
         }
@@ -193,12 +208,23 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
         return if (city.isEmpty()) date else "$date  ·  $city"
     }
 
-    /** The five times of the CURRENT day, keyed by prayer. */
-    private fun timesToday(entries: List<Slot>, now: Long): Map<String, String> {
-        val today = dayOf(now)
+    /** The five times of the calendar day [at] falls in, keyed by prayer. */
+    private fun timesOnDayOf(entries: List<Slot>, at: Long): Map<String, String> {
+        val day = dayOf(at)
         val out = LinkedHashMap<String, String>()
-        for (e in entries) if (dayOf(e.at) == today) out[e.key] = e.hhmm
+        for (e in entries) if (dayOf(e.at) == day) out[e.key] = hhmm(e.at)
         return out
+    }
+
+    /** 24-hour zero-padded, Locale.US so the digits stay Western in every
+     *  app language, matching how the app itself prints times. */
+    private fun hhmm(ms: Long): String {
+        val c = GregorianCalendar()
+        c.timeInMillis = ms
+        return String.format(
+            Locale.US, "%02d:%02d",
+            c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE)
+        )
     }
 
     /** yyyyMMdd in the DEVICE timezone, explicitly Gregorian: a locale
@@ -237,31 +263,44 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
             val pi = tickIntent(ctx)
             am.cancel(pi)
             if (at <= 0L || at == Long.MAX_VALUE) return
-            // INEXACT on purpose. Redrawing a card does not justify the
-            // SCHEDULE_EXACT_ALARM grant (Play restricts it to time-critical
-            // alerts, and the adhan already owns the app's one exact alarm).
-            // allow-while-idle still pierces Doze, and the Chronometer keeps
-            // counting inside the system process meanwhile, so a few minutes
-            // of slack are invisible to the user.
-            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi)
+            // A Chronometer keeps counting past its base, so a LATE refresh
+            // does not freeze the card, it shows a negative countdown until
+            // it lands. That is why this alarm uses the exact grant WHEN THE
+            // APP ALREADY HAS IT (the adhan asks for it; nothing new is
+            // requested here, and Play sees no new declaration), and degrades
+            // to an inexact Doze-piercing alarm otherwise.
+            if (canExact(am)) {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi)
+            } else {
+                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi)
+            }
         } catch (e: Exception) {
             // fail-open: the OS still redraws every updatePeriodMillis, and
             // the adhan chain refreshes us at every prayer.
         }
     }
 
-    private data class Slot(val at: Long, val key: String, val hhmm: String)
+    private fun canExact(am: AlarmManager): Boolean =
+        if (android.os.Build.VERSION.SDK_INT >= 31) {
+            try {
+                am.canScheduleExactAlarms()
+            } catch (e: Exception) {
+                false
+            }
+        } else true
 
-    /** "epoch|key|HH:mm,..." as pushed by Dart, ascending by time. */
+    private data class Slot(val at: Long, val key: String)
+
+    /** "epoch|key,..." as pushed by Dart, ascending by time. */
     private fun parseEntries(raw: String?): List<Slot> {
         if (raw.isNullOrBlank()) return emptyList()
         val out = ArrayList<Slot>()
         for (part in raw.split(",")) {
             val f = part.split("|")
-            if (f.size != 3) continue
+            if (f.size != 2) continue
             val at = f[0].toLongOrNull() ?: continue
             if (at <= 0L || f[1].isBlank()) continue
-            out.add(Slot(at, f[1], f[2]))
+            out.add(Slot(at, f[1]))
         }
         out.sortBy { it.at }
         return out
@@ -299,7 +338,7 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
          * Redraws every placed instance. Safe to call from anywhere and cheap
          * when no widget exists; the native adhan chain calls it at every
          * prayer, which is what keeps the card exact even when Doze defers
-         * our own inexact refresh alarm.
+         * our own refresh alarm.
          */
         fun refresh(ctx: Context) {
             try {
@@ -318,6 +357,10 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
             }
         }
 
+        /** EXPLICIT intent (component set), so ACTION_TICK deliberately has no
+         *  manifest intent-filter: a filter would let any installed app
+         *  broadcast it and spin our refreshes. Same reasoning as the
+         *  exported=false on HomeWidgetBackgroundReceiver. */
         private fun tickIntent(ctx: Context): PendingIntent {
             val i = Intent(ctx, PrayerWidgetProvider::class.java)
                 .setAction(ACTION_TICK)

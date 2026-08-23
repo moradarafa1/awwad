@@ -33,8 +33,18 @@ import WidgetKit
 struct PrayerSlot {
   let at: Date
   let key: String
-  let hhmm: String
 }
+
+/// 24-hour zero-padded, POSIX locale so the digits stay Western in every app
+/// language, exactly like the Android side. Only absolute epochs are pushed:
+/// a pushed clock string would be text formatted in the timezone that was
+/// active at push time, and a traveller would read wrong times for a month.
+private let pwClock: DateFormatter = {
+  let f = DateFormatter()
+  f.dateFormat = "HH:mm"
+  f.locale = Locale(identifier: "en_US_POSIX")
+  return f
+}()
 
 struct PrayerRowCell {
   let name: String
@@ -63,7 +73,7 @@ struct PrayerProvider: TimelineProvider {
 
   private func defaults() -> UserDefaults? { UserDefaults(suiteName: awwadGroupId) }
 
-  /// "epoch|key|HH:mm,..." exactly as Dart encodes it.
+  /// "epoch|key,..." exactly as Dart encodes it.
   private func slots(_ d: UserDefaults?) -> [PrayerSlot] {
     guard let raw = d?.string(forKey: "pw_times"), !raw.isEmpty else { return [] }
     return
@@ -71,10 +81,9 @@ struct PrayerProvider: TimelineProvider {
       .split(separator: ",")
       .compactMap { part -> PrayerSlot? in
         let f = part.split(separator: "|", omittingEmptySubsequences: false)
-        guard f.count == 3, let ms = Double(f[0]), ms > 0 else { return nil }
+        guard f.count == 2, let ms = Double(f[0]), ms > 0 else { return nil }
         return PrayerSlot(
-          at: Date(timeIntervalSince1970: ms / 1000),
-          key: String(f[1]), hhmm: String(f[2]))
+          at: Date(timeIntervalSince1970: ms / 1000), key: String(f[1]))
       }
       .sorted { $0.at < $1.at }
   }
@@ -118,21 +127,33 @@ struct PrayerProvider: TimelineProvider {
     let nm = names(d)
     let next = all.first { $0.at > moment }
     let hij = hijri(moment, d)
-    guard let next = next, d?.bool(forKey: "pw_has") ?? false else {
+    let configured = d?.bool(forKey: "pw_has") ?? false
+    guard let next = next else {
+      // A table that has run out is NOT the same as a missing location: that
+      // user's settings are fine and all they must do is open the app.
+      let key = configured ? "pw_stale" : "pw_empty"
       return PrayerEntry(
         date: moment, hijri: hij, nextLine: "", nextName: "", nextAt: nil,
         row: [],
-        empty: d?.string(forKey: "pw_empty") ?? "حدّد موقعك من إعدادات الصلاة")
+        empty: d?.string(forKey: key) ?? "حدّد موقعك من إعدادات الصلاة")
     }
     let name = nm[next.key] ?? next.key
+    // The label arrives WITH its own punctuation (French puts a space before
+    // the colon); nothing is invented here.
     let label = d?.string(forKey: "pw_next") ?? ""
+    let time = pwClock.string(from: next.at)
     // ONE string, so the system's bidi puts an Arabic name on the right and a
     // Latin one on the left with no layout switch (same rule as Android).
-    let line = label.isEmpty ? "\(name)  \(next.hhmm)" : "\(label): \(name)  \(next.hhmm)"
+    let line = label.isEmpty ? "\(name)  \(time)" : "\(label) \(name)  \(time)"
 
+    // The row follows the day the NEXT prayer belongs to, not "today":
+    // between isha and midnight a row still showing today's times would
+    // state two different times for the same prayer.
     let cal = Calendar.current
     var today: [String: String] = [:]
-    for s in all where cal.isDate(s.at, inSameDayAs: moment) { today[s.key] = s.hhmm }
+    for s in all where cal.isDate(s.at, inSameDayAs: next.at) {
+      today[s.key] = pwClock.string(from: s.at)
+    }
     let order =
       (d?.string(forKey: "pw_order") ?? "").split(separator: ",").map(String.init)
     let keys = order.count == 5 ? order : ["fajr", "dhuhr", "asr", "maghrib", "isha"]
