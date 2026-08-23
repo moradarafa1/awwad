@@ -1294,7 +1294,16 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
   countdown while the row shows Western ones); there is no `previewImage`, so the widget picker
   falls back to the app icon below API 31 (`previewLayout` is 31+), exactly like the habit
   widget; and the iOS lock-screen accessory alignment follows the device language.
-  analyze clean, 214/214 tests (2 new label tests).
+  analyze clean, 214/214 tests (2 new label tests). Commit `1f56c10`, pushed. Release APK
+  REBUILT and re-verified against the packaged file: the receiver's intent-filter now carries
+  only APPWIDGET_UPDATE + the four PROTECTED system actions (PRAYER_WIDGET_TICK is gone, fix 5
+  confirmed in the shipped manifest), both widget resources are packaged, `raw/adhan` still
+  survives shrinking, all three permissions present. Copied over
+  `C:/Users/morad/OneDrive/Desktop/Awwad-1.0.0-prayer-widget.apk`.
+  DELIVERY NOTE for future sessions: SendUserFile CANNOT deliver this APK to the owner's phone
+  or the web client (66.2MB against a 30MB upload cap); it only renders in the desktop app.
+  The working channel is the Desktop copy, which lives inside OneDrive and therefore appears in
+  the owner's OneDrive phone app. Do not promise to "send the APK" without that caveat.
 
 - **2026-08-22 PRAYER WIDGET SHIPPED (Android): next prayer, LIVE countdown, Hijri date, the
   five times.** Owner order the same day: "build it the way the competitors' adhan apps build
