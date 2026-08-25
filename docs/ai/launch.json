@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "awwad-site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "web", "run", "dev", "--", "--port", "8088", "--host"],
+      "port": 8088
+    },
+    {
+      "name": "awwad-app",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "-s", "app/build/web", "-l", "8099"],
+      "port": 8099
+    },
+    {
+      "name": "awwad-site-static",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "-s", "web/dist", "-l", "8090"],
+      "port": 8090
+    }
+  ]
+}

@@ -44,6 +44,11 @@ context or dropping anything:
 
 ## 0.6 HANDOFF 2026-08-01 (RESUME HERE)
 
+> **NEW ACCOUNT OR NEW MACHINE? Read `docs/HANDOVER.md` before anything else** (added
+> 2026-08-26). It carries the owner's standing working rules, the toolchain paths, the secrets
+> inventory and the one git-ignored folder that must travel by hand. `docs/SESSIONS_LOG.md`
+> maps the chat history. Then come back here.
+
 **THE 2026-07-21 ADHAN-LATE BUG IS CLOSED.** Root cause: SCHEDULE_EXACT_ALARM denied by
 default on Android 14+ -> silent inexact degrade -> Doze deferral (up to 1h, batched with
 other notifications, which also explained "habit reminders play the adhan"). Fixed by the
@@ -533,7 +538,17 @@ awwad/
   ops/        keep-alive.yml (GitHub Action), build-app-cloud.ps1, icongen/
   assets/     icons / splash / store screenshots
   docs/       PROJECT_STATE.md (this file), content-values-guideline.md, tracking-plan.md
+  docs/ai/    the ACCOUNT-LOCAL assistant context, exported into the repo 2026-08-26 so it
+              survives switching Claude accounts: the owner's account-wide working rules,
+              the six feedback memories, the project memory (redacted), the Awwad skill,
+              two scheduled tasks, the 12 multi-agent workflow scripts, launch.json
+  _local/     GIT-IGNORED handover bundle: signing key + passwords, the UNREDACTED memory,
+              raw chat archives. Must be copied BY HAND to a new machine. See docs/HANDOVER.md
 ```
+
+**Switching Claude account or machine: read `docs/HANDOVER.md`.** It inventories what survives,
+what does not, the toolchain paths, and every secret by name and location (never by value).
+`docs/SESSIONS_LOG.md` maps which chat produced what.
 
 Key app files:
 - `app/lib/main.dart` — entry; offline-first; cloud init is timeout-guarded.
@@ -577,9 +592,15 @@ Paid (owner only, when shipping): domain (~$12/yr), Apple Developer ($99/yr), Go
 
 ## 5. Accounts & secrets
 
-> The actual `service_role` key and full credentials live ONLY in the local AI memory
-> (`~/.claude/.../memory/project_awwad.md`), NEVER in this repo. This section lists
+> The actual `service_role` key and full credentials are NEVER in this repo. This section lists
 > public-safe values + where the secrets live.
+>
+> **CORRECTED 2026-08-26:** they no longer live only inside an assistant memory. That memory was
+> account-local (and the path this line used to give was already wrong: the real one was
+> `~/.claude/projects/D--Claude/memory/`, not `D--Claude-awwad`), so closing the account would
+> have destroyed the keystore password with it. Every value now sits in
+> `_local/memory-project_awwad.FULL.md` on disk, git-ignored, with the signing key beside it.
+> Inventory and restore steps: `docs/HANDOVER.md` §4 and §5.
 
 - **GitHub:** https://github.com/moradarafa1/awwad.git (private). **Fully pushed & in sync as of 2026-07-11:** local `main` == `origin/main` at `042379d` (release networking fixes: signup edge fn, localized errors, Gradle heap). Working tree clean, no stash, no other branches.
 - **Supabase project ref:** `kdczbzzjezyhfxgpegqc` (region ap-southeast-1, Singapore). Postgres 17.
@@ -1260,6 +1281,27 @@ All 5 deployed and ACTIVE (`supabase/functions/`):
 ---
 
 ## 13. Changelog
+
+- **2026-08-26 HANDOVER EXPORT: the project no longer depends on the Claude account that built
+  it.** Owner may close that account and continue on another one, on this machine or a new one.
+  Everything account-local was inventoried and moved. NEW: `docs/HANDOVER.md` (what survives an
+  account switch and what does not, the toolchain paths, and a secrets inventory BY NAME AND
+  LOCATION, never by value), `docs/SESSIONS_LOG.md` (the 14 archived chats plus a phase-by-phase
+  map of what each period delivered), and `docs/ai/` holding the exported assistant context: the
+  owner's account-wide working rules, the six feedback memories (long-job/limit routine, Arabic
+  RTL, deploy permission, no push notifications, quiet watchdog ticks, bypass-permissions), the
+  project memory REDACTED, the hosting memory, the Awwad skill, two scheduled tasks, the 12
+  workflow scripts, and launch.json.
+  SECURITY: nothing secret entered git. The assistant memory carried live values (keystore
+  password, service_role key, Supabase PAT, Brevo SMTP key) and one workflow script had the
+  keystore password as a literal grep target; the committed copies are redacted and a scan for
+  every secret pattern over `docs/` comes back clean. The unredacted originals, the signing key,
+  `key.properties` and the raw chat archives went to `_local/` (git-ignored, with its own
+  README) and MUST be carried to a new machine by hand.
+  FINDING WORTH KEEPING: §5 said the secrets live in `~/.claude/projects/D--Claude-awwad/memory/`
+  and that directory is EMPTY. The real memory was under `…/projects/D--Claude/memory/` (the old
+  working directory). Had the account been closed on the strength of that line, the keystore
+  password would have been lost with it, and the Play listing could never have been updated.
 
 - **2026-08-23 PRAYER WIDGET, adversarial review round: 5 real defects fixed, 4 limits
   documented instead of hidden.** METHOD NOTE, important for whoever reads the run: the review

@@ -63,3 +63,6 @@ Thumbs.db
 "فاتورة 1 مارتك بتوين (1).pdf"
 فاتورة*.pdf
 app/android/build/
+
+# Handover bundle: secrets, signing key and raw chat archives. NEVER commit (docs/HANDOVER.md §5)
+_local/
